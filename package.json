@@ -1,0 +1,21 @@
+{
+  "name": "RS",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx tailwindcss-cli@latest build ./static/css/tailwind.css --output ./static/css/style.css && cleancss -o ./static/css/style.min.css ./static/css/style.css",
+    "dev": "npx postcss ./static/css/tailwind.css -o ./static/css/style.css -w --verbose"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/jit": "^0.1.18",
+    "autoprefixer": "^10.2.5",
+    "clean-css-cli": "^5.2.2",
+    "postcss": "^8.2.9",
+    "postcss-cli": "^8.3.1",
+    "tailwindcss": "^2.1.1"
+  }
+}

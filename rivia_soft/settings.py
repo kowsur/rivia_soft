@@ -25,7 +25,7 @@ SECRET_KEY = 'wh*lo-yh6geec40s91k0wb!enwn5ov6)3^k53c1hq)pq6png4@'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -36,9 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    # 'django.contrib.staticfiles',
 
     # Project apps
+    'error_handler',
     'users',
 ]
 
@@ -57,7 +58,9 @@ ROOT_URLCONF = 'rivia_soft.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'templates'
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -121,3 +124,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
+
+# Custom User Model
+AUTH_USER_MODEL = 'users.CustomUser'
+LOGIN_URL = 'users_login'
+LOGIN_REDIRECT_URL ='users_login'
+LOGOUT_REDIRECT_URL = 'users_logout'

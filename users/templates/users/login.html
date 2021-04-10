@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- <nav class="w-full px-20 absolute flex flex-row justify-between">
+    <div class="">Logo</div>
+    <div class="w-full flex justify-center">Links</div>
+</nav> -->
+<div class="h-full w-full grid place-items-center">
+    <div class="relative sm:max-w-sm w-full">
+        <div class="card bg-blue-400 shadow-lg w-full h-full rounded-3xl absolute  transform -rotate-6"></div>
+        <div class="card bg-red-400 shadow-lg  w-full h-full rounded-3xl absolute  transform rotate-6"></div>
+        <div class="relative w-full rounded-3xl  px-6 py-4 bg-gray-100 dark:bg-gray-500 shadow-md">
+            <label for="" class="block mt-2 text-md text-gray-700 dark:text-gray-200 text-center font-semibold">
+                Login
+            </label>
+            
+            {% comment %} Login Form {% endcomment %}
+            <form method="POST" action="{% url 'users_login' %}" class="mt-8">
+                {% csrf_token %}
+
+                    <div>
+                        <input name="email" {% if form.email.value %} value="{{ form.email.value }}" {% endif %} required type="email" placeholder="Email" class="input_field">
+                    </div>
+
+                    <div class="mt-6">
+                        <input name="password" {% if form.password.value %} value="{{ form.password.value }}" {% endif %} required type="password" placeholder="Password" class="input_field">
+                    </div>
+                    
+                    {% if message %}
+                    <div class="message">
+                        {{ message }}
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-6 mb-6">
+                        <button class="button">
+                            Login
+                        </button>
+                    </div>
+
+                    {% comment %}
+                    <div class="mt-7">
+                        <div class="w-full px-2 flex justify-between">
+                            <label class="text-sm text-gray-700 dark:text-white mr-auto">Don't have an account?</label>
+                            <a href="{% url 'users_signup' %}" class="custom-link">
+                                Sign Up
+                            </a>
+                        </div>
+                    </div>
+                    {% endcomment %}
+    
+            </form>
+            {% comment %} End Login Form {% endcomment %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

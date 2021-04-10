@@ -4,9 +4,21 @@
 
 @layer components {
   /* custom styles */
-  .custom-btn {
-    color: violet;
-    background: blue;
-    padding: 4px;
+  .input_field{
+    @apply mt-1 px-3 block w-full border-none bg-gray-100 h-11 rounded-xl shadow-lg outline-none;
+  }
+  .input_field:focus{
+    @apply bg-blue-100 ring-0;
+  }
+  .input_field:hover{
+    @apply bg-blue-100;
+  }
+  
+  .button{
+    @apply bg-blue-500 w-full py-3 rounded-xl text-white shadow-xl hover:shadow-inner focus:outline-none transition duration-300 ease-in-out transform;
+  }
+
+  .message{
+    @apply mt-6 px-3 py-2 w-full h-11 rounded-xl shadow-lg text-white bg-red-600 dark:bg-gray-800 hover:bg-red-500;
   }
 }

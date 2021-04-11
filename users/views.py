@@ -1,8 +1,13 @@
+from django.http.response import Http404, HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.serializers import serialize
 
 from .models import CustomUser
 from .forms import CustomUserLoginForm, CustomUserCreationForm, CustomUserSignupForm
+
+from .queries import search_CustomUser, search_CustomUser_by_email
 
 # Create your views here.
 def signup_user(request):
@@ -49,3 +54,26 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return redirect('users_login')
+
+# Content-type to return the search results
+content_type = 'application/json'
+# serialize the results with the format
+serialize_format = 'json'
+
+def serialize_queryset_to_json(queryset):
+    data = serialize(queryset=queryset, format=serialize_format)
+    return data
+
+@login_required
+def search_users_by_email(request, search_text='', limit=-1):
+    if request.method=='GET' and request.headers.get('Content-Type')==content_type:
+        results = search_CustomUser_by_email(search_text, limit)
+        return HttpResponse(serialize_queryset_to_json(results), content_type=content_type)
+    raise Http404()
+
+@login_required
+def search_users_extended(request, search_text='', limit=-1):
+    if request.method=='GET' and request.headers.get('Content-Type')==content_type:
+        results = search_CustomUser(search_text, limit)
+        return HttpResponse(serialize_queryset_to_json(results), content_type=content_type)
+    raise Http404()

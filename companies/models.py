@@ -10,6 +10,9 @@ class Selfassesment(models.Model):
         verbose_name = _("Selfassesment")
         verbose_name_plural = _("Selfassesments")
     
+    # identifies wheather the record is updated needs superuser permission
+    is_updated = models.BooleanField(_('Update Status'), default=True, editable=False)
+
     created_by = models.ForeignKey(
         to='users.CustomUser',
         on_delete=models.PROTECT,
@@ -91,6 +94,15 @@ class Selfassesment(models.Model):
     
     def get_next_file_number(self):
       return self.get_max_file_number()+1
+    
+    def approve_update_request(self):
+        self.is_updated = True
+        self.save()
+
+    def request_to_update(self):
+        self.is_updated=False
+        self.save()
+
 
 class SelfassesmentAccountSubmission(models.Model):
 

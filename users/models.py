@@ -15,7 +15,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     user_id = models.BigAutoField(verbose_name='user id', unique=True, editable=False, primary_key=True, db_index=True)
     email = models.EmailField(_('email address'), unique=True, db_index=True)
-    first_name = models.CharField(max_length=64, blank=True, db_index=False)
+    first_name = models.CharField(max_length=64, blank=False, db_index=False)
     last_name = models.CharField(max_length=64, blank=True, db_index=False)
 
     is_staff = models.BooleanField(default=False)
@@ -28,14 +28,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     def __str__(self):
-        if self.get_full_name():
-            return self.get_full_name()
-        elif self.first_name:
-            return self.first_name
-        elif self.last_name:
-            return self.last_name
-        else:
-            return self.email
+        return self.email
     
     def get_username(self) -> str:
         return self.get_email()

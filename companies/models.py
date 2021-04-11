@@ -66,7 +66,7 @@ class Selfassesment(models.Model):
     is_active = models.BooleanField(verbose_name='Active Status', blank=False, null=False, default=True)
 
     def __str__(self) -> str:
-        return f'{self.client_id} - {self.client_name}'
+        return f'{self.client_id} - {self.client_name} - {self.client_phone_number}'
     
     def __repr__(self) -> str:
         return str(self)
@@ -120,7 +120,7 @@ class SelfassesmentAccountSubmission(models.Model):
         verbose_name='Submitted By', 
         related_name='submitted_by',
         to_field='user_id',
-        blank=True,
+        blank=False,
         null=True)
     account_prepared_by = models.ForeignKey(
         to='users.CustomUser',
@@ -136,7 +136,7 @@ class SelfassesmentAccountSubmission(models.Model):
     is_submitted = models.BooleanField(verbose_name='Is Submitted', blank=True, null=False, default=False)
 
     def __str__(self):
-        return f'Client: {self.client_id} | Submitted by: {self.submitted_by.get_username()} | Prepared by: {self.account_prepared_by.get_username()}'
+        return f'Client: {self.client_id}, Submission Date: {self.date_of_submission}'
     
     def __repr__(self) -> str:
         return str(self)
@@ -156,7 +156,7 @@ class Tracker(models.Model):
         verbose_name='Created By',
         related_name='tracker_created_by',
         to_field='email',
-        blank=True,
+        blank=False,
         null=False)
     done_by = models.ForeignKey(
         to='users.CustomUser',

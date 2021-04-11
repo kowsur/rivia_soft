@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # Project apps
     'error_handler',
     'users',
+    'companies',
 ]
 
 MIDDLEWARE = [

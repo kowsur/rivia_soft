@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@tailwindcss/custom-forms": "^0.2.1",
     "@tailwindcss/jit": "^0.1.18",
     "autoprefixer": "^10.2.5",
     "clean-css-cli": "^5.2.2",

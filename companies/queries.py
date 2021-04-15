@@ -1,8 +1,10 @@
 from django.db.models import Q
 from .models import Selfassesment, SelfassesmentAccountSubmission, Tracker
 
-
-def SEARCH_Selfassesment(search_text: str, limit=-1):
+# =============================================================================================================
+# =============================================================================================================
+# Selfassesment
+def db_search_Selfassesment(search_text: str, limit=-1):
     Query = Q(client_name__contains             = search_text) |\
             Q(client_phone_number__contains     = search_text) |\
             Q(date_of_registration__contains    = search_text) |\
@@ -26,8 +28,13 @@ def SEARCH_Selfassesment(search_text: str, limit=-1):
         return Selfassesment.objects.filter(Query)
     return Selfassesment.objects.filter(Query)[:limit]
 
+def db_all_Selfassesment(limit=-1):
+    if limit<=-1:
+        return Selfassesment.objects.all()
+    return Selfassesment.objects.all()[:limit]
 
-def SEARCH_SelfassesmentAccountSubmission(search_text: str, limit=-1):
+# SelfassesmentAccountSubmission
+def db_search_SelfassesmentAccountSubmission(search_text: str, limit=-1):
     Query = Q(date_of_submission__contains          = search_text) |\
             Q(tax_year__contains                    = search_text) |\
             Q(submitted_by__email__contains         = search_text) |\
@@ -44,7 +51,15 @@ def SEARCH_SelfassesmentAccountSubmission(search_text: str, limit=-1):
     return SelfassesmentAccountSubmission.objects.filter(Query)[:limit]
 
 
-def SEARCH_Tracker(search_text: str, user='admin@gmail.com', limit=-1):
+def db_all_SelfassesmentAccountSubmission(limit=-1):
+    if limit<=-1:
+        return SelfassesmentAccountSubmission.objects.all()
+    return SelfassesmentAccountSubmission.objects.all()[:limit]
+
+# =============================================================================================================
+# =============================================================================================================
+# Tracker
+def db_search_Tracker(search_text: str, user='admin@gmail.com', limit=-1):
     Query = Q(done_by__email__contains      = search_text) |\
             Q(job_description__contains     = search_text) |\
             Q(deadline__contains            = search_text) |\
@@ -60,3 +75,8 @@ def SEARCH_Tracker(search_text: str, user='admin@gmail.com', limit=-1):
     if limit==-1:
         return Tracker.objects.filter(Query)
     return Tracker.objects.filter(Query)[:limit]
+
+def db_all_Trackers(limit=-1):
+    if limit<=-1:
+        return Tracker.objects.all()
+    return Tracker.objects.all()[:limit]

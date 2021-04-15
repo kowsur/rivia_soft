@@ -2,21 +2,26 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}
-    Rivia
-  {% endblock title %}</title>
-  <link rel="stylesheet" href='{% static "css/style.css" %}'>
-  {% block head %}
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>{% block title %} Rivia {% endblock title %}</title>
     
-  {% endblock head %}
-</head>
-<body class="h-screen w-screen">
-  {% block content %}
-    
-  {% endblock content %}
-</body>
+    <link rel="stylesheet" href='{% static "css/style.css" %}' />
+    <script src='{% static "js/script.js" %}'></script>
+    {% block head %} {% endblock head %}
+
+  </head>
+
+  <body class="font-normal text-gray-700 dark:text-gray-400 bg-gray-200 dark:bg-gray-900">
+    <!-- navbar -->
+    {% include "navbar.html" %}
+
+    <!-- content -->
+    <div class="max-w-screen-xl px-4 md:px-6 lg:px-8 mx-auto my-5 min-h-screen">
+      {% block content %} {% endblock content %}
+    </div>
+  </body>
 </html>

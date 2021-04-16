@@ -9,6 +9,8 @@ from .forms import CustomUserLoginForm, CustomUserCreationForm, CustomUserSignup
 
 from .queries import search_CustomUser, search_CustomUser_by_email
 
+from companies.url_variables import *
+
 # Create your views here.
 def signup_user(request):
     context = {}
@@ -28,9 +30,7 @@ def signup_user(request):
             if user:
                 # if authenticated then let the user login
                 login(request, user)
-                return redirect('home')
-
-            return redirect('companies-home')
+                return redirect('/')
     return render(request, 'users/signup.html', context=context)
 
 def login_user(request):
@@ -47,7 +47,7 @@ def login_user(request):
             if user:
                 # if authenticated then let the user login
                 login(request, user)
-                return redirect('home')
+            return redirect('/')
         context['message'] = 'Incorrect email or password.'
     return render(request, 'users/login.html', context=context)
 

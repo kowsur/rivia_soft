@@ -1,44 +1,43 @@
-{% extends "base.html" %}
+{% extends "bare_base.html" %}
+{% load static %}
 
 
-{% comment %} Page title {% endcomment %}
 {% block title %}
-    Sign Up
+  Sign Up
 {% endblock title %}
 
-
-{% comment %} header informations {% endcomment %}
 {% block head %}
-
+<link rel="stylesheet" href='{% static "css/style.css" %}' />
+<script src='{% static "js/script.js" %}'></script>
 {% endblock head %}
 
 
-{% comment %} Main content {% endcomment %}
-{% block content %}
-
+{% block content_body %}
+<body>
+    <div class="h-screen w-full grid place-items-center dark:bg-gray-700">
 <div class="relative sm:max-w-sm w-full">
     <div class="card bg-blue-400 shadow-lg w-full h-full rounded-3xl absolute  transform -rotate-6"></div>
     <div class="card bg-red-400 shadow-lg  w-full h-full rounded-3xl absolute  transform rotate-6"></div>
     <div class="relative w-full rounded-3xl  px-6 py-4 bg-gray-100 dark:bg-gray-500 shadow-md">
-        <label for="" class="block mt-2 text-md text-gray-700 dark:text-gray-200 text-center font-semibold">
+        <label for="" class="block mt-2 text-xl text-gray-700 dark:text-gray-200 text-center font-bold">
             Sign Up
         </label>
 
         {% comment %} Sing Up Form {% endcomment %}
-        <form method="POST" action="{% url 'users-signup' %}" class="mt-8">
+        <form method="POST" action="{% url 'users_signup' %}" class="mt-8">
             {% csrf_token %}
             <div class="mt-6">
-                <input name="first_name" {% if form.first_name.value %} value="{{ form.first_name.value }}" {% endif %} type="text" placeholder="First Name" class="custom-input">
+                <input name="first_name" {% if form.first_name.value %} value="{{ form.first_name.value }}" {% endif %} type="text" placeholder="First Name" class="mt-1 px-4 py-2 outline-none block w-full border-none dark:text-gray-100 bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:bg-gray-800 h-11 rounded-xl shadow-lg hover:bg-blue-100 focus:bg-blue-100 focus:ring-0 placeholder-gray-500 dark:placeholder-gray-50">
             </div>
 
             <div class="mt-6">
-                <input name="last_name" {% if form.last_name.value %} value="{{ form.last_name.value }}" {% endif %} type="text" placeholder="Last Name" class="custom-input">
+                <input name="last_name" {% if form.last_name.value %} value="{{ form.last_name.value }}" {% endif %} type="text" placeholder="Last Name" class="mt-1 px-4 py-2 outline-none block w-full border-none dark:text-gray-100 bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:bg-gray-800 h-11 rounded-xl shadow-lg hover:bg-blue-100 focus:bg-blue-100 focus:ring-0 placeholder-gray-500 dark:placeholder-gray-50">
             </div>
 
             <div class="mt-6">
-                <input name="email" {% if form.email.value %} value="{{ form.email.value }}" {% endif %} type="email" required placeholder="Email*" class="custom-input">
+                <input name="email" {% if form.email.value %} value="{{ form.email.value }}" {% endif %} type="email" required placeholder="Email*" class="mt-1 px-4 py-2 outline-none block w-full border-none dark:text-gray-100 bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:bg-gray-800 h-11 rounded-xl shadow-lg hover:bg-blue-100 focus:bg-blue-100 focus:ring-0 placeholder-gray-500 dark:placeholder-gray-50">
                 {% if form.email.errors %}
-                    <div class="help text-sm text-black px-2">{{ form.email.errors}}</div> 
+                    <div class="mt-2 px-2 py-1 inline-block bg-red-400 shadow-md rounded text-white w-full font-normal text-sm">{{ form.email.errors}}</div> 
                 {% endif %}
             </div>
 
@@ -46,31 +45,33 @@
                 <!-- {% if form.password1.help_text %}
                     <div class="help">{{ form.password1.help_text|safe }}</div>
                 {% endif %} -->
-                <input name="password1" {% if form.password1.value %} value="{{ form.password1.value }}" {% endif %} required minlength="8" type="password" placeholder="Password*" class="custom-input">
-                {% if form.password2.errors %}
-                <div class="help text-sm text-black px-2">
-                    Your password can’t be too similar to your other personal information and can’t be entirely numeric.
+                <input name="password1" {% if form.password1.value %} value="{{ form.password1.value }}" {% endif %} required minlength="8" type="password" placeholder="Password*" class="mt-1 px-4 py-2 outline-none block w-full border-none dark:text-gray-100 bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:bg-gray-800 h-11 rounded-xl shadow-lg hover:bg-blue-100 focus:bg-blue-100 focus:ring-0 placeholder-gray-500 dark:placeholder-gray-50">
+                {% if form.password1.errors %}
+                <div class="mt-2 px-2 py-1 inline-block bg-red-400 shadow-md rounded text-white w-full font-normal text-sm">
+                    {{ form.password1.errors }}
                 </div>
                 {% endif %}
             </div>
 
             <div class="mt-6">
-                <input name="password2" {% if form.password2.value %} value="{{ form.password2.value }}" {% endif %} required minlength="8" type="password" placeholder="Confirm Password*" class="custom-input">
+                <input name="password2" {% if form.password2.value %} value="{{ form.password2.value }}" {% endif %} required minlength="8" type="password" placeholder="Confirm Password*" class="mt-1 px-4 py-2 outline-none block w-full border-none dark:text-gray-100 bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:bg-gray-800 h-11 rounded-xl shadow-lg hover:bg-blue-100 focus:bg-blue-100 focus:ring-0 placeholder-gray-500 dark:placeholder-gray-50">
                 {% if form.password2.errors %}
-                    <div class="help text-sm text-black px-2">{{ form.password2.help_text|safe }}</div>
+                    <div class="mt-2 px-2 py-1 inline-block bg-red-400 shadow-md rounded text-white w-full font-normal text-sm">{{ form.password2.errors }}</div>
                 {% endif %}
             </div>
             
-            <div class="mt-6">
-                <button class="custom-button">
+            
+            <div class="my-6">
+                <button class="w-full text-white bg-blue-500 hover:bg-blue-400 active:bg-blue-600 hover:outline-none appearance-none rounded-md px-4 py-2 font-semibold shadow-md hover:shadow-lg">
                     Sign Up
                 </button>
             </div>
+            
 
             <div class="mt-7">
                 <div class="w-full px-2 flex justify-between">
                     <label class="text-sm text-gray-700 dark:text-white mr-auto">Already have an account?</label>
-                    <a href="{% url 'users-login' %}" class="custom-link">
+                    <a href="{% url 'users_login' %}" class="text-red-400 hover:text-red-500 dark:text-gray-200 dark:hover:text-gray-50 transform transition-all hover:scale-125 font-semibold">
                         Login
                     </a>
                 </div>
@@ -79,9 +80,10 @@
         {% comment %} End Login Form {% endcomment %}
     </div>
 </div>
+</div>
+</body>
 
-
-{% endblock content %}
+{% endblock content_body %}
 
 
 <!-- --------------------------------------------------------------------------------------------------------------------------- -->

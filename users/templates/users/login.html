@@ -1,16 +1,24 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "bare_base.html" %}
+{% load static %}
 
-<!-- <nav class="w-full px-20 absolute flex flex-row justify-between">
-    <div class="">Logo</div>
-    <div class="w-full flex justify-center">Links</div>
-</nav> -->
-<div class="h-full w-full grid place-items-center dark:bg-gray-700">
+
+{% block title %}
+  Login
+{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href='{% static "css/style.css" %}' />
+<script src='{% static "js/script.js" %}'></script>
+{% endblock head %}
+
+{% block content_body %}
+<body>
+<div class="h-screen w-full grid place-items-center dark:bg-gray-700">
     <div class="relative sm:max-w-sm w-full">
         <div class="card bg-blue-400 shadow-lg w-full h-full rounded-3xl absolute  transform -rotate-6"></div>
         <div class="card bg-red-400 shadow-lg  w-full h-full rounded-3xl absolute  transform rotate-6"></div>
-        <div class="relative w-full rounded-3xl  px-6 py-4 bg-gray-100 dark:bg-gray-500 shadow-md">
-            <label for="" class="block mt-2 text-md text-gray-700 dark:text-gray-200 text-center font-semibold">
+        <div class="relative w-full rounded-3xl  px-6 py-4 bg-gray-100 dark:bg-gray-500 dark:text-gray-200 shadow-md">
+            <label for="" class="block mt-2 text-xl text-gray-700 dark:text-gray-200 text-center font-bold">
                 Login
             </label>
             
@@ -19,21 +27,21 @@
                 {% csrf_token %}
 
                     <div>
-                        <input name="email" {% if form.email.value %} value="{{ form.email.value }}" {% endif %} required type="email" placeholder="Email" class="input_field">
+                        <input name="email" {% if form.email.value %} value="{{ form.email.value }}" {% endif %} required type="email" placeholder="Email" class="mt-1 px-4 py-2 outline-none block w-full border-none dark:text-gray-100 bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:bg-gray-800 h-11 rounded-xl shadow-lg hover:bg-blue-100 focus:bg-blue-100 focus:ring-0 placeholder-gray-500 dark:placeholder-gray-50 ">
                     </div>
 
                     <div class="mt-6">
-                        <input name="password" {% if form.password.value %} value="{{ form.password.value }}" {% endif %} required type="password" placeholder="Password" class="input_field">
+                        <input name="password" {% if form.password.value %} value="{{ form.password.value }}" {% endif %} required type="password" placeholder="Password" class="mt-1 px-4 py-2 outline-none block w-full border-none dark:text-gray-100 bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:bg-gray-800 h-11 rounded-xl shadow-lg hover:bg-blue-100 focus:bg-blue-100 focus:ring-0 placeholder-gray-500 dark:placeholder-gray-50">
                     </div>
                     
                     {% if message %}
-                    <div class="message">
+                    <span class="mt-4 px-4 py-2 inline-block text-white w-full bg-red-400 rounded-xl shadow-lg">
                         {{ message }}
-                    </div>
+                    </span>
                     {% endif %}
 
-                    <div class="mt-6 mb-6">
-                        <button class="button">
+                    <div class="my-6">
+                        <button class="w-full text-white bg-blue-500 hover:bg-blue-400 active:bg-blue-600 hover:outline-none appearance-none rounded-md px-4 py-2 font-semibold shadow-md hover:shadow-lg">
                             Login
                         </button>
                     </div>
@@ -54,4 +62,5 @@
         </div>
     </div>
 </div>
-{% endblock content %}
+</body>
+{% endblock content_body %}

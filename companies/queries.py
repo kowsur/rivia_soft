@@ -1,6 +1,7 @@
 from django.db.models import Q
 from .models import Selfassesment, SelfassesmentAccountSubmission, Tracker
 
+
 # =============================================================================================================
 # =============================================================================================================
 # Selfassesment
@@ -55,6 +56,7 @@ def db_all_SelfassesmentAccountSubmission(limit=-1):
     if limit<=-1:
         return SelfassesmentAccountSubmission.objects.all()
     return SelfassesmentAccountSubmission.objects.all()[:limit]
+
 
 # =============================================================================================================
 # =============================================================================================================

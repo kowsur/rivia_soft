@@ -1,6 +1,6 @@
 # url paths 'companies/model_path/action/'
 
-app_name = 'companies'
+application_name = 'companies'
 
 Selfassesment_path = 'SA'
 Selfassesment_name = 'SA'

@@ -11,9 +11,7 @@
   textarea { @apply form-textarea resize-x w-full text-black bg-gray-100 fill-current placeholder-gray-500 rounded-md shadow-md appearance-none border-none bg-none outline-none; }
   select { @apply form-select; }
   select[multiple] { @apply form-multiselect; }
-}
 
-@layer components{
   label{ @apply mb-1 mr-2 inline-block text-gray-800; }
 
   input{ @apply px-4 py-2 w-full h-10 text-black bg-gray-100 fill-current placeholder-gray-500 rounded-md shadow-md appearance-none border-none bg-none outline-none; }
@@ -35,76 +33,91 @@
   }
 }
 
-
-/* customized button */
-button[type]{
-  @apply mt-6 px-4 py-2 w-full font-bold rounded-md outline-none bg-none border-none appearance-none;
-}
-
-.create{
-  @apply bg-green-700 text-gray-50;
-}
-.create:hover{
-  @apply bg-green-600 text-gray-50;
-}
-.create:active{
-  @apply bg-green-900 text-gray-50;
-}
-
-.delete{
-  @apply bg-red-700 text-gray-50;
-}
-
-.update{
-  @apply bg-blue-800;
-}
-
-@media (prefers-color-scheme: dark){
-  .create{
-    @apply bg-green-800 text-gray-50;
+@layer components{
+  /* customized button */
+  button[type]{
+    @apply mt-6 px-4 py-2 w-full font-bold rounded-md outline-none bg-none border-none appearance-none;
   }
-  
+
+  .create{
+    @apply bg-green-700 text-gray-50;
+  }
+  .create:hover{
+    @apply bg-green-600 text-gray-50;
+  }
+  .create:active{
+    @apply bg-green-900 text-gray-50;
+  }
+
   .delete{
     @apply bg-red-700 text-gray-50;
   }
-  
+
   .update{
     @apply bg-blue-800;
-  } 
-}
-
-/* message styles */
-.message {
-  -moz-animation: cssAnimation 0s ease-in 10s forwards;
-  /* Firefox */
-  -webkit-animation: cssAnimation 0s ease-in 10s forwards;
-  /* Safari and Chrome */
-  -o-animation: cssAnimation 0s ease-in 10s forwards;
-  /* Opera */
-  animation: cssAnimation 0s ease-in 10s forwards;
-  -webkit-animation-fill-mode: forwards;
-  animation-fill-mode: forwards;
-  @apply w-full px-4 py-2;
-}
-.success{
-  @apply bg-green-700 text-gray-50;
-}
-
-.error{
-  @apply bg-red-700 text-gray-50;
-}
-
-@keyframes cssAnimation {
-  to {
-      width:0;
-      height:0;
-      visibility: hidden;
   }
-}
-@-webkit-keyframes cssAnimation {
-  to {
-      width:0;
-      height:0;
-      visibility: hidden;
+
+  @media (prefers-color-scheme: dark){
+    .create{
+      @apply bg-green-800 text-gray-50;
+    }
+    
+    .delete{
+      @apply bg-red-700 text-gray-50;
+    }
+    
+    .update{
+      @apply bg-blue-800 text-gray-50;
+    } 
+  }
+
+  /* message styles */
+  .message {
+    -moz-animation: cssAnimation 0s ease-in 10s forwards;
+    /* Firefox */
+    -webkit-animation: cssAnimation 0s ease-in 10s forwards;
+    /* Safari and Chrome */
+    -o-animation: cssAnimation 0s ease-in 10s forwards;
+    /* Opera */
+    animation: cssAnimation 0s ease-in 10s forwards;
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+    @apply w-full px-4 py-2 text-gray-50;
+  }
+  .success{
+    @apply bg-green-700 text-gray-50;
+  }
+
+  .error{
+    @apply bg-red-700 text-gray-50;
+  }
+
+  @keyframes cssAnimation {
+    to {
+        width:0;
+        height:0;
+        visibility: hidden;
+    }
+  }
+  @-webkit-keyframes cssAnimation {
+    to {
+        width:0;
+        height:0;
+        visibility: hidden;
+    }
+  }
+
+  /* form headers */
+  .header{
+    @apply py-3 text-lg font-bold text-center rounded shadow-lg select-none;
+  }
+  .create-header{
+    @apply create text-white;
+  }
+  .update-header{
+    @apply update text-white;
+  }
+  .delete-header{
+    @apply error;
   }
 }

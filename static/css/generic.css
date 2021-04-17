@@ -1,6 +1,9 @@
 /* Light mode */
+
 @media (prefers-color-scheme: light) {
   ::-webkit-calendar-picker-indicator {
+    /* convert hex color to filter https://codepen.io/sosuke/pen/Pjoqqp */
+    /* filter: invert(51%) sepia(97%) saturate(1688%) hue-rotate(324deg) brightness(101%) contrast(88%); */
     filter: invert(0);
   }
 }
@@ -8,6 +11,8 @@
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
   ::-webkit-calendar-picker-indicator {
+    /* convert hex color to filter https://codepen.io/sosuke/pen/Pjoqqp */
+    /* filter: invert(51%) sepia(97%) saturate(1688%) hue-rotate(324deg) brightness(101%) contrast(88%); */
     filter: invert(1);
   }
 }

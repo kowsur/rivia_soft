@@ -79,6 +79,22 @@ def update_selfassesment(request, client_id:int):
     **URL_path_names,
   }
   context['form'] = SelfassesmentChangeForm()
+  context['client_id'] = client_id
+
+  try:
+    record =  Selfassesment.objects.get(client_id=client_id)
+    context['form'] = SelfassesmentChangeForm(instance=record)
+  except Selfassesment.DoesNotExist:
+    raise Http404
+
+  if request.method == 'POST':
+    form = SelfassesmentCreationForm(request.POST, instance=record)
+    context['form'] = form
+    if form.is_valid():
+      assesment = form.save()
+      messages.success(request, f'Selfassesment has been updated having id {client_id}!')
+      return redirect(URL_path_names['selfassesment_home'])
+    messages.error(request, 'Update failed due to invalid data!')
   return render(request, template_name='companies/selfassesment/update.html', context=context)
 
 @login_required

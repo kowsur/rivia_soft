@@ -72,3 +72,39 @@ button[type]{
     @apply bg-blue-800;
   } 
 }
+
+/* message styles */
+.message {
+  -moz-animation: cssAnimation 0s ease-in 10s forwards;
+  /* Firefox */
+  -webkit-animation: cssAnimation 0s ease-in 10s forwards;
+  /* Safari and Chrome */
+  -o-animation: cssAnimation 0s ease-in 10s forwards;
+  /* Opera */
+  animation: cssAnimation 0s ease-in 10s forwards;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+  @apply w-full px-4 py-2;
+}
+.success{
+  @apply bg-green-700 text-gray-50;
+}
+
+.error{
+  @apply bg-red-700 text-gray-50;
+}
+
+@keyframes cssAnimation {
+  to {
+      width:0;
+      height:0;
+      visibility: hidden;
+  }
+}
+@-webkit-keyframes cssAnimation {
+  to {
+      width:0;
+      height:0;
+      visibility: hidden;
+  }
+}

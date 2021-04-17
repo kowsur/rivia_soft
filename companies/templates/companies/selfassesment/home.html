@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Home Selfassesment
+{% endblock title %}
+
+{% block head %}
+  
+{% endblock head %}
+
+{% block content %}
+  {% if messages %}
+    {% for message in messages %}
+    <h1 class='message {{ message.tags  }}'>
+        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+        {{ message }}
+    </h1>
+    {% endfor %}
+  {% endif %}
+
+{% endblock content %}

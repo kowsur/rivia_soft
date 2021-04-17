@@ -84,16 +84,18 @@ class Selfassesment(models.Model):
         if not self.bank_account_holder_name:
             self.bank_account_holder_name = self.client_name
         self.save()
-      
-    def get_max_file_number(self):
+
+    @classmethod
+    def get_max_file_number(cls):
       try:
-        max_num = Selfassesment.all().order_by("-client_file_number")[0].client_file_number
+        max_num = cls.objects.all().order_by("-client_file_number")[0].client_file_number
         return max_num
       except IndexError:
         return 0
     
-    def get_next_file_number(self):
-      return self.get_max_file_number()+1
+    @classmethod
+    def get_next_file_number(cls):
+      return cls.get_max_file_number()+1
     
     def approve_update_request(self):
         self.is_updated = True

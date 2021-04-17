@@ -118,6 +118,6 @@
     @apply update text-white;
   }
   .delete-header{
-    @apply error;
+    @apply error text-white;
   }
 }

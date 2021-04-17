@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 #forms
-from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm
+from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm
 from .forms import SelfassesmentAccountSubmissionCreationForm, SelfassesmentAccountSubmissionChangeForm
 from .forms import Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form
 from .forms import TrackerCreationForm, TrackerChangeForm
@@ -102,7 +102,20 @@ def delete_selfassesment(request, client_id:int):
   context = {
     **URL_path_names,
   }
-  context['form'] = SelfassesmentChangeForm()
+  context['form'] = SelfassesmentDeleteForm()
+  context['client_id'] = client_id
+
+  if request.method == 'POST':
+    form = SelfassesmentDeleteForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      try:
+        record =  Selfassesment.objects.get(client_id=client_id)
+        record.delete()
+        messages.success(request, f'Selfassesment has been deleted having id {client_id}!')
+      except Selfassesment.DoesNotExist:
+        messages.error(request, f'The record having id {client_id}, you are looking for does not exist!')
+      return redirect(URL_path_names['selfassesment_home'])
   return render(request, template_name='companies/selfassesment/delete.html', context=context)
 
 @login_required

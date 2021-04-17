@@ -61,6 +61,11 @@ class SelfassesmentChangeForm(forms.ModelForm):
             'bank_account_holder_name',
             'is_active')
 
+class SelfassesmentDeleteForm(forms.ModelForm):
+    agree = forms.BooleanField(label='I understand', required=True)
+    class Meta:
+        model = Selfassesment
+        fields = ()
 
 
 class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):

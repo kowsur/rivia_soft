@@ -1,10 +1,13 @@
 from django import forms
-from django.db.models import fields
 from .models import Selfassesment, SelfassesmentAccountSubmission, Tracker
+from django.utils import timezone
 
 
 class SelfassesmentCreationForm(forms.ModelForm):
-    date_of_registration = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    date_of_registration = forms.DateField(
+        label='Registration date',
+        widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate(), 'placehoder': 'Registration date'})
+    )
 
     class Meta:
         model = Selfassesment
@@ -30,7 +33,10 @@ class SelfassesmentCreationForm(forms.ModelForm):
 
 
 class SelfassesmentChangeForm(forms.ModelForm):
-    date_of_registration = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    date_of_registration = forms.DateField(
+        label='Registration date',
+        widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate(), 'placehoder': 'Registration date'})
+    )
     
     class Meta:
         model = Selfassesment

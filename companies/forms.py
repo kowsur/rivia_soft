@@ -98,12 +98,20 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
             'client_id', 
             'date_of_submission', 
             'tax_year', 
-            'submitted_by', 
+            # 'submitted_by', 
             'account_prepared_by', 
             'remarks', 
             'paid_amount', 
             'is_paid', 
             'is_submitted')
+
+class SelfassesmentAccountSubmissionDeleteForm(forms.ModelForm):
+    agree = forms.BooleanField(label='I want to proceed.', required=True)
+    class Meta:
+        model = SelfassesmentAccountSubmission
+        fields = ()
+
+
 
 class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelForm):
     date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))

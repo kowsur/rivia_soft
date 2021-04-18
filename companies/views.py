@@ -6,7 +6,7 @@ from django.contrib import messages
 
 #forms
 from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm
-from .forms import SelfassesmentAccountSubmissionCreationForm, SelfassesmentAccountSubmissionChangeForm
+from .forms import SelfassesmentAccountSubmissionCreationForm, SelfassesmentAccountSubmissionChangeForm, SelfassesmentAccountSubmissionDeleteForm
 from .forms import Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form
 from .forms import TrackerCreationForm, TrackerChangeForm
 
@@ -179,18 +179,18 @@ def create_selfassesment_account_submission(request):
   return render(request, template_name='companies/selfassesment_account_submission/create.html', context=context)
 
 @login_required
-def update_selfassesment_account_submission(request, client_id:int):
+def update_selfassesment_account_submission(request, submission_id:int):
   context = {
     **URL_path_names,
   }
   context['form'] = SelfassesmentAccountSubmissionChangeForm()
-  context['client_id'] = client_id
+  context['submission_id'] = submission_id
 
   try:
-    record =  SelfassesmentAccountSubmission.objects.get(submission_id=client_id)
+    record =  SelfassesmentAccountSubmission.objects.get(submission_id=submission_id)
     context['form'] = SelfassesmentAccountSubmissionChangeForm(instance=record)
   except SelfassesmentAccountSubmission.DoesNotExist:
-    messages.error(request, f'Selfassesment Account Submission having id {client_id} does not exists!')
+    messages.error(request, f'Selfassesment Account Submission having id {submission_id} does not exists!')
     return redirect(URL_path_names['selfassesment_account_submission_home'])
     raise Http404
 
@@ -199,18 +199,33 @@ def update_selfassesment_account_submission(request, client_id:int):
     context['form'] = form
     if form.is_valid():
       assesment = form.save()
-      messages.success(request, f'Selfassesment Account Submission has been updated having id {client_id}!')
+      messages.success(request, f'Selfassesment Account Submission has been updated having id {submission_id}!')
       return redirect(URL_path_names['selfassesment_account_submission_home'])
-    messages.error(request, f'Updating Selfassesment Account Submission having id {client_id} failed due to invalid data!')
+    messages.error(request, f'Updating Selfassesment Account Submission having id {submission_id} failed due to invalid data!')
   return render(request, template_name='companies/selfassesment_account_submission/update.html', context=context)
 
-# @login_required
-# def delete_selfassesment_account_submission(request, client_id:int):
-#   context = {
-#     **URL_path_names,
-#   }
-#   context['form'] = SelfassesmentAccountSubmissionChangeForm()
-#   return render(request, template_name='companies/selfassesment/delete.html', context=context)
+@login_required
+def delete_selfassesment_account_submission(request, submission_id:int):
+  context = {
+    **URL_path_names,
+  }
+  context['form'] = SelfassesmentAccountSubmissionDeleteForm()
+  context['submission_id'] = submission_id
+
+  if request.method == 'POST':
+    form = SelfassesmentAccountSubmissionDeleteForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      try:
+        record =  SelfassesmentAccountSubmission.objects.get(submission_id=submission_id)
+        record.delete()
+        messages.success(request, f'Selfassesment Account Submission has been deleted having id {submission_id}!')
+      except Selfassesment.DoesNotExist:
+        messages.error(request, f'Selfassesment Account Submission record with id {submission_id}, you are looking for does not exist!')
+    else:
+      messages.error(request, f'Deletion of Selfassesment Account Submission having id {submission_id} failed')
+    return redirect(URL_path_names['selfassesment_account_submission_home'])
+  return render(request, template_name='companies/selfassesment_account_submission/delete.html', context=context)
 
 # @login_required
 # def search_selfassesment_account_submission(request, search_text: str='', limit: int=-1):

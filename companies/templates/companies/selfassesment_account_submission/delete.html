@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load companies_tags %}
+
+{% block title %}
+  Delete Selfassesment
+{% endblock title %}
+
+
+{% block content %}
+
+<form action="{% url selfassesment_account_submission_delete submission_id %}" method="POST" class="my-10">
+  {% csrf_token %}
+  <h1 class="header delete-header">Selfassesment Account Submission Delete Form</h1>
+  <p class="mt-5">Once the record is deleted it can't recovered.</p>
+  {% for field in form %}
+    <div class="flex flex-col align-middle items-start w-full">
+        <div class="w-full mt-3.5">
+            <label for="{{ 'id_'|addstr:field.name }}">{{ field.label }}{% if field.field.required %}*{% endif %}</label>
+            {{ field }}
+            <div class="text-red-500">
+                {{ field.errors }}
+            </div>
+        </div>
+    </div>
+  {% endfor %}
+  <button type="submit" class="delete">Delete</button>
+</form>
+
+{% endblock content %}

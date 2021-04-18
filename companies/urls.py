@@ -1,7 +1,7 @@
 from django.urls import path
 from django.urls.conf import re_path
 from .views import home_selfassesment, view_selfassesment, create_selfassesment, update_selfassesment, delete_selfassesment, search_selfassesment, all_selfassesment
-
+from .views import home_selfassesment_account_submission, create_selfassesment_account_submission
 from .url_variables import *
 
 app_name = application_name
@@ -39,14 +39,14 @@ urlpatterns = [
         name=f'{Selfassesment_name}_{viewall_suffix}'), # fetch only
 
 
-    # # SelfassesmentAccountSubmission
-    # path(route=f'{Selfassesment_Account_Submission_path}/{home_suffix}/', 
-    #     view=home_selfassesment_account_submission, 
-    #     name=f'{Selfassesment_Account_Submission_name}_{home_suffix}'),
+    # SelfassesmentAccountSubmission
+    path(route=f'{Selfassesment_Account_Submission_path}/{home_suffix}/', 
+        view=home_selfassesment_account_submission, 
+        name=f'{Selfassesment_Account_Submission_name}_{home_suffix}'),
 
-    # path(route=f'{Selfassesment_Account_Submission_path}/{create_suffix}/', 
-    #     view=create_selfassesment_account_submission, 
-    #     name=f'{Selfassesment_Account_Submission_name}_{create_suffix}'),
+    path(route=f'{Selfassesment_Account_Submission_path}/{create_suffix}/', 
+        view=create_selfassesment_account_submission, 
+        name=f'{Selfassesment_Account_Submission_name}_{create_suffix}'),
 
     # path(route=f'{Selfassesment_Account_Submission_path}/{update_suffix}/<int:client_id>/', 
     #     view=update_selfassesment_account_submission, 

@@ -143,27 +143,38 @@ def all_selfassesment(request, limit=-1):
   raise Http404
 
 
-# # =============================================================================================================
-# # =============================================================================================================
-# # SelfassesmentAccountSubmission
+# =============================================================================================================
+# =============================================================================================================
+# SelfassesmentAccountSubmission
+@login_required
+def home_selfassesment_account_submission(request):
+  context = {
+    **URL_path_names,
+  }
+  return render(request=request, template_name='companies/selfassesment_account_submission/home.html', context=context)
+
 # @login_required
 # def view_selfassesment_account_submission(request):
-#   context = {
-#     **URL_path_names,
-#   }
-#   return render(request=request, template_name='companies/selfassesment/home.html', context=context)
+#   return redirect(URL_path_names['selfassesment_account_submission_home'])
 
-# @login_required
-# def home_selfassesment_account_submission(request):
-#   return view_selfassesment_account_submission(request)
+@login_required
+def create_selfassesment_account_submission(request):
+  context = {
+    **URL_path_names,
+  }
+  context['form'] = SelfassesmentAccountSubmissionCreationForm()
 
-# @login_required
-# def create_selfassesment_account_submission(request):
-#   context = {
-#     **URL_path_names,
-#   }
-#   context['form'] = SelfassesmentAccountSubmissionCreationForm()
-#   return render(request, template_name='companies/selfassesment/create.html', context=context)
+  if request.method == 'POST':
+    form = SelfassesmentAccountSubmissionCreationForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      assesment = form.save()
+      assesment.set_defaults()
+      assesment.created_by = request.user
+      assesment.save()
+      messages.success(request, f'New Selfassesment Account Submission has been created with id {assesment.submission_id}!')
+      return redirect(URL_path_names['selfassesment_home'])
+  return render(request, template_name='companies/selfassesment_account_submission/create.html', context=context)
 
 # @login_required
 # def update_selfassesment_account_submission(request, client_id:int):

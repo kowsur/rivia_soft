@@ -3,6 +3,7 @@ from django.core.serializers import serialize
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db import models
 
 #forms
 from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm
@@ -19,9 +20,13 @@ from .queries import db_search_Selfassesment, db_all_Selfassesment
 from .queries import db_search_SelfassesmentAccountSubmission, db_all_SelfassesmentAccountSubmission
 from .queries import db_search_Tracker, db_all_Trackers
 
-from .url_variables import application_name, Selfassesment_name, Selfassesment_path, Selfassesment_Account_Submission_name
+from .url_variables import application_name, Selfassesment_name, Selfassesment_path, Selfassesment_Account_Submission_name, Selfassesment_Account_Submission_path
 from .url_variables import Limited_name, Limited_Account_Submission_name, Tracker_name
 from .url_variables import home_suffix, viewall_suffix, create_suffix, update_suffix, delete_suffix, search_suffix
+
+
+# html generator
+from .html_generator import get_field_names_from_model, generate_template_tag_for_model, generate_data_container_table
 
 # these path names will be passed to templates to use in the navbar links
 URL_path_names = {
@@ -41,9 +46,13 @@ URL_path_names = {
   'selfassesment_account_submission_home': f'{application_name}:{Selfassesment_Account_Submission_name}_{home_suffix}',
   'selfassesment_account_submission_create': f'{application_name}:{Selfassesment_Account_Submission_name}_{create_suffix}',
   'selfassesment_account_submission_update': f'{application_name}:{Selfassesment_Account_Submission_name}_{update_suffix}',
+  'selfassesment_account_submission_update_url_without_argument': f'/{application_name}/{Selfassesment_Account_Submission_path}/{update_suffix}/',
   'selfassesment_account_submission_delete': f'{application_name}:{Selfassesment_Account_Submission_name}_{delete_suffix}',
+  'selfassesment_account_submission_delete_url_without_argument': f'/{application_name}/{Selfassesment_Account_Submission_path}/{delete_suffix}/',
   'selfassesment_account_submission_search': f'{application_name}:{Selfassesment_Account_Submission_name}_{search_suffix}', # fetch only
+  'selfassesment_account_submission_search_url_without_argument': f'/{application_name}/{Selfassesment_Account_Submission_path}/{search_suffix}/', # fetch only
   'selfassesment_account_submission_viewall': f'{application_name}:{Selfassesment_Account_Submission_name}_{viewall_suffix}', # fetch only
+  'selfassesment_account_submission_viewall_url': f'/{application_name}/{Selfassesment_Account_Submission_path}/{viewall_suffix}/', # fetch only
 }
 
 # =============================================================================================================
@@ -53,6 +62,9 @@ URL_path_names = {
 def home_selfassesment(request):
   context = {
     **URL_path_names,
+    'model_fields': get_field_names_from_model(Selfassesment),
+    'template_tag': generate_template_tag_for_model(Selfassesment, 'client_id'),
+    'data_container': generate_data_container_table(Selfassesment, 'client_id'),
   }
   return render(request=request, template_name='companies/selfassesment/home.html', context=context)
 
@@ -91,6 +103,8 @@ def update_selfassesment(request, client_id:int):
     record =  Selfassesment.objects.get(client_id=client_id)
     context['form'] = SelfassesmentChangeForm(instance=record)
   except Selfassesment.DoesNotExist:
+    messages.error(request, f'Selfassesment Account having id {client_id} does not exists!')
+    return redirect(URL_path_names['selfassesment_home'])
     raise Http404
 
   if request.method == 'POST':
@@ -128,9 +142,9 @@ def delete_selfassesment(request, client_id:int):
 
 @login_required
 def search_selfassesment(request, search_text: str='', limit: int=-1):
-  if search_text.strip()=='':
-    return redirect(URL_path_names['selfassesment_viewall'])
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    if search_text.strip()=='':
+      return redirect(URL_path_names['selfassesment_viewall'])
     records = db_search_Selfassesment(search_text, limit)
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
@@ -152,6 +166,9 @@ def all_selfassesment(request, limit=-1):
 def home_selfassesment_account_submission(request):
   context = {
     **URL_path_names,
+    'model_fields': get_field_names_from_model(SelfassesmentAccountSubmission),
+    'template_tag': generate_template_tag_for_model(SelfassesmentAccountSubmission, 'submission_id'),
+    'data_container': generate_data_container_table(SelfassesmentAccountSubmission, 'submission_id'),
   }
   return render(request=request, template_name='companies/selfassesment_account_submission/home.html', context=context)
 
@@ -220,25 +237,28 @@ def delete_selfassesment_account_submission(request, submission_id:int):
         record =  SelfassesmentAccountSubmission.objects.get(submission_id=submission_id)
         record.delete()
         messages.success(request, f'Selfassesment Account Submission has been deleted having id {submission_id}!')
-      except Selfassesment.DoesNotExist:
+      except SelfassesmentAccountSubmission.DoesNotExist:
         messages.error(request, f'Selfassesment Account Submission record with id {submission_id}, you are looking for does not exist!')
+        return redirect(URL_path_names['selfassesment_account_submission_home'])
     else:
       messages.error(request, f'Deletion of Selfassesment Account Submission having id {submission_id} failed')
     return redirect(URL_path_names['selfassesment_account_submission_home'])
   return render(request, template_name='companies/selfassesment_account_submission/delete.html', context=context)
 
-# @login_required
-# def search_selfassesment_account_submission(request, search_text: str='', limit: int=-1):
-#   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
-#     records = db_search_SelfassesmentAccountSubmission(search_text, limit)
-#     data = serialize(queryset=records, format='json')
-#     return HttpResponse(data, content_type='application/json')
-#   raise Http404
+@login_required
+def search_selfassesment_account_submission(request, search_text: str='', limit: int=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    if search_text.strip()=='':
+      return redirect(URL_path_names['selfassesment_account_submission_viewall'])
+    records = db_search_SelfassesmentAccountSubmission(search_text, limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
 
-# @login_required
-# def all_selfassesment_account_submission(request, limit=-1):
-#   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
-#     records = db_all_SelfassesmentAccountSubmission(limit)
-#     data = serialize(queryset=records, format='json')
-#     return HttpResponse(data, content_type='application/json')
-#   raise Http404
+@login_required
+def all_selfassesment_account_submission(request, limit=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    records = db_all_SelfassesmentAccountSubmission(limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404

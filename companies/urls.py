@@ -1,7 +1,13 @@
 from django.urls import path
 from django.urls.conf import re_path
-from .views import home_selfassesment, view_selfassesment, create_selfassesment, update_selfassesment, delete_selfassesment, search_selfassesment, all_selfassesment
-from .views import home_selfassesment_account_submission, create_selfassesment_account_submission, update_selfassesment_account_submission, delete_selfassesment_account_submission
+
+# selfassesment view functions
+from .views import home_selfassesment, view_selfassesment, create_selfassesment,\
+    update_selfassesment, delete_selfassesment, search_selfassesment, all_selfassesment
+# selfassesment account submission view function
+from .views import home_selfassesment_account_submission, create_selfassesment_account_submission,\
+    update_selfassesment_account_submission, delete_selfassesment_account_submission,\
+    search_selfassesment_account_submission, all_selfassesment_account_submission
 from .url_variables import *
 
 app_name = application_name
@@ -56,13 +62,13 @@ urlpatterns = [
         view=delete_selfassesment_account_submission, 
         name=f'{Selfassesment_Account_Submission_name}_{delete_suffix}'),
     
-    # path(route=f'{Selfassesment_Account_Submission_path}/{search_suffix}/<str:search_text>/', 
-    #     view=search_selfassesment_account_submission, 
-    #     name=f'{Selfassesment_Account_Submission_name}_{search_suffix}'),
+    path(route=f'{Selfassesment_Account_Submission_path}/{search_suffix}/<str:search_text>/', 
+        view=search_selfassesment_account_submission, 
+        name=f'{Selfassesment_Account_Submission_name}_{search_suffix}'),
     
-    # path(route=f'{Selfassesment_Account_Submission_path}/{viewall_suffix}/', 
-    #     view=all_selfassesment_account_submission, 
-    #     name=f'{Selfassesment_Account_Submission_name}_{viewall_suffix}'),
+    path(route=f'{Selfassesment_Account_Submission_path}/{viewall_suffix}/', 
+        view=all_selfassesment_account_submission, 
+        name=f'{Selfassesment_Account_Submission_name}_{viewall_suffix}'),
 
     # # Add all Selfassesment to SelfassesmentAccountSubmission
     # path(route=f'add_all/{Selfassesment_path}/to/{Selfassesment_Account_Submission_path}/', 

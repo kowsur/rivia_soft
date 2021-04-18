@@ -17,9 +17,10 @@ export default DATA;
 export function get_tr_for_table(data, template=template, update_url=DATA.update_url, delete_url=DATA.delete_url) {
   // prepare table row for table using template and data
   let instance = template.content.cloneNode(true)
-  let update_link = `<a href="${update_url}${data.pk}/">edit</a>`
-  let delete_link = `<a href="${delete_url}${data.pk}/">Delete</a>`
-  instance.getElementById('client_id').innerHTML = `${update_link}<br>${delete_link}`
+  let update_link = `${update_url}${data.pk}/`
+  let delete_link = `${delete_url}${data.pk}/`
+  instance.getElementById('edit').href = `${update_link}`
+  instance.getElementById('delete').href = `${delete_link}`
   instance.getElementById('client_file_number').textContent = data.fields['client_file_number']
   instance.getElementById('client_name').textContent = data.fields['client_name']
   instance.getElementById('client_phone_number').textContent = data.fields['client_phone_number']

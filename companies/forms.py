@@ -79,12 +79,13 @@ class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
             'client_id',
             'date_of_submission', 
             'tax_year', 
-            'submitted_by', 
-            'account_prepared_by', 
+            # 'submitted_by', 
+            # 'account_prepared_by', 
             'remarks', 
-            'paid_amount', 
-            'is_paid', 
-            'is_submitted')
+            # 'paid_amount', 
+            # 'is_paid', 
+            # 'is_submitted'
+            )
 
 
 class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):

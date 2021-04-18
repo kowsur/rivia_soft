@@ -27,7 +27,7 @@
 <!-- add all selfassesments -->
 {% if request.user.is_superuser %}
 <div class="mt-5 grid place-items-center">
-  <a href="{% url add_all_selfassesment_to_selfassesment_account_submission %}" class="create px-4 py-2">
+  <a href="{% url add_all_selfassesment_to_selfassesment_account_submission %}" class="create px-4 py-2 rounded-md">
     Add all Selfassesment to Selfassesment Account Submission</a>
 </div>
 {% endif %}
@@ -46,7 +46,7 @@
 
 <!-- data -->
 <input hidden aria-hidden="true" type="url" name="all_url" value="{{ selfassesment_account_submission_viewall_url }}">
-<input hidden aria-hidden="true" type="url" name="search_url_without_argument" value="{{ selfassesment_account_submission_create }}">
+<input hidden aria-hidden="true" type="url" name="search_url_without_argument" value="{{ selfassesment_account_submission_search_url_without_argument }}">
 <input hidden aria-hidden="true" type="url" name="update_url_without_argument" value="{{ selfassesment_account_submission_update_url_without_argument }}">
 <input hidden aria-hidden="true" type="url" name="delete_url_without_argument" value="{{ selfassesment_account_submission_delete_url_without_argument }}">
 <pre hidden aria-hidden="true" name="model_fields">{{ model_fields }}</pre>

@@ -1,9 +1,21 @@
-import {
-  DATA, get_tr_for_table
-} from './companies/selfassesment/script.js';
-
 let template_querySelector = 'template#data-template';
 
+// collect urls
+let all_url = document.querySelector('input[name="all_url"]').value;
+let search_url = document.querySelector('input[name="search_url_without_argument"]').value;
+let update_url = document.querySelector('input[name="update_url_without_argument"]').value;
+let delete_url = document.querySelector('input[name="delete_url_without_argument"]').value;
+
+// get fields
+let fields = JSON.parse(document.querySelector('pre[name="model_fields"]').innerText.replaceAll("'",'"'))
+let template_querySelector_string = 'template#data-template';
+let template = document.querySelector(template_querySelector_string);
+let DATA = {
+  all_url,
+  search_url,
+  update_url,
+  delete_url
+};
 
 // ================================================================================================
 // Search functionality
@@ -50,7 +62,25 @@ if (search_bar){
 }
 
 
+//====================================================================================================================================
+//====================================================================================================================================
+//====================================================================================================================================
 // commonly used functions
+function get_tr_for_table(data, template=template, model_fields=fields, update_url=DATA.update_url, delete_url=DATA.delete_url) {
+  // prepare table row for table using template and data
+  let instance = template.content.cloneNode(true)
+
+  let update_link = `${update_url}${data.pk}/`
+  let delete_link = `${delete_url}${data.pk}/`
+  instance.getElementById('edit').href = `${update_link}`
+  instance.getElementById('delete').href = `${delete_link}`
+  
+  for (let field of model_fields){
+    let td = instance.getElementById(field)
+    if (td) td.textContent = data.fields[field]
+  } return instance;
+}
+
 function populate_with_data(
   data_array,
   table_row_getter = get_tr_for_table,
@@ -68,7 +98,9 @@ function populate_with_data(
   })
 }
 
-//========================================================================================
+//====================================================================================================================================
+//====================================================================================================================================
+//====================================================================================================================================
 // search database
 async function db_all_records(all_url = DATA.all_url) {
   const records = await fetch_url(all_url, 'GET')
@@ -84,69 +116,6 @@ async function db_search_records(search_text, search_url = DATA.search_url) {
   return records; // return data
 }
 
-//========================================================================================
-// SelfassesmentAccountSubmission
-if (document.getElementById('search_SelfassesmentAccountSubmission')){
-    document.getElementById('search_SelfassesmentAccountSubmission').addEventListener('keyup', (event)=>{
-        let search_bar = document.getElementById('search_SelfassesmentAccountSubmission')
-        let search_url = search_bar.dataset.url.slice(0, search_bar.dataset.url.lastIndexOf('/')+1)
-        let search_text = search_bar.value
-        search_text = search_text.trim()
-        
-        clearTimeout(typingTimer);
-        if (search_text===''){
-            typingTimer = setTimeout(all_SelfassesmentAccountSubmission, doneTypingInterval);
-        }else{
-            typingTimer = setTimeout(search_SelfassesmentAccountSubmission, doneTypingInterval, search_text, search_url);
-        }
-    })
-
-    function search_SelfassesmentAccountSubmission(text, url) {
-        return fetch(`${url}${text}`, {headers: {'Content-Type': 'application/json'}, method: 'GET'})
-            .then(res => res.json())
-            .then((json_data) => {
-                let tbody = document.getElementById('data')
-                tbody.innerHTML=''
-                let template = document.getElementById('data-template')
-                json_data.forEach((item) => {
-                    tbody.appendChild(get_tr_for_table(template, item))
-                })
-        }).catch(err => console.error(err));
-    }
-
-    function all_SelfassesmentAccountSubmission(url='/companies/SelfassesmentAccountSubmission/all/') {
-        return fetch(url, {headers: {'Content-Type': 'application/json'}, method: 'GET'})
-            .then(res => res.json())
-            .then((json_data) => {
-                let tbody = document.getElementById('data')
-                tbody.innerHTML=''
-                let template = document.getElementById('data-template')
-                json_data.forEach((item) => {
-                    tbody.appendChild(get_tr_for_table(template, item))
-                })
-        }).catch(err => console.error(err));
-    }
-
-    function get_tr_for_table(template, item, update_url='/companies/SelfassesmentAccountSubmission/update/') {
-        // prepare table row for table using template and item
-        let instance = template.content.cloneNode(true)
-        let link = `<a href="/${update_url}${item.pk}">edit</a>`
-        instance.getElementById('submission_id').href = `${update_url}${item.pk}`
-        instance.getElementById('client_id').innerText = item.fields['client_id']
-        instance.getElementById('date_of_submission').textContent = item.fields['date_of_submission'] 
-        instance.getElementById('tax_year').textContent = item.fields['tax_year'] 
-        instance.getElementById('submitted_by').textContent = item.fields['submitted_by'] 
-        instance.getElementById('account_prepared_by').textContent = item.fields['account_prepared_by'] 
-        instance.getElementById('remarks').textContent = item.fields['remarks'] 
-        instance.getElementById('paid_amount').textContent = item.fields['paid_amount'] 
-        instance.getElementById('is_paid').textContent = item.fields['is_paid'] 
-        instance.getElementById('is_submitted').textContent = item.fields['is_submitted'] 
-        console.log(item)
-        return instance
-    }
-
-    all_SelfassesmentAccountSubmission()
-}
 
 
 

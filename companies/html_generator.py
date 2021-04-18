@@ -59,7 +59,6 @@ def generate_template_tag_for_model(django_model:models.Model, pk_filed='id', ex
     </tr>
   </template>
   """
-  print(template_tag)
   return template_tag
 
 
@@ -92,5 +91,4 @@ def generate_data_container_table(django_model:models.Model, pk_filed='id', excl
     </table>
   </div>
   """
-  print(table_tag)
   return table_tag

@@ -62,14 +62,14 @@ class SelfassesmentChangeForm(forms.ModelForm):
             'is_active')
 
 class SelfassesmentDeleteForm(forms.ModelForm):
-    agree = forms.BooleanField(label='I understand', required=True)
+    agree = forms.BooleanField(label='I want to proceed.', required=True)
     class Meta:
         model = Selfassesment
         fields = ()
 
 
 class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
-    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate()}))
 
     class Meta:
         model = SelfassesmentAccountSubmission

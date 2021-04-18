@@ -53,6 +53,7 @@ URL_path_names = {
   'selfassesment_account_submission_search_url_without_argument': f'/{application_name}/{Selfassesment_Account_Submission_path}/{search_suffix}/', # fetch only
   'selfassesment_account_submission_viewall': f'{application_name}:{Selfassesment_Account_Submission_name}_{viewall_suffix}', # fetch only
   'selfassesment_account_submission_viewall_url': f'/{application_name}/{Selfassesment_Account_Submission_path}/{viewall_suffix}/', # fetch only
+  'add_all_selfassesment_to_selfassesment_account_submission': f'{application_name}:add_all_{Selfassesment_name}_to_{Selfassesment_Account_Submission_name}',
 }
 
 # =============================================================================================================
@@ -262,3 +263,38 @@ def all_selfassesment_account_submission(request, limit=-1):
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
   raise Http404
+
+# add_all_selfassesment_to_selfassesment_account_submission_w_submission_year
+@login_required
+def add_all_selfassesment_to_selfassesment_account_submission_w_submission_year(request):
+  context = {
+    **URL_path_names,
+  }
+  if not request.user.is_superuser:
+    messages.error(request, 'Only Superusers can use this feature!')
+    return redirect(URL_path_names['selfassesment_account_submission_home'])
+  context['form'] = Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(initial={'submitted_by': request.user, 'account_prepared_by': request.user})
+
+  if request.method=='POST':
+    form = Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(data=request.POST)
+    context['form'] = form
+    if form.is_valid():
+      submitted_by = form.cleaned_data.get('submitted_by')
+      if submitted_by==None:
+        form.cleaned_data['submitted_by'] = request.user
+
+      all_Selfassesments = Selfassesment.objects.all()
+      
+      for assesment in all_Selfassesments:
+        form.cleaned_data['client_id'] = assesment
+        instance = SelfassesmentAccountSubmission(**form.cleaned_data)
+        instance.set_defaults()
+        instance.save()
+      messages.success(request, 'Added all Selfassesment to Selfassesment Account Submission!')
+      return redirect(URL_path_names['selfassesment_account_submission_home'])
+  return render(request, 'companies/selfassesment_account_submission/add_all_selfassesment_account_submission.html', context=context)
+
+
+# =============================================================================================================
+# =============================================================================================================
+# SelfassesmentAccountSubmission

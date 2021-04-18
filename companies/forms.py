@@ -114,7 +114,7 @@ class SelfassesmentAccountSubmissionDeleteForm(forms.ModelForm):
 
 
 class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelForm):
-    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate()}))
     
     class Meta:
         model = SelfassesmentAccountSubmission
@@ -123,7 +123,8 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
             'tax_year', 
             'submitted_by', 
             'account_prepared_by', 
-            'remarks')
+            'remarks',
+            'date_of_submission')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

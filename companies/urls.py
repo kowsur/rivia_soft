@@ -2,12 +2,13 @@ from django.urls import path
 from django.urls.conf import re_path
 
 # selfassesment view functions
-from .views import home_selfassesment, view_selfassesment, create_selfassesment,\
+from .views import home_selfassesment, view_selfassesment, create_selfassesment,                    \
     update_selfassesment, delete_selfassesment, search_selfassesment, all_selfassesment
 # selfassesment account submission view function
-from .views import home_selfassesment_account_submission, create_selfassesment_account_submission,\
-    update_selfassesment_account_submission, delete_selfassesment_account_submission,\
-    search_selfassesment_account_submission, all_selfassesment_account_submission
+from .views import home_selfassesment_account_submission, create_selfassesment_account_submission,  \
+    update_selfassesment_account_submission, delete_selfassesment_account_submission,               \
+    search_selfassesment_account_submission, all_selfassesment_account_submission,                  \
+    add_all_selfassesment_to_selfassesment_account_submission_w_submission_year
 from .url_variables import *
 
 app_name = application_name
@@ -70,10 +71,10 @@ urlpatterns = [
         view=all_selfassesment_account_submission, 
         name=f'{Selfassesment_Account_Submission_name}_{viewall_suffix}'),
 
-    # # Add all Selfassesment to SelfassesmentAccountSubmission
-    # path(route=f'add_all/{Selfassesment_path}/to/{Selfassesment_Account_Submission_path}/', 
-    #     # view=add_all_Selfassesment_to_SelfassesmentAccountSubmission_w_submission_year, 
-    #     name=f'add_all_{Selfassesment_name}_to_{Selfassesment_Account_Submission_name}'),
+    # Add all Selfassesment to SelfassesmentAccountSubmission
+    path(route=f'add_all/{Selfassesment_path}/to/{Selfassesment_Account_Submission_path}/', 
+        view=add_all_selfassesment_to_selfassesment_account_submission_w_submission_year, 
+        name=f'add_all_{Selfassesment_name}_to_{Selfassesment_Account_Submission_name}'),
     
 
     # =============================================================================================================

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-  Home Selfassesment
+  Selfassesment Account Submission
 {% endblock title %}
 
 {% block head %}
@@ -24,6 +24,13 @@
 <!-- searchbar -->
 {% include "companies/searchbar.html" %}
 
+<!-- add all selfassesments -->
+{% if request.user.is_superuser %}
+<div class="mt-5 grid place-items-center">
+  <a href="{% url add_all_selfassesment_to_selfassesment_account_submission %}" class="create px-4 py-2">
+    Add all Selfassesment to Selfassesment Account Submission</a>
+</div>
+{% endif %}
 
 <!-- data -->
 {% autoescape off %}

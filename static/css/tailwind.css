@@ -3,27 +3,27 @@
 @tailwind utilities;
 
 @layer base{
+  select { @apply form-select; }
+  select[multiple] { @apply form-multiselect; }
   input	{ @apply form-input; }
   input[type='checkbox']	{ @apply form-checkbox bg-red-500 checked:bg-green-500; }
   input[type='checkbox']:hover { @apply bg-red-300 checked:bg-green-300; }
   input[type='checkbox']:focus { @apply bg-red-800 checked:bg-green-800; }
   input[type='radio']	{ @apply form-radio; }
-  textarea { @apply form-textarea resize-x w-full text-black bg-gray-100 fill-current placeholder-gray-500 rounded-md shadow-md appearance-none border-none bg-none outline-none; }
-  select { @apply form-select; }
-  select[multiple] { @apply form-multiselect; }
+  textarea { @apply form-textarea resize-x w-full; }
 
   label{ @apply mb-1 mr-2 inline-block text-gray-800; }
-
-  input{ @apply px-4 py-2 w-full h-10 text-black bg-gray-100 fill-current placeholder-gray-500 rounded-md shadow-md appearance-none border-none bg-none outline-none; }
-  input:hover, textarea:hover{ @apply bg-gray-200; }
-  input:focus, textarea:focus{ @apply bg-blue-100 ring-2; }
+  input{ @apply px-4 py-2 h-10 w-full; }
+  input, textarea, select{ @apply  text-black bg-gray-100 fill-current placeholder-gray-500 rounded-md shadow-md appearance-none border-none bg-none outline-none; }
+  input:hover, textarea:hover, select:hover{ @apply bg-gray-200; }
+  input:focus, textarea:focus, select:focus{ @apply bg-blue-100 ring-2; }
 
   @media (prefers-color-scheme: dark){
     label{ @apply text-gray-50; }
     
-    input, textarea{ @apply text-gray-100 bg-gray-700 placeholder-gray-50; }
-    input:hover, textarea:hover{ @apply bg-gray-600; }
-    input:focus, textarea:focus{ @apply text-gray-100 bg-gray-800 ring-2; }
+    input, textarea, select{ @apply text-gray-100 bg-gray-700 placeholder-gray-50; }
+    input:hover, textarea:hover, select:hover{ @apply bg-gray-600; }
+    input:focus, textarea:focus, select:focus{ @apply text-gray-100 bg-gray-800 ring-2; }
   }
   input[type='checkbox']{
     @apply h-full;

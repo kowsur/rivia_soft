@@ -130,7 +130,7 @@
     @apply update text-white;
   }
   .delete-header{
-    @apply error text-white;
+    @apply delete text-white;
   }
 }
 

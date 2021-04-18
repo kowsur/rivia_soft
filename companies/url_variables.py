@@ -14,8 +14,8 @@ Limited_name = 'LTD'
 Limited_Account_Submission_path = 'LAS'
 Limited_Account_Submission_name = 'LAS'
 
-Tracker_path = 'Trc'
-Tracker_name = 'Trc'
+SelfassesmentTracker_path = 'Trc'
+SelfassesmentTracker_name = 'Trc'
 
 home_suffix = 'home'
 create_suffix = 'create'

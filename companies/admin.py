@@ -1,17 +1,17 @@
 from django.contrib import admin
-from .models import Selfassesment, SelfassesmentAccountSubmission, Tracker
+from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
 
 
 # Register your models here.
-class TrackerAdmin(admin.ModelAdmin):
+class SelfassesmentTrackerAdmin(admin.ModelAdmin):
     # fields = ('created_by', 'done_by', 'client_id', 'job_description', 'deadline', 'complete_date', 'is_completed')
-    model = Tracker
+    model = SelfassesmentTracker
     list_display = ('created_by', 'done_by', 'client_id', 'job_description', 'is_completed')
     list_filter = ('is_completed',)
     search_fields = ('job_description', 'created_by', 'done_by','deadline', 'complete_date')
     ordering = ('deadline', 'complete_date')
 
-admin.site.register(Tracker, TrackerAdmin)
+admin.site.register(SelfassesmentTracker, SelfassesmentTrackerAdmin)
 
 
 class SelfassesmentAdmin(admin.ModelAdmin):

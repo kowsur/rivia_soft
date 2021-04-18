@@ -1,5 +1,5 @@
 from django import forms
-from .models import Selfassesment, SelfassesmentAccountSubmission, Tracker
+from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
 from django.utils import timezone
 
 
@@ -131,11 +131,11 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
         self.fields['tax_year'].required = True
 
 
-class TrackerCreationForm(forms.ModelForm):
+class SelfassesmentTrackerCreationForm(forms.ModelForm):
     deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     
     class Meta:
-        model = Tracker
+        model = SelfassesmentTracker
         fields = (
             # 'tracker_id',
             # 'created_by', #request.user
@@ -147,11 +147,11 @@ class TrackerCreationForm(forms.ModelForm):
             # 'is_completed',
             )
 
-class TrackerChangeForm(forms.ModelForm):
+class SelfassesmentTrackerChangeForm(forms.ModelForm):
     complete_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     
     class Meta:
-        model = Tracker
+        model = SelfassesmentTracker
         fields = (
             # 'tracker_id',
             # 'created_by',

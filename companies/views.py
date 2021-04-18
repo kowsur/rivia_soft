@@ -9,19 +9,19 @@ from django.db import models
 from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm
 from .forms import SelfassesmentAccountSubmissionCreationForm, SelfassesmentAccountSubmissionChangeForm, SelfassesmentAccountSubmissionDeleteForm
 from .forms import Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form
-from .forms import TrackerCreationForm, TrackerChangeForm
+from .forms import SelfassesmentTrackerCreationForm, SelfassesmentTrackerChangeForm
 
 #models
 from .models import Selfassesment, SelfassesmentAccountSubmission
-from .models import Tracker
+from .models import SelfassesmentTracker
 
 #queries
 from .queries import db_search_Selfassesment, db_all_Selfassesment
 from .queries import db_search_SelfassesmentAccountSubmission, db_all_SelfassesmentAccountSubmission
-from .queries import db_search_Tracker, db_all_Trackers
+from .queries import db_search_SelfassesmentTracker, db_all_SelfassesmentTrackers
 
 from .url_variables import application_name, Selfassesment_name, Selfassesment_path, Selfassesment_Account_Submission_name, Selfassesment_Account_Submission_path
-from .url_variables import Limited_name, Limited_Account_Submission_name, Tracker_name
+from .url_variables import Limited_name, Limited_Account_Submission_name, SelfassesmentTracker_name
 from .url_variables import home_suffix, viewall_suffix, create_suffix, update_suffix, delete_suffix, search_suffix
 
 

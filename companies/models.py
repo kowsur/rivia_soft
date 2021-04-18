@@ -149,11 +149,11 @@ class SelfassesmentAccountSubmission(models.Model):
         
 
 
-class Tracker(models.Model):
+class SelfassesmentTracker(models.Model):
 
     class Meta:
-        verbose_name = _("Tracker")
-        verbose_name_plural = _("Trackers")
+        verbose_name = _("Selfassesment Tracker")
+        verbose_name_plural = _("Selfassesment Trackers")
 
     tracker_id = models.AutoField(verbose_name = 'Tracker ID', blank=True, null=False, primary_key=True, db_index=True)
     creation_date = models.DateTimeField(verbose_name='Tracker creation datetime', editable=False, blank=True, null=False, default=timezone.now)
@@ -161,7 +161,7 @@ class Tracker(models.Model):
         to='users.CustomUser',
         on_delete=models.RESTRICT,
         verbose_name='Created By',
-        related_name='tracker_created_by',
+        related_name='selfassesment_tracker_created_by',
         to_field='email',
         blank=False,
         null=False)
@@ -169,11 +169,56 @@ class Tracker(models.Model):
         to='users.CustomUser',
         on_delete=models.RESTRICT,
         verbose_name='Done By',
-        related_name='done_by',
+        related_name='selfassesment_trackerdone_by',
         to_field='email',
         blank=True,
         null=True)
-    client_id = models.ForeignKey(to=Selfassesment, on_delete=models.RESTRICT, verbose_name='Client ID', to_field='client_id', blank=False, null=False)
+    client_id = models.ForeignKey(to=Selfassesment, on_delete=models.RESTRICT, verbose_name='Client ID', to_field='client_id', related_name='selfassesment_client_id',blank=False, null=False)
+    job_description = models.TextField(verbose_name='Description', blank=True, null=True)
+    deadline = models.DateField(verbose_name='Deadline', blank=False, null=False, default=timezone.now)
+    complete_date = models.DateField(verbose_name='Complete Date', blank=True, null=True, default=timezone.now)
+    is_completed = models.BooleanField(verbose_name='Status', blank=True, null=False, default=False)
+
+    def __str__(self) -> str:
+        if self.job_description:
+            return f"{self.job_description}"
+        return f"Deadline: {self.deadline} | Created By: {self.created_by}"
+
+
+
+class Limited(models.Model):
+    class Meta:
+        verbose_name = _('Limited')
+        verbose_name_plural = _('Limited Accounts')
+    
+    client_id = models.AutoField(verbose_name='client_id', primary_key=True, editable=False)
+
+
+
+class LimitedTracker(models.Model):
+    class Meta:
+        verbose_name = _("Limited Tracker")
+        verbose_name_plural = _("Limited Trackers")
+
+    tracker_id = models.AutoField(verbose_name = 'Tracker ID', blank=True, null=False, primary_key=True, db_index=True)
+    creation_date = models.DateTimeField(verbose_name='Tracker creation datetime', editable=False, blank=True, null=False, default=timezone.now)
+    created_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.CASCADE,
+        verbose_name='Created By',
+        related_name='limited_tracker_created_by',
+        to_field='email',
+        blank=False,
+        null=False)
+    done_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Done By',
+        related_name='limited_tracker_done_by',
+        to_field='email',
+        blank=True,
+        null=True)
+    client_id = models.ForeignKey(to=Limited, on_delete=models.CASCADE, verbose_name='Client ID', to_field='client_id', related_name='limited_client_id',blank=False, null=False)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)
     deadline = models.DateField(verbose_name='Deadline', blank=False, null=False, default=timezone.now)
     complete_date = models.DateField(verbose_name='Complete Date', blank=True, null=True, default=timezone.now)

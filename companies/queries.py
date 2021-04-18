@@ -1,5 +1,5 @@
 from django.db.models import Q
-from .models import Selfassesment, SelfassesmentAccountSubmission, Tracker
+from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
 
 
 # =============================================================================================================
@@ -60,8 +60,8 @@ def db_all_SelfassesmentAccountSubmission(limit=-1):
 
 # =============================================================================================================
 # =============================================================================================================
-# Tracker
-def db_search_Tracker(search_text: str, user='admin@gmail.com', limit=-1):
+# SelfassesmentTracker
+def db_search_SelfassesmentTracker(search_text: str, user='admin@gmail.com', limit=-1):
     Query = Q(done_by__email__contains      = search_text) |\
             Q(job_description__contains     = search_text) |\
             Q(deadline__contains            = search_text) |\
@@ -75,10 +75,10 @@ def db_search_Tracker(search_text: str, user='admin@gmail.com', limit=-1):
     Query = Query & Q(created_by__email = user)
     
     if limit==-1:
-        return Tracker.objects.filter(Query)
-    return Tracker.objects.filter(Query)[:limit]
+        return SelfassesmentTracker.objects.filter(Query)
+    return SelfassesmentTracker.objects.filter(Query)[:limit]
 
-def db_all_Trackers(limit=-1):
+def db_all_SelfassesmentTrackers(limit=-1):
     if limit<=-1:
-        return Tracker.objects.all()
-    return Tracker.objects.all()[:limit]
+        return SelfassesmentTracker.objects.all()
+    return SelfassesmentTracker.objects.all()[:limit]

@@ -142,6 +142,11 @@ class SelfassesmentAccountSubmission(models.Model):
     
     def __repr__(self) -> str:
         return str(self)
+    
+    def set_defaults(self):
+        self.account_prepared_by = self.submitted_by
+        self.save()
+        
 
 
 class Tracker(models.Model):

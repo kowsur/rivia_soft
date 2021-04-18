@@ -75,7 +75,7 @@ def create_selfassesment(request):
       assesment.set_defaults()
       assesment.created_by = request.user
       assesment.save()
-      messages.success(request, 'New Selfassesment has been created!')
+      messages.success(request, f'New Selfassesment has been created with id {assesment.client_id}!')
       return redirect(URL_path_names['selfassesment_home'])
   return render(request, template_name='companies/selfassesment/create.html', context=context)
 
@@ -94,13 +94,13 @@ def update_selfassesment(request, client_id:int):
     raise Http404
 
   if request.method == 'POST':
-    form = SelfassesmentCreationForm(request.POST, instance=record)
+    form = SelfassesmentChangeForm(request.POST, instance=record)
     context['form'] = form
     if form.is_valid():
       assesment = form.save()
       messages.success(request, f'Selfassesment has been updated having id {client_id}!')
       return redirect(URL_path_names['selfassesment_home'])
-    messages.error(request, 'Update failed due to invalid data!')
+    messages.error(request, f'Updating Selfassesment {client_id} failed due to invalid data!')
   return render(request, template_name='companies/selfassesment/update.html', context=context)
 
 @login_required
@@ -120,8 +120,10 @@ def delete_selfassesment(request, client_id:int):
         record.delete()
         messages.success(request, f'Selfassesment has been deleted having id {client_id}!')
       except Selfassesment.DoesNotExist:
-        messages.error(request, f'The record having id {client_id}, you are looking for does not exist!')
-      return redirect(URL_path_names['selfassesment_home'])
+        messages.error(request, f'Selfassesment record with id {client_id}, you are looking for does not exist!')
+    else:
+      messages.error(request, f'Deletion of Selfassesment having id {client_id} failed')
+    return redirect(URL_path_names['selfassesment_home'])
   return render(request, template_name='companies/selfassesment/delete.html', context=context)
 
 @login_required
@@ -162,27 +164,45 @@ def create_selfassesment_account_submission(request):
   context = {
     **URL_path_names,
   }
-  context['form'] = SelfassesmentAccountSubmissionCreationForm()
+  context['form'] = SelfassesmentAccountSubmissionCreationForm(initial={'submitted_by': request.user.user_id})
 
   if request.method == 'POST':
     form = SelfassesmentAccountSubmissionCreationForm(request.POST)
     context['form'] = form
     if form.is_valid():
       assesment = form.save()
+      if not assesment.submitted_by:
+        assesment.submitted_by = request.user
       assesment.set_defaults()
-      assesment.created_by = request.user
-      assesment.save()
       messages.success(request, f'New Selfassesment Account Submission has been created with id {assesment.submission_id}!')
-      return redirect(URL_path_names['selfassesment_home'])
+      return redirect(URL_path_names['selfassesment_account_submission_home'])
   return render(request, template_name='companies/selfassesment_account_submission/create.html', context=context)
 
-# @login_required
-# def update_selfassesment_account_submission(request, client_id:int):
-#   context = {
-#     **URL_path_names,
-#   }
-#   context['form'] = SelfassesmentAccountSubmissionChangeForm()
-#   return render(request, template_name='companies/selfassesment/update.html', context=context)
+@login_required
+def update_selfassesment_account_submission(request, client_id:int):
+  context = {
+    **URL_path_names,
+  }
+  context['form'] = SelfassesmentAccountSubmissionChangeForm()
+  context['client_id'] = client_id
+
+  try:
+    record =  SelfassesmentAccountSubmission.objects.get(submission_id=client_id)
+    context['form'] = SelfassesmentAccountSubmissionChangeForm(instance=record)
+  except SelfassesmentAccountSubmission.DoesNotExist:
+    messages.error(request, f'Selfassesment Account Submission having id {client_id} does not exists!')
+    return redirect(URL_path_names['selfassesment_account_submission_home'])
+    raise Http404
+
+  if request.method == 'POST':
+    form = SelfassesmentAccountSubmissionChangeForm(request.POST, instance=record)
+    context['form'] = form
+    if form.is_valid():
+      assesment = form.save()
+      messages.success(request, f'Selfassesment Account Submission has been updated having id {client_id}!')
+      return redirect(URL_path_names['selfassesment_account_submission_home'])
+    messages.error(request, f'Updating Selfassesment Account Submission having id {client_id} failed due to invalid data!')
+  return render(request, template_name='companies/selfassesment_account_submission/update.html', context=context)
 
 # @login_required
 # def delete_selfassesment_account_submission(request, client_id:int):

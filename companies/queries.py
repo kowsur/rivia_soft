@@ -7,6 +7,7 @@ from .models import Selfassesment, SelfassesmentAccountSubmission, Tracker
 # Selfassesment
 def db_search_Selfassesment(search_text: str, limit=-1):
     Query = Q(client_name__contains             = search_text) |\
+            Q(client_file_number__contains      = search_text) |\
             Q(client_phone_number__contains     = search_text) |\
             Q(date_of_registration__contains    = search_text) |\
             Q(HMRC_referance__contains          = search_text) |\
@@ -22,8 +23,7 @@ def db_search_Selfassesment(search_text: str, limit=-1):
             Q(UTR                               = search_text) |\
             Q(NINO                              = search_text)
     if search_text.isnumeric():
-        Query = Query | Q(client_file_number    = search_text) |\
-                        Q(client_id             = search_text)
+        Query = Query | Q(client_id                    = int(search_text))
     
     if limit==-1:
         return Selfassesment.objects.filter(Query)

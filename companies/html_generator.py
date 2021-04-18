@@ -12,7 +12,7 @@ def get_header_name_from_field_name(django_model, field_name):
 
 def generate_template_tag_for_model(django_model:models.Model, pk_filed='id', exclude_fields=('is_updated','created_by'),tag_name='data-template', tag_id='data-template'):
   model_fields = get_field_names_from_model(django_model)
-  inner_template_tr = """"
+  inner_template_tr = """
   <td class="data-cell data-id" >
     <a class="w-max" href="" id='edit'>
       <svg class="edit-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -52,19 +52,20 @@ def generate_template_tag_for_model(django_model:models.Model, pk_filed='id', ex
     if not field == pk_filed and field not in exclude_fields:
       inner_template_tr += f'<td class="data-cell" id="{field}"></td>\n'
   
-  template_tag = f'''
+  template_tag = f"""
   <template id="{tag_id}" name="{tag_name}">
     <tr class="data-row">
     {inner_template_tr}
     </tr>
   </template>
-  '''
+  """
+  print(template_tag)
   return template_tag
 
 
 def generate_data_container_table(django_model:models.Model, pk_filed='id', exclude_fields=('is_updated','created_by'),tag_name='data-template', tag_id='data-template'):
   model_fields = get_field_names_from_model(django_model)
-  inner_header_tr = """"
+  inner_header_tr = """
   <th class="data-cell stick-top data-id">#</th>
   """
 
@@ -91,4 +92,5 @@ def generate_data_container_table(django_model:models.Model, pk_filed='id', excl
     </table>
   </div>
   """
+  print(table_tag)
   return table_tag

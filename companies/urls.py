@@ -8,14 +8,14 @@ app_name = application_name
 
 urlpatterns = [
     path(route='', 
-        view=home_selfassesment,
+        view=view_selfassesment,
         name='home'),
     
     # =============================================================================================================
     # =============================================================================================================
     # Selfassesment
     path(route=f'{Selfassesment_path}/{home_suffix}/',
-        view=view_selfassesment,
+        view=home_selfassesment,
         name=f'{Selfassesment_name}_{home_suffix}'),
 
     path(route=f'{Selfassesment_path}/{create_suffix}/',

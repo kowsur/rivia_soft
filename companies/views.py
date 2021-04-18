@@ -48,14 +48,14 @@ URL_path_names = {
 # =============================================================================================================
 # Selfassesment
 @login_required
-def view_selfassesment(request):
+def home_selfassesment(request):
   context = {
     **URL_path_names,
   }
   return render(request=request, template_name='companies/selfassesment/home.html', context=context)
 
 @login_required
-def home_selfassesment(request):
+def view_selfassesment(request):
   return redirect(URL_path_names['selfassesment_home'])
 
 @login_required

@@ -19,7 +19,7 @@ from .queries import db_search_Selfassesment, db_all_Selfassesment
 from .queries import db_search_SelfassesmentAccountSubmission, db_all_SelfassesmentAccountSubmission
 from .queries import db_search_Tracker, db_all_Trackers
 
-from .url_variables import application_name, Selfassesment_name, Selfassesment_Account_Submission_name
+from .url_variables import application_name, Selfassesment_name, Selfassesment_path, Selfassesment_Account_Submission_name
 from .url_variables import Limited_name, Limited_Account_Submission_name, Tracker_name
 from .url_variables import home_suffix, viewall_suffix, create_suffix, update_suffix, delete_suffix, search_suffix
 
@@ -28,9 +28,13 @@ URL_path_names = {
   'selfassesment_home': f'{application_name}:{Selfassesment_name}_{home_suffix}',
   'selfassesment_create': f'{application_name}:{Selfassesment_name}_{create_suffix}',
   'selfassesment_update': f'{application_name}:{Selfassesment_name}_{update_suffix}',
+  'selfassesment_update_url_without_argument': f'/{application_name}/{Selfassesment_path}/{update_suffix}/',
   'selfassesment_delete': f'{application_name}:{Selfassesment_name}_{delete_suffix}',
+  'selfassesment_delete_url_without_argument': f'/{application_name}/{Selfassesment_path}/{delete_suffix}/',
   'selfassesment_search': f'{application_name}:{Selfassesment_name}_{search_suffix}', # fetch only
+  'selfassesment_search_url_without_argument': f'/{application_name}/{Selfassesment_path}/{search_suffix}/', # fetch only
   'selfassesment_viewall': f'{application_name}:{Selfassesment_name}_{viewall_suffix}', # fetch only
+  'selfassesment_viewall_url': f'/{application_name}/{Selfassesment_path}/{viewall_suffix}/', # fetch only
 
   'selfassesment_account_submission_home': f'{application_name}:{Selfassesment_Account_Submission_name}_{home_suffix}',
   'selfassesment_account_submission_create': f'{application_name}:{Selfassesment_Account_Submission_name}_{create_suffix}',
@@ -120,6 +124,8 @@ def delete_selfassesment(request, client_id:int):
 
 @login_required
 def search_selfassesment(request, search_text: str='', limit: int=-1):
+  if search_text.strip()=='':
+    return redirect(URL_path_names['selfassesment_viewall'])
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
     records = db_search_Selfassesment(search_text, limit)
     data = serialize(queryset=records, format='json')

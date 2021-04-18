@@ -52,9 +52,21 @@
   .delete{
     @apply bg-red-700 text-gray-50;
   }
+  .delete:hover{
+    @apply bg-red-600 text-gray-50;
+  }
+  .delete:active{
+    @apply bg-red-900 text-gray-50;
+  }
 
   .update{
     @apply bg-blue-800 text-gray-50;
+  }
+  .update:hover{
+    @apply bg-blue-600 text-gray-50;
+  }
+  .update:active{
+    @apply bg-blue-900 text-gray-50;
   }
 
   @media (prefers-color-scheme: dark){

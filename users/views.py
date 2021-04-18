@@ -15,7 +15,6 @@ from companies.url_variables import *
 def signup_user(request):
     context = {}
     context['form']= CustomUserSignupForm()
-    context['theme'] = request.COOKIES.get('theme')
     if request.method == 'POST':
         form = CustomUserSignupForm(request.POST)
         context['form'] = form
@@ -23,6 +22,7 @@ def signup_user(request):
             user = form.save(commit=False)
             email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password1')
+            next_url = request.POST.get('next')
             user.is_active = True
             user.save()
 
@@ -30,23 +30,27 @@ def signup_user(request):
             if user:
                 # if authenticated then let the user login
                 login(request, user)
+                if next_url:
+                    return redirect(next_url)
                 return redirect('/')
     return render(request, 'users/signup.html', context=context)
 
 def login_user(request):
     context = {'form': CustomUserLoginForm()}
-    context['theme'] = request.COOKIES.get('theme')
     if request.method=='POST':
         form = CustomUserLoginForm(request.POST)
         context['form'] = form
         if form.is_valid():
             email = request.POST.get('email')
             password = request.POST.get('password')
+            next_url = request.POST.get('next')
             # see if the user can login with the creedentials
             user = authenticate(email=email, password=password)
             if user:
                 # if authenticated then let the user login
                 login(request, user)
+                if next_url:
+                    return redirect(next_url)
             return redirect('/')
         context['message'] = 'Incorrect email or password.'
     return render(request, 'users/login.html', context=context)

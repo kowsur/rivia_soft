@@ -25,6 +25,8 @@ from .url_variables import home_suffix, viewall_suffix, create_suffix, update_su
 
 # these path names will be passed to templates to use in the navbar links
 URL_path_names = {
+  'home': f'{application_name}:home',
+  
   'selfassesment_home': f'{application_name}:{Selfassesment_name}_{home_suffix}',
   'selfassesment_create': f'{application_name}:{Selfassesment_name}_{create_suffix}',
   'selfassesment_update': f'{application_name}:{Selfassesment_name}_{update_suffix}',

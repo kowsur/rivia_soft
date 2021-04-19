@@ -15,7 +15,7 @@ class Selfassesment(models.Model):
 
     created_by = models.ForeignKey(
         to='users.CustomUser',
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         verbose_name='Created by',
         related_name='utr_created_by',
         to_field='email',
@@ -25,6 +25,8 @@ class Selfassesment(models.Model):
     client_file_number = models.IntegerField(verbose_name='File Number', unique=True, blank=False, null=True, editable=True)
     client_name = models.CharField(verbose_name='Full Name', max_length=100, blank=False, null=False, db_index=True)
     client_phone_number = models.CharField(verbose_name='Phone numbers', max_length=255, blank=False, null=False, db_index=True)
+    email = models.EmailField(verbose_name='Email', max_length=320, blank=True, null=True)
+    is_active = models.BooleanField(verbose_name='Active Status', blank=False, null=False, default=True)
     date_of_registration = models.DateField(verbose_name='Registration date', blank=False, null=False, default=timezone.now)
     UTR = models.CharField(
         verbose_name='UTR',
@@ -44,7 +46,6 @@ class Selfassesment(models.Model):
     gateway_password = models.CharField(verbose_name='Gateway Password', max_length=255, blank=True, null=True)
     address = models.TextField(verbose_name='Address', blank=True, null=True, db_index=True)
     post_code = models.CharField(verbose_name='Postal Code', max_length=10, blank=True, null=True)
-    email = models.EmailField(verbose_name='Email', max_length=320, blank=True, null=True)
     bank_name = models.CharField(verbose_name='Name of Bank', max_length=100, blank=True, null=True)
     bank_account_number = models.CharField(
         verbose_name='Account number in Bank',
@@ -63,10 +64,9 @@ class Selfassesment(models.Model):
         max_length=100,
         blank=True,
         null=False)
-    is_active = models.BooleanField(verbose_name='Active Status', blank=False, null=False, default=True)
 
     def __str__(self) -> str:
-        return f'{self.client_id} - {self.client_name} - {self.client_phone_number}'
+        return f'👥{self.client_name} 📞{self.client_phone_number}'
     
     def __repr__(self) -> str:
         return str(self)
@@ -113,23 +113,23 @@ class SelfassesmentAccountSubmission(models.Model):
         verbose_name_plural = _("Selfassesment Submissions")
 
     submission_id = models.AutoField(verbose_name='Submission ID', primary_key=True, null=False, db_index=True, editable=False)
-    client_id = models.ForeignKey(Selfassesment, on_delete=models.PROTECT, verbose_name='Client ID', to_field='client_id', blank=False, null=False)
+    client_id = models.ForeignKey(Selfassesment, on_delete=models.CASCADE, verbose_name='Client ID', to_field='client_id', blank=False, null=False)
     date_of_submission = models.DateField(verbose_name='Submission date', blank=True, null=True, default=timezone.now)
     tax_year = models.CharField(verbose_name='Tax Year', max_length=10, blank=True)
     submitted_by = models.ForeignKey(
         to='users.CustomUser', 
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         verbose_name='Submitted By', 
         related_name='submitted_by',
-        to_field='user_id',
+        to_field='email',
         blank=False,
         null=True)
     account_prepared_by = models.ForeignKey(
         to='users.CustomUser',
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         verbose_name='Prepared By',
         related_name='account_prepared_by',
-        to_field='user_id',
+        to_field='email',
         blank=True,
         null=True)
     remarks = models.TextField(verbose_name='Remarks', blank=True, null=True)
@@ -164,16 +164,16 @@ class SelfassesmentTracker(models.Model):
         related_name='selfassesment_tracker_created_by',
         to_field='email',
         blank=False,
-        null=False)
+        null=True)
     done_by = models.ForeignKey(
         to='users.CustomUser',
-        on_delete=models.RESTRICT,
+        on_delete=models.SET_NULL,
         verbose_name='Done By',
         related_name='selfassesment_trackerdone_by',
         to_field='email',
         blank=True,
         null=True)
-    client_id = models.ForeignKey(to=Selfassesment, on_delete=models.RESTRICT, verbose_name='Client ID', to_field='client_id', related_name='selfassesment_client_id',blank=False, null=False)
+    client_id = models.ForeignKey(to=Selfassesment, on_delete=models.CASCADE, verbose_name='Client ID', to_field='client_id', related_name='selfassesment_client_id',blank=False, null=False)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)
     deadline = models.DateField(verbose_name='Deadline', blank=False, null=False, default=timezone.now)
     complete_date = models.DateField(verbose_name='Complete Date', blank=True, null=True, default=timezone.now)
@@ -204,15 +204,15 @@ class LimitedTracker(models.Model):
     creation_date = models.DateTimeField(verbose_name='Tracker creation datetime', editable=False, blank=True, null=False, default=timezone.now)
     created_by = models.ForeignKey(
         to='users.CustomUser',
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         verbose_name='Created By',
         related_name='limited_tracker_created_by',
         to_field='email',
         blank=False,
-        null=False)
+        null=True)
     done_by = models.ForeignKey(
         to='users.CustomUser',
-        on_delete=models.RESTRICT,
+        on_delete=models.SET_NULL,
         verbose_name='Done By',
         related_name='limited_tracker_done_by',
         to_field='email',

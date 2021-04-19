@@ -72,13 +72,13 @@ def db_search_SelfassesmentTracker(search_text: str, user='admin@gmail.com', lim
         Query = Query | Q(tracker_id        = search_text) |\
                         Q(client_id         = search_text)
     # created by should be the current logged in user
-    Query = Query & Q(created_by__email = user)
+    # Query = Query & Q(created_by__email = user)
     
     if limit==-1:
         return SelfassesmentTracker.objects.filter(Query)
     return SelfassesmentTracker.objects.filter(Query)[:limit]
 
-def db_all_SelfassesmentTrackers(limit=-1):
+def db_all_SelfassesmentTracker(limit=-1):
     if limit<=-1:
         return SelfassesmentTracker.objects.all()
     return SelfassesmentTracker.objects.all()[:limit]

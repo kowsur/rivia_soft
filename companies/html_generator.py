@@ -80,15 +80,17 @@ def generate_data_container_table(django_model:models.Model, pk_filed='id', excl
   """
 
   table_tag = f"""
-  <div class="data-wrapper">
-    <table class="data-container">
-      <thead class="data-head">
-          {header_tr}
-      </thead>
-      <tbody id="data">
-          
-      </tbody>
-    </table>
+  <div class="container">
+    <div class="data-wrapper">
+      <table class="data-container">
+        <thead class="data-head">
+            {header_tr}
+        </thead>
+        <tbody id="data">
+            
+        </tbody>
+      </table>
+    </div>
   </div>
   """
   return table_tag

@@ -137,8 +137,11 @@
   -webkit-box-shadow: 0px 1px 0px 0px #ffff;
   box-shadow: 0px 1px 0px 0px #ffff;
 }
+/* round table corners */
 .stick-top:first-child, .data-wrapper{ @apply rounded-tl-lg; }
 .stick-top:last-child, .data-wrapper{ @apply rounded-tr-lg; }
+#data .data-row:last-child .data-cell:last-child{ @apply rounded-br-lg; }
+#data .data-row:last-child .data-cell:first-child{ @apply rounded-bl-lg; }
 
 .data-head .data-head-row{
   @apply font-normal;

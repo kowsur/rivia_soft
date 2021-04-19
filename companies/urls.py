@@ -10,6 +10,10 @@ from .views import home_selfassesment_account_submission, create_selfassesment_a
     update_selfassesment_account_submission, delete_selfassesment_account_submission,               \
     search_selfassesment_account_submission, all_selfassesment_account_submission,                  \
     add_all_selfassesment_to_selfassesment_account_submission_w_submission_year
+
+# selfassesment tracker
+from .views import home_selfassesment_tracker, create_selfassesment_tracker, update_selfassesment_tracker, \
+    delete_selfassesment_tracker, search_selfassesment_tracker, all_selfassesment_tracker
     
 from .url_variables import *
 
@@ -138,30 +142,30 @@ urlpatterns = [
     #     name=f'add_all_{Limited_name}_to_{Limited_Account_Submission_name}'),
 
 
-    # # =============================================================================================================
-    # # =============================================================================================================
-    # # Tracker
-    # path(route=f'{Tracker_path}/{home_suffix}/',
-    #     # view=create_Tracker,
-    #     name=f'{Tracker_name}_{home_suffix}'),
+    # =============================================================================================================
+    # =============================================================================================================
+    # SelfassesmentTracker
+    path(route=f'{SelfassesmentTracker_path}/{home_suffix}/',
+        view=home_selfassesment_tracker,
+        name=f'{SelfassesmentTracker_name}_{home_suffix}'),
 
-    # path(route=f'{Tracker_path}/{create_suffix}/',
-    #     # view=create_Tracker,
-    #     name=f'{Tracker_name}_{create_suffix}'),
+    path(route=f'{SelfassesmentTracker_path}/{create_suffix}/',
+        view=create_selfassesment_tracker,
+        name=f'{SelfassesmentTracker_name}_{create_suffix}'),
 
-    # path(route=f'{Tracker_path}/{update_suffix}/<int:client_id>/', 
-    #     # view=update_Tracker, 
-    #     name=f'{Tracker_name}_{update_suffix}'),
+    path(route=f'{SelfassesmentTracker_path}/{update_suffix}/<int:tracker_id>/', 
+        view=update_selfassesment_tracker, 
+        name=f'{SelfassesmentTracker_name}_{update_suffix}'),
 
-    # path(route=f'{Tracker_path}/{delete_suffix}/<int:client_id>/', 
-    #     # view=update_Tracker, 
-    #     name=f'{Tracker_name}_{delete_suffix}'),
+    path(route=f'{SelfassesmentTracker_path}/{delete_suffix}/<int:tracker_id>/', 
+        view=delete_selfassesment_tracker, 
+        name=f'{SelfassesmentTracker_name}_{delete_suffix}'),
 
-    # path(route=f'{Tracker_path}/{search_suffix}/<str:search_text>/', 
-    #     # view=search_Tracker, 
-    #     name=f'{Tracker_name}_{search_suffix}'),
+    path(route=f'{SelfassesmentTracker_path}/{search_suffix}/<str:search_text>/', 
+        view=search_selfassesment_tracker, 
+        name=f'{SelfassesmentTracker_name}_{search_suffix}'),
 
-    # path(route=f'{Tracker_path}/{viewall_suffix}/', 
-    #     # view=all_Tracker, 
-    #     name=f'{Tracker_name}_{viewall_suffix}'),
+    path(route=f'{SelfassesmentTracker_path}/{viewall_suffix}/', 
+        view=all_selfassesment_tracker, 
+        name=f'{SelfassesmentTracker_name}_{viewall_suffix}'),
 ]

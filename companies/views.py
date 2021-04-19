@@ -9,7 +9,7 @@ from django.db import models
 from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm
 from .forms import SelfassesmentAccountSubmissionCreationForm, SelfassesmentAccountSubmissionChangeForm, SelfassesmentAccountSubmissionDeleteForm
 from .forms import Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form
-from .forms import SelfassesmentTrackerCreationForm, SelfassesmentTrackerChangeForm
+from .forms import SelfassesmentTrackerCreationForm, SelfassesmentTrackerChangeForm, SelfassesmentTrackerDeleteForm
 
 #models
 from .models import Selfassesment, SelfassesmentAccountSubmission
@@ -18,10 +18,10 @@ from .models import SelfassesmentTracker
 #queries
 from .queries import db_search_Selfassesment, db_all_Selfassesment
 from .queries import db_search_SelfassesmentAccountSubmission, db_all_SelfassesmentAccountSubmission
-from .queries import db_search_SelfassesmentTracker, db_all_SelfassesmentTrackers
+from .queries import db_search_SelfassesmentTracker, db_all_SelfassesmentTracker
 
 from .url_variables import application_name, Selfassesment_name, Selfassesment_path, Selfassesment_Account_Submission_name, Selfassesment_Account_Submission_path
-from .url_variables import Limited_name, Limited_Account_Submission_name, SelfassesmentTracker_name
+from .url_variables import Limited_name, Limited_Account_Submission_name, SelfassesmentTracker_name, SelfassesmentTracker_path
 from .url_variables import home_suffix, viewall_suffix, create_suffix, update_suffix, delete_suffix, search_suffix
 
 
@@ -54,6 +54,17 @@ URL_path_names = {
   'selfassesment_account_submission_viewall': f'{application_name}:{Selfassesment_Account_Submission_name}_{viewall_suffix}', # fetch only
   'selfassesment_account_submission_viewall_url': f'/{application_name}/{Selfassesment_Account_Submission_path}/{viewall_suffix}/', # fetch only
   'add_all_selfassesment_to_selfassesment_account_submission': f'{application_name}:add_all_{Selfassesment_name}_to_{Selfassesment_Account_Submission_name}',
+
+  'selfassesment_tracker_home': f'{application_name}:{SelfassesmentTracker_name}_{home_suffix}',
+  'selfassesment_tracker_create': f'{application_name}:{SelfassesmentTracker_name}_{create_suffix}',
+  'selfassesment_tracker_update': f'{application_name}:{SelfassesmentTracker_name}_{update_suffix}',
+  'selfassesment_tracker_update_url_without_argument': f'/{application_name}/{SelfassesmentTracker_path}/{update_suffix}/',
+  'selfassesment_tracker_delete': f'{application_name}:{SelfassesmentTracker_name}_{delete_suffix}',
+  'selfassesment_tracker_delete_url_without_argument': f'/{application_name}/{SelfassesmentTracker_path}/{delete_suffix}/',
+  'selfassesment_tracker_search': f'{application_name}:{SelfassesmentTracker_name}_{search_suffix}', # fetch only
+  'selfassesment_tracker_search_url_without_argument': f'/{application_name}/{SelfassesmentTracker_path}/{search_suffix}/', # fetch only
+  'selfassesment_tracker_viewall': f'{application_name}:{SelfassesmentTracker_name}_{viewall_suffix}', # fetch only
+  'selfassesment_tracker_viewall_url': f'/{application_name}/{SelfassesmentTracker_path}/{viewall_suffix}/', # fetch only
 }
 
 # =============================================================================================================
@@ -305,7 +316,7 @@ def add_all_selfassesment_to_selfassesment_account_submission_w_submission_year(
 @login_required
 def home_selfassesment_tracker(request):
   pk_field = 'tracker_id'
-  exclude_fields = set(['tracker_id', 'is_updated', 'created_by'])
+  exclude_fields = set(['tracker_id', 'is_updated', 'creation_date'])
   context = {
     **URL_path_names,
     'model_fields': get_field_names_from_model(SelfassesmentTracker),
@@ -323,17 +334,17 @@ def create_selfassesment_tracker(request):
   context = {
     **URL_path_names,
   }
-  context['form'] = SelfassesmentTrackerCreationForm(initial={'submitted_by': request.user.user_id})
+  context['form'] = SelfassesmentTrackerCreationForm(initial={'created_by': request.user.user_id})
 
   if request.method == 'POST':
-    form = SelfassesmentTrackerCreationForm(request.POST)
+    form = SelfassesmentTrackerCreationForm(request.POST, initial={'created_by': request.user.user_id})
     context['form'] = form
     if form.is_valid():
       assesment = form.save()
-      if not assesment.submitted_by:
-        assesment.submitted_by = request.user
-      assesment.set_defaults()
-      messages.success(request, f'New Selfassesment Account Submission has been created with id {assesment.tracker_id}!')
+      assesment.created_by = request.user
+      assesment.done_by = request.user
+      assesment.save()
+      messages.success(request, f'New Selfassesment Tracker has been created with id {assesment.tracker_id}!')
       return redirect(URL_path_names['selfassesment_tracker_home'])
   return render(request, template_name='companies/selfassesment_tracker/create.html', context=context)
 
@@ -349,7 +360,7 @@ def update_selfassesment_tracker(request, tracker_id:int):
     record =  SelfassesmentTracker.objects.get(tracker_id=tracker_id)
     context['form'] = SelfassesmentTrackerChangeForm(instance=record)
   except SelfassesmentTracker.DoesNotExist:
-    messages.error(request, f'Selfassesment Account Submission having id {tracker_id} does not exists!')
+    messages.error(request, f'Selfassesment Tracker having id {tracker_id} does not exists!')
     return redirect(URL_path_names['selfassesment_tracker_home'])
     raise Http404
 
@@ -358,49 +369,49 @@ def update_selfassesment_tracker(request, tracker_id:int):
     context['form'] = form
     if form.is_valid():
       assesment = form.save()
-      messages.success(request, f'Selfassesment Account Submission has been updated having id {tracker_id}!')
+      messages.success(request, f'Selfassesment Tracker has been updated having id {tracker_id}!')
       return redirect(URL_path_names['selfassesment_tracker_home'])
-    messages.error(request, f'Updating Selfassesment Account Submission having id {tracker_id} failed due to invalid data!')
+    messages.error(request, f'Updating Selfassesment Tracker having id {tracker_id} failed due to invalid data!')
   return render(request, template_name='companies/selfassesment_tracker/update.html', context=context)
 
-# @login_required
-# def delete_selfassesment_tracker(request, tracker_id:int):
-#   context = {
-#     **URL_path_names,
-#   }
-#   context['form'] = SelfassesmentTrackerDeleteForm()
-#   context['tracker_id'] = tracker_id
+@login_required
+def delete_selfassesment_tracker(request, tracker_id:int):
+  context = {
+    **URL_path_names,
+  }
+  context['form'] = SelfassesmentTrackerDeleteForm()
+  context['tracker_id'] = tracker_id
 
-#   if request.method == 'POST':
-#     form = SelfassesmentTrackerDeleteForm(request.POST)
-#     context['form'] = form
-#     if form.is_valid():
-#       try:
-#         record =  SelfassesmentTracker.objects.get(tracker_id=tracker_id)
-#         record.delete()
-#         messages.success(request, f'Selfassesment Account Submission has been deleted having id {tracker_id}!')
-#       except SelfassesmentTracker.DoesNotExist:
-#         messages.error(request, f'Selfassesment Account Submission record with id {tracker_id}, you are looking for does not exist!')
-#         return redirect(URL_path_names['selfassesment_tracker_home'])
-#     else:
-#       messages.error(request, f'Deletion of Selfassesment Account Submission having id {tracker_id} failed')
-#     return redirect(URL_path_names['selfassesment_tracker_home'])
-#   return render(request, template_name='companies/selfassesment_tracker/delete.html', context=context)
+  if request.method == 'POST':
+    form = SelfassesmentTrackerDeleteForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      try:
+        record =  SelfassesmentTracker.objects.get(tracker_id=tracker_id)
+        record.delete()
+        messages.success(request, f'Selfassesment Tracker has been deleted having id {tracker_id}!')
+      except SelfassesmentTracker.DoesNotExist:
+        messages.error(request, f'Selfassesment Tracker record with id {tracker_id}, you are looking for does not exist!')
+        return redirect(URL_path_names['selfassesment_tracker_home'])
+    else:
+      messages.error(request, f'Deletion of Selfassesment Tracker having id {tracker_id} failed')
+    return redirect(URL_path_names['selfassesment_tracker_home'])
+  return render(request, template_name='companies/selfassesment_tracker/delete.html', context=context)
 
-# @login_required
-# def search_selfassesment_tracker(request, search_text: str='', limit: int=-1):
-#   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
-#     if search_text.strip()=='':
-#       return redirect(URL_path_names['selfassesment_tracker_viewall'])
-#     records = db_search_SelfassesmentTracker(search_text, limit)
-#     data = serialize(queryset=records, format='json')
-#     return HttpResponse(data, content_type='application/json')
-#   raise Http404
+@login_required
+def search_selfassesment_tracker(request, search_text: str='', limit: int=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    if search_text.strip()=='':
+      return redirect(URL_path_names['selfassesment_tracker_viewall'])
+    records = db_search_SelfassesmentTracker(search_text, limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
 
-# @login_required
-# def all_selfassesment_tracker(request, limit=-1):
-#   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
-#     records = db_all_SelfassesmentTracker(limit)
-#     data = serialize(queryset=records, format='json')
-#     return HttpResponse(data, content_type='application/json')
-#   raise Http404
+@login_required
+def all_selfassesment_tracker(request, limit=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    records = db_all_SelfassesmentTracker(limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404

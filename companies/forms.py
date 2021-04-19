@@ -132,7 +132,7 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
 
 
 class SelfassesmentTrackerCreationForm(forms.ModelForm):
-    deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate()}))
     
     class Meta:
         model = SelfassesmentTracker
@@ -157,7 +157,13 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
             # 'created_by',
             'done_by',
             # 'client_id',
-            # 'job_description',
+            'job_description',
             # 'deadline',
             'complete_date',
             'is_completed',)
+
+class SelfassesmentTrackerDeleteForm(forms.ModelForm):
+    agree = forms.BooleanField(label='I want to proceed.', required=True)
+    class Meta:
+        model = Selfassesment
+        fields = ()

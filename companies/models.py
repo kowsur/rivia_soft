@@ -156,6 +156,7 @@ class SelfassesmentTracker(models.Model):
         verbose_name_plural = _("Selfassesment Trackers")
 
     tracker_id = models.AutoField(verbose_name = 'Tracker ID', blank=True, null=False, primary_key=True, db_index=True)
+    client_id = models.ForeignKey(to=Selfassesment, on_delete=models.CASCADE, verbose_name='Client ID', to_field='client_id', related_name='selfassesment_client_id',blank=False, null=False)
     creation_date = models.DateTimeField(verbose_name='Tracker creation datetime', editable=False, blank=True, null=False, default=timezone.now)
     created_by = models.ForeignKey(
         to='users.CustomUser',
@@ -173,7 +174,6 @@ class SelfassesmentTracker(models.Model):
         to_field='email',
         blank=True,
         null=True)
-    client_id = models.ForeignKey(to=Selfassesment, on_delete=models.CASCADE, verbose_name='Client ID', to_field='client_id', related_name='selfassesment_client_id',blank=False, null=False)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)
     deadline = models.DateField(verbose_name='Deadline', blank=False, null=False, default=timezone.now)
     complete_date = models.DateField(verbose_name='Complete Date', blank=True, null=True, default=timezone.now)

@@ -173,9 +173,9 @@ def home_selfassesment_account_submission(request):
   }
   return render(request=request, template_name='companies/selfassesment_account_submission/home.html', context=context)
 
-# @login_required
-# def view_selfassesment_account_submission(request):
-#   return redirect(URL_path_names['selfassesment_account_submission_home'])
+@login_required
+def view_selfassesment_account_submission(request):
+  return redirect(URL_path_names['selfassesment_account_submission_home'])
 
 @login_required
 def create_selfassesment_account_submission(request):
@@ -297,4 +297,4 @@ def add_all_selfassesment_to_selfassesment_account_submission_w_submission_year(
 
 # =============================================================================================================
 # =============================================================================================================
-# SelfassesmentAccountSubmission
+# SelfassesmentTracker

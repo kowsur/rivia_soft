@@ -2,13 +2,14 @@ from django.urls import path
 from django.urls.conf import re_path
 
 # selfassesment view functions
-from .views import home_selfassesment, view_selfassesment, create_selfassesment,                    \
+from .views import home_selfassesment, view_selfassesment, create_selfassesment,                                     \
     update_selfassesment, delete_selfassesment, search_selfassesment, all_selfassesment
 # selfassesment account submission view function
-from .views import home_selfassesment_account_submission, create_selfassesment_account_submission,  \
-    update_selfassesment_account_submission, delete_selfassesment_account_submission,               \
-    search_selfassesment_account_submission, all_selfassesment_account_submission,                  \
-    add_all_selfassesment_to_selfassesment_account_submission_w_submission_year
+from .views import home_selfassesment_account_submission, view_selfassesment_account_submission,                     \
+    create_selfassesment_account_submission, update_selfassesment_account_submission,                                \
+    delete_selfassesment_account_submission, search_selfassesment_account_submission,                                \
+    all_selfassesment_account_submission, add_all_selfassesment_to_selfassesment_account_submission_w_submission_year\
+    
 from .url_variables import *
 
 app_name = application_name
@@ -24,7 +25,11 @@ urlpatterns = [
     path(route=f'{Selfassesment_path}/{home_suffix}/',
         view=home_selfassesment,
         name=f'{Selfassesment_name}_{home_suffix}'),
-
+    
+    path(route=f'{Selfassesment_path}/{viewall_suffix}/',
+        view=view_selfassesment,
+        name=f'{Selfassesment_name}_{viewall_suffix}'),
+    
     path(route=f'{Selfassesment_path}/{create_suffix}/',
         view=create_selfassesment,
         name=f'{Selfassesment_name}_{create_suffix}'),
@@ -50,6 +55,10 @@ urlpatterns = [
     path(route=f'{Selfassesment_Account_Submission_path}/{home_suffix}/', 
         view=home_selfassesment_account_submission, 
         name=f'{Selfassesment_Account_Submission_name}_{home_suffix}'),
+    
+    path(route=f'{Selfassesment_Account_Submission_path}/{viewall_suffix}/', 
+        view=view_selfassesment_account_submission, 
+        name=f'{Selfassesment_Account_Submission_name}_{viewall_suffix}'),
 
     path(route=f'{Selfassesment_Account_Submission_path}/{create_suffix}/', 
         view=create_selfassesment_account_submission, 

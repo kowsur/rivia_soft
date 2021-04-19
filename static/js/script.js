@@ -17,6 +17,16 @@ let DATA = {
   delete_url
 };
 
+let delete_message_after = 10000 //milisecond
+setTimeout(function(){
+    let messages = document.getElementsByClassName('message')
+    if (messages){
+    for (let element of messages){
+      element.remove()
+    }
+  };
+}, delete_message_after);
+
 // ================================================================================================
 // Search functionality
 //setup before functions

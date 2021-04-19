@@ -27,7 +27,7 @@
 <!-- add all selfassesments -->
 {% if request.user.is_superuser %}
 <div class="mt-5 grid place-items-center">
-  <a href="{% url add_all_selfassesment_to_selfassesment_account_submission %}" class="create px-4 py-2 rounded-md">
+  <a href="{% url add_all_selfassesment_to_selfassesment_account_submission %}" class="create px-4 py-2 text-md font-semibold rounded-md">
     Add all Selfassesment to Selfassesment Account Submission</a>
 </div>
 {% endif %}
@@ -51,7 +51,4 @@
 <input hidden aria-hidden="true" type="url" name="delete_url_without_argument" value="{{ selfassesment_account_submission_delete_url_without_argument }}">
 <pre hidden aria-hidden="true" name="model_fields">{{ model_fields }}</pre>
 
-<!-- script -->
 {% endblock content %}
-
-<!-- message clases = 'message error success' -->

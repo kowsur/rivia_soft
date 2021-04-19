@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load companies_tags %}
+
+{% block title %}
+  Limited to Limited Account Submission
+{% endblock title %}
+
+
+{% block content %}
+
+<form action="{% url add_all_limited_to_limited_account_submission %}" method="POST" class="my-10">
+  {% csrf_token %}
+  <h1 class="py-3 text-lg font-bold text-center rounded shadow-lg create select-none">Add all Limited to Limited Account Submission</h1>
+  
+  {% for field in form %}
+    <div class="flex flex-col align-middle items-start w-full">
+        <div class="w-full mt-3.5">
+            <label for="{{ 'id_'|addstr:field.name }}">{{ field.label }}{% if field.field.required %}*{% endif %}</label>
+            {{ field }}
+            <div class="text-red-500">
+                {{ field.errors }}
+            </div>
+        </div>
+    </div>
+  {% endfor %}
+  <button type="submit" class="create">Add all</button>
+</form>
+
+{% endblock content %}

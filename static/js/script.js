@@ -85,13 +85,26 @@ function get_tr_for_table(data, template=template, model_fields=fields, update_u
   instance.getElementById('edit').href = `${update_link}`
   instance.getElementById('delete').href = `${delete_link}`
   
+  // fill the template
   for (let field of model_fields){
     let td = instance.getElementById(field)
-    if (td) td.textContent = data.fields[field]
-  } return instance;
+    // when field exists in the template fill it in with data
+    if (td){
+      let field_data = data.fields[field]
+      if (!(field_data===true || field_data===false)){
+        // field data is text so show it as text
+        td.textContent = field_data
+      }else{
+        //data is boolean so show it as checkbox
+        let checked_checkbox = `<input type="checkbox" checked="" disabled>`
+        let unchecked_checkbox = `<input type="checkbox" disabled>`
+        if(field_data) {td.innerHTML=checked_checkbox} else{td.innerHTML=unchecked_checkbox}
+      } 
+    }
+  }return instance; //return table row instance
 }
 
-function populate_with_data(
+async function populate_with_data(
   data_array,
   table_row_getter = get_tr_for_table,
   template_querySelector_string = template_querySelector){
@@ -103,9 +116,10 @@ function populate_with_data(
   tbody.innerHTML='' // clear the container
   
   // populate the table
-  data_array.forEach(record => {
-    tbody.appendChild(table_row_getter(record, template))
-  })
+  for (let record of data_array){
+    let table_row = table_row_getter(record, template)
+    tbody.appendChild(table_row)
+  }
 }
 
 //====================================================================================================================================
@@ -276,4 +290,12 @@ function deepCompare () {
   }
 
   return true;
+}
+
+function sleep(milliseconds) {
+  const date = Date.now();
+  let currentDate = null;
+  do {
+    currentDate = Date.now();
+  } while (currentDate - date < milliseconds);
 }

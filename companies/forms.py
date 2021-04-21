@@ -1,6 +1,8 @@
 from django import forms
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
 from django.utils import timezone
+from .fields import SearchableSelectField
+from .url_variables import *
 
 
 class SelfassesmentCreationForm(forms.ModelForm):
@@ -67,9 +69,16 @@ class SelfassesmentDeleteForm(forms.ModelForm):
         model = Selfassesment
         fields = ()
 
+selfassesment_search_url_without_argument =  f'/{application_name}/{Selfassesment_path}/{search_suffix}/'
+selfassesment_viewall_url =  f'/{application_name}/{Selfassesment_path}/{viewall_suffix}/'
 
 class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
     date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate()}))
+    client_id = SearchableSelectField(
+        search_url = selfassesment_search_url_without_argument,
+        all_url = selfassesment_viewall_url,
+        repr_format = r"👥{fields.client_name} 📞{fields.client_phone_number}"
+        )
 
     class Meta:
         model = SelfassesmentAccountSubmission

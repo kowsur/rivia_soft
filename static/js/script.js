@@ -94,6 +94,10 @@ function get_tr_for_table(data, template=template, model_fields=fields, update_u
       if (!(field_data===true || field_data===false)){
         // field data is text so show it as text
         td.textContent = field_data
+        if (field_data && field_data.length>=70){
+          td.classList.add('whitespace-normal')
+          td.classList.add('max-w-md')
+        }
       }else{
         //data is boolean so show it as checkbox
         let checked_checkbox = `<input type="checkbox" checked="" disabled>`

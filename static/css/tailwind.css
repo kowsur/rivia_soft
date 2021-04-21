@@ -144,7 +144,7 @@
 #data .data-row:last-child .data-cell:first-child{ @apply rounded-bl-lg; }
 
 .data-head .data-head-row{
-  @apply font-normal;
+  @apply font-normal whitespace-nowrap;
 }
 
 .data-row{
@@ -155,11 +155,27 @@
 }
 
 .data-id{
-  @apply text-center px-3 py-2;
+  @apply text-center px-3 py-2 whitespace-nowrap;
 }
 .data-cell{
-  @apply h-full whitespace-nowrap px-5;
+  @apply h-full px-5 py-2;
 }
 /* #data .data-row:hover{
   @apply ;
 } */
+
+/* searchable input field */
+div.search_field > select{
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+}
+
+div.search_field > select:active,
+div.search_field > select:focus,
+div.search_field > select:focus-visible,
+div.search_field > input:focus ~ select,
+div.search_field > input:focus-visible ~ select{
+  display: block;
+}

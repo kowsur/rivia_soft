@@ -12,7 +12,8 @@ module.exports = {
     content: [
       // Important: keep the files that uses tailwind classes in a sub-folder and add them here
       './templates/**/*.html',
-      './**/templates/**/*.html'
+      './**/templates/**/*.html',
+      './**/static/js/**/*.js'
     ]
   },
   darkMode: 'media', // or 'media' or 'class'

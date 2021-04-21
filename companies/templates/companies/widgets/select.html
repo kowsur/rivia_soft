@@ -1,0 +1,13 @@
+{% load static %}
+{% load companies_tags %}
+
+<div style="position: relative;" class="search_field">
+  <input value="{{ repr_format }}" name="repr_format" type="text"  aria-hidden="true" hidden>
+  <input value="{{ search_url }}" name="search_url" type="text"  aria-hidden="true" hidden>
+  <input value="{{ all_url }}" name="all_url" type="text"  aria-hidden="true" hidden>
+  <input type="text" for='client_id' class="search" name="search" autocomplete="off">
+  <select name="{{ widget.name }}" required id="{{ 'id_'|addstr:widget.name }}">
+    <option value="" selected>---------</option>
+  </select>
+  <script type="module" src='{% static "js/form_search.js" %}'></script>
+</div>

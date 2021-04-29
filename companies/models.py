@@ -13,13 +13,14 @@ class Selfassesment(models.Model):
     
     # identifies wheather the record is updated needs superuser permission
     is_updated = models.BooleanField(_('Update Status'), default=True, editable=False)
-
+    date_of_registration = models.DateField(verbose_name='Registration date', blank=False, null=False, default=timezone.now)
+    
     created_by = models.ForeignKey(
         to='users.CustomUser',
         on_delete=models.SET_NULL,
         verbose_name='Created by',
         related_name='selfassesment_created_by',
-        to_field='email',
+        to_field='user_id',
         blank=True,
         null=True)
     client_id = models.AutoField(
@@ -31,11 +32,10 @@ class Selfassesment(models.Model):
         editable=False,
         db_index=True) # auto incrementing primary field
     client_file_number = models.IntegerField(verbose_name='File Number', unique=True, blank=False, null=True, editable=True)
-    client_name = models.CharField(verbose_name='Full Name', max_length=100, blank=False, null=False, db_index=True)
+    client_name = models.CharField(verbose_name='Full Name / Business Name', max_length=100, blank=False, null=False, db_index=True)
     client_phone_number = models.CharField(verbose_name='Phone numbers', max_length=255, blank=False, null=False, db_index=True)
     email = models.EmailField(verbose_name='Email', max_length=320, blank=True, null=True)
     is_active = models.BooleanField(verbose_name='Active Status', blank=False, null=False, default=True)
-    date_of_registration = models.DateField(verbose_name='Registration date', blank=False, null=False, default=timezone.now)
     UTR = models.CharField(
         verbose_name='UTR',
         max_length=10,
@@ -50,7 +50,7 @@ class Selfassesment(models.Model):
         blank=True,
         null=True,
         validators=[NINO_VALIDATOR])
-    gateway_id = models.CharField(verbose_name='Gateway ID', max_length=255, blank=True, null=True)
+    gateway_id = models.CharField(verbose_name='Personal Gateway ID', max_length=255, blank=True, null=True)
     gateway_password = models.CharField(verbose_name='Gateway Password', max_length=255, blank=True, null=True)
     address = models.TextField(verbose_name='Address', blank=True, null=True, db_index=True)
     post_code = models.CharField(verbose_name='Postal Code', max_length=10, blank=True, null=True)
@@ -136,7 +136,7 @@ class SelfassesmentAccountSubmission(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Submitted By', 
         related_name='selfassesment_account_submission_submitted_by',
-        to_field='email',
+        to_field='user_id',
         blank=False,
         null=True)
     account_prepared_by = models.ForeignKey(
@@ -144,7 +144,7 @@ class SelfassesmentAccountSubmission(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Prepared By',
         related_name='selfassesment_account_submission_prepared_by',
-        to_field='email',
+        to_field='user_id',
         blank=True,
         null=True)
     remarks = models.TextField(verbose_name='Remarks', blank=True, null=True)
@@ -185,7 +185,7 @@ class SelfassesmentTracker(models.Model):
         on_delete=models.RESTRICT,
         verbose_name='Created By',
         related_name='selfassesment_tracker_created_by',
-        to_field='email',
+        to_field='user_id',
         blank=False,
         null=True)
     done_by = models.ForeignKey(
@@ -193,7 +193,7 @@ class SelfassesmentTracker(models.Model):
         on_delete=models.SET_NULL,
         verbose_name='Done By',
         related_name='selfassesment_tracker_done_by',
-        to_field='email',
+        to_field='user_id',
         blank=True,
         null=True)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)
@@ -226,7 +226,7 @@ class Limited(models.Model):
         on_delete=models.SET_NULL,
         verbose_name='Created by',
         related_name='limited_created_by',
-        to_field='email',
+        to_field='user_id',
         blank=True,
         null=True)
     client_id = models.AutoField(
@@ -343,7 +343,7 @@ class LimitedAccountSubmission(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Submitted By', 
         related_name='limited_account_submission_submitted_by',
-        to_field='email',
+        to_field='user_id',
         blank=False,
         null=True)
     account_prepared_by = models.ForeignKey(
@@ -351,7 +351,7 @@ class LimitedAccountSubmission(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Prepared By',
         related_name='limited_account_submission_prepared_by',
-        to_field='email',
+        to_field='user_id',
         blank=True,
         null=True)
     remarks = models.TextField(verbose_name='Remarks', blank=True, null=True)
@@ -392,7 +392,7 @@ class LimitedTracker(models.Model):
         on_delete=models.RESTRICT,
         verbose_name='Created By',
         related_name='limited_tracker_created_by',
-        to_field='email',
+        to_field='user_id',
         blank=False,
         null=True)
     done_by = models.ForeignKey(
@@ -400,7 +400,7 @@ class LimitedTracker(models.Model):
         on_delete=models.SET_NULL,
         verbose_name='Done By',
         related_name='limited_tracker_done_by',
-        to_field='email',
+        to_field='user_id',
         blank=True,
         null=True)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)

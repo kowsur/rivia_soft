@@ -2,17 +2,55 @@
 {% load static %}
 
 {% block title %}
-RiviaSoft | Home
+  {{ page_title }}
 {% endblock title %}
 
 {% block head %}
-
-{% endblock head %} 
+  
+{% endblock head %}
 
 {% block content %}
 
-<form action="">
-  
-</form>
+<!-- messages -->
+{% if messages %}
+{% for message in messages %}
+<h1 class='message {{ message.tags }}'>
+  {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+  {{ message }}
+</h1>
+{% endfor %}
+{% endif %}
+
+<!-- searchbar -->
+{% include "companies/searchbar.html" %}
+
+{% if add_all_url %}
+  <!-- add all selfassesments -->
+  {% if request.user.is_superuser %}
+  <div class="mt-5 grid place-items-center">
+    <a href="{% url add_all_url %}" class="create px-4 py-2 text-md font-semibold rounded-md">
+      {{ add_all_text }}</a>
+  </div>
+  {% endif %}
+{% endif %}
+
+
+<!-- data -->
+{% autoescape off %}
+  {{ data_container }}
+{% endautoescape %}
+
+
+<!-- data template -->
+{% autoescape off %}
+  {{ template_tag }}
+{% endautoescape %}
+
+<!-- data -->
+<input hidden aria-hidden="true" type="url" name="all_url" value="{{ viewall_url }}">
+<input hidden aria-hidden="true" type="url" name="search_url_without_argument" value="{{ search_url }}">
+<input hidden aria-hidden="true" type="url" name="update_url_without_argument" value="{{ update_url }}">
+<input hidden aria-hidden="true" type="url" name="delete_url_without_argument" value="{{ delete_url }}">
+<pre hidden aria-hidden="true" name="model_fields">{{ model_fields }}</pre>
 
 {% endblock content %}

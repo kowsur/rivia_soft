@@ -1,3 +1,14 @@
+// clear messsage after 10 seconds
+let delete_message_after = 10000 //milisecond
+setTimeout(function(){
+  let messages = document.getElementsByClassName('message')
+  if (messages){
+    for (let element of messages){
+      element.remove()
+    }
+  };
+}, delete_message_after);
+
 let template_querySelector = 'template#data-template';
 
 // collect urls
@@ -16,16 +27,6 @@ let DATA = {
   update_url,
   delete_url
 };
-
-let delete_message_after = 10000 //milisecond
-setTimeout(function(){
-    let messages = document.getElementsByClassName('message')
-    if (messages){
-    for (let element of messages){
-      element.remove()
-    }
-  };
-}, delete_message_after);
 
 // ================================================================================================
 // Search functionality
@@ -94,9 +95,11 @@ function get_tr_for_table(data, template=template, model_fields=fields, update_u
       if (!(field_data===true || field_data===false)){
         // field data is text so show it as text
         td.textContent = field_data
-        if (field_data && field_data.length>=70){
+        td.classList.add('whitespace-nowrap')
+        if (field_data && field_data.length>=30){
+          td.classList.remove('whitespace-nowrap')
           td.classList.add('whitespace-normal')
-          td.classList.add('max-w-md')
+          td.style.minWidth = '35ch'
         }
       }else{
         //data is boolean so show it as checkbox

@@ -20,14 +20,17 @@ select_elements.forEach(element => {
   })
 }); 
 
+// Add event lister to query database on text input
 let search_boxes = document.querySelectorAll('div[class="search_field"] > [name="search"]')
 search_boxes.forEach(search_box => 
   search_box.addEventListener('input', (event) => {
+    // collect fields containing input and urls
     let search_field = event.currentTarget.parentElement
     let search_url_input_tag = search_field.querySelector('[name="search_url"]')
     let all_url_input_tag = search_field.querySelector('[name="all_url"]')
     let repr_format_pre_tag = search_field.querySelector('[name="repr_format"]')
 
+    // separate info to search
     let search_text = event.currentTarget.value.trim()
     let search_url = search_url_input_tag.value
     let all_url = all_url_input_tag.value

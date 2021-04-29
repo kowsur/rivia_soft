@@ -1,9 +1,14 @@
+from django.forms import widgets
+from django.utils.translation import ugettext_lazy as _
 from django import forms
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
 from django.utils import timezone
-from .fields import SearchableSelectField
-from .url_variables import *
+from .fields import SearchableModelField, Select
+from .url_variables import Full_URL_PATHS_WITHOUT_ARGUMENTS
 
+from users.models import CustomUser
+search_users_url_path = '/u/search/'
+all_users_url_path = '/u/all/'
 
 class SelfassesmentCreationForm(forms.ModelForm):
     date_of_registration = forms.DateField(
@@ -15,10 +20,10 @@ class SelfassesmentCreationForm(forms.ModelForm):
         model = Selfassesment
         fields = (
             # 'client_id',
+            'date_of_registration', 
             'client_file_number', 
             'client_name', 
             'client_phone_number', 
-            'date_of_registration', 
             'UTR', 
             'HMRC_referance', 
             'NINO', 
@@ -69,15 +74,17 @@ class SelfassesmentDeleteForm(forms.ModelForm):
         model = Selfassesment
         fields = ()
 
-selfassesment_search_url_without_argument =  f'/{application_name}/{Selfassesment_path}/{search_suffix}/'
-selfassesment_viewall_url =  f'/{application_name}/{Selfassesment_path}/{viewall_suffix}/'
 
 class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
     date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate()}))
-    client_id = SearchableSelectField(
-        search_url = selfassesment_search_url_without_argument,
-        all_url = selfassesment_viewall_url,
-        repr_format = r"👥{fields.client_name} 📞{fields.client_phone_number}"
+    client_id = SearchableModelField(
+        queryset=Selfassesment.objects.all(),
+        label = 'Client Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
+        repr_format = r"👥{fields.client_name} 📞{fields.client_phone_number}",
+        model=Selfassesment,
+        fk_field='client_id'
         )
 
     class Meta:
@@ -95,10 +102,30 @@ class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
             # 'is_paid', 
             # 'is_submitted'
             )
+        labels = {
+            'client_id': _('Client Name'),
+        }
 
 
 class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
     date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    client_id = SearchableModelField(
+        queryset=Selfassesment.objects.all(),
+        label = 'Client Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
+        repr_format = r"👥{fields.client_name} 📞{fields.client_phone_number}",
+        model=Selfassesment,
+        fk_field='client_id'
+        )
+    account_prepared_by = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = r"📨{fields.email} 👥{fields.first_name}",
+        model=CustomUser,
+        fk_field='email'
+        )
 
     class Meta:
         model = SelfassesmentAccountSubmission
@@ -113,6 +140,9 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
             'paid_amount', 
             'is_paid', 
             'is_submitted')
+        labels = {
+            'client_id': _('Client Name'),
+        }
 
 class SelfassesmentAccountSubmissionDeleteForm(forms.ModelForm):
     agree = forms.BooleanField(label='I want to proceed.', required=True)
@@ -121,9 +151,24 @@ class SelfassesmentAccountSubmissionDeleteForm(forms.ModelForm):
         fields = ()
 
 
-
 class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelForm):
     date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate()}))
+    submitted_by = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = r"📨{fields.email} 👥{fields.first_name}",
+        model=CustomUser,
+        fk_field='email'
+        )
+    account_prepared_by = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = r"📨{fields.email} 👥{fields.first_name}",
+        model=CustomUser,
+        fk_field='email'
+        )
     
     class Meta:
         model = SelfassesmentAccountSubmission
@@ -142,6 +187,15 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
 
 class SelfassesmentTrackerCreationForm(forms.ModelForm):
     deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate()}))
+    client_id = SearchableModelField(
+        queryset=Selfassesment.objects.all(),
+        label = 'Client Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
+        repr_format = r"👥{fields.client_name} 📞{fields.client_phone_number}",
+        model=Selfassesment,
+        fk_field='client_id'
+        )
     
     class Meta:
         model = SelfassesmentTracker
@@ -156,8 +210,17 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
             # 'is_completed',
             )
 
+
 class SelfassesmentTrackerChangeForm(forms.ModelForm):
     complete_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    done_by = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = r"📨{fields.email} 👥{fields.first_name}",
+        model=CustomUser,
+        fk_field='email'
+        )
     
     class Meta:
         model = SelfassesmentTracker

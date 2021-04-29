@@ -73,7 +73,7 @@ class SelfassesmentAdmin(admin.ModelAdmin):
           }
         ),
         (
-          'Others', {
+          'HMRC Details', {
             'classes': ('wide',),
             'fields': ('UTR', 'HMRC_referance', 'NINO', 'gateway_id', 'gateway_password')
           }

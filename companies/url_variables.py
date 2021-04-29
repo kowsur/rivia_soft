@@ -30,18 +30,21 @@ LimitedTracker_name = 'LTDTrc'
 
 
 class Dict_Duck_type:
-  def get_dict(self):
+  @classmethod
+  def get_dict(cls) -> dict:
     attars = {}
-    for attar in dir(self):
+    for attar in dir(cls):
       if not callable(attar) and not (attar.startswith('__') or attar.endswith('__')):
-        attars[attar] = getattr(self, attar)
+        attars[attar] = getattr(cls, attar)
     return attars
   
-  def __getitem__(self, key:str) -> str:
-    return getattr(self, key, '')
+  @classmethod
+  def __getitem__(cls, key:str) -> str:
+    return getattr(cls, key, '')
   
-  def __setitem__(self, key:str, value) -> None:
-    setattr(self, key, value)
+  @classmethod
+  def __setitem__(cls, key:str, value) -> None:
+    setattr(cls, key, value)
 
 
 # Only use in urls.py to set url routes

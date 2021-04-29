@@ -37,7 +37,9 @@ class Select(widgets.ChoiceWidget):
         # print(self.model._meta.pk.name)
 
         query = {self.fk_field: value}
-        context['value'] = self.model.objects.get(**query)
+        context['value'] = ''
+        if not query=={self.fk_field: None}:
+            context['value'] = self.model.objects.get(**query)
         return context
 
 class SearchableModelField(forms.ModelChoiceField):

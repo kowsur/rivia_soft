@@ -84,6 +84,7 @@ class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
         all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
         repr_format = r"👥{fields.client_name} 📞{fields.client_phone_number}",
         model=Selfassesment,
+        choices=Selfassesment.objects.all().only('client_id', 'client_name'),
         fk_field='client_id'
         )
 
@@ -116,6 +117,7 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
         repr_format = r"👥{fields.client_name} 📞{fields.client_phone_number}",
         model=Selfassesment,
+        choices=Selfassesment.objects.all().only('client_id', 'client_name'),
         fk_field='client_id'
         )
     account_prepared_by = SearchableModelField(
@@ -124,7 +126,8 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         all_url = all_users_url_path,
         repr_format = r"📨{fields.email} 👥{fields.first_name}",
         model=CustomUser,
-        fk_field='email'
+        choices=CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field='user_id'
         )
 
     class Meta:
@@ -159,7 +162,8 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
         all_url = all_users_url_path,
         repr_format = r"📨{fields.email} 👥{fields.first_name}",
         model=CustomUser,
-        fk_field='email'
+        choices=CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field='user_id'
         )
     account_prepared_by = SearchableModelField(
         queryset=CustomUser.objects.all(),
@@ -167,7 +171,8 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
         all_url = all_users_url_path,
         repr_format = r"📨{fields.email} 👥{fields.first_name}",
         model=CustomUser,
-        fk_field='email'
+        choices=CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field='user_id'
         )
     
     class Meta:
@@ -194,6 +199,7 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
         all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
         repr_format = r"👥{fields.client_name} 📞{fields.client_phone_number}",
         model=Selfassesment,
+        choices=Selfassesment.objects.all().only('client_id', 'client_name'),
         fk_field='client_id'
         )
     
@@ -219,7 +225,8 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
         all_url = all_users_url_path,
         repr_format = r"📨{fields.email} 👥{fields.first_name}",
         model=CustomUser,
-        fk_field='email'
+        choices=CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field='user_id'
         )
     
     class Meta:

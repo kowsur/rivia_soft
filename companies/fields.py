@@ -9,7 +9,7 @@ class Select(widgets.ChoiceWidget):
     option_template_name = 'companies/widgets/select_option.html'
 
     # def __init__(self, search_url, all_url, fields, repr_format, attrs=None) -> None:
-    def __init__(self, search_url, all_url, repr_format, *args, attrs=None, model=None, fk_field=None, **kwargs) -> None:
+    def __init__(self, search_url, all_url, repr_format, *args, attrs=None, model=None, choices=None, fk_field=None,**kwargs) -> None:
         self.repr_format = repr_format
         self.search_url = search_url
         self.all_url = all_url
@@ -19,9 +19,7 @@ class Select(widgets.ChoiceWidget):
             self.fk_field = self.model._meta.pk.name
         if kwargs.get('label'):
             del kwargs['label']
-        
 
-        choices = Selfassesment.objects.all().only('client_id', 'client_name')
         super().__init__(choices=choices)
     
     def get_context(self, name, value, attrs):
@@ -39,12 +37,13 @@ class Select(widgets.ChoiceWidget):
         query = {self.fk_field: value}
         context['value'] = ''
         if not query=={self.fk_field: None}:
+            print(self.model, query, name,  value)
             context['value'] = self.model.objects.get(**query)
         return context
 
 class SearchableModelField(forms.ModelChoiceField):
     widget = Select
     # def __init__(self, search_url, all_url, fields, repr_format,*args, **kwargs) -> None:
-    def __init__(self, search_url, all_url, repr_format, *args, model=None, fk_field=None, **kwargs) -> None:
-        self.widget = Select(search_url, all_url, repr_format, *args, model=model, fk_field=fk_field,**kwargs)
+    def __init__(self, search_url, all_url, repr_format, *args, model=None, choices=None, fk_field=None, **kwargs) -> None:
+        self.widget = Select(search_url, all_url, repr_format, *args, model=model, choices=choices, fk_field=fk_field,**kwargs)
         super().__init__(*args, **kwargs)

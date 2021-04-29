@@ -20,7 +20,7 @@ class Selfassesment(models.Model):
         on_delete=models.SET_NULL,
         verbose_name='Created by',
         related_name='selfassesment_created_by',
-        to_field='email',
+        to_field='user_id',
         blank=True,
         null=True)
     client_id = models.AutoField(
@@ -136,7 +136,7 @@ class SelfassesmentAccountSubmission(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Submitted By', 
         related_name='selfassesment_account_submission_submitted_by',
-        to_field='email',
+        to_field='user_id',
         blank=False,
         null=True)
     account_prepared_by = models.ForeignKey(
@@ -144,7 +144,7 @@ class SelfassesmentAccountSubmission(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Prepared By',
         related_name='selfassesment_account_submission_prepared_by',
-        to_field='email',
+        to_field='user_id',
         blank=True,
         null=True)
     remarks = models.TextField(verbose_name='Remarks', blank=True, null=True)
@@ -185,7 +185,7 @@ class SelfassesmentTracker(models.Model):
         on_delete=models.RESTRICT,
         verbose_name='Created By',
         related_name='selfassesment_tracker_created_by',
-        to_field='email',
+        to_field='user_id',
         blank=False,
         null=True)
     done_by = models.ForeignKey(
@@ -193,7 +193,7 @@ class SelfassesmentTracker(models.Model):
         on_delete=models.SET_NULL,
         verbose_name='Done By',
         related_name='selfassesment_tracker_done_by',
-        to_field='email',
+        to_field='user_id',
         blank=True,
         null=True)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)
@@ -226,7 +226,7 @@ class Limited(models.Model):
         on_delete=models.SET_NULL,
         verbose_name='Created by',
         related_name='limited_created_by',
-        to_field='email',
+        to_field='user_id',
         blank=True,
         null=True)
     client_id = models.AutoField(
@@ -343,7 +343,7 @@ class LimitedAccountSubmission(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Submitted By', 
         related_name='limited_account_submission_submitted_by',
-        to_field='email',
+        to_field='user_id',
         blank=False,
         null=True)
     account_prepared_by = models.ForeignKey(
@@ -351,7 +351,7 @@ class LimitedAccountSubmission(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Prepared By',
         related_name='limited_account_submission_prepared_by',
-        to_field='email',
+        to_field='user_id',
         blank=True,
         null=True)
     remarks = models.TextField(verbose_name='Remarks', blank=True, null=True)
@@ -392,7 +392,7 @@ class LimitedTracker(models.Model):
         on_delete=models.RESTRICT,
         verbose_name='Created By',
         related_name='limited_tracker_created_by',
-        to_field='email',
+        to_field='user_id',
         blank=False,
         null=True)
     done_by = models.ForeignKey(
@@ -400,7 +400,7 @@ class LimitedTracker(models.Model):
         on_delete=models.SET_NULL,
         verbose_name='Done By',
         related_name='limited_tracker_done_by',
-        to_field='email',
+        to_field='user_id',
         blank=True,
         null=True)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)

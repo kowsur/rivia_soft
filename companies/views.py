@@ -445,6 +445,7 @@ def delete_selfassesment_tracker(request, tracker_id:int):
       messages.success(request, f'Selfassesment Tracker has been deleted having id {tracker_id}!')
     else:
       messages.error(request, f'Deletion of Selfassesment Tracker having id {tracker_id} failed')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
   return render(request, template_name='companies/delete.html', context=context)
 
 @login_required

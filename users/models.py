@@ -28,7 +28,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.email
+        return f"📨{self.email} 👥{self.first_name}"
     
     def get_username(self) -> str:
         return self.get_email()

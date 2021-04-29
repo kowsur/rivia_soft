@@ -81,3 +81,10 @@ def search_users_extended(request, search_text='', limit=-1):
         results = search_CustomUser(search_text, limit)
         return HttpResponse(serialize_queryset_to_json(results), content_type=content_type)
     raise Http404()
+
+@login_required
+def all_users(request):
+    if request.method=='GET' and request.headers.get('Content-Type')==content_type:
+        results = CustomUser.objects.all()
+        return HttpResponse(serialize_queryset_to_json(results), content_type=content_type)
+    raise Http404()

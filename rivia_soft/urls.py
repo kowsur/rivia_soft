@@ -18,10 +18,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-from companies.views import home_selfassesment
+from companies.views import home_selfassesment_tracker
 
 urlpatterns = [
-    path('', home_selfassesment),
+    path('', home_selfassesment_tracker),
     path('companies/', include('companies.urls'), name='companies'),
     path('u/', include('users.urls')),
     path('admin/', admin.site.urls),

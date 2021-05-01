@@ -83,14 +83,14 @@ def db_search_SelfassesmentTracker(search_text: str, user='admin@gmail.com', lim
         records = SelfassesmentTracker.objects.filter(Query)
     else:
         records = SelfassesmentTracker.objects.filter(Query)[:limit]
-    return records.order_by('deadline')
+    return records.order_by('is_completed', 'deadline')
 
 def db_all_SelfassesmentTracker(limit=-1):
     if limit==-1:
         records = SelfassesmentTracker.objects.all()
     else:
         records = SelfassesmentTracker.objects.all()[:limit]
-    return records.order_by('deadline', 'is_completed')
+    return records.order_by('is_completed', 'deadline')
 
 
 

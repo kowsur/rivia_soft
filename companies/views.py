@@ -388,6 +388,7 @@ def home_selfassesment_tracker(request):
     'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_update_url,
     'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_delete_url,
     'completed_tasks': SelfassesmentTracker.objects.filter(is_completed=True).count(),
+    'future_taks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.now()).count(),
     'todays_taks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.now()).count(),
     'previous_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.now(), is_completed=False).count()
   }

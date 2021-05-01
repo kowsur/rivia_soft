@@ -222,6 +222,9 @@ div.search_field > input[name="search"]:focus-visible ~ div.select{
 .task-done{
   @apply bg-green-600;
 }
+.task-upcoming{
+  @apply bg-blue-600;
+}
 .task-today{
  @apply bg-yellow-400;
 }

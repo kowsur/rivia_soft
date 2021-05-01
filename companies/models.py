@@ -161,7 +161,7 @@ class SelfassesmentAccountSubmission(models.Model):
         return str(self)
     
     def set_defaults(self):
-        self.account_prepared_by = self.submitted_by
+        self.prepared_by = self.submitted_by
         self.save()
         
 
@@ -348,7 +348,7 @@ class LimitedAccountSubmission(models.Model):
         to_field='user_id',
         blank=False,
         null=True)
-    account_prepared_by = models.ForeignKey(
+    prepared_by = models.ForeignKey(
         to='users.CustomUser',
         on_delete=models.CASCADE,
         verbose_name='Prepared By',
@@ -368,7 +368,7 @@ class LimitedAccountSubmission(models.Model):
         return str(self)
     
     def set_defaults(self):
-        self.account_prepared_by = self.submitted_by
+        self.prepared_by = self.submitted_by
         self.save()
         
 

@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'error_handler',
     'users',
     'companies',
-    'api'
 ]
 
 MIDDLEWARE = [

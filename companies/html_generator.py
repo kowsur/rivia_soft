@@ -1,5 +1,7 @@
 from django.db import models
 
+
+
 def get_field_names_from_model(django_model:models.Model):
   field_names = []
   for field in django_model._meta.fields:
@@ -10,6 +12,12 @@ def get_header_name_from_field_name(django_model, field_name):
   return django_model._meta.get_field(field_name).verbose_name
 
 
+# foreign key fields
+user_repr_format = r"📨{email} 👥{first_name}"
+user_details_url_without_argument = '/u/details/'
+Selfassesment_repr_format = r"👥{client_name} 📁{client_file_number} 📞{client_phone_number}"
+Selfassesment_details_url_without_argument = '/companies/SA/details/'
+
 def generate_template_tag_for_model(
     django_model:models.Model,
     pk_filed='id',
@@ -17,11 +25,11 @@ def generate_template_tag_for_model(
     tag_name='data-template',
     tag_id='data-template',
     fk_fields = {
-      'created_by': { 'details_url_without_argument': '/u/details/', 'repr-format': r"📨{email} 👥{first_name}" },
-      'done_by': { 'details_url_without_argument': '/u/details/', 'repr-format': r"📨{email} 👥{first_name}" },
-      'submitted_by': { 'details_url_without_argument': '/u/details/', 'repr-format': r"📨{email} 👥{first_name}" },
-      'prepared_by': { 'details_url_without_argument': '/u/details/', 'repr-format': r"📨{email} 👥{first_name}" },
-      'client_id': { 'details_url_without_argument': '/companies/SA/details/', 'repr-format': r"👥{client_name} 📁{client_file_number} 📞{client_phone_number}" }
+      'created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
+      'done_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
+      'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
+      'prepared_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
+      'client_id': { 'details_url_without_argument': Selfassesment_details_url_without_argument, 'repr-format': Selfassesment_repr_format }
       }
   ):
   

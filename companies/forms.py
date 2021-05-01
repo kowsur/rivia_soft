@@ -102,7 +102,7 @@ class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
             'date_of_submission', 
             'tax_year', 
             # 'submitted_by', 
-            # 'account_prepared_by', 
+            # 'prepared_by', 
             'remarks', 
             # 'paid_amount', 
             # 'is_paid', 
@@ -126,7 +126,7 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         fk_field='client_id',
         empty_label=None
         )
-    account_prepared_by = SearchableModelField(
+    prepared_by = SearchableModelField(
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
         all_url = all_users_url_path,
@@ -145,7 +145,7 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
             'date_of_submission', 
             'tax_year', 
             # 'submitted_by', 
-            'account_prepared_by', 
+            'prepared_by', 
             'remarks', 
             'paid_amount', 
             'is_paid', 
@@ -173,7 +173,7 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
         fk_field='user_id',
         empty_label=None
         )
-    account_prepared_by = SearchableModelField(
+    prepared_by = SearchableModelField(
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
         all_url = all_users_url_path,
@@ -190,7 +190,7 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
             # 'submission_id',
             'tax_year', 
             'submitted_by', 
-            'account_prepared_by', 
+            'prepared_by', 
             'remarks',
             'date_of_submission')
 
@@ -346,7 +346,7 @@ class LimitedAccountSubmissionCreationForm(forms.ModelForm):
             'date_of_submission', 
             'tax_year', 
             # 'submitted_by', 
-            # 'account_prepared_by', 
+            # 'prepared_by', 
             'remarks', 
             # 'paid_amount', 
             # 'is_paid', 
@@ -365,7 +365,7 @@ class LimitedAccountSubmissionChangeForm(forms.ModelForm):
             'date_of_submission', 
             'tax_year', 
             # 'submitted_by', 
-            'account_prepared_by', 
+            'prepared_by', 
             'remarks', 
             'paid_amount', 
             'is_paid', 
@@ -388,7 +388,7 @@ class Add_All_Limited_to_LimitedAccountSubmission_Form(forms.ModelForm):
             # 'submission_id',
             'tax_year', 
             'submitted_by', 
-            'account_prepared_by', 
+            'prepared_by', 
             'remarks',
             'date_of_submission')
 

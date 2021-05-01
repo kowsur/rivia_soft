@@ -209,16 +209,15 @@ div.search_field > input[name="search"]:focus-visible ~ div.select{
   -webkit-user-select: none;
   -moz-user-select: none;
   position: absolute;
-  top: 0px;
   right: 0;
   transform: translateY(-100%);
-  /* @apply absolute transform -translate-y-full; */
+  @apply top-0 sm:-top-1 md:-top-2;
 }
 .task{
   cursor: default;
   position: relative;
   border-radius: 50%;
-  @apply inline-block px-2 text-white text-center text-sm font-light  sm:text-lg sm:font-semibold sm:px-2.5 md:text-lg md:font-bold; /* px-4 py-2 text-xl */
+  @apply inline-block px-2 text-white text-center text-sm font-light  sm:text-lg sm:font-semibold sm:px-2.5 md:text-xl md:font-bold; /* px-4 py-2 text-xl */
 }
 
 .task-done{

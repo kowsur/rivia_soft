@@ -31,6 +31,10 @@
   input[type='number'], input[type='time'], input[type='date'], input[type='datetimelocal'], input[type='datetime']{
     @apply w-max inline;
   }
+  /* placeholder opacity for inputs */
+  input, textarea, select{
+    @apply placeholder-opacity-40;
+  }
 }
 
 @layer components{
@@ -155,6 +159,9 @@
 }
 
 .data-id{
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
   @apply text-center px-3 py-2 whitespace-nowrap;
 }
 .data-cell{
@@ -164,21 +171,95 @@
   @apply ;
 } */
 
+/* options */
+div.search_field > div.select > .option{
+  display: block;
+  @apply my-2;
+}
+/* selected option */
+.option.selected{
+  @apply text-green-500 text-lg font-bold;
+}
+
 /* searchable input field */
-div.search_field > select{
+div.search_field > div.select{
   display: none;
   position: absolute;
   top: 100%;
   left: 0;
+  @apply bg-gray-800 rounded-md px-4 py-2 shadow-lg;
 }
 
-div.search_field > select:active,
-div.search_field > select:focus,
-div.search_field > select:focus-visible,
-div.search_field > input:focus ~ select,
-div.search_field > input:focus-visible ~ select{
+div.search_field > input[name="search"] ~ div.select:hover,
+div.search_field > input[name="search"]:active ~ div.select,
+div.search_field > input[name="search"]:focus ~ div.select,
+div.search_field > input[name="search"]:focus-visible ~ div.select{
+  display: block;
+  z-index: 50;
+}
+
+
+
+
+
+
+
+.task-container{
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  position: absolute;
+  top: -5px;
+  right: 0;
+  transform: translateY(-100%);
+  /* @apply absolute transform -translate-y-full; */
+}
+.task{
+  cursor: default;
+  position: relative;
+  @apply rounded-full text-white text-lg text-center px-2 inline-block font-bold; /* px-4 py-2 text-xl */
+}
+.task-done{
+  @apply bg-green-600;
+}
+.task-today{
+ @apply bg-yellow-400;
+}
+.task-previous{
+  @apply bg-red-600;
+}
+.task-tooltip{
+  display: none;
+  position: absolute;
+  top: -30%;
+  right: 0;
+  @apply transform -translate-y-full px-1 text-base font-normal text-gray-100 whitespace-nowrap bg-gray-600 rounded-md px-3 py-1;
+}
+.task-tooltip::after {
+  content: " ";
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  right: 3.5%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(75, 85, 99) transparent transparent transparent;
+}
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .task-tooltip::after{
+
+  }
+}
+.task:hover > .task-tooltip{
   display: block;
 }
+
+
+
+
+
+
 
 
 /* Light mode */

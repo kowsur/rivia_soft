@@ -91,11 +91,23 @@ function get_tr_for_table(data, template=template, model_fields=fields, update_u
     let td = instance.getElementById(field)
     // when field exists in the template fill it in with data
     if (td){
+      td.classList.add('whitespace-nowrap')
       let field_data = data.fields[field]
       if (!(field_data===true || field_data===false)){
         // field data is text so show it as text
-        td.textContent = field_data
-        td.classList.add('whitespace-nowrap')
+        // if the field is foriegn key of other model the it should contain data-url and data-repr-format
+        let data_url = td.getAttribute('data-url')
+        let repr_format = td.getAttribute('data-repr-format')
+        if (data_url && field_data){
+          data_url = `${data_url}${field_data}/`
+          
+          fetch_url(data_url, 'GET').then(response => response.json()).then(data => {
+            td.textContent = repr_format.format(data)
+          })
+        }else{
+          td.textContent = field_data
+        }
+        
         if (field_data && field_data.length>=30){
           td.classList.remove('whitespace-nowrap')
           td.classList.add('whitespace-normal')
@@ -306,3 +318,33 @@ function sleep(milliseconds) {
     currentDate = Date.now();
   } while (currentDate - date < milliseconds);
 }
+
+
+// source https://gist.github.com/poxip/90a9787be621eeddb82a
+/**
+ * Python-like string format function
+ * @param {String} str - Template string.
+ * @param {Object} data - Data to insert strings from.
+ * @returns {String}
+ */
+ var format = function(str, data) {
+  var re = /{([^{}]+)}/g;
+
+  return str.replace(/{([^{}]+)}/g, function(match, val) {
+    var prop = data;
+    val.split('.').forEach(function(key) {
+      prop = prop[key];
+    });
+
+    return prop;
+  });
+};
+
+/**
+ * Python-like format method
+ * @param {Object} data - Data to insert strings from.
+ * @returns {String}
+ */
+String.prototype.format = function(data) {
+  return format(this, data);
+};

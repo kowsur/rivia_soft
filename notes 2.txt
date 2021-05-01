@@ -5,11 +5,11 @@ Limited
 
 # delete and update are only for admins
 
+(done)
 # Tracker
   search functionality while creating record- show(phone+name)
   navigation link - redirects to home
   create stay - stays in the creation form
-  create move - moves to home page
 
   change label - client_id -> Client Name
   view order - deadline ascending
@@ -17,14 +17,14 @@ Limited
 
 -------------------------------------------------------
 
-# Menu(done)
+(done)
+# Menu
   create - order 1
   home -> view - order 2
 
 # Selfassesment creation form
   navigation link - redirects to home
   create stay - stays in the creation form
-  create move - moves to home page
 
   field label - client_id -> Client Name
 
@@ -48,3 +48,10 @@ Limited
 
 - Groups for related fields in creation form
 
+
+
+# Tracker
+  when status is updated as done
+  set date as current date
+
+  - done by, complete date required if status is updated

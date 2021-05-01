@@ -10,7 +10,21 @@ def get_header_name_from_field_name(django_model, field_name):
   return django_model._meta.get_field(field_name).verbose_name
 
 
-def generate_template_tag_for_model(django_model:models.Model, pk_filed='id', exclude_fields=('is_updated','created_by'),tag_name='data-template', tag_id='data-template'):
+def generate_template_tag_for_model(
+    django_model:models.Model,
+    pk_filed='id',
+    exclude_fields=('is_updated','created_by'),
+    tag_name='data-template',
+    tag_id='data-template',
+    fk_fields = {
+      'created_by': { 'details_url_without_argument': '/u/details/', 'repr-format': r"📨{email} 👥{first_name}" },
+      'done_by': { 'details_url_without_argument': '/u/details/', 'repr-format': r"📨{email} 👥{first_name}" },
+      'submitted_by': { 'details_url_without_argument': '/u/details/', 'repr-format': r"📨{email} 👥{first_name}" },
+      'prepared_by': { 'details_url_without_argument': '/u/details/', 'repr-format': r"📨{email} 👥{first_name}" },
+      'client_id': { 'details_url_without_argument': '/companies/SA/details/', 'repr-format': r"👥{client_name} 📁{client_file_number} 📞{client_phone_number}" }
+      }
+  ):
+  
   model_fields = get_field_names_from_model(django_model)
   inner_template_tr = """
   <td class="data-cell data-id" >
@@ -50,7 +64,12 @@ def generate_template_tag_for_model(django_model:models.Model, pk_filed='id', ex
 
   for field in model_fields:
     if not field == pk_filed and field not in exclude_fields:
-      inner_template_tr += f'<td class="data-cell" id="{field}"></td>\n'
+      if field in fk_fields:
+        inner_template_tr+=f"""
+        <td class="data-cell" id="{field}"
+          data-url="{fk_fields[field]['details_url_without_argument']}" data-repr-format="{fk_fields[field]['repr-format']}"></td>\n"""
+      else:
+        inner_template_tr += f'<td class="data-cell" id="{field}"></td>\n'
   
   template_tag = f"""
   <template id="{tag_id}" name="{tag_name}">

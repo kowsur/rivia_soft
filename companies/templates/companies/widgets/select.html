@@ -6,20 +6,18 @@
   <input value="{{ search_url }}" name="search_url" type="text"  aria-hidden="true" hidden>
   <input value="{{ all_url }}" name="all_url" type="text"  aria-hidden="true" hidden>
   <input type="text" for='client_id' class="search" name="search" autocomplete="off" placeholder="{{ value }}">
-  <!-- <div class="select">
+
+  <div class="select" name="{{ widget.name }}" id="{{ 'id_'|addstr:widget.name }}" {% include "companies/widgets/attrs.html" %}>
+    <span class="option selected" value="{{ value.pk }}" data-value="{{ value.pk }}">{{ value }}</span>
     {% for group_name, group_choices, group_index in widget.optgroups %}{% if group_name %}
     <optgroup label="{{ group_name }}">{% endif %}{% for option in group_choices %}
       {% include option.template_name with widget=option %}{% endfor %}{% if group_name %}
     </optgroup>
     {% endif %}{% endfor %}
   </div>
-   -->
-  <select name="{{ widget.name }}" id="{{ 'id_'|addstr:widget.name }}" {% include "companies/widgets/attrs.html" %}>{% for group_name, group_choices, group_index in widget.optgroups %}{% if group_name %}
-    <optgroup label="{{ group_name }}">{% endif %}{% for option in group_choices %}
-      {% include option.template_name with widget=option %}{% endfor %}{% if group_name %}
-    </optgroup>
-    {% endif %}{% endfor %}
+  <!-- actual input -->
+  <select class="hidden" name="{{ widget.name }}" id="{{ 'id_'|addstr:widget.name }}" {% include "companies/widgets/attrs.html" %}>
+    <option value="{{ value.pk }}" selected>{{ value }}</option>
   </select>
-  
   <script type="module" src='{% static "js/form_search.js" %}'></script>
 </div>

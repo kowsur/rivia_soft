@@ -2,7 +2,7 @@ let typingTimer;
 let doneTypingInterval = 300;
 
 // find all searchable select fields
-let select_elements = document.querySelectorAll('div[class="search_field"] > select')
+let select_elements = document.querySelectorAll('div[class="search_field"] > div.select')
 
 // add event listeners on searchable select fields
 select_elements.forEach(element => {
@@ -22,7 +22,14 @@ select_elements.forEach(element => {
 
 // Add event lister to query database on text input
 let search_boxes = document.querySelectorAll('div[class="search_field"] > [name="search"]')
-search_boxes.forEach(search_box => 
+search_boxes.forEach((search_box) => {
+  let search_field = search_box.parentElement
+  let options_container = search_field.querySelector('div.select')
+  // Add event listenners to update selected option
+  for(let option of options_container.children){
+    option.addEventListener('click', option_selected)
+  }
+
   search_box.addEventListener('input', (event) => {
     // collect fields containing input and urls
     let search_field = event.currentTarget.parentElement
@@ -35,43 +42,87 @@ search_boxes.forEach(search_box =>
     let search_url = search_url_input_tag.value
     let all_url = all_url_input_tag.value
     let repr_format = repr_format_pre_tag.value
-    let select_element = event.currentTarget.nextElementSibling
+    
+    let select_element = search_field.querySelector('select')
+    let options_container = search_field.querySelector('div.select')
     
     clearTimeout(typingTimer)
-    typingTimer =  setTimeout(async (search_text, search_url, all_url, repr_format, select)=>{
+    typingTimer =  setTimeout(async (search_text, search_url, all_url, repr_format, select_element, options_container)=>{
       if(!deepCompare(search_text, '')){
         let records = await db_search_records(search_text, search_url)
-        update_options(records, repr_format, select)
+        update_options(records, repr_format, select_element, options_container)
       }else{
         let records = await db_all_records(all_url)
-        update_options(records, repr_format, select)
+        update_options(records, repr_format, select_element, options_container)
       }
-    }, doneTypingInterval, search_text, search_url, all_url, repr_format, select_element)
+    }, doneTypingInterval, search_text, search_url, all_url, repr_format, select_element, options_container)
   })
-)
-function update_options(records, repr_format, select_element) {
+})
+function update_options(records, repr_format, select_element, options_container, option_element_tag='span') {
   // clear options and select default
+  options_container.innerHTML = ''
   let currently_selected_option = select_element.options[select_element.selectedIndex]
+  let selected = document.createElement(option_element_tag)
+  selected.classList.add('option')
+  selected.classList.add('selected')
+  selected.value = currently_selected_option.value
+  selected.setAttribute('data-value', currently_selected_option.value)
+  selected.textContent = currently_selected_option.textContent
+  options_container.appendChild(selected)
+  selected.addEventListener('click', option_selected)
 
-  // let default_option = `<option value="" selected>---------</option>`
-  select_element.innerHTML = ''
-  select_element.add(currently_selected_option)
 
   // update options
   for (let record of records){
     // create option
-    let option = document.createElement('option')
+    let option = document.createElement(option_element_tag)
     option.value = record.pk
-    option.textContent = repr_format.format(record) // `👥${client_name} 📞${client_phone_number}`
+    option.setAttribute('data-value', record.pk)
+    option.textContent = repr_format.format(record) // `👥${client_name} 📁${client_file_number} 📞${client_phone_number}`
+    // add class
+    option.classList.add('option')
+    
+    // add event listenner to this option
+    option.addEventListener('click', option_selected)
     
     // add option in the select tag
-    select_element.add(option)
+    options_container.appendChild(option)
   }
 }
 
+//====================================================================================================================================
+//
+function option_selected(event) {
+  // Option clicked on
+  let clicked_option = event.currentTarget
+  let value = clicked_option.getAttribute('data-value')
+  let text = clicked_option.textContent
+  let options_container = clicked_option.parentElement
+  let search_field = options_container.parentElement
+  
+  // Create option that is selected
+  let selected_option = document.createElement('option')
+  selected_option.textContent = text
+  selected_option.value = value
+  selected_option.setAttribute('data-value', value)
+  
+  // Clear select element
+  let select_element = search_field.querySelector('select')
+  select_element.innerHTML = ''
+  // add option
+  select_element.add(selected_option)
 
+  // Update options_container
+  clicked_option.remove()
+  clicked_option.classList.add('selected')
+  options_container.firstElementChild.classList.remove('selected')
+  options_container.prepend(clicked_option)
 
-
+  // Update search_bar
+  let search_bar = search_field.querySelector('input[name="search"]')
+  search_bar.placeholder = text
+  // search_bar.value = text
+}
 
 
 //====================================================================================================================================

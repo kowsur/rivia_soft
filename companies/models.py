@@ -42,13 +42,15 @@ class Selfassesment(models.Model):
         blank=True,
         null=True,
         db_index=True,
+        unique=True,
         validators=[UTR_VALIDATOR])
-    HMRC_referance = models.TextField(verbose_name='HMRC', max_length=2048, blank=True, null=True)
+    HMRC_referance = models.CharField(verbose_name='HMRC Referance', max_length=2048, blank=True, null=True)
     NINO = models.CharField(
         verbose_name='NINO',
         max_length=9,
         blank=True,
         null=True,
+        unique=True,
         validators=[NINO_VALIDATOR])
     gateway_id = models.CharField(verbose_name='Personal Gateway ID', max_length=255, blank=True, null=True)
     gateway_password = models.CharField(verbose_name='Gateway Password', max_length=255, blank=True, null=True)
@@ -74,7 +76,7 @@ class Selfassesment(models.Model):
         null=False)
 
     def __str__(self) -> str:
-        return f'👥{self.client_name} 📞{self.client_phone_number}'
+        return f'👥{self.client_name} 📁{self.client_file_number} 📞{self.client_phone_number}'
     
     def __repr__(self) -> str:
         return str(self)
@@ -139,7 +141,7 @@ class SelfassesmentAccountSubmission(models.Model):
         to_field='user_id',
         blank=False,
         null=True)
-    account_prepared_by = models.ForeignKey(
+    prepared_by = models.ForeignKey(
         to='users.CustomUser',
         on_delete=models.CASCADE,
         verbose_name='Prepared By',
@@ -180,14 +182,9 @@ class SelfassesmentTracker(models.Model):
         blank=False,
         null=False)
     creation_date = models.DateTimeField(verbose_name='Tracker creation datetime', editable=False, blank=True, null=False, default=timezone.now)
-    created_by = models.ForeignKey(
-        to='users.CustomUser',
-        on_delete=models.RESTRICT,
-        verbose_name='Created By',
-        related_name='selfassesment_tracker_created_by',
-        to_field='user_id',
-        blank=False,
-        null=True)
+    job_description = models.TextField(verbose_name='Description', blank=True, null=True)
+    deadline = models.DateField(verbose_name='Deadline', blank=False, null=False, default=timezone.now)
+    complete_date = models.DateField(verbose_name='Complete Date', blank=True, null=True)
     done_by = models.ForeignKey(
         to='users.CustomUser',
         on_delete=models.SET_NULL,
@@ -196,10 +193,15 @@ class SelfassesmentTracker(models.Model):
         to_field='user_id',
         blank=True,
         null=True)
-    job_description = models.TextField(verbose_name='Description', blank=True, null=True)
-    deadline = models.DateField(verbose_name='Deadline', blank=False, null=False, default=timezone.now)
-    complete_date = models.DateField(verbose_name='Complete Date', blank=True, null=True, default=timezone.now)
     is_completed = models.BooleanField(verbose_name='Status', blank=True, null=False, default=False)
+    created_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Created By',
+        related_name='selfassesment_tracker_created_by',
+        to_field='user_id',
+        blank=False,
+        null=True)
 
     def __str__(self) -> str:
         if self.job_description:

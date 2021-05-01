@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+from companies.url_variables import URL_NAMES_PREFIXED_WITH_APP_NAME
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,11 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     # 'django.contrib.staticfiles',
+    'rest_framework',
 
     # Project apps
     'error_handler',
     'users',
     'companies',
+    'api'
 ]
 
 MIDDLEWARE = [
@@ -133,5 +136,5 @@ STATIC_ROOT = BASE_DIR / 'static'
 # Custom User Model
 AUTH_USER_MODEL = 'users.CustomUser'
 LOGIN_URL = 'users_login'
-LOGIN_REDIRECT_URL ='/'
+LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'users_login'

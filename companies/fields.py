@@ -36,8 +36,7 @@ class Select(widgets.ChoiceWidget):
 
         query = {self.fk_field: value}
         context['value'] = ''
-        if not query=={self.fk_field: None}:
-            print(self.model, query, name,  value)
+        if not (query=={self.fk_field: None} or query=={self.fk_field: ''}):
             context['value'] = self.model.objects.get(**query)
         return context
 

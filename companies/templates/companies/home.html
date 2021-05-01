@@ -24,6 +24,9 @@
 <!-- searchbar -->
 {% include "companies/searchbar.html" %}
 
+
+
+
 {% if add_all_url %}
   <!-- add all selfassesments -->
   {% if request.user.is_superuser %}
@@ -34,12 +37,30 @@
   {% endif %}
 {% endif %}
 
-
-<!-- data -->
-{% autoescape off %}
-  {{ data_container }}
-{% endautoescape %}
-
+<!-- represent data -->
+<div class="relative max-w-min mx-auto">
+  {% if todays_taks %}
+  <div class="task-container">
+    <span class="task task-previous">
+      {{ previous_tasks }}
+      <span class="task-tooltip">Previous remaining tasks.</span>
+    </span>
+    <span class="task task-today">
+      {{todays_taks}}
+      <span class="task-tooltip">Todays remaining tasks.</span>
+    </span>
+    <span class="task task-done">
+      {{completed_tasks}}
+      <span class="task-tooltip">Finished tasks.</span>
+    </span>
+  </div>  
+  {% endif %}
+  
+  <!-- data -->
+  {% autoescape off %}
+    {{ data_container }}
+  {% endautoescape %}
+</div>
 
 <!-- data template -->
 {% autoescape off %}

@@ -1,4 +1,5 @@
 from django.forms import widgets
+from django.http import request
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
@@ -9,6 +10,9 @@ from .url_variables import Full_URL_PATHS_WITHOUT_ARGUMENTS
 from users.models import CustomUser
 search_users_url_path = '/u/search/'
 all_users_url_path = '/u/all/'
+
+Selfassesment_client_id_repr_format = r"👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.client_phone_number}"
+CustomUser_repr_format = r"📨{fields.email} 👥{fields.first_name}"
 
 class SelfassesmentCreationForm(forms.ModelForm):
     date_of_registration = forms.DateField(
@@ -82,10 +86,11 @@ class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
         label = 'Client Name',
         search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
         all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
-        repr_format = r"👥{fields.client_name} 📞{fields.client_phone_number}",
+        repr_format = Selfassesment_client_id_repr_format,
         model=Selfassesment,
         choices=Selfassesment.objects.all().only('client_id', 'client_name'),
-        fk_field='client_id'
+        fk_field='client_id',
+        empty_label=None
         )
 
     class Meta:
@@ -115,19 +120,21 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         label = 'Client Name',
         search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
         all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
-        repr_format = r"👥{fields.client_name} 📞{fields.client_phone_number}",
+        repr_format = Selfassesment_client_id_repr_format,
         model=Selfassesment,
         choices=Selfassesment.objects.all().only('client_id', 'client_name'),
-        fk_field='client_id'
+        fk_field='client_id',
+        empty_label=None
         )
     account_prepared_by = SearchableModelField(
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
         all_url = all_users_url_path,
-        repr_format = r"📨{fields.email} 👥{fields.first_name}",
+        repr_format = CustomUser_repr_format,
         model=CustomUser,
         choices=CustomUser.objects.all().only('user_id', 'first_name'),
-        fk_field='user_id'
+        fk_field='user_id',
+        empty_label=None
         )
 
     class Meta:
@@ -160,19 +167,21 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
         all_url = all_users_url_path,
-        repr_format = r"📨{fields.email} 👥{fields.first_name}",
+        repr_format = CustomUser_repr_format,
         model=CustomUser,
         choices=CustomUser.objects.all().only('user_id', 'first_name'),
-        fk_field='user_id'
+        fk_field='user_id',
+        empty_label=None
         )
     account_prepared_by = SearchableModelField(
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
         all_url = all_users_url_path,
-        repr_format = r"📨{fields.email} 👥{fields.first_name}",
+        repr_format = CustomUser_repr_format,
         model=CustomUser,
         choices=CustomUser.objects.all().only('user_id', 'first_name'),
-        fk_field='user_id'
+        fk_field='user_id',
+        empty_label=None
         )
     
     class Meta:
@@ -197,10 +206,11 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
         label = 'Client Name',
         search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
         all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
-        repr_format = r"👥{fields.client_name} 📞{fields.client_phone_number}",
+        repr_format = Selfassesment_client_id_repr_format,
         model=Selfassesment,
         choices=Selfassesment.objects.all().only('client_id', 'client_name'),
-        fk_field='client_id'
+        fk_field='client_id',
+        empty_label=None
         )
     
     class Meta:
@@ -218,15 +228,18 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
 
 
 class SelfassesmentTrackerChangeForm(forms.ModelForm):
-    complete_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    # complete_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     done_by = SearchableModelField(
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
         all_url = all_users_url_path,
-        repr_format = r"📨{fields.email} 👥{fields.first_name}",
+        repr_format = CustomUser_repr_format,
         model=CustomUser,
         choices=CustomUser.objects.all().only('user_id', 'first_name'),
-        fk_field='user_id'
+        fk_field='user_id',
+        required=False,
+        empty_label=None # remove default option '------' from select menu
         )
     
     class Meta:
@@ -237,8 +250,8 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
             'done_by',
             # 'client_id',
             'job_description',
-            # 'deadline',
-            'complete_date',
+            'deadline',
+            # 'complete_date',
             'is_completed',)
 
 class SelfassesmentTrackerDeleteForm(forms.ModelForm):

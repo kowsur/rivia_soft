@@ -6,6 +6,7 @@ create_suffix = 'create'
 update_suffix = 'update'
 delete_suffix = 'delete'
 search_suffix = 'search'
+details_suffix = 'details'
 viewall_suffix = 'all'
 
 
@@ -52,6 +53,7 @@ class URL_PATHS(Dict_Duck_type):
   # Selfassesment
   Selfassesment_home_url = f'{Selfassesment_path}/{home_suffix}/'
   Selfassesment_create_url = f'{Selfassesment_path}/{create_suffix}/'
+  Selfassesment_details_url = f'{Selfassesment_path}/{details_suffix}/<int:client_id>/'
   Selfassesment_update_url = f'{Selfassesment_path}/{update_suffix}/<int:client_id>/'
   Selfassesment_delete_url = f'{Selfassesment_path}/{delete_suffix}/<int:client_id>/'
   Selfassesment_search_url = f'{Selfassesment_path}/{search_suffix}/<str:search_text>/' # fetch only
@@ -80,6 +82,7 @@ class URL_NAMES(Dict_Duck_type):
   # Selfassesment
   Selfassesment_home_name = f'{Selfassesment_name}_{home_suffix}'
   Selfassesment_create_name = f'{Selfassesment_name}_{create_suffix}'
+  Selfassesment_details_name = f'{Selfassesment_path}_{details_suffix}'
   Selfassesment_update_name = f'{Selfassesment_name}_{update_suffix}'
   Selfassesment_delete_name = f'{Selfassesment_name}_{delete_suffix}'
   Selfassesment_search_name = f'{Selfassesment_name}_{search_suffix}' # fetch only
@@ -108,6 +111,7 @@ class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
   # Selfassesment
   Selfassesment_home_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{home_suffix}/'
   Selfassesment_create_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{create_suffix}/'
+  Selfassesment_details_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{details_suffix}/'
   Selfassesment_update_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{update_suffix}/'
   Selfassesment_delete_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{delete_suffix}/'
   Selfassesment_search_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{search_suffix}/' # fetch only
@@ -136,6 +140,7 @@ class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
   # Selfassesment
   Selfassesment_home_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{home_suffix}'
   Selfassesment_create_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{create_suffix}'
+  Selfassesment_details_name = f'{APPLICATION_NAME}:{Selfassesment_path}_{details_suffix}'
   Selfassesment_update_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{update_suffix}'
   Selfassesment_delete_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{delete_suffix}'
   Selfassesment_search_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{search_suffix}' # fetch only

@@ -30,9 +30,16 @@
     
     {% for field in form %}
       <div class="flex flex-col align-middle items-start w-full">
+        <!-- input container -->
           <div class="w-full mt-3.5">
-            <!-- {{ field|dir }} -->
-              <label for="{{ 'id_'|addstr:field.name }}">{{ field.label }}{% if field.field.required %}*{% endif %}</label>
+              <!-- input label -->
+              <label for="{{ 'id_'|addstr:field.name }}">{{field.label }}
+                {% if field.field.required %}
+                <!-- required indicator -->
+                {% include "companies/required_indicator.html" %}
+                {% endif %}
+              </label>
+              <!-- input field -->
               {{ field }}
               <div class="text-red-500">
                   {{ field.errors }}

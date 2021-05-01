@@ -1,6 +1,8 @@
+import json
 from django.http.response import Http404, HttpResponse
 from django.core.serializers import serialize
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db import models
@@ -29,6 +31,11 @@ from .queries import db_search_SelfassesmentTracker, db_all_SelfassesmentTracker
 from .queries import db_search_Limited, db_all_Limited
 from .queries import db_search_LimitedAccountSubmission, db_all_LimitedAccountSubmission
 from .queries import db_search_LimitedTracker, db_all_LimitedTracker
+
+# serializers
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .serializers import CustomUserSerializer, SelfassesmentSerializer
 
 #permissions
 from .decorators import allowed_for_staff, allowed_for_superuser
@@ -99,6 +106,15 @@ def create_selfassesment(request):
   return render(request, template_name='companies/create.html', context=context)
 
 @login_required
+def get_details_selfassesment(request, client_id=None):
+    record = get_object_or_404(Selfassesment, client_id=client_id)
+    response = SelfassesmentSerializer(instance=record).data
+    return HttpResponse(json.dumps(response))
+
+@login_required
+@allowed_for_staff(
+  message="Sorry! You are not authorized to update this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_home_name)
 def update_selfassesment(request, client_id:int):
   context = {
     **URLS,
@@ -129,6 +145,9 @@ def update_selfassesment(request, client_id:int):
   return render(request, template_name='companies/update.html', context=context)
 
 @login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to delete this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_home_name)
 def delete_selfassesment(request, client_id:int):
   context = {
     **URLS,
@@ -174,6 +193,10 @@ def all_selfassesment(request, limit=-1):
     return HttpResponse(data, content_type='application/json')
   raise Http404
 
+@api_view(['GET'])
+def serialized(request):
+  
+  return SelfassesmentSerializer()
 
 # =============================================================================================================
 # =============================================================================================================
@@ -228,6 +251,9 @@ def create_selfassesment_account_submission(request):
   return render(request, template_name='companies/create.html', context=context)
 
 @login_required
+@allowed_for_staff(
+  message="Sorry! You are not authorized to update this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_home_name)
 def update_selfassesment_account_submission(request, submission_id:int):
   context = {
     **URLS,
@@ -258,6 +284,9 @@ def update_selfassesment_account_submission(request, submission_id:int):
   return render(request, template_name='companies/update.html', context=context)
 
 @login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to delete this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_home_name)
 def delete_selfassesment_account_submission(request, submission_id:int):
   context = {
     **URLS,
@@ -358,6 +387,9 @@ def home_selfassesment_tracker(request):
     'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_search_url,
     'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_update_url,
     'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_delete_url,
+    'completed_tasks': SelfassesmentTracker.objects.filter(is_completed=True).count(),
+    'todays_taks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.now()).count(),
+    'previous_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.now(), is_completed=False).count()
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -383,13 +415,15 @@ def create_selfassesment_tracker(request):
     if form.is_valid():
       assesment = form.save()
       assesment.created_by = request.user
-      assesment.done_by = request.user
       assesment.save()
       messages.success(request, f'New Selfassesment Tracker has been created with id {assesment.tracker_id}!')
       context['form'] = SelfassesmentTrackerCreationForm(initial={'created_by': request.user.user_id})
   return render(request, template_name='companies/create.html', context=context)
 
 @login_required
+@allowed_for_staff(
+  message="Sorry! You are not authorized to update this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
 def update_selfassesment_tracker(request, tracker_id:int):
   context = {
     **URLS,
@@ -413,13 +447,22 @@ def update_selfassesment_tracker(request, tracker_id:int):
     form = SelfassesmentTrackerChangeForm(request.POST, instance=record)
     context['form'] = form
     if form.is_valid():
-      assesment = form.save()
+      assesment = form.save(commit=False)
+      if form.cleaned_data.get('is_completed')==True:
+        if assesment.done_by==None:
+          form.add_error('done_by', 'Done by is required since you are trying to update status.')
+          return render(request, template_name='companies/update.html', context=context)
+        assesment.complete_date = timezone.now()
+      assesment.save()
       messages.success(request, f'Selfassesment Tracker has been updated having id {tracker_id}!')
     else:
       messages.error(request, f'Updating Selfassesment Tracker having id {tracker_id} failed due to invalid data!')
   return render(request, template_name='companies/update.html', context=context)
 
 @login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to delete this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
 def delete_selfassesment_tracker(request, tracker_id:int):
   context = {
     **URLS,

@@ -1,9 +1,9 @@
 from django.urls import path
-from django.urls.conf import re_path
+from django.urls.conf import include, re_path
 
 # selfassesment view functions
 from .views import home_selfassesment, create_selfassesment, update_selfassesment, \
-    delete_selfassesment, search_selfassesment, all_selfassesment
+    delete_selfassesment, search_selfassesment, all_selfassesment, get_details_selfassesment
 
 # selfassesment account submission view function
 from .views import home_selfassesment_account_submission, create_selfassesment_account_submission, \
@@ -38,6 +38,11 @@ urlpatterns = [
     path(route = URL_PATHS.Selfassesment_create_url,
         view = create_selfassesment,
         name = URL_NAMES.Selfassesment_create_name),
+
+    path(route = URL_PATHS.Selfassesment_details_url,
+        view = get_details_selfassesment,
+        name = URL_NAMES.Selfassesment_details_name
+    ),
 
     path(route = URL_PATHS.Selfassesment_update_url,
         view = update_selfassesment,

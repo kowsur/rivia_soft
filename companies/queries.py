@@ -38,8 +38,11 @@ def db_all_Selfassesment(limit=-1):
 def db_search_SelfassesmentAccountSubmission(search_text: str, limit=-1):
     Query = Q(date_of_submission__contains          = search_text) |\
             Q(tax_year__contains                    = search_text) |\
+            Q(client_id__client_name__contains = search_text) |\
+            Q(client_id__client_phone_number__contains = search_text) |\
+            Q(client_id__client_file_number__contains = search_text) |\
             Q(submitted_by__email__contains         = search_text) |\
-            Q(account_prepared_by__email__contains  = search_text) |\
+            Q(prepared_by__email__contains          = search_text) |\
             Q(remarks__contains                     = search_text)
 
     if search_text.isnumeric():
@@ -62,26 +65,32 @@ def db_all_SelfassesmentAccountSubmission(limit=-1):
 # =============================================================================================================
 # SelfassesmentTracker
 def db_search_SelfassesmentTracker(search_text: str, user='admin@gmail.com', limit=-1):
-    Query = Q(done_by__email__contains      = search_text) |\
-            Q(job_description__contains     = search_text) |\
+    Query = Q(job_description__contains     = search_text) |\
             Q(deadline__contains            = search_text) |\
-            Q(complete_date__contains       = search_text) |\
-            Q(is_completed__contains        = search_text)
+            Q(client_id__client_name__contains = search_text) |\
+            Q(client_id__client_phone_number__contains = search_text) |\
+            Q(client_id__client_file_number__contains = search_text)
+            # Q(created_by__first_name__contains = search_text) |\
+            # Q(created_by__last_name__contains = search_text) |\
+            # Q(done_by__first_name__contains = search_text) |\
+            # Q(done_by__last_name__contains = search_text)
     
-    if search_text.isnumeric():
-        Query = Query | Q(tracker_id        = search_text) |\
-                        Q(client_id         = search_text)
     # created by should be the current logged in user
     # Query = Query & Q(created_by__email = user)
     
+    # Filter records from db using query
     if limit==-1:
-        return SelfassesmentTracker.objects.filter(Query)
-    return SelfassesmentTracker.objects.filter(Query)[:limit]
+        records = SelfassesmentTracker.objects.filter(Query)
+    else:
+        records = SelfassesmentTracker.objects.filter(Query)[:limit]
+    return records.order_by('deadline')
 
 def db_all_SelfassesmentTracker(limit=-1):
-    if limit<=-1:
-        return SelfassesmentTracker.objects.all()
-    return SelfassesmentTracker.objects.all()[:limit]
+    if limit==-1:
+        records = SelfassesmentTracker.objects.all()
+    else:
+        records = SelfassesmentTracker.objects.all()[:limit]
+    return records.order_by('deadline', 'is_completed')
 
 
 
@@ -157,11 +166,12 @@ def db_search_LimitedTracker(search_text: str, user='admin@gmail.com', limit=-1)
     # created by should be the current logged in user
     # Query = Query & Q(created_by__email = user)
     
+    # filter records using the query
     if limit==-1:
-        return LimitedTracker.objects.filter(Query)
+        return LimitedTracker.objects.filter(Query).order_by('-deadline')
     return LimitedTracker.objects.filter(Query)[:limit]
 
 def db_all_LimitedTracker(limit=-1):
     if limit<=-1:
-        return LimitedTracker.objects.all()
+        return LimitedTracker.objects.all().order_by('-deadline')
     return LimitedTracker.objects.all()[:limit]

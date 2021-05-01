@@ -25,6 +25,7 @@ urlpatterns = [
     path('companies/', include('companies.urls'), name='companies'),
     path('u/', include('users.urls')),
     path('admin/', admin.site.urls),
+    path('api/', include('api.urls'))
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 handler400 = 'error_handler.views.handle_400_error'

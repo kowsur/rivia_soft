@@ -1,15 +1,24 @@
 from django.http.response import Http404, HttpResponse
+import json
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.serializers import serialize
+from django.shortcuts import get_object_or_404
+from django.forms.models import model_to_dict
 
+# models and forms
 from .models import CustomUser
 from .forms import CustomUserLoginForm, CustomUserCreationForm, CustomUserSignupForm
 
+# queries
 from .queries import search_CustomUser, search_CustomUser_by_email
 
-from companies.url_variables import *
+# serializer
+from .serializers import CustomUserSerializer
+
+from companies.url_variables import URL_NAMES_PREFIXED_WITH_APP_NAME
+
 
 # Create your views here.
 def signup_user(request):
@@ -51,7 +60,7 @@ def login_user(request):
                 login(request, user)
                 if next_url:
                     return redirect(next_url)
-            return redirect('/')
+            return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
         context['message'] = 'Incorrect email or password.'
     return render(request, 'users/login.html', context=context)
 
@@ -88,3 +97,9 @@ def all_users(request):
         results = CustomUser.objects.all()
         return HttpResponse(serialize_queryset_to_json(results), content_type=content_type)
     raise Http404()
+
+@login_required
+def get_user_details(request, user_id=None):
+    record = get_object_or_404(CustomUser, user_id=user_id)
+    response = CustomUserSerializer(instance=record).data
+    return HttpResponse(json.dumps(response))

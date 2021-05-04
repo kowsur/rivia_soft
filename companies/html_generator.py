@@ -15,8 +15,10 @@ def get_header_name_from_field_name(django_model, field_name):
 # foreign key fields
 user_repr_format = r"📨{email} 👥{first_name}"
 user_details_url_without_argument = '/u/details/'
-Selfassesment_repr_format = r"👥{client_name} 📁{client_file_number} 📞{client_phone_number}"
+Selfassesment_repr_format = r"👥{client_name} 📁{client_file_number} 📞{personal_phone_number} ☎{business_phone_number}"
 Selfassesment_details_url_without_argument = '/companies/SA/details/'
+Selfassesment_type_repr_format = r"{type_name}"
+Selfassesment_type_details_url_without_argument = '/companies/SAT/details/'
 
 def generate_template_tag_for_model(
     django_model:models.Model,
@@ -111,7 +113,7 @@ def generate_data_container_table(django_model:models.Model, pk_filed='id', excl
     <div class="data-wrapper">
       <table class="data-container">
         <thead class="data-head">
-            {header_tr}
+          {header_tr}
         </thead>
         <tbody id="data">
             

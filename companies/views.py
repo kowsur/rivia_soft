@@ -13,24 +13,14 @@ from .forms import SelfassesmentAccountSubmissionCreationForm, SelfassesmentAcco
 from .forms import Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form
 from .forms import SelfassesmentTrackerCreationForm, SelfassesmentTrackerChangeForm, SelfassesmentTrackerDeleteForm
 
-from .forms import LimitedCreationForm, LimitedChangeForm, LimitedDeleteForm
-from .forms import LimitedAccountSubmissionCreationForm, LimitedAccountSubmissionChangeForm, LimitedAccountSubmissionDeleteForm
-from .forms import LimitedTrackerCreationForm, LimitedTrackerChangeForm, LimitedTrackerDeleteForm
-from .forms import Add_All_Limited_to_LimitedAccountSubmission_Form
-
 #models
 from .models import Selfassesment, SelfassesmentAccountSubmission
 from .models import SelfassesmentTracker
-from .models import Limited, LimitedAccountSubmission, LimitedTracker
 
 #queries
 from .queries import db_search_Selfassesment, db_all_Selfassesment
 from .queries import db_search_SelfassesmentAccountSubmission, db_all_SelfassesmentAccountSubmission
 from .queries import db_search_SelfassesmentTracker, db_all_SelfassesmentTracker
-
-from .queries import db_search_Limited, db_all_Limited
-from .queries import db_search_LimitedAccountSubmission, db_all_LimitedAccountSubmission
-from .queries import db_search_LimitedTracker, db_all_LimitedTracker
 
 # serializers
 from rest_framework.decorators import api_view
@@ -62,13 +52,17 @@ URLS = {
 @login_required
 def home_selfassesment(request):
   pk_field = 'client_id'
-  exclude_fields = set(['client_id', 'is_updated', 'created_by'])
+  exclude_fields = []
+  include_fields = ['is_active', 'client_file_number', 'client_name', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent']
+  keep_include_fields = True
+  show_others = False
   context = {
     **URLS,
     'model_fields': get_field_names_from_model(Selfassesment),
-    'template_tag': generate_template_tag_for_model(Selfassesment, pk_filed=pk_field, exclude_fields=exclude_fields),
-    'data_container': generate_data_container_table(Selfassesment, pk_filed=pk_field, exclude_fields=exclude_fields),
+    'template_tag': generate_template_tag_for_model(Selfassesment, pk_field=pk_field, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+    'data_container': generate_data_container_table(Selfassesment, pk_field=pk_field, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
 
+    'caption': 'View Selfassesment',
     'page_title': 'View Selfassesment',
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_create_name,
     'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
@@ -89,7 +83,7 @@ def create_selfassesment(request):
     'page_title': 'Create Selfassesment',
     'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_home_name,
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_create_name,
-    'form_title': 'Selfassesment Creation Form',
+    'form_title': 'Selfassesment Account Year Assign Form',
     'form': SelfassesmentCreationForm(initial={'client_file_number': Selfassesment.get_next_file_number()})
   }
 
@@ -112,9 +106,6 @@ def get_details_selfassesment(request, client_id=None):
     return HttpResponse(json.dumps(response))
 
 @login_required
-@allowed_for_staff(
-  message="Sorry! You are not authorized to update this.",
-  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_home_name)
 def update_selfassesment(request, client_id:int):
   context = {
     **URLS,
@@ -204,13 +195,15 @@ def serialized(request):
 @login_required
 def home_selfassesment_account_submission(request):
   pk_field = 'submission_id'
-  exclude_fields = set(['submission_id', 'is_updated', 'created_by'])
+  exclude_fields = []
+  keep_include_fields = True
   context = {
     **URLS,
     'model_fields': get_field_names_from_model(SelfassesmentAccountSubmission),
-    'template_tag': generate_template_tag_for_model(SelfassesmentAccountSubmission, pk_filed=pk_field, exclude_fields=exclude_fields),
-    'data_container': generate_data_container_table(SelfassesmentAccountSubmission, pk_filed=pk_field, exclude_fields=exclude_fields),
+    'template_tag': generate_template_tag_for_model(SelfassesmentAccountSubmission, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    'data_container': generate_data_container_table(SelfassesmentAccountSubmission, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
     
+    'caption': 'View Selfassesment Account Submission',
     'page_title': 'View Selfassesment Account Submission',
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_create_name,
     'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_viewall_url,
@@ -251,9 +244,6 @@ def create_selfassesment_account_submission(request):
   return render(request, template_name='companies/create.html', context=context)
 
 @login_required
-@allowed_for_staff(
-  message="Sorry! You are not authorized to update this.",
-  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_home_name)
 def update_selfassesment_account_submission(request, submission_id:int):
   context = {
     **URLS,
@@ -375,18 +365,21 @@ def add_all_selfassesment_to_selfassesment_account_submission_w_submission_year(
 def home_selfassesment_tracker(request):
   pk_field = 'tracker_id'
   exclude_fields = set(['tracker_id', 'is_updated', 'creation_date'])
+  keep_include_fields = False
   context = {
     **URLS,
     'model_fields': get_field_names_from_model(SelfassesmentTracker),
-    'template_tag': generate_template_tag_for_model(SelfassesmentTracker, pk_filed=pk_field, exclude_fields=exclude_fields),
-    'data_container': generate_data_container_table(SelfassesmentTracker, pk_filed=pk_field, exclude_fields=exclude_fields),
+    'template_tag': generate_template_tag_for_model(SelfassesmentTracker, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    'data_container': generate_data_container_table(SelfassesmentTracker, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
     
     'page_title': 'View Selfassesment Tracker',
+    'caption': 'View Selfassesment Tracker',
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_create_name,
     'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_viewall_url,
     'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_search_url,
     'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_update_url,
     'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_delete_url,
+    'task_counts': True,
     'completed_tasks': SelfassesmentTracker.objects.filter(is_completed=True).count(),
     'future_taks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.now()).count(),
     'todays_taks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.now()).count(),
@@ -422,9 +415,6 @@ def create_selfassesment_tracker(request):
   return render(request, template_name='companies/create.html', context=context)
 
 @login_required
-@allowed_for_staff(
-  message="Sorry! You are not authorized to update this.",
-  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
 def update_selfassesment_tracker(request, tracker_id:int):
   context = {
     **URLS,
@@ -439,6 +429,9 @@ def update_selfassesment_tracker(request, tracker_id:int):
   try:
     record =  SelfassesmentTracker.objects.get(tracker_id=tracker_id)
     context['form'] = SelfassesmentTrackerChangeForm(instance=record)
+    if record.is_completed:
+      messages.error(request, message=f"Task {tracker_id} is completed therefore can't be updated!")
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
   except SelfassesmentTracker.DoesNotExist:
     messages.error(request, f'Selfassesment Tracker having id {tracker_id} does not exists!')
     return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
@@ -449,10 +442,8 @@ def update_selfassesment_tracker(request, tracker_id:int):
     context['form'] = form
     if form.is_valid():
       assesment = form.save(commit=False)
+      assesment.done_by = request.user
       if form.cleaned_data.get('is_completed')==True:
-        if assesment.done_by==None:
-          form.add_error('done_by', 'Done by is required since you are trying to update status.')
-          return render(request, template_name='companies/update.html', context=context)
         assesment.complete_date = timezone.now()
       assesment.save()
       messages.success(request, f'Selfassesment Tracker has been updated having id {tracker_id}!')

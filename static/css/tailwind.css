@@ -14,14 +14,14 @@
 
   label{ @apply mb-1 mr-2 inline-block text-gray-800; }
   input{ @apply px-4 py-2 h-10 w-full; }
-  input, textarea, select{ @apply  text-black bg-gray-100 fill-current placeholder-gray-500 rounded-md shadow-md appearance-none border-none bg-none outline-none z-10; }
+  input, textarea, select{ @apply  text-black bg-gray-100 fill-current rounded-md shadow-md appearance-none border-none bg-none outline-none z-10; }
   input:hover, textarea:hover, select:hover{ @apply bg-gray-200; }
   input:focus, textarea:focus, select:focus{ @apply bg-blue-100 ring-2; }
 
   @media (prefers-color-scheme: dark){
     label{ @apply text-gray-50; }
     
-    input, textarea, select{ @apply text-gray-100 bg-gray-700 placeholder-gray-50; }
+    input, textarea, select{ @apply text-gray-100 bg-gray-700; }
     input:hover, textarea:hover, select:hover{ @apply bg-gray-600; }
     input:focus, textarea:focus, select:focus{ @apply text-gray-100 bg-gray-800 ring-2; }
   }
@@ -33,7 +33,7 @@
   }
   /* placeholder opacity for inputs */
   input, textarea, select{
-    @apply placeholder-opacity-40;
+    @apply placeholder-black dark:placeholder-gray-50 placeholder-opacity-80 dark:placeholder-opacity-50;
   }
 }
 
@@ -105,6 +105,11 @@
   .delete-header{
     @apply delete text-white;
   }
+  
+  /* fieldset */
+  h1.fieldset.title{
+    @apply bg-pink-600 text-white text-xl font-semibold mt-10 px-5 py-2 rounded-md;
+  }
 }
 
 .success{
@@ -130,10 +135,10 @@
   @apply mx-auto;
 }
 .data-wrapper{
-  @apply overflow-auto mt-5 max-h-screen relative;
+  @apply overflow-auto max-h-screen relative;
 }
 .data-container{
-  @apply max-h-screen rounded-md mx-auto;
+  @apply max-h-screen rounded-md mx-auto text-xs sm:text-sm;
 }
 
 .stick-top{
@@ -148,7 +153,7 @@
 #data .data-row:last-child .data-cell:first-child{ @apply rounded-bl-lg; }
 
 .data-head .data-head-row{
-  @apply font-normal whitespace-nowrap;
+  @apply whitespace-nowrap;
 }
 
 .data-row{
@@ -165,7 +170,7 @@
   @apply text-center px-3 py-2 whitespace-nowrap;
 }
 .data-cell{
-  @apply h-full px-5 py-2;
+  @apply h-full px-3 py-2;
 }
 /* #data .data-row:hover{
   @apply ;
@@ -174,11 +179,14 @@
 /* options */
 div.search_field > div.select > .option{
   display: block;
-  @apply my-2;
+  @apply bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-300 border-gray-400 border-b-2 px-3 py-2 text-sm border-opacity-50;
+}
+div.search_field > div.select > .option:last-child{
+  @apply border-b-0;
 }
 /* selected option */
-.option.selected{
-  @apply text-green-500 text-lg font-bold;
+div.search_field > div.select > .selected{
+  @apply bg-gray-400 dark:bg-gray-900 text-base font-bold py-3 border-blue-500 border-opacity-50;
 }
 
 /* searchable input field */
@@ -187,29 +195,26 @@ div.search_field > div.select{
   position: absolute;
   top: 100%;
   left: 0;
-  @apply bg-gray-800 rounded-md px-4 py-2 shadow-lg;
+  @apply max-h-72 rounded-md overflow-auto shadow-lg ring-2;
 }
 
-div.search_field > input[name="search"] ~ div.select:hover,
-div.search_field > input[name="search"]:active ~ div.select,
-div.search_field > input[name="search"]:focus ~ div.select,
-div.search_field > input[name="search"]:focus-visible ~ div.select{
+div.search_field > input[name="search"] ~ div.select:hover:not([disabled]),
+div.search_field > input[name="search"]:active ~ div.select:not([disabled]),
+div.search_field > input[name="search"]:focus ~ div.select:not([disabled]),
+div.search_field > input[name="search"]:focus-visible ~ div.select:not([disabled]){
   display: block;
   z-index: 50;
 }
 
 
-
-
-
-
-
+/* tasks */
 .task-container{
+  z-index: 1000;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   position: absolute;
-  right: 0;
+  left: 0;
   transform: translateY(-100%);
   @apply top-0 sm:-top-1 md:-top-2;
 }
@@ -236,24 +241,18 @@ div.search_field > input[name="search"]:focus-visible ~ div.select{
   display: none;
   position: absolute;
   top: -30%;
-  right: 0;
+  left: 0;
   @apply transform -translate-y-full px-1 text-base font-normal text-gray-100 whitespace-nowrap bg-gray-600 rounded-md px-3 py-1;
 }
 .task-tooltip::after {
   content: " ";
   position: absolute;
   top: 100%; /* At the bottom of the tooltip */
-  right: 3.5%;
   margin-left: -5px;
   border-width: 5px;
   border-style: solid;
   border-color: rgba(75, 85, 99) transparent transparent transparent;
-}
-/* Dark mode */
-@media (prefers-color-scheme: dark) {
-  .task-tooltip::after{
-
-  }
+  @apply left-[10px] sm:left-[15px];
 }
 .task:hover > .task-tooltip{
   display: block;
@@ -272,7 +271,7 @@ div.search_field > input[name="search"]:focus-visible ~ div.select{
     /* convert hex color to filter https://codepen.io/sosuke/pen/Pjoqqp */
     /* filter: invert(51%) sepia(97%) saturate(1688%) hue-rotate(324deg) brightness(101%) contrast(88%); */
     filter: invert(0);
-    z-index: -1;
+    z-index: 0;
   }
   ::-webkit-search-cancel-button{
     filter: invert(0%) sepia(100%) saturate(0%) hue-rotate(21deg) brightness(97%) contrast(103%);

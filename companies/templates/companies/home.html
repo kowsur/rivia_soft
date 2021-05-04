@@ -21,12 +21,8 @@
 {% endfor %}
 {% endif %}
 
-<!-- searchbar -->
-{% include "companies/searchbar.html" %}
-
-
-
-
+{% if caption %}
+<h1 class="mt-5 text-2xl text-center">{{ caption }}</h1>
 {% if add_all_url %}
   <!-- add all selfassesments -->
   {% if request.user.is_superuser %}
@@ -36,10 +32,14 @@
   </div>
   {% endif %}
 {% endif %}
+{% endif %}
+
+<!-- searchbar -->
+{% include "companies/searchbar.html" %}
 
 <!-- represent data -->
 <div class="relative max-w-min mx-auto">
-  {% if todays_taks %}
+  {% if task_counts %}
   <div class="task-container">
     <span class="task task-previous">
       {{ previous_tasks }}

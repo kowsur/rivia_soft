@@ -2,14 +2,16 @@ from django import forms
 from django.forms import widgets
 from .models import Selfassesment
 from typing import *
+from collections import namedtuple
 
+Fieldset = namedtuple('Fieldset', ['title', 'fields'])
 
 class Select(widgets.ChoiceWidget):
     template_name = 'companies/widgets/select.html'
     option_template_name = 'companies/widgets/select_option.html'
 
     # def __init__(self, search_url, all_url, fields, repr_format, attrs=None) -> None:
-    def __init__(self, search_url, all_url, repr_format, *args, attrs=None, model=None, choices=None, fk_field=None,**kwargs) -> None:
+    def __init__(self, search_url, all_url, repr_format, *args, attrs=None, model=None, choices=None, fk_field=None, **kwargs) -> None:
         self.repr_format = repr_format
         self.search_url = search_url
         self.all_url = all_url
@@ -44,5 +46,5 @@ class SearchableModelField(forms.ModelChoiceField):
     widget = Select
     # def __init__(self, search_url, all_url, fields, repr_format,*args, **kwargs) -> None:
     def __init__(self, search_url, all_url, repr_format, *args, model=None, choices=None, fk_field=None, **kwargs) -> None:
-        self.widget = Select(search_url, all_url, repr_format, *args, model=model, choices=choices, fk_field=fk_field,**kwargs)
+        self.widget = Select(search_url, all_url, repr_format, *args, model=model, choices=choices, fk_field=fk_field, **kwargs)
         super().__init__(*args, **kwargs)

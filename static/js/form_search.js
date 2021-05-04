@@ -15,7 +15,7 @@ select_elements.forEach(element => {
 
     // update placeholder to currently selected value
     let selected_option_text = select.options[select.selectedIndex].textContent
-    search_box.placeholder = selected_option_text
+    // search_box.placeholder = selected_option_text
     // search_box.value = selected_option_text
   })
 }); 
@@ -62,15 +62,16 @@ function update_options(records, repr_format, select_element, options_container,
   // clear options and select default
   options_container.innerHTML = ''
   let currently_selected_option = select_element.options[select_element.selectedIndex]
-  let selected = document.createElement(option_element_tag)
-  selected.classList.add('option')
-  selected.classList.add('selected')
-  selected.value = currently_selected_option.value
-  selected.setAttribute('data-value', currently_selected_option.value)
-  selected.textContent = currently_selected_option.textContent
-  options_container.appendChild(selected)
-  selected.addEventListener('click', option_selected)
-
+  if (currently_selected_option.value){
+    let selected = document.createElement(option_element_tag)
+    selected.classList.add('option')
+    selected.classList.add('selected')
+    selected.value = currently_selected_option.value
+    selected.setAttribute('data-value', currently_selected_option.value)
+    selected.textContent = currently_selected_option.textContent
+    options_container.appendChild(selected)
+    selected.addEventListener('click', option_selected)
+  }
 
   // update options
   for (let record of records){
@@ -78,7 +79,7 @@ function update_options(records, repr_format, select_element, options_container,
     let option = document.createElement(option_element_tag)
     option.value = record.pk
     option.setAttribute('data-value', record.pk)
-    option.textContent = repr_format.format(record) // `👥${client_name} 📁${client_file_number} 📞${client_phone_number}`
+    option.textContent = repr_format.format(record) // `👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} ☎{fields.business_phone_number}`
     // add class
     option.classList.add('option')
     
@@ -95,6 +96,8 @@ function update_options(records, repr_format, select_element, options_container,
 function option_selected(event) {
   // Option clicked on
   let clicked_option = event.currentTarget
+  if(clicked_option.hasAttribute('disabled')) return false
+
   let value = clicked_option.getAttribute('data-value')
   let text = clicked_option.textContent
   let options_container = clicked_option.parentElement
@@ -115,13 +118,16 @@ function option_selected(event) {
   // Update options_container
   clicked_option.remove()
   clicked_option.classList.add('selected')
-  options_container.firstElementChild.classList.remove('selected')
+  if (options_container.firstElementChild){
+    options_container.firstElementChild.classList.remove('selected')
+  }
   options_container.prepend(clicked_option)
 
   // Update search_bar
   let search_bar = search_field.querySelector('input[name="search"]')
   search_bar.placeholder = text
-  // search_bar.value = text
+  search_bar.value = text
+  return true
 }
 
 

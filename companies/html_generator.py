@@ -18,7 +18,6 @@ def get_field_names_from_model(django_model:models.Model):
   return field_names
 
 def get_header_name_from_field_name(django_model, field_name):
-  print(field_name)
   return django_model._meta.get_field(field_name).verbose_name
 
 def is_includeable(field, include_fields=[], exclude_fields=[], keep_include_fields=True, show_others=False):

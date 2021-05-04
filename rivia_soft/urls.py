@@ -24,10 +24,16 @@ urlpatterns = [
     path('', home_selfassesment_tracker),
     path('companies/', include('companies.urls'), name='companies'),
     path('u/', include('users.urls')),
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls, name='admin'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
+# Custom error handler page
 handler400 = 'error_handler.views.handle_400_error'
 handler403 = 'error_handler.views.handle_403_error'
 handler404 = 'error_handler.views.handle_404_error'
 handler500 = 'error_handler.views.handle_500_error'
+
+# Change admin titles and headers
+admin.site.site_header = "Rivia Solutions"
+admin.site.site_title = "Rivia Solutions Administration"
+admin.site.index_title = "Welcome to RSA"

@@ -100,6 +100,8 @@ def all_users(request):
 
 @login_required
 def get_user_details(request, user_id=None):
-    record = get_object_or_404(CustomUser, user_id=user_id)
-    response = CustomUserSerializer(instance=record).data
-    return HttpResponse(json.dumps(response))
+    if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+        record = get_object_or_404(CustomUser, user_id=user_id)
+        response = CustomUserSerializer(instance=record).data
+        return HttpResponse(json.dumps(response))
+    raise Http404

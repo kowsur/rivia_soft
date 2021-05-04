@@ -101,9 +101,11 @@ def create_selfassesment(request):
 
 @login_required
 def get_details_selfassesment(request, client_id=None):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
     record = get_object_or_404(Selfassesment, client_id=client_id)
     response = SelfassesmentSerializer(instance=record).data
     return HttpResponse(json.dumps(response))
+  raise Http404
 
 @login_required
 def update_selfassesment(request, client_id:int):
@@ -486,9 +488,14 @@ def delete_selfassesment_tracker(request, tracker_id:int):
 @login_required
 def search_selfassesment_tracker(request, search_text: str='', limit: int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+
     if search_text.strip()=='':
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_viewall_name)
-    records = db_search_SelfassesmentTracker(search_text, limit)
+    records = db_search_SelfassesmentTracker(
+      search_text=search_text,
+      user_email=request.user.email,
+      is_superuser=request.user.is_superuser,
+      limit=limit)
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
   raise Http404
@@ -496,7 +503,10 @@ def search_selfassesment_tracker(request, search_text: str='', limit: int=-1):
 @login_required
 def all_selfassesment_tracker(request, limit=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
-    records = db_all_SelfassesmentTracker(limit)
+    records = db_all_SelfassesmentTracker(
+      user_email=request.user.email,
+      is_superuser=request.user.is_superuser,
+      limit=limit)
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
   raise Http404

@@ -165,6 +165,7 @@ async function db_search_records(search_text, search_url = DATA.search_url) {
 // =============================================================================================================================
 // Api caller
 async function fetch_url(url, req_method, data_object={'name': 'IFTAKHAR HUSAN'}, headers={'Content-Type': 'application/json'}, others={}){
+  req_method = req_method.toUpperCase()
   if (deepCompare(others, {})){
     others = {
       credentials: 'same-origin',
@@ -175,7 +176,7 @@ async function fetch_url(url, req_method, data_object={'name': 'IFTAKHAR HUSAN'}
                                     // same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
     }
   }
-  if (req_method.toUpperCase()=='GET'){
+  if (req_method==='GET'){
     // send GET request
     const response = await fetch( url, {
       method: req_method,

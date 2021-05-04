@@ -2,16 +2,6 @@ from django.db import models
 
 
 
-def get_field_names_from_model(django_model:models.Model):
-  field_names = []
-  for field in django_model._meta.fields:
-    field_names.append(field.name)
-  return field_names
-
-def get_header_name_from_field_name(django_model, field_name):
-  return django_model._meta.get_field(field_name).verbose_name
-
-
 # foreign key fields
 user_repr_format = r"📨{email} 👥{first_name}"
 user_details_url_without_argument = '/u/details/'
@@ -20,10 +10,34 @@ Selfassesment_details_url_without_argument = '/companies/SA/details/'
 Selfassesment_type_repr_format = r"{type_name}"
 Selfassesment_type_details_url_without_argument = '/companies/SAT/details/'
 
+
+def get_field_names_from_model(django_model:models.Model):
+  field_names = []
+  for field in django_model._meta.fields:
+    field_names.append(field.name)
+  return field_names
+
+def get_header_name_from_field_name(django_model, field_name):
+  print(field_name)
+  return django_model._meta.get_field(field_name).verbose_name
+
+def is_includeable(field, include_fields=[], exclude_fields=[], keep_include_fields=True, show_others=False):
+  # skip if exclude_fields contains the field and keep_include_fields is False
+  if field in exclude_fields and keep_include_fields is False:
+    return False
+  # skip if neither include_fields nor exclude_fields contains the field and show others is False
+  if (field not in include_fields and field not in exclude_fields) and show_others is False:
+    return False
+  return True
+
 def generate_template_tag_for_model(
     django_model:models.Model,
-    pk_filed='id',
-    exclude_fields=('is_updated','created_by'),
+    pk_field='id',
+    exclude_fields = [],
+    include_fields = [],
+    ordering = [],
+    keep_include_fields = True,
+    show_others = True,
     tag_name='data-template',
     tag_id='data-template',
     fk_fields = {
@@ -71,15 +85,25 @@ def generate_template_tag_for_model(
     </a>
   </td>
   """
+  # mantain field order
+  field_order = list(ordering) # provided order
+  for field in include_fields: # include_field order
+    if field not in field_order:
+      field_order.append(field)
+  for field in model_fields: # django model's order
+    if field not in field_order:
+      field_order.append(field)
 
-  for field in model_fields:
-    if not field == pk_filed and field not in exclude_fields:
-      if field in fk_fields:
-        inner_template_tr+=f"""
-        <td class="data-cell" id="{field}"
-          data-url="{fk_fields[field]['details_url_without_argument']}" data-repr-format="{fk_fields[field]['repr-format']}"></td>\n"""
-      else:
-        inner_template_tr += f'<td class="data-cell" id="{field}"></td>\n'
+  for field in field_order:
+    # skip if field is pk_field
+    if field is pk_field or not is_includeable(field, include_fields, exclude_fields, keep_include_fields, show_others):
+      continue
+    if field in fk_fields:
+      inner_template_tr+=f"""
+      <td class="data-cell" id="{field}"
+        data-url="{fk_fields[field]['details_url_without_argument']}" data-repr-format="{fk_fields[field]['repr-format']}"></td>\n"""
+    else:
+      inner_template_tr += f'<td class="data-cell" id="{field}"></td>\n'
   
   template_tag = f"""
   <template id="{tag_id}" name="{tag_name}">
@@ -91,16 +115,36 @@ def generate_template_tag_for_model(
   return template_tag
 
 
-def generate_data_container_table(django_model:models.Model, pk_filed='id', exclude_fields=('is_updated','created_by'),tag_name='data-template', tag_id='data-template'):
+def generate_data_container_table(
+    django_model:models.Model,
+    pk_field='id',
+    exclude_fields=[],
+    include_fields=[],
+    keep_include_fields=True,
+    ordering = [],
+    show_others = True,
+    tag_name='data-template',
+    tag_id='data-template'
+  ):
   model_fields = get_field_names_from_model(django_model)
   inner_header_tr = """
   <th class="data-cell stick-top data-id">#</th>
   """
-
-  for field in model_fields:
-    if not field == pk_filed and field not in exclude_fields:
-      header_name = get_header_name_from_field_name(django_model, field)
-      inner_header_tr += f'<th class="data-cell stick-top data-id">{header_name}</th>\n'
+  # mantain field order
+  field_order = list(ordering) # provided order
+  for field in include_fields: # include_field order
+    if field not in field_order:
+      field_order.append(field)
+  for field in model_fields: # django model's order
+    if field not in field_order:
+      field_order.append(field)
+  
+  for field in field_order:
+    if field is pk_field or not is_includeable(field, include_fields, exclude_fields, keep_include_fields, show_others):
+      continue
+    header_name = get_header_name_from_field_name(django_model, field)
+    inner_header_tr += f'<th class="data-cell stick-top data-id">{header_name}</th>\n'
+    
   
   header_tr = f"""
   <tr class="data-row data-head-row">

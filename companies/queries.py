@@ -49,19 +49,20 @@ def db_all_Selfassesment(limit=-1):
 
 # SelfassesmentAccountSubmission
 def db_search_SelfassesmentAccountSubmission(search_text: str, limit=-1):
-    Query = Q(date_of_submission__contains          = search_text) |\
-            Q(tax_year__contains                    = search_text) |\
-            Q(client_id__client_name__contains = search_text) |\
+    Query = Q(date_of_submission__contains               = search_text) |\
+            Q(tax_year__contains                         = search_text) |\
+            Q(client_id__client_name__contains           = search_text) |\
             Q(client_id__personal_phone_number__contains = search_text) |\
-            Q(client_id__client_file_number__contains = search_text) |\
-            Q(submitted_by__email__contains         = search_text) |\
-            Q(prepared_by__email__contains          = search_text) |\
-            Q(remarks__contains                     = search_text)
+            Q(client_id__business_phone_number__contains = search_text) |\
+            Q(submitted_by__email__contains              = search_text) |\
+            Q(prepared_by__email__contains               = search_text) |\
+            Q(remarks__contains                          = search_text)
     try:
         num = int(search_text)
-        Query |= Q(submission_id            = num) |\
-                Q(client_id                 = num) |\
-                Q(paid_amount               = num)
+        Query |= Q(submission_id                = num) |\
+                Q(client_id__client_file_number = num) |\
+                Q(client_id                     = num) |\
+                Q(paid_amount                   = num)
     except Exception:
         pass
     
@@ -80,11 +81,12 @@ def db_all_SelfassesmentAccountSubmission(limit=-1):
 # =============================================================================================================
 # SelfassesmentTracker
 def db_search_SelfassesmentTracker(search_text: str, user_email='', is_superuser=False, limit=-1):
-    Query = Q(job_description__contains     = search_text) |\
-            Q(deadline__contains            = search_text) |\
-            Q(client_id__client_name__contains = search_text) |\
+    Query = Q(job_description__contains                  = search_text) |\
+            Q(deadline__contains                         = search_text) |\
+            Q(client_id__client_name__contains           = search_text) |\
             Q(client_id__personal_phone_number__contains = search_text) |\
-            Q(client_id__client_file_number__contains = search_text)
+            Q(client_id__business_phone_number__contains = search_text) |\
+            Q(client_id__client_file_number__contains    = search_text)
             # Q(created_by__first_name__contains = search_text) |\
             # Q(created_by__last_name__contains = search_text) |\
             # Q(done_by__first_name__contains = search_text) |\

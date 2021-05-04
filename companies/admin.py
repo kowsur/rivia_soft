@@ -1,6 +1,8 @@
 from django.contrib import admin
-from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
+from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker, SelfassesmentType
 
+
+admin.site.register(SelfassesmentType)
 
 # Register your models here.
 class SelfassesmentTrackerAdmin(admin.ModelAdmin):
@@ -8,7 +10,30 @@ class SelfassesmentTrackerAdmin(admin.ModelAdmin):
     model = SelfassesmentTracker
     list_display = ('created_by', 'done_by', 'client_id', 'job_description', 'is_completed')
     list_filter = ('is_completed',)
-    search_fields = ('job_description', 'created_by', 'done_by','deadline', 'complete_date')
+    search_fields = (
+      'tracker_id',
+      'client_id__client_name',
+      'client_id__client_file_number',
+      'client_id__personal_email',
+      'client_id__personal_phone_number',
+      'client_id__personal_address',
+      'client_id__personal_post_code',
+      'client_id__business_email',
+      'client_id__business_phone_number',
+      'client_id__business_address',
+      'client_id__business_post_code',
+      'created_by__email', 
+      'created_by__first_name', 
+      'created_by__last_name', 
+      'job_description',
+      'created_by__email', 
+      'created_by__first_name', 
+      'created_by__last_name',
+      'done_by__email', 
+      'done_by__first_name', 
+      'done_by__last_name', 
+      'deadline',
+      'complete_date')
     ordering = ('deadline', 'complete_date')
 
 admin.site.register(SelfassesmentTracker, SelfassesmentTrackerAdmin)
@@ -17,65 +42,114 @@ admin.site.register(SelfassesmentTracker, SelfassesmentTrackerAdmin)
 class SelfassesmentAdmin(admin.ModelAdmin):
   # fields = (
     # 'client_id',
+    # 'created_by', 
+    # 'selfassesment_type',
+    # 'date_of_registration',
+    # 'is_updated',
+    # 'is_active',
+    # 'remarks',
+
     # 'client_file_number', 
-    # 'client_name', 
-    # 'client_phone_number', 
-    # 'date_of_registration', 
-    # 'UTR', 
+    # 'client_name',
+
+    # 'date_of_birth', 
+    # 'PAYE_number', 
+    # 'personal_phone_number', 
+    # 'personal_email', 
+    # 'personal_address', 
+    # 'personal_post_code',
+
+    # 'AOR_number',
+    # 'business_phone_number',
+    # 'business_email', 
+    # 'business_address', 
+    # 'business_post_code',
+
+    # 'HMRC_agent', 
     # 'HMRC_referance', 
+    # 'UTR', 
     # 'NINO', 
     # 'gateway_id', 
     # 'gateway_password', 
-    # 'address', 
-    # 'post_code', 
-    # 'email', 
+    
     # 'bank_name', 
     # 'bank_account_number', 
     # 'bank_sort_code', 
-    # 'bank_account_holder_name', 
-    # 'is_active')
+    # 'bank_account_holder_name',
+    # )
   model = Selfassesment
-  list_display = ('client_name', 'date_of_registration', 'client_phone_number', 'email', 'is_active')
-  list_filter = ('is_active',)
+  list_display = ('client_name', 'client_file_number', 'date_of_registration', 'business_phone_number', 'business_email', 'is_active')
+  list_filter = ('is_active', 'date_of_registration')
   search_fields = (
+    'client_id',
+    'created_by__email', 
+    'created_by__first_name', 
+    'created_by__last_name', 
+    'selfassesment_type__type_name',
+    'date_of_registration',
+    'is_updated',
+    'is_active',
+    'remarks',
+
     'client_file_number', 
-    'client_name', 
-    'client_phone_number', 
-    'date_of_registration', 
-    'UTR', 
+    'client_name',
+
+    'date_of_birth', 
+    'PAYE_number', 
+    'personal_phone_number', 
+    'personal_email', 
+    'personal_address', 
+    'personal_post_code',
+
+    'AOR_number',
+    'business_phone_number',
+    'business_email', 
+    'business_address', 
+    'business_post_code',
+
+    'HMRC_agent', 
     'HMRC_referance', 
+    'UTR', 
     'NINO', 
     'gateway_id', 
     'gateway_password', 
-    'address', 
-    'post_code', 
-    'email', 
+    
     'bank_name', 
     'bank_account_number', 
     'bank_sort_code', 
-    'bank_account_holder_name', 
-    'is_active')
+    'bank_account_holder_name',
+    )
   ordering = ('date_of_registration',)
   fieldsets = (
+        # ('Identification', {
+        #   'classes': ('wide', ),
+        #   'fields': ('created_by', 'is_updated',)
+        #   }
+        # ),
         ('Client Info', {
             'classes': ('wide',),
-            'fields': ('client_name', 'client_file_number', 'date_of_registration', 'is_active')
+            'fields': ('selfassesment_type', 'date_of_registration', 'remarks', 'is_active', 'client_file_number', 'client_name')
           }
         ),
-        ('Contact Info', {
+        ('Personal Info', {
             'classes': ('wide',),
-            'fields': ('client_phone_number', 'email', 'address', 'post_code')
+            'fields': ('date_of_birth', 'PAYE_number', 'personal_phone_number', 'personal_email', 'personal_address', 'personal_post_code', 'gateway_id', 'gateway_password', )
+          }
+        ),
+        ('Business Info', {
+            'classes': ('wide',),
+            'fields': ('AOR_number', 'business_phone_number', 'business_email', 'business_address', 'business_post_code', )
           }
         ),
         ('Bank Info', {
             'classes': ('wide',),
-            'fields': ('bank_account_holder_name', 'bank_name', 'bank_account_number', 'bank_sort_code')
+            'fields': ('bank_name', 'bank_account_number', 'bank_sort_code', 'bank_account_holder_name',)
           }
         ),
         (
           'HMRC Details', {
             'classes': ('wide',),
-            'fields': ('UTR', 'HMRC_referance', 'NINO', 'gateway_id', 'gateway_password')
+            'fields': ('HMRC_referance', 'UTR', 'NINO', 'HMRC_agent', )
           }
         )
     )
@@ -98,13 +172,26 @@ class SelfassesmentAccountSubmissionAdmin(admin.ModelAdmin):
   model = SelfassesmentAccountSubmission
   list_display = ('client_id', 'remarks', 'paid_amount', 'is_paid', 'is_submitted')
   list_filter = ('is_paid', 'is_submitted')
-  search_fields = ('is_updated',
+  search_fields = (
     'submission_id',
-    'client_id',
+    'client_id__client_name',
+    'client_id__client_file_number',
+    'client_id__personal_email',
+    'client_id__personal_phone_number',
+    'client_id__personal_address',
+    'client_id__personal_post_code',
+    'client_id__business_email',
+    'client_id__business_phone_number',
+    'client_id__business_address',
+    'client_id__business_post_code',
     'date_of_submission', 
     'tax_year', 
-    'submitted_by', 
-    'prepared_by', 
+    'submitted_by__email', 
+    'submitted_by__first_name', 
+    'submitted_by__last_name',
+    'prepared_by__email', 
+    'prepared_by__first_name', 
+    'prepared_by__last_name', 
     'remarks', 
     'paid_amount', 
     'is_paid', 

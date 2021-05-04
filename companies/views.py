@@ -169,8 +169,9 @@ def delete_selfassesment(request, client_id:int):
   return render(request, template_name='companies/delete.html', context=context)
 
 @login_required
-def search_selfassesment(request, search_text: str='', limit: int=-1):
+def search_selfassesment(request, limit: int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    search_text = request.GET.get('q', '')
     if search_text.strip()=='':
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_viewall_name)
     records = db_search_Selfassesment(search_text, limit)
@@ -308,8 +309,9 @@ def delete_selfassesment_account_submission(request, submission_id:int):
   return render(request, template_name='companies/delete.html', context=context)
 
 @login_required
-def search_selfassesment_account_submission(request, search_text: str='', limit: int=-1):
+def search_selfassesment_account_submission(request, limit: int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    search_text = request.GET.get('q', '')
     if search_text.strip()=='':
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_viewall_name)
     records = db_search_SelfassesmentAccountSubmission(search_text, limit)
@@ -385,7 +387,7 @@ def home_selfassesment_tracker(request):
     'completed_tasks': SelfassesmentTracker.objects.filter(is_completed=True).count(),
     'future_taks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.now()).count(),
     'todays_taks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.now()).count(),
-    'previous_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.now(), is_completed=False).count()
+    'previous_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.now(), is_completed=False).count(),
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -486,9 +488,9 @@ def delete_selfassesment_tracker(request, tracker_id:int):
   return render(request, template_name='companies/delete.html', context=context)
 
 @login_required
-def search_selfassesment_tracker(request, search_text: str='', limit: int=-1):
+def search_selfassesment_tracker(request, limit: int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
-
+    search_text = request.GET.get('q', '')
     if search_text.strip()=='':
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_viewall_name)
     records = db_search_SelfassesmentTracker(

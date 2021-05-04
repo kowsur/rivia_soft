@@ -56,7 +56,7 @@ class URL_PATHS(Dict_Duck_type):
   Selfassesment_details_url = f'{Selfassesment_path}/{details_suffix}/<int:client_id>/'
   Selfassesment_update_url = f'{Selfassesment_path}/{update_suffix}/<int:client_id>/'
   Selfassesment_delete_url = f'{Selfassesment_path}/{delete_suffix}/<int:client_id>/'
-  Selfassesment_search_url = f'{Selfassesment_path}/{search_suffix}/<str:search_text>/' # fetch only
+  Selfassesment_search_url = f'{Selfassesment_path}/{search_suffix}/' # fetch only
   Selfassesment_viewall_url = f'{Selfassesment_path}/{viewall_suffix}/' # fetch only
 
   # Selfassesment Account Submission
@@ -64,7 +64,7 @@ class URL_PATHS(Dict_Duck_type):
   Selfassesment_Account_Submission_create_url = f'{Selfassesment_Account_Submission_path}/{create_suffix}/'
   Selfassesment_Account_Submission_update_url = f'{Selfassesment_Account_Submission_path}/{update_suffix}/<int:submission_id>/'
   Selfassesment_Account_Submission_delete_url = f'{Selfassesment_Account_Submission_path}/{delete_suffix}/<int:submission_id>/'
-  Selfassesment_Account_Submission_search_url = f'{Selfassesment_Account_Submission_path}/{search_suffix}/<str:search_text>/' # fetch only
+  Selfassesment_Account_Submission_search_url = f'{Selfassesment_Account_Submission_path}/{search_suffix}/' # fetch only
   Selfassesment_Account_Submission_viewall_url = f'{Selfassesment_Account_Submission_path}/{viewall_suffix}/' # fetch only
   add_all_Selfassesment_to_Selfassesment_Account_Submission_url = f'add_all/{Selfassesment_path}/to/{Selfassesment_Account_Submission_path}/'
 
@@ -73,7 +73,7 @@ class URL_PATHS(Dict_Duck_type):
   Selfassesment_Tracker_create_url = f'{Selfassesment_Tracker_path}/{create_suffix}/'
   Selfassesment_Tracker_update_url = f'{Selfassesment_Tracker_path}/{update_suffix}/<int:tracker_id>/'
   Selfassesment_Tracker_delete_url = f'{Selfassesment_Tracker_path}/{delete_suffix}/<int:tracker_id>/'
-  Selfassesment_Tracker_search_url = f'{Selfassesment_Tracker_path}/{search_suffix}/<str:search_text>/' # fetch only
+  Selfassesment_Tracker_search_url = f'{Selfassesment_Tracker_path}/{search_suffix}/' # fetch only
   Selfassesment_Tracker_viewall_url = f'{Selfassesment_Tracker_path}/{viewall_suffix}/' # fetch only
 
 
@@ -177,7 +177,7 @@ def gen_urls(
       print(f"{prefix}_{path}_url = f'{open}{prefix}_path{close}/{open}{path}_suffix{close}/'")
     for path in paths_w_args:
       print(f"{prefix}_{path}_url = f'{open}{prefix}_path{close}/{open}{path}_suffix{close}/{id_param}/'")
-    print(f"{prefix}_search_url = f'{open}{prefix}_path{close}/{open}{search}_suffix{close}/<str:search_text>/'")
+    print(f"{prefix}_search_url = f'{open}{prefix}_path{close}/{open}{search}_suffix{close}/'")
     print('')
 
 def gen_names(

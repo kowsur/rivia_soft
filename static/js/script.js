@@ -153,7 +153,9 @@ async function db_all_records(all_url = DATA.all_url) {
 }
 
 async function db_search_records(search_text, search_url = DATA.search_url) {
-  const records = await fetch_url(`${search_url}${search_text}/`, 'GET')
+  let params = {q:search_text}
+  let search_param = new URLSearchParams(params).toString()
+  const records = await fetch_url(`${search_url}?${search_param}`, 'GET')
     .then(res => res.json()) // convert response to JSON
     .then(data=>data) // recieve json data 
   return records; // return data

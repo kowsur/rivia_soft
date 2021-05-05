@@ -77,7 +77,7 @@ class Selfassesment(models.Model):
     # Personal Info
     date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=True)
     PAYE_number = models.CharField(verbose_name='PAYE Number', max_length=255, blank=True, null=True, db_index=True)
-    personal_phone_number = models.CharField(verbose_name='Personal Phone numbers', max_length=255, blank=False, null=False, db_index=True)
+    personal_phone_number = models.CharField(verbose_name='Personal Phone numbers', max_length=255, blank=False, null=True, db_index=True)
     personal_email = models.EmailField(verbose_name='Personal Email', max_length=320, blank=True, null=True)
     personal_address = models.TextField(verbose_name='Personal Address', blank=True, null=True, db_index=True)
     personal_post_code =models.CharField(verbose_name='Personal Postal Code', max_length=10, blank=True, null=True)

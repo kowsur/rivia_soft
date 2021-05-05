@@ -219,7 +219,7 @@ div.search_field > input[name="search"]:focus-visible ~ div.select:not([disabled
   @apply top-0 sm:-top-1 md:-top-2;
 }
 .task{
-  cursor: default;
+  cursor: pointer;
   position: relative;
   border-radius: 50%;
   @apply inline-block px-2 text-white text-center text-sm font-light  sm:text-lg sm:font-semibold sm:px-2.5 md:text-xl md:font-bold; /* px-4 py-2 text-xl */

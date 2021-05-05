@@ -77,7 +77,7 @@ if (search_bar){
 //====================================================================================================================================
 //====================================================================================================================================
 // commonly used functions
-function get_tr_for_table(data, template=template, model_fields=fields, update_url=DATA.update_url, delete_url=DATA.delete_url) {
+export function get_tr_for_table(data, template=template, model_fields=fields, update_url=DATA.update_url, delete_url=DATA.delete_url) {
   // prepare table row for table using template and data
   let instance = template.content.cloneNode(true)
 
@@ -100,8 +100,11 @@ function get_tr_for_table(data, template=template, model_fields=fields, update_u
         let repr_format = td.getAttribute('data-repr-format')
         if (data_url && field_data){
           data_url = `${data_url}${field_data}/`
-          
-          fetch_url(data_url, 'GET').then(response => response.json()).then(data => {
+          let kwargs = {
+            url: data_url,
+            req_method: 'GET'
+          }
+          fetch_url(kwargs).then(response => response.json()).then(data => {
             td.textContent = repr_format.format(data)
           })
         }else{
@@ -123,7 +126,7 @@ function get_tr_for_table(data, template=template, model_fields=fields, update_u
   }return instance; //return table row instance
 }
 
-async function populate_with_data(
+export async function populate_with_data(
   data_array,
   table_row_getter = get_tr_for_table,
   template_querySelector_string = template_querySelector){
@@ -145,17 +148,25 @@ async function populate_with_data(
 //====================================================================================================================================
 //====================================================================================================================================
 // search database
-async function db_all_records(all_url = DATA.all_url) {
-  const records = await fetch_url(all_url, 'GET')
+export async function db_all_records(all_url = DATA.all_url) {
+  let kwargs = {
+    url: all_url,
+    req_method: 'GET'
+  }
+  const records = await fetch_url(kwargs)
     .then(res => res.json()) // convert response to JSON
     .then(data=>data) // recieve json data 
   return records; // return data
 }
 
-async function db_search_records(search_text, search_url = DATA.search_url) {
+export async function db_search_records(search_text, search_url = DATA.search_url) {
   let params = {q:search_text}
   let search_param = new URLSearchParams(params).toString()
-  const records = await fetch_url(`${search_url}?${search_param}`, 'GET')
+  let kwargs = {
+    url: `${search_url}?${search_param}`,
+    req_method: 'GET'
+  }
+  const records = await fetch_url(kwargs)
     .then(res => res.json()) // convert response to JSON
     .then(data=>data) // recieve json data 
   return records; // return data
@@ -166,7 +177,7 @@ async function db_search_records(search_text, search_url = DATA.search_url) {
 
 // =============================================================================================================================
 // Api caller
-async function fetch_url(url, req_method, data_object={'name': 'IFTAKHAR HUSAN'}, headers={'Content-Type': 'application/json'}, others={}){
+export async function fetch_url({url, req_method, data_object={}, headers={'Content-Type': 'application/json'}, others={}}){
   req_method = req_method.toUpperCase()
   if (deepCompare(others, {})){
     others = {
@@ -199,7 +210,7 @@ async function fetch_url(url, req_method, data_object={'name': 'IFTAKHAR HUSAN'}
 }
 
 // Javascript object compare
-function deepCompare () {
+export function deepCompare () {
   var i, l, leftChain, rightChain;
 
   function compare2Objects (x, y) {

@@ -41,25 +41,25 @@
 <div class="relative max-w-min mx-auto">
   {% if task_counts %}
   <div class="task-container">
-    <span class="task task-previous" data-query_param='previous_incomplete_tasks'>
-      {{ previous_tasks }}
+    <span class="task task-previous" data-tasks='previous_incomplete_tasks'>
+      {{ previous_incomplete_tasks }}
       <span class="task-tooltip">Previous remaining tasks.</span>
     </span>
-    <span class="task task-today" data-query_param='todays_incomplete_tasks'>
-      {{todays_taks}}
+    <span class="task task-today" data-tasks='todays_incomplete_tasks'>
+      {{ todays_incomplete_tasks }}
       <span class="task-tooltip">Todays remaining tasks.</span>
     </span>
-    <span class="task task-upcoming" data-query_param='future_incomplete_tasks'>
-      {{future_taks}}
+    <span class="task task-upcoming" data-tasks='future_incomplete_tasks'>
+      {{ future_incomplete_tasks }}
       <span class="task-tooltip">Upcoming tasks.</span>
     </span>
-    <span class="task task-done" data-query_param='completed_tasks'>
-      {{completed_tasks}}
+    <span class="task task-done" data-tasks='completed_tasks'>
+      {{ completed_tasks }}
       <span class="task-tooltip">Finished tasks.</span>
     </span>
   </div>
 
-  <script src='{% static "/static/js/tracker_search.js" %}' defer></script>
+  <script src='{% static "/static/js/tracker_search.js" %}' type='module'></script>
   {% endif %}
   
   <!-- data -->

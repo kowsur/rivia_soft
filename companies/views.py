@@ -385,9 +385,9 @@ def home_selfassesment_tracker(request):
     'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_delete_url,
     'task_counts': True,
     'completed_tasks': SelfassesmentTracker.objects.filter(is_completed=True).count(),
-    'future_taks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.now()).count(),
-    'todays_taks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.now()).count(),
-    'previous_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.now(), is_completed=False).count(),
+    'future_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.now()).count(),
+    'todays_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.now()).count(),
+    'previous_incomplete_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.now(), is_completed=False).count(),
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -490,9 +490,26 @@ def delete_selfassesment_tracker(request, tracker_id:int):
 @login_required
 def search_selfassesment_tracker(request, limit: int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
-    search_text = request.GET.get('q', '')
-    if search_text.strip()=='':
+    # get search text from url query parameter
+    search_text = request.GET.get('q', '').strip()
+
+    # if tasks query paramter exists then return tasks
+    if request.GET.get('tasks'):
+      tasks = {
+        'completed_tasks': SelfassesmentTracker.objects.filter(is_completed=True),
+        'future_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.now()),
+        'todays_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.now()),
+        'previous_incomplete_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.now(), is_completed=False)
+      }
+      records = tasks.get(request.GET.get('tasks'), [])
+      records.order_by('deadline')
+      data = serialize(queryset=records, format='json')
+      return HttpResponse(data, content_type='application/json')
+    
+    # filter results using the search_text
+    if not search_text:
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_viewall_name)
+    
     records = db_search_SelfassesmentTracker(
       search_text=search_text,
       user_email=request.user.email,

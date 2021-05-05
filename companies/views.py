@@ -356,6 +356,8 @@ def add_all_selfassesment_to_selfassesment_account_submission_w_submission_year(
         form.cleaned_data['client_id'] = assesment
         instance = SelfassesmentAccountSubmission(**form.cleaned_data)
         instance.set_defaults()
+        if form.cleaned_data.get('prepared_by'):
+          instance.prepared_by = form.cleaned_data.get('prepared_by')
         instance.save()
       messages.success(request, 'Added all Selfassesment to Selfassesment Account Submission!')
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_home_name)

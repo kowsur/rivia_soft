@@ -64,12 +64,16 @@ class SelfassesmentCreationForm(forms.ModelForm):
         fieldsets = (
             Fieldset(
                 title = 'Client Info',
-                fields = ('client_file_number', 'selfassesment_type', 'date_of_registration', 'remarks', 'is_active', 'client_name', )
+                fields = ('client_file_number', 'selfassesment_type', 'date_of_registration', 'client_name', 'remarks', 'is_active', )
                 ),
             Fieldset(
                 title = 'Personal Info',
-                fields = ('date_of_birth', 'personal_phone_number', 'personal_email', 'personal_address', 'personal_post_code', 'gateway_id', 'gateway_password', )
+                fields = ('date_of_birth', 'personal_phone_number', 'personal_email', 'personal_address', 'personal_post_code', )
                 ),
+            Fieldset(
+                title = 'HMRC Details',
+                fields =  ('HMRC_referance', 'UTR', 'NINO', 'HMRC_agent', 'gateway_id', 'gateway_password', )
+            ),
             Fieldset(
                 title = 'Business Info', 
                 fields = ('business_phone_number', 'business_email', 'business_address', 'business_post_code', 'PAYE_number', 'AOR_number', )
@@ -78,10 +82,6 @@ class SelfassesmentCreationForm(forms.ModelForm):
                 title = 'Bank Info',
                 fields = ('bank_name', 'bank_account_number', 'bank_sort_code', 'bank_account_holder_name',)
                 ),
-            Fieldset(
-                title = 'HMRC Details',
-                fields =  ('HMRC_referance', 'UTR', 'NINO', 'HMRC_agent', )
-            ),
         )
 
 
@@ -136,24 +136,24 @@ class SelfassesmentChangeForm(forms.ModelForm):
         fieldsets = (
             Fieldset(
                 title = 'Client Info',
-                fields = ('client_file_number', 'selfassesment_type', 'date_of_registration', 'remarks', 'is_active', 'client_name', )
+                fields = ('client_file_number', 'selfassesment_type', 'date_of_registration', 'client_name', 'remarks', 'is_active', )
                 ),
             Fieldset(
                 title = 'Personal Info',
-                fields = ('date_of_birth', 'PAYE_number', 'personal_phone_number', 'personal_email', 'personal_address', 'personal_post_code', 'gateway_id', 'gateway_password', )
+                fields = ('date_of_birth', 'personal_phone_number', 'personal_email', 'personal_address', 'personal_post_code', )
                 ),
             Fieldset(
+                title = 'HMRC Details',
+                fields =  ('HMRC_referance', 'UTR', 'NINO', 'HMRC_agent', 'gateway_id', 'gateway_password', )
+            ),
+            Fieldset(
                 title = 'Business Info', 
-                fields = ('AOR_number', 'business_phone_number', 'business_email', 'business_address', 'business_post_code', )
+                fields = ('business_phone_number', 'business_email', 'business_address', 'business_post_code', 'PAYE_number', 'AOR_number', )
                 ),
             Fieldset(
                 title = 'Bank Info',
                 fields = ('bank_name', 'bank_account_number', 'bank_sort_code', 'bank_account_holder_name',)
                 ),
-            Fieldset(
-                title = 'HMRC Details',
-                fields =  ('HMRC_referance', 'UTR', 'NINO', 'HMRC_agent', )
-            ),
         )
 
 class SelfassesmentDeleteForm(forms.ModelForm):
@@ -328,25 +328,25 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
         empty_label=None,
         disabled=True
         )
-    done_by = SearchableModelField(
-        queryset=CustomUser.objects.all(),
-        search_url = search_users_url_path,
-        all_url = all_users_url_path,
-        repr_format = CustomUser_repr_format,
-        model = CustomUser,
-        choices = CustomUser.objects.all().only('user_id', 'first_name'),
-        fk_field = 'user_id',
-        disabled = True,
-        required = False,
-        empty_label = None # remove default option '------' from select menu
-        )
+    # done_by = SearchableModelField(
+    #     queryset=CustomUser.objects.all(),
+    #     search_url = search_users_url_path,
+    #     all_url = all_users_url_path,
+    #     repr_format = CustomUser_repr_format,
+    #     model = CustomUser,
+    #     choices = CustomUser.objects.all().only('user_id', 'first_name'),
+    #     fk_field = 'user_id',
+    #     disabled = True,
+    #     required = False,
+    #     empty_label = None # remove default option '------' from select menu
+    #     )
     
     class Meta:
         model = SelfassesmentTracker
         fields = (
             # 'tracker_id',
             # 'created_by',
-            'done_by',
+            # 'done_by',
             'client_id',
             'job_description',
             'deadline',

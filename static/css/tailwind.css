@@ -209,7 +209,6 @@ div.search_field > input[name="search"]:focus-visible ~ div.select:not([disabled
 
 /* tasks */
 .task-container{
-  z-index: 1000;
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;

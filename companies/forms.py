@@ -6,8 +6,8 @@ from .fields import SearchableModelField, Select, Fieldset
 from .url_variables import Full_URL_PATHS_WITHOUT_ARGUMENTS
 
 # dummy import
-# uncomment tripple doubble quotes(''') at the top and bottom of the file before migrating
-from .dummy_class import *
+# next line and uncomment tripple doubble quotes(''') at the top and bottom of the file before migrating
+# from .dummy_class import *
 
 
 from users.models import CustomUser

@@ -6,8 +6,8 @@ from collections import namedtuple
 from django.db.models.query import QuerySet
 
 # dummy import
-# uncomment tripple doubble quotes(''') at the top and bottom of the file before migrating
-from .dummy_class import *
+# uncomment next line and tripple doubble quotes(''') at the top and bottom of the file before migrating
+# from .dummy_class import *
 
 
 Fieldset = namedtuple('Fieldset', ['title', 'fields'])

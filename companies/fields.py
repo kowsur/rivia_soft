@@ -6,13 +6,12 @@ from collections import namedtuple
 from django.db.models.query import QuerySet
 
 # dummy import
-# uncomment next line and tripple doubble quotes(''') at the top and bottom of the file before migrating
+# uncomment next line before migrating
 # from .dummy_class import *
 
 
 Fieldset = namedtuple('Fieldset', ['title', 'fields'])
 
-#'''
 class Select(widgets.ChoiceWidget):
     template_name = 'companies/widgets/select.html'
     option_template_name = 'companies/widgets/select_option.html'
@@ -54,4 +53,3 @@ class SearchableModelField(forms.ModelChoiceField):
     def __init__(self, search_url, all_url, repr_format, *args, model=None, choices=None, fk_field=None, **kwargs) -> None:
         self.widget = Select(search_url, all_url, repr_format, *args, model=model, choices=choices, fk_field=fk_field, **kwargs)
         super().__init__(*args, **kwargs)
-#'''

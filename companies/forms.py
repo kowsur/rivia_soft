@@ -6,7 +6,7 @@ from .fields import SearchableModelField, Select, Fieldset
 from .url_variables import Full_URL_PATHS_WITHOUT_ARGUMENTS
 
 # dummy import
-# next line and uncomment tripple doubble quotes(''') at the top and bottom of the file before migrating
+# next line before migrating
 # from .dummy_class import *
 
 
@@ -17,7 +17,6 @@ all_users_url_path = '/u/all/'
 Selfassesment_client_id_repr_format = r"👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} ☎{fields.business_phone_number}"
 CustomUser_repr_format = r"📨{fields.email} 👥{fields.first_name}"
 
-#'''
 class SelfassesmentCreationForm(forms.ModelForm):
     date_of_registration = forms.DateField(
         label='Registration date',
@@ -364,4 +363,3 @@ class SelfassesmentTrackerDeleteForm(forms.ModelForm):
     class Meta:
         model = Selfassesment
         fields = ()
-#'''

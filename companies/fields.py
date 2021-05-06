@@ -3,9 +3,16 @@ from django.forms import widgets
 from .models import Selfassesment
 from typing import *
 from collections import namedtuple
+from django.db.models.query import QuerySet
+
+# dummy import
+# uncomment tripple doubble quotes(''') at the top and bottom of the file before migrating
+from .dummy_class import *
+
 
 Fieldset = namedtuple('Fieldset', ['title', 'fields'])
 
+#'''
 class Select(widgets.ChoiceWidget):
     template_name = 'companies/widgets/select.html'
     option_template_name = 'companies/widgets/select_option.html'
@@ -21,7 +28,6 @@ class Select(widgets.ChoiceWidget):
             self.fk_field = self.model._meta.pk.name
         if kwargs.get('label'):
             del kwargs['label']
-
         super().__init__(choices=choices)
     
     def get_context(self, name, value, attrs):
@@ -48,3 +54,4 @@ class SearchableModelField(forms.ModelChoiceField):
     def __init__(self, search_url, all_url, repr_format, *args, model=None, choices=None, fk_field=None, **kwargs) -> None:
         self.widget = Select(search_url, all_url, repr_format, *args, model=model, choices=choices, fk_field=fk_field, **kwargs)
         super().__init__(*args, **kwargs)
+#'''

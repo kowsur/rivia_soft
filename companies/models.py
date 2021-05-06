@@ -58,7 +58,7 @@ class Selfassesment(models.Model):
         blank=True,
         null=True)
     selfassesment_type = models.ForeignKey(
-        to=SelfassesmentType,
+        to='companies.SelfassesmentType',
         on_delete=models.RESTRICT,
         verbose_name='Selfassesment Type',
         related_name='selfassesment_type_id',
@@ -180,7 +180,7 @@ class SelfassesmentAccountSubmission(models.Model):
 
     submission_id = models.AutoField(verbose_name='Submission ID', primary_key=True, null=False, db_index=True, editable=False)
     client_id = models.ForeignKey(
-        to=Selfassesment,
+        to='companies.Selfassesment',
         on_delete=models.CASCADE,
         verbose_name='Client ID',
         to_field='client_id',
@@ -230,7 +230,7 @@ class SelfassesmentTracker(models.Model):
 
     tracker_id = models.AutoField(verbose_name = 'Tracker ID', blank=True, null=False, primary_key=True, db_index=True)
     client_id = models.ForeignKey(
-        to=Selfassesment,
+        to='companies.Selfassesment',
         on_delete=models.CASCADE,
         verbose_name='Client ID',
         to_field='client_id',

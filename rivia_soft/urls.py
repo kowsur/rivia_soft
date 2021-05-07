@@ -19,12 +19,14 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from companies.views import home_selfassesment_tracker
+from django.http import FileResponse
 
 urlpatterns = [
     path('', home_selfassesment_tracker),
     path('companies/', include('companies.urls'), name='companies'),
     path('u/', include('users.urls')),
     path('admin/', admin.site.urls, name='admin'),
+    path('opensearch.xml', lambda request: FileResponse(open('I:/Projects/rs/static/osd.xml','rb')), name='opensearch'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Custom error handler page

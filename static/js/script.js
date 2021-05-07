@@ -63,13 +63,26 @@ if (search_bar){
     }
   })
 
-  // when page loads load all the records
-  window.addEventListener('load', () => {
-    setTimeout(async ()=>{
-      let all_records = await db_all_records()
-      populate_with_data(all_records)
-    }, 10); // search with text
-  })
+  // OpenSearch
+  let current_url = window.location.href
+  let url = new URL(current_url)
+  let open_query = url.searchParams.get('q')
+  if (open_query){open_query=open_query.trim()}
+
+  if (open_query){
+    typingTimer = setTimeout(async (search_text, search_url)=>{
+      let search_records = await db_search_records(search_text, search_url)
+      populate_with_data(search_records)
+    }, 10, open_query, DATA.search_url); // search with text
+  }else{
+    // when page loads load all the records
+    window.addEventListener('load', () => {
+      setTimeout(async ()=>{
+        let all_records = await db_all_records()
+        populate_with_data(all_records)
+      }, 10); // search with text
+    })
+  }
 }
 
 

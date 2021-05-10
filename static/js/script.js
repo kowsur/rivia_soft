@@ -29,6 +29,11 @@ let DATA = {
 };
 
 // ================================================================================================
+// Handle reload
+document.querySelector('.action-reload').addEventListener('click', async (event) => {
+  loadAllRecords()
+})
+
 // Search functionality
 //setup before functions
 let typingTimer;                  //timer identifier
@@ -76,15 +81,16 @@ if (search_bar){
     }, 10, open_query, DATA.search_url); // search with text
   }else{
     // when page loads load all the records
-    window.addEventListener('load', () => {
-      setTimeout(async ()=>{
-        let all_records = await db_all_records()
-        populate_with_data(all_records)
-      }, 10); // search with text
-    })
+    loadAllRecords();
   }
 }
 
+export function loadAllRecords(){
+    setTimeout(async ()=>{
+      let all_records = await db_all_records()
+      populate_with_data(all_records)
+    }, 10); // search with text
+}
 
 //====================================================================================================================================
 //====================================================================================================================================

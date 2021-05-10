@@ -260,7 +260,56 @@ div.search_field > input[name="search"]:focus-visible ~ div.select:not([disabled
 
 
 
+/* actions */
+.action-container{
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  position: absolute;
+  right: 0;
+  transform: translateY(-100%);
+  @apply top-1 sm:top-[2px] md:top-0;
+}
+.action{
+  border-radius: 100%;
+  @apply relative inline-block p-[1px] sm:p-[2px] md:p-[3px];
+}
 
+.action-container svg{
+  color: white;
+  @apply h-5 w-5 sm:h-6 sm:w-6;
+}
+
+.action-create{
+  @apply bg-green-700;
+}
+.action-reload{
+  @apply bg-pink-700;
+}
+.action-export{
+  @apply bg-indigo-600;
+}
+
+.action-tooltip{
+  display: none;
+  position: absolute;
+  top: -30%;
+  right: 0;
+  @apply transform -translate-y-full px-1 text-base font-normal text-gray-100 whitespace-nowrap bg-gray-600 rounded-md px-3 py-1;
+}
+.action-tooltip::after {
+  content: " ";
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(75, 85, 99) transparent transparent transparent;
+  @apply right-[6px] sm:right-[10px];
+}
+.action:hover > .action-tooltip{
+  display: block;
+}
 
 
 

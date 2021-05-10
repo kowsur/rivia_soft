@@ -12,22 +12,42 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 from companies.url_variables import URL_NAMES_PREFIXED_WITH_APP_NAME
-from socket import gethostname, gethostbyname 
+from socket import gethostname, gethostbyname
+from json import loads
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# config file for production
+CONFIG_FILE_NAME = 'config.json'
+CONFIG_FILE_PATH = BASE_DIR / CONFIG_FILE_NAME # Server settings
+# load configurations
+with open(CONFIG_FILE_PATH, 'r') as CONFIG_FILE:
+    CONFIG = loads(CONFIG_FILE.read())
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'wh*lo-yh6geec40s91k0wb!enwn5ov6)3^k53c1hq)pq6png4@'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = CONFIG['DEBUG']
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', gethostname(), gethostbyname(gethostname())]
+# SECURITY WARNING: keep the secret key used in production secret!
+# Database
+# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+if DEBUG:
+    SECRET_KEY = 'wh*lo-yh6geec40s91k0wb!enwn5ov6)3^k53c1hq)pq6png4@'
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', gethostname(), gethostbyname(gethostname())]
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    SECRET_KEY = CONFIG['SECRET_KEY']
+    ALLOWED_HOSTS = CONFIG['ALLOWED_HOSTS']
+    DATABASES = CONFIG['DATABASES']
 
 
 # Application definition
@@ -78,17 +98,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'rivia_soft.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 
 # Password validation

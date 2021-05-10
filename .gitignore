@@ -1,3 +1,7 @@
+#Server Setup
+config.json
+ENVIRONMENT.py
+
 ### Custom ###
 static/css/style.css
 static/css/style.min.css

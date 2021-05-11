@@ -3,7 +3,8 @@ from django.db import models
 
 
 # foreign key fields
-user_repr_format = r"📨{email} 👥{first_name}"
+# user_repr_format = r"📨{email} 👥{first_name}"
+user_repr_format = r"👥{first_name} {last_name}"
 user_details_url_without_argument = '/u/details/'
 Selfassesment_repr_format = r"👥{client_name} 📁{client_file_number} 📞{personal_phone_number} ☎{business_phone_number}"
 Selfassesment_details_url_without_argument = '/companies/SA/details/'
@@ -48,7 +49,6 @@ def generate_template_tag_for_model(
       }
   ):
   
-  model_fields = get_field_names_from_model(django_model)
   inner_template_tr = """
   <td class="data-cell data-id" >
     <a class="w-max" href="" id='edit'>
@@ -85,6 +85,7 @@ def generate_template_tag_for_model(
   </td>
   """
   # mantain field order
+  model_fields = get_field_names_from_model(django_model)
   field_order = list(ordering) # provided order
   for field in include_fields: # include_field order
     if field not in field_order:

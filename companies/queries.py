@@ -86,11 +86,11 @@ def db_search_SelfassesmentTracker(search_text: str, user_email='', is_superuser
             Q(client_id__client_name__contains           = search_text) |\
             Q(client_id__personal_phone_number__contains = search_text) |\
             Q(client_id__business_phone_number__contains = search_text) |\
-            Q(client_id__client_file_number__contains    = search_text)
-            # Q(created_by__first_name__contains = search_text) |\
-            # Q(created_by__last_name__contains = search_text) |\
-            # Q(done_by__first_name__contains = search_text) |\
-            # Q(done_by__last_name__contains = search_text)
+            Q(client_id__client_file_number__contains    = search_text) |\
+            Q(created_by__first_name__contains = search_text) |\
+            Q(created_by__last_name__contains = search_text) |\
+            Q(done_by__first_name__contains = search_text) |\
+            Q(done_by__last_name__contains = search_text)
     
     # # created by should be the current logged in user
     # if not is_superuser:

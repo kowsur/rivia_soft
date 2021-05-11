@@ -272,6 +272,7 @@ div.search_field > input[name="search"]:focus-visible ~ div.select:not([disabled
 }
 .action{
   border-radius: 100%;
+  cursor: pointer;
   @apply relative inline-block p-[1px] sm:p-[2px] md:p-[3px];
 }
 

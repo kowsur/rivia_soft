@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db import models
 
 #forms
 from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm
@@ -16,6 +15,9 @@ from .forms import SelfassesmentTrackerCreationForm, SelfassesmentTrackerChangeF
 #models
 from .models import Selfassesment, SelfassesmentAccountSubmission
 from .models import SelfassesmentTracker
+
+#export
+from .export_models import export_to_csv
 
 #queries
 from .queries import db_search_Selfassesment, db_all_Selfassesment
@@ -65,6 +67,7 @@ def home_selfassesment(request):
     'caption': 'View Selfassesment',
     'page_title': 'View Selfassesment',
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_create_name,
+    'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_export_name,
     'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
     'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
     'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_update_url,
@@ -187,6 +190,26 @@ def all_selfassesment(request, limit=-1):
     return HttpResponse(data, content_type='application/json')
   raise Http404
 
+@login_required
+def export_selfassesment(request):
+  response = HttpResponse(
+    content_type='text/csv',
+    headers={'Content-Disposition': f'attachment; filename="selfassesment_{timezone.now()}.csv"'},
+  )
+  include_fields = ['is_active', 'client_file_number', 'client_name', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent']
+  exclude_fields = ['client_id',]
+  keep_include_fields = True
+  show_others = False
+  export_to_csv(
+    django_model = Selfassesment,
+    write_to = response,
+    include_fields = include_fields,
+    exclude_fields = exclude_fields,
+    keep_include_fields = keep_include_fields,
+    show_others = show_others
+    )
+  return response
+
 @api_view(['GET'])
 def serialized(request):
   
@@ -209,6 +232,7 @@ def home_selfassesment_account_submission(request):
     'caption': 'View Selfassesment Account Submission',
     'page_title': 'View Selfassesment Account Submission',
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_create_name,
+    'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_export_name,
     'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_viewall_url,
     'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_search_url,
     'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_update_url,
@@ -327,6 +351,26 @@ def all_selfassesment_account_submission(request, limit=-1):
     return HttpResponse(data, content_type='application/json')
   raise Http404
 
+@login_required
+def export_selfassesment_account_submission(request):
+  response = HttpResponse(
+    content_type='text/csv',
+    headers={'Content-Disposition': f'attachment; filename="selfassesment_account_submimssion_{timezone.now()}.csv"'},
+  )
+  include_fields = []
+  exclude_fields = ['submission_id']
+  keep_include_fields = False
+  show_others = True
+  export_to_csv(
+    django_model = SelfassesmentAccountSubmission,
+    write_to = response,
+    include_fields = include_fields,
+    exclude_fields = exclude_fields,
+    keep_include_fields = keep_include_fields,
+    show_others = show_others
+    )
+  return response
+
 # add_all_selfassesment_to_selfassesment_account_submission_w_submission_year
 @login_required
 def add_all_selfassesment_to_selfassesment_account_submission_w_submission_year(request):
@@ -381,6 +425,7 @@ def home_selfassesment_tracker(request):
     'page_title': 'View Selfassesment Tracker',
     'caption': 'View Selfassesment Tracker',
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_create_name,
+    'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_export_name,
     'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_viewall_url,
     'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_search_url,
     'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_update_url,
@@ -531,3 +576,23 @@ def all_selfassesment_tracker(request, limit=-1):
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
   raise Http404
+
+@login_required
+def export_selfassesment_tracker(request):
+  response = HttpResponse(
+    content_type='text/csv; charset=utf-8',
+    headers={'Content-Disposition': f'attachment; filename="selfassesment_tracker_{timezone.now()}.csv"'},
+  )
+  include_fields = []
+  exclude_fields = set(['tracker_id', 'is_updated', 'creation_date'])
+  keep_include_fields = True
+  show_others = True
+  export_to_csv(
+    django_model = SelfassesmentTracker,
+    write_to = response,
+    include_fields = include_fields,
+    exclude_fields = exclude_fields,
+    keep_include_fields = keep_include_fields,
+    show_others = show_others
+    )
+  return response

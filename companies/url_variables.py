@@ -7,6 +7,7 @@ update_suffix = 'update'
 delete_suffix = 'delete'
 search_suffix = 'search'
 details_suffix = 'details'
+export_suffix = 'export'
 viewall_suffix = 'all'
 
 
@@ -58,6 +59,7 @@ class URL_PATHS(Dict_Duck_type):
   Selfassesment_delete_url = f'{Selfassesment_path}/{delete_suffix}/<int:client_id>/'
   Selfassesment_search_url = f'{Selfassesment_path}/{search_suffix}/' # fetch only
   Selfassesment_viewall_url = f'{Selfassesment_path}/{viewall_suffix}/' # fetch only
+  Selfassesment_export_url = f'{Selfassesment_path}/{export_suffix}/'
 
   # Selfassesment Account Submission
   Selfassesment_Account_Submission_home_url = f'{Selfassesment_Account_Submission_path}/{home_suffix}/'
@@ -66,6 +68,7 @@ class URL_PATHS(Dict_Duck_type):
   Selfassesment_Account_Submission_delete_url = f'{Selfassesment_Account_Submission_path}/{delete_suffix}/<int:submission_id>/'
   Selfassesment_Account_Submission_search_url = f'{Selfassesment_Account_Submission_path}/{search_suffix}/' # fetch only
   Selfassesment_Account_Submission_viewall_url = f'{Selfassesment_Account_Submission_path}/{viewall_suffix}/' # fetch only
+  Selfassesment_Account_Submission_export_url = f'{Selfassesment_Account_Submission_path}/{export_suffix}/'
   add_all_Selfassesment_to_Selfassesment_Account_Submission_url = f'add_all/{Selfassesment_path}/to/{Selfassesment_Account_Submission_path}/'
 
   # Tracker
@@ -75,6 +78,8 @@ class URL_PATHS(Dict_Duck_type):
   Selfassesment_Tracker_delete_url = f'{Selfassesment_Tracker_path}/{delete_suffix}/<int:tracker_id>/'
   Selfassesment_Tracker_search_url = f'{Selfassesment_Tracker_path}/{search_suffix}/' # fetch only
   Selfassesment_Tracker_viewall_url = f'{Selfassesment_Tracker_path}/{viewall_suffix}/' # fetch only
+  Selfassesment_Tracker_export_url = f'{Selfassesment_Tracker_path}/{export_suffix}/'
+
 
 
 # Only use in urls.py to set url names
@@ -87,6 +92,7 @@ class URL_NAMES(Dict_Duck_type):
   Selfassesment_delete_name = f'{Selfassesment_name}_{delete_suffix}'
   Selfassesment_search_name = f'{Selfassesment_name}_{search_suffix}' # fetch only
   Selfassesment_viewall_name = f'{Selfassesment_name}_{viewall_suffix}' # fetch only
+  Selfassesment_export_name = f'{Selfassesment_name}_{export_suffix}'
 
   # Selfassesment Account Submission
   Selfassesment_Account_Submission_home_name = f'{Selfassesment_Account_Submission_name}_{home_suffix}'
@@ -95,6 +101,7 @@ class URL_NAMES(Dict_Duck_type):
   Selfassesment_Account_Submission_delete_name = f'{Selfassesment_Account_Submission_name}_{delete_suffix}'
   Selfassesment_Account_Submission_search_name = f'{Selfassesment_Account_Submission_name}_{search_suffix}' # fetch only
   Selfassesment_Account_Submission_viewall_name = f'{Selfassesment_Account_Submission_name}_{viewall_suffix}' # fetch only
+  Selfassesment_Account_Submission_export_name = f'{Selfassesment_Account_Submission_name}_{export_suffix}'
   add_all_Selfassesment_to_Selfassesment_Account_Submission_name = f'add_all_{Selfassesment_name}_to_{Selfassesment_Account_Submission_name}'
 
   # Tracker
@@ -104,6 +111,7 @@ class URL_NAMES(Dict_Duck_type):
   Selfassesment_Tracker_delete_name = f'{Selfassesment_Tracker_name}_{delete_suffix}'
   Selfassesment_Tracker_search_name = f'{Selfassesment_Tracker_name}_{search_suffix}' # fetch only
   Selfassesment_Tracker_viewall_name = f'{Selfassesment_Tracker_name}_{viewall_suffix}' # fetch only
+  Selfassesment_Tracker_export_name = f'{Selfassesment_Tracker_name}_{export_suffix}'
 
 
 # Should be passed in templates for JavaScript to fetch() api calls
@@ -116,6 +124,8 @@ class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
   Selfassesment_delete_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{delete_suffix}/'
   Selfassesment_search_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{search_suffix}/' # fetch only
   Selfassesment_viewall_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{viewall_suffix}/' # fetch only
+  Selfassesment_export_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{export_suffix}/'
+
 
   # Selfassesment Account Submission
   Selfassesment_Account_Submission_home_url = f'/{APPLICATION_NAME}/{Selfassesment_Account_Submission_path}/{home_suffix}/'
@@ -124,6 +134,7 @@ class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
   Selfassesment_Account_Submission_delete_url = f'/{APPLICATION_NAME}/{Selfassesment_Account_Submission_path}/{delete_suffix}/'
   Selfassesment_Account_Submission_search_url = f'/{APPLICATION_NAME}/{Selfassesment_Account_Submission_path}/{search_suffix}/' # fetch only
   Selfassesment_Account_Submission_viewall_url = f'/{APPLICATION_NAME}/{Selfassesment_Account_Submission_path}/{viewall_suffix}/' # fetch only
+  Selfassesment_Account_Submission_export_url = f'/{APPLICATION_NAME}/{Selfassesment_Account_Submission_path}/{export_suffix}/'
   add_all_Selfassesment_to_Selfassesment_Account_Submission_url = f'add_all/{Selfassesment_path}/to/{Selfassesment_Account_Submission_path}/'
 
   # Tracker
@@ -133,6 +144,7 @@ class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
   Selfassesment_Tracker_delete_url = f'/{APPLICATION_NAME}/{Selfassesment_Tracker_path}/{delete_suffix}/'
   Selfassesment_Tracker_search_url = f'/{APPLICATION_NAME}/{Selfassesment_Tracker_path}/{search_suffix}/' # fetch only
   Selfassesment_Tracker_viewall_url = f'/{APPLICATION_NAME}/{Selfassesment_Tracker_path}/{viewall_suffix}/' # fetch only
+  Selfassesment_Tracker_export_url = f'/{APPLICATION_NAME}/{Selfassesment_Tracker_path}/{export_suffix}/'
 
 
 # Should be used in templates to reffer to links
@@ -145,6 +157,8 @@ class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
   Selfassesment_delete_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{delete_suffix}'
   Selfassesment_search_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{search_suffix}' # fetch only
   Selfassesment_viewall_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{viewall_suffix}' # fetch only
+  Selfassesment_export_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{export_suffix}'
+
 
   # Selfassesment Account Submission
   Selfassesment_Account_Submission_home_name = f'{APPLICATION_NAME}:{Selfassesment_Account_Submission_name}_{home_suffix}'
@@ -153,6 +167,7 @@ class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
   Selfassesment_Account_Submission_delete_name = f'{APPLICATION_NAME}:{Selfassesment_Account_Submission_name}_{delete_suffix}'
   Selfassesment_Account_Submission_search_name = f'{APPLICATION_NAME}:{Selfassesment_Account_Submission_name}_{search_suffix}' # fetch only
   Selfassesment_Account_Submission_viewall_name = f'{APPLICATION_NAME}:{Selfassesment_Account_Submission_name}_{viewall_suffix}' # fetch only
+  Selfassesment_Account_Submission_export_name = f'{APPLICATION_NAME}:{Selfassesment_Account_Submission_name}_{export_suffix}'
   add_all_Selfassesment_to_Selfassesment_Account_Submission_name = f'{APPLICATION_NAME}:add_all_{Selfassesment_name}_to_{Selfassesment_Account_Submission_name}'
 
   # Tracker
@@ -162,6 +177,8 @@ class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
   Selfassesment_Tracker_delete_name = f'{APPLICATION_NAME}:{Selfassesment_Tracker_name}_{delete_suffix}'
   Selfassesment_Tracker_search_name = f'{APPLICATION_NAME}:{Selfassesment_Tracker_name}_{search_suffix}' # fetch only
   Selfassesment_Tracker_viewall_name = f'{APPLICATION_NAME}:{Selfassesment_Tracker_name}_{viewall_suffix}' # fetch only
+  Selfassesment_Tracker_export_name = f'{APPLICATION_NAME}:{Selfassesment_Tracker_name}_{export_suffix}'
+
 
 
 def gen_urls(

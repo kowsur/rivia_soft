@@ -1,6 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from .fields import SearchableModelField, Select, Fieldset
 from .url_variables import Full_URL_PATHS_WITHOUT_ARGUMENTS
@@ -316,6 +317,13 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
             # 'complete_date', #default timezone.now
             # 'is_completed',
             )
+    def clean_deadline(self):
+        input_date = self.cleaned_data['deadline']
+        current_date = timezone.localdate()
+        if input_date>=current_date:
+            return input_date
+        raise ValidationError("Deadline can't be a previous date.")
+        
 
 
 class SelfassesmentTrackerChangeForm(forms.ModelForm):
@@ -357,6 +365,13 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
             'deadline',
             # 'complete_date',
             'is_completed',)
+    
+    def clean_deadline(self):
+        input_date = self.cleaned_data['deadline']
+        current_date = timezone.localdate()
+        if input_date>=current_date:
+            return input_date
+        raise ValidationError("Deadline can't be a previous date.")
 
 class SelfassesmentTrackerDeleteForm(forms.ModelForm):
     agree = forms.BooleanField(label='I want to proceed.', required=True)

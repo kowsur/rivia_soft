@@ -85,8 +85,9 @@ def search_users_by_email(request, search_text='', limit=-1):
     raise Http404()
 
 @login_required
-def search_users_extended(request, search_text='', limit=-1):
+def search_users_extended(request, limit=-1):
     if request.method=='GET' and request.headers.get('Content-Type')==content_type:
+        search_text = request.GET.get('q', '')
         results = search_CustomUser(search_text, limit)
         return HttpResponse(serialize_queryset_to_json(results), content_type=content_type)
     raise Http404()

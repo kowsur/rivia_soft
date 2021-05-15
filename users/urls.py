@@ -10,6 +10,6 @@ urlpatterns = [
     path('logout/', logout_user, name='users_logout'),
     path('details/<int:user_id>/', get_user_details, name='user_details'),
     path('search_email/<str:search_text>/', search_users_by_email, name='search_users_by_email'),
-    path('search/<str:search_text>/', search_users_extended, name='search_users'),
+    path('search/', search_users_extended, name='search_users'),
     path('all/', all_users, name='all_users'),
 ]

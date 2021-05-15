@@ -135,14 +135,25 @@ function option_selected(event) {
 //====================================================================================================================================
 // search database
 async function db_all_records(all_url = '/') {
-  const records = await fetch_url(all_url, 'GET')
+  let kwargs = {
+    url: all_url,
+    req_method: 'GET',
+  }
+  const records = await fetch_url(kwargs)
     .then(res => res.json()) // convert response to JSON
     .then(data=>data) // recieve json data 
   return records; // return data
 }
 
-function db_search_records(search_text, search_url='/') {
-  const records = fetch_url(`${search_url}${search_text}/`, 'GET')
+async function db_search_records(search_text, search_url='/') {
+  let params = {q:search_text}
+  let search_param = new URLSearchParams(params).toString()
+  let kwargs = {
+    url: `${search_url}?${search_param}`,
+    req_method: 'GET',
+  }
+  
+  const records = await fetch_url(kwargs)
     .then(res => res.json()) // convert response to JSON
     .then(data=>data) // recieve json data 
   return records; // return data
@@ -152,7 +163,8 @@ function db_search_records(search_text, search_url='/') {
 //====================================================================================================================================
 //====================================================================================================================================
 // Api caller
-async function fetch_url(url, req_method, data_object={'name': 'IFTAKHAR HUSAN'}, headers={'Content-Type': 'application/json'}, others={}){
+export async function fetch_url({url, req_method, data_object={}, headers={'Content-Type': 'application/json'}, others={}}){
+  req_method = req_method.toUpperCase()
   if (deepCompare(others, {})){
     others = {
       credentials: 'same-origin',
@@ -163,7 +175,7 @@ async function fetch_url(url, req_method, data_object={'name': 'IFTAKHAR HUSAN'}
                                     // same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
     }
   }
-  if (req_method.toUpperCase()=='GET'){
+  if (req_method==='GET'){
     // send GET request
     const response = await fetch( url, {
       method: req_method,

@@ -1,3 +1,7 @@
+*env*/
+*data.*
+todo.txt
+
 #Server Setup
 config.json
 ENVIRONMENT.py

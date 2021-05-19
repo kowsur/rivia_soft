@@ -313,8 +313,8 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
             # 'done_by', #request.user
             'client_id',
             'job_description',
-            'deadline', #default timezone.now
-            # 'complete_date', #default timezone.now
+            'deadline', #default timezone now
+            # 'complete_date', #default timezone now
             # 'is_completed',
             )
     def clean_deadline(self):
@@ -328,7 +328,6 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
 
 class SelfassesmentTrackerChangeForm(forms.ModelForm):
     # complete_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate(), 'min': timezone.localdate()}))
     client_id = SearchableModelField(
         queryset=Selfassesment.objects.all(),
         label = 'Client Name',
@@ -362,16 +361,8 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
             # 'done_by',
             'client_id',
             'job_description',
-            'deadline',
             # 'complete_date',
             'is_completed',)
-    
-    def clean_deadline(self):
-        input_date = self.cleaned_data['deadline']
-        current_date = timezone.localdate()
-        if input_date>=current_date:
-            return input_date
-        raise ValidationError("Deadline can't be a previous date.")
 
 class SelfassesmentTrackerDeleteForm(forms.ModelForm):
     agree = forms.BooleanField(label='I want to proceed.', required=True)

@@ -94,9 +94,12 @@ function update_options(records, repr_format, select_element, options_container,
 //====================================================================================================================================
 //
 function option_selected(event) {
+  // Options container
+  let container = event.currentTarget.parentElement
   // Option clicked on
   let clicked_option = event.currentTarget
   if(clicked_option.hasAttribute('disabled')) return false
+  clicked_option.classList.add('selected')
 
   let value = clicked_option.getAttribute('data-value')
   let text = clicked_option.textContent
@@ -115,18 +118,22 @@ function option_selected(event) {
   // add option
   select_element.add(selected_option)
 
-  // Update options_container
-  clicked_option.remove()
-  clicked_option.classList.add('selected')
-  if (options_container.firstElementChild){
-    options_container.firstElementChild.classList.remove('selected')
-  }
-  options_container.prepend(clicked_option)
+  //Old
+  // // Update options_container
+  // clicked_option.remove()
+  // if (options_container.firstElementChild){
+  //   options_container.firstElementChild.classList.remove('selected')
+  // }
+  // options_container.prepend(clicked_option)
+  //New according to requirements
+  options_container.innerHTML = ''
+  options_container.appendChild(clicked_option)
 
   // Update search_bar
   let search_bar = search_field.querySelector('input[name="search"]')
   search_bar.placeholder = text
-  search_bar.value = text
+  // search_bar.value = text
+  search_bar.value = ''
   return true
 }
 

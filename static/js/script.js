@@ -88,10 +88,12 @@ if (search_bar){
 }
 
 export function loadAllRecords(){
-    setTimeout(async ()=>{
-      let all_records = await db_all_records()
-      populate_with_data(all_records)
-    }, 10); // search with text
+  let loading_indicator = document.querySelector(loading_indicator_selector)
+  loading_indicator.classList.remove('hidden')
+  setTimeout(async ()=>{
+    let all_records = await db_all_records()
+    populate_with_data(all_records)
+  }, 10); // search with text
 }
 
 //====================================================================================================================================
@@ -179,10 +181,10 @@ export async function populate_with_data(
   data_array,
   table_row_getter = get_tr_for_table,
   template_querySelector_string = template_querySelector){
-    let template = document.querySelector(template_querySelector_string) //find template
-    
-    let tbody = document.querySelector('tbody#data') // find data containser
-    tbody.innerHTML='' // clear the container
+  let template = document.querySelector(template_querySelector_string) //find template
+  
+  let tbody = document.querySelector('tbody#data') // find data containser
+  tbody.innerHTML='' // clear the container
   
   let loading_indicator = document.querySelector(loading_indicator_selector)
   loading_indicator.classList.remove('hidden')

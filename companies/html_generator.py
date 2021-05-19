@@ -38,6 +38,7 @@ def generate_template_tag_for_model(
     ordering = [],
     keep_include_fields = True,
     show_others = True,
+    show_id = True,
     tag_name='data-template',
     tag_id='data-template',
     fk_fields = {
@@ -97,6 +98,8 @@ def generate_template_tag_for_model(
   for field in field_order:
     # skip if field is pk_field
     if field is pk_field or not is_includeable(field, include_fields, exclude_fields, keep_include_fields, show_others):
+      if show_id and pk_field==field:
+        inner_template_tr += f'<td class="data-cell" id="pk"></td>\n'
       continue
     if field in fk_fields:
       inner_template_tr+=f"""
@@ -122,9 +125,10 @@ def generate_data_container_table(
     include_fields=[],
     keep_include_fields=True,
     ordering = [],
+    show_id = True,
     show_others = True,
     tag_name='data-template',
-    tag_id='data-template'
+    tag_id='data-template',
   ):
   model_fields = get_field_names_from_model(django_model)
   inner_header_tr = """
@@ -138,10 +142,13 @@ def generate_data_container_table(
   for field in model_fields: # django model's order
     if field not in field_order:
       field_order.append(field)
-  
+
   for field in field_order:
     if field is pk_field or not is_includeable(field, include_fields, exclude_fields, keep_include_fields, show_others):
-      continue
+      if show_id and pk_field==field:
+        pass
+      else:
+        continue
     header_name = get_header_name_from_field_name(django_model, field)
     inner_header_tr += f'<th class="data-cell stick-top data-id">{header_name}</th>\n'
     

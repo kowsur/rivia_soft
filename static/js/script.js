@@ -99,50 +99,77 @@ export function loadAllRecords(){
 export function get_tr_for_table(data, template=template, model_fields=fields, update_url=DATA.update_url, delete_url=DATA.delete_url) {
   // prepare table row for table using template and data
   let instance = template.content.cloneNode(true)
+  let serial_num = instance.getElementById('pk')
+  if (serial_num) serial_num.textContent = data.pk
 
   let update_link = `${update_url}${data.pk}/`
   let delete_link = `${delete_url}${data.pk}/`
   instance.getElementById('edit').href = `${update_link}`
   instance.getElementById('delete').href = `${delete_link}`
-  
+
   // fill the template
   for (let field of model_fields){
+    let field_data = data.fields[field]
     let td = instance.getElementById(field)
-    // when field exists in the template fill it in with data
-    if (td){
-      td.classList.add('whitespace-nowrap')
-      let field_data = data.fields[field]
-      if (!(field_data===true || field_data===false)){
-        // field data is text so show it as text
-        // if the field is foriegn key of other model the it should contain data-url and data-repr-format
-        let data_url = td.getAttribute('data-url')
-        let repr_format = td.getAttribute('data-repr-format')
-        if (data_url && field_data){
-          data_url = `${data_url}${field_data}/`
-          let kwargs = {
-            url: data_url,
-            req_method: 'GET'
-          }
-          fetch_url(kwargs).then(response => response.json()).then(data => {
-            td.textContent = repr_format.format(data)
-          })
-        }else{
-          td.textContent = field_data
-        }
-        
-        if (field_data && field_data.length>=30){
-          td.classList.remove('whitespace-nowrap')
-          td.classList.add('whitespace-normal')
-          td.style.minWidth = '35ch'
-        }
-      }else{
-        //data is boolean so show it as checkbox
-        let checked_checkbox = `<input type="checkbox" checked="" disabled>`
-        let unchecked_checkbox = `<input type="checkbox" disabled>`
-        if(field_data) {td.innerHTML=checked_checkbox} else{td.innerHTML=unchecked_checkbox}
-      } 
+    
+    if (!td || field_data==null) continue
+    td.classList.add('whitespace-nowrap') // show text in one line
+    
+    // Boolean data
+    if(typeof field_data === "boolean"){
+      //data is boolean so show it as checkbox
+      let checked_checkbox = `<input type="checkbox" checked="" disabled>`
+      let unchecked_checkbox = `<input type="checkbox" disabled>`
+      if(field_data) {td.innerHTML=checked_checkbox} else{td.innerHTML=unchecked_checkbox}
+      continue
     }
-  }return instance; //return table row instance
+    
+    // Foreign Data
+    let data_url = td.getAttribute('data-url')
+    let repr_format = td.getAttribute('data-repr-format')
+    if (data_url && field_data){
+      //this is a foreign key field. fetch the data and format it
+      data_url = `${data_url}${field_data}/`
+      let kwargs = {
+        url: data_url,
+        req_method: 'GET'
+      }
+      fetch_url(kwargs).then(response => response.json()).then(data => {
+        td.textContent = repr_format.format(data)
+      })
+      td.removeAttribute('data-url')
+      td.removeAttribute('data-repr-format')
+      continue
+    }
+
+    let date = new Date(field_data)
+    if (!isNaN(date)){
+      //this is date field so show it in local format 
+
+      // when field_data.length > 10 it's a datetime
+      if (field_data.length>10) td.textContent = date.toLocaleString()
+      // when field_data.length == 10 it's a date
+      if (field_data.length==10) td.textContent = date.toLocaleDateString()
+      // when field_data.length < 10 it's a time
+      if (field_data.length<10) td.textContent = date.toLocaleTimeString()
+      
+      // //GMTString
+      // console.log(date.toGMTString())
+      // console.log(date.toGMTString().slice(0, 16))
+      continue
+    }
+
+    // show field_data as text
+    td.textContent = field_data
+
+    if (field_data && field_data.length>=30){
+      // text is too large. set max width for the cell.
+      td.classList.remove('whitespace-nowrap')
+      td.classList.add('whitespace-normal')
+      td.style.minWidth = '35ch'
+    }
+  }
+  return instance;
 }
 
 export async function populate_with_data(

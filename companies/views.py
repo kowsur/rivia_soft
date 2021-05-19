@@ -55,14 +55,14 @@ URLS = {
 def home_selfassesment(request):
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['is_active', 'client_file_number', 'client_name', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent']
+  include_fields = ['client_id', 'is_active', 'client_file_number', 'client_name', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent']
   keep_include_fields = True
   show_others = False
   context = {
     **URLS,
     'model_fields': get_field_names_from_model(Selfassesment),
-    'template_tag': generate_template_tag_for_model(Selfassesment, pk_field=pk_field, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
-    'data_container': generate_data_container_table(Selfassesment, pk_field=pk_field, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+    'template_tag': generate_template_tag_for_model(Selfassesment, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+    'data_container': generate_data_container_table(Selfassesment, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
 
     'caption': 'View Selfassesment',
     'page_title': 'View Selfassesment',
@@ -226,8 +226,8 @@ def home_selfassesment_account_submission(request):
   context = {
     **URLS,
     'model_fields': get_field_names_from_model(SelfassesmentAccountSubmission),
-    'template_tag': generate_template_tag_for_model(SelfassesmentAccountSubmission, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
-    'data_container': generate_data_container_table(SelfassesmentAccountSubmission, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    'template_tag': generate_template_tag_for_model(SelfassesmentAccountSubmission, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    'data_container': generate_data_container_table(SelfassesmentAccountSubmission, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
     
     'caption': 'View Selfassesment Account Submission',
     'page_title': 'View Selfassesment Account Submission',
@@ -415,12 +415,12 @@ def add_all_selfassesment_to_selfassesment_account_submission_w_submission_year(
 def home_selfassesment_tracker(request):
   pk_field = 'tracker_id'
   exclude_fields = set(['tracker_id', 'is_updated', 'creation_date'])
-  keep_include_fields = False
+  keep_include_fields = True
   context = {
     **URLS,
     'model_fields': get_field_names_from_model(SelfassesmentTracker),
-    'template_tag': generate_template_tag_for_model(SelfassesmentTracker, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
-    'data_container': generate_data_container_table(SelfassesmentTracker, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    'template_tag': generate_template_tag_for_model(SelfassesmentTracker, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    'data_container': generate_data_container_table(SelfassesmentTracker, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
     
     'page_title': 'View Selfassesment Tracker',
     'caption': 'View Selfassesment Tracker',

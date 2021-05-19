@@ -65,7 +65,7 @@ class Selfassesment(models.Model):
         to_field='type_id',
         blank=False,
         null=True)
-    date_of_registration = models.DateField(verbose_name='Registration date', blank=False, null=False, default=timezone.now)
+    date_of_registration = models.DateField(verbose_name='Registration date', blank=False, null=False, default=timezone.localtime)
     # identifies wheather the record is updated needs superuser permission
     is_updated = models.BooleanField(_('Update Status'), default=True, editable=False)
     is_active = models.BooleanField(verbose_name='Active Status', blank=False, null=False, default=True)
@@ -187,7 +187,7 @@ class SelfassesmentAccountSubmission(models.Model):
         related_name='selfassesment_account_submission_client_id',
         blank=False,
         null=False)
-    date_of_submission = models.DateField(verbose_name='Submission date', blank=True, null=True, default=timezone.now)
+    date_of_submission = models.DateField(verbose_name='Submission date', blank=True, null=True, default=timezone.localtime)
     tax_year = models.CharField(verbose_name='Tax Year', max_length=10, blank=True)
     submitted_by = models.ForeignKey(
         to='users.CustomUser', 
@@ -237,9 +237,9 @@ class SelfassesmentTracker(models.Model):
         related_name='selfassesment_tracker_client_id',
         blank=False,
         null=False)
-    creation_date = models.DateTimeField(verbose_name='Tracker creation datetime', editable=False, blank=True, null=False, default=timezone.now)
+    creation_date = models.DateTimeField(verbose_name='Tracker creation datetime', editable=False, blank=True, null=False, default=timezone.localtime)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)
-    deadline = models.DateField(verbose_name='Deadline', blank=False, null=False, default=timezone.now)
+    deadline = models.DateField(verbose_name='Deadline', blank=False, null=False, default=timezone.localtime)
     is_completed = models.BooleanField(verbose_name='Status', blank=True, null=False, default=False)
     complete_date = models.DateField(verbose_name='Complete Date', blank=True, null=True)
     done_by = models.ForeignKey(

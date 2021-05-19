@@ -194,7 +194,7 @@ def all_selfassesment(request, limit=-1):
 def export_selfassesment(request):
   response = HttpResponse(
     content_type='text/csv',
-    headers={'Content-Disposition': f'attachment; filename="selfassesment_{timezone.now()}.csv"'},
+    headers={'Content-Disposition': f'attachment; filename="selfassesment_{timezone.localtime()}.csv"'},
   )
   include_fields = ['is_active', 'client_file_number', 'client_name', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent']
   exclude_fields = ['client_id',]
@@ -355,7 +355,7 @@ def all_selfassesment_account_submission(request, limit=-1):
 def export_selfassesment_account_submission(request):
   response = HttpResponse(
     content_type='text/csv',
-    headers={'Content-Disposition': f'attachment; filename="selfassesment_account_submimssion_{timezone.now()}.csv"'},
+    headers={'Content-Disposition': f'attachment; filename="selfassesment_account_submimssion_{timezone.localtime()}.csv"'},
   )
   include_fields = []
   exclude_fields = ['submission_id']
@@ -432,9 +432,9 @@ def home_selfassesment_tracker(request):
     'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_delete_url,
     'task_counts': True,
     'completed_tasks': SelfassesmentTracker.objects.filter(is_completed=True).count(),
-    'future_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.now()).count(),
-    'todays_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.now()).count(),
-    'previous_incomplete_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.now(), is_completed=False).count(),
+    'future_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime()).count(),
+    'todays_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.localtime()).count(),
+    'previous_incomplete_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False).count(),
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -495,7 +495,7 @@ def update_selfassesment_tracker(request, tracker_id:int):
       assesment = form.save(commit=False)
       assesment.done_by = request.user
       if form.cleaned_data.get('is_completed')==True:
-        assesment.complete_date = timezone.now()
+        assesment.complete_date = timezone.localtime()
       assesment.save()
       messages.success(request, f'Selfassesment Tracker has been updated having id {tracker_id}!')
     else:
@@ -544,9 +544,9 @@ def search_selfassesment_tracker(request, limit: int=-1):
     if request.GET.get('tasks'):
       tasks = {
         'completed_tasks': SelfassesmentTracker.objects.filter(is_completed=True),
-        'future_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.now()),
-        'todays_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.now()),
-        'previous_incomplete_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.now(), is_completed=False)
+        'future_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime()),
+        'todays_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.localtime()),
+        'previous_incomplete_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False)
       }
       records = tasks.get(request.GET.get('tasks'), [])
       records.order_by('deadline')
@@ -581,7 +581,7 @@ def all_selfassesment_tracker(request, limit=-1):
 def export_selfassesment_tracker(request):
   response = HttpResponse(
     content_type='text/csv; charset=utf-8',
-    headers={'Content-Disposition': f'attachment; filename="selfassesment_tracker_{timezone.now()}.csv"'},
+    headers={'Content-Disposition': f'attachment; filename="selfassesment_tracker_{timezone.localtime()}.csv"'},
   )
   include_fields = []
   exclude_fields = set(['tracker_id', 'is_updated', 'creation_date'])

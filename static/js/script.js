@@ -1,4 +1,5 @@
 // clear messsage after 10 seconds
+const CACHE = {}
 let delete_message_after = 10000 //milisecond
 setTimeout(function(){
   let messages = document.getElementsByClassName('message')
@@ -96,7 +97,7 @@ export function loadAllRecords(){
 //====================================================================================================================================
 //====================================================================================================================================
 // commonly used functions
-export function get_tr_for_table(data, template=template, model_fields=fields, update_url=DATA.update_url, delete_url=DATA.delete_url) {
+export async function get_tr_for_table(data, template=template, model_fields=fields, update_url=DATA.update_url, delete_url=DATA.delete_url) {
   // prepare table row for table using template and data
   let instance = template.content.cloneNode(true)
   let serial_num = instance.getElementById('pk')
@@ -134,9 +135,10 @@ export function get_tr_for_table(data, template=template, model_fields=fields, u
         url: data_url,
         req_method: 'GET'
       }
-      fetch_url(kwargs).then(response => response.json()).then(data => {
-        td.textContent = repr_format.format(data)
-      })
+      if (!CACHE[data_url]){
+        CACHE[data_url] = await fetch_url(kwargs).then(response => response.json()).then(data => data)
+      }
+      td.textContent = repr_format.format(CACHE[data_url])
       td.removeAttribute('data-url')
       td.removeAttribute('data-repr-format')
       continue
@@ -185,7 +187,7 @@ export async function populate_with_data(
   
   // populate the table
   for (let record of data_array){
-    let table_row = table_row_getter(record, template)
+    let table_row = await table_row_getter(record, template)
     tbody.appendChild(table_row)
   }
 }

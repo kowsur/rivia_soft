@@ -1,5 +1,6 @@
 // clear messsage after 10 seconds
 const CACHE = {}
+const loading_indicator_selector = '#loading-indicator'
 let delete_message_after = 10000 //milisecond
 setTimeout(function(){
   let messages = document.getElementsByClassName('message')
@@ -178,18 +179,19 @@ export async function populate_with_data(
   data_array,
   table_row_getter = get_tr_for_table,
   template_querySelector_string = template_querySelector){
-  // Populate the table using the provided data
-
-  let template = document.querySelector(template_querySelector_string) //find template
-
-  let tbody = document.querySelector('tbody#data') // find data containser
-  tbody.innerHTML='' // clear the container
+    let template = document.querySelector(template_querySelector_string) //find template
+    
+    let tbody = document.querySelector('tbody#data') // find data containser
+    tbody.innerHTML='' // clear the container
   
-  // populate the table
+  let loading_indicator = document.querySelector(loading_indicator_selector)
+  loading_indicator.classList.remove('hidden')
+  // Populate the table using the provided data
   for (let record of data_array){
     let table_row = await table_row_getter(record, template)
     tbody.appendChild(table_row)
   }
+  loading_indicator.classList.add('hidden')
 }
 
 //====================================================================================================================================
@@ -197,6 +199,9 @@ export async function populate_with_data(
 //====================================================================================================================================
 // search database
 export async function db_all_records(all_url = DATA.all_url) {
+  let loading_indicator = document.querySelector(loading_indicator_selector)
+  loading_indicator.classList.remove('hidden')
+
   let kwargs = {
     url: all_url,
     req_method: 'GET'
@@ -208,6 +213,9 @@ export async function db_all_records(all_url = DATA.all_url) {
 }
 
 export async function db_search_records(search_text, search_url = DATA.search_url) {
+  let loading_indicator = document.querySelector(loading_indicator_selector)
+  loading_indicator.classList.remove('hidden')
+
   let params = {q:search_text}
   let search_param = new URLSearchParams(params).toString()
   let kwargs = {

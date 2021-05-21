@@ -156,6 +156,10 @@
   @apply whitespace-nowrap;
 }
 
+.data-head-row th{
+  @apply cursor-pointer;
+}
+
 .data-row{
   @apply h-full bg-gray-300 dark:bg-gray-800;
 }

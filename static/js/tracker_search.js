@@ -26,7 +26,8 @@ for (let task of tasks){
     
     methods.populate_with_data(data)
 
-    let regex = /\s*\d+?[\s]*/gm;    
+    let regex = /\s*\d+[\s]*/gm;
+    console.log(task.innerHTML)
     task.innerHTML = task.innerHTML.replace(regex, data.length)
   })
 }

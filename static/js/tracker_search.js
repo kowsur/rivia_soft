@@ -25,6 +25,8 @@ for (let task of tasks){
     let data = await response.json()
     
     methods.populate_with_data(data)
-    task.textContent = data.length
+
+    let regex = /\s*\d+?[\s]*/gm;    
+    task.innerHTML = task.innerHTML.replace(regex, data.length)
   })
 }

@@ -135,7 +135,7 @@
   @apply mx-auto;
 }
 .data-wrapper{
-  @apply overflow-auto max-h-screen relative;
+  @apply overflow-auto max-h-screen relative mt-8 sm:mt-10 md:mt-12;
 }
 .data-container{
   @apply max-h-screen rounded-md mx-auto text-xs sm:text-sm;
@@ -179,7 +179,16 @@
 /* options */
 div.search_field > div.select > .option{
   display: block;
-  @apply bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-300 border-gray-400 border-b-2 px-3 py-2 text-sm border-opacity-50;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  @apply bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-300 border-gray-400 border-2 px-3 py-2 text-sm border-opacity-50 border-b-0;
+}
+div.search_field > div.select > .option:hover{
+  @apply bg-gray-400 dark:bg-gray-900 text-base font-bold py-3 border-blue-500 border-b-2 rounded-md;
+}
+div.search_field > div.select > .option:hover + .option{
+  @apply border-t-0;
 }
 div.search_field > div.select > .option:last-child{
   @apply border-b-0;
@@ -220,8 +229,7 @@ div.search_field > input[name="search"]:focus-visible ~ div.select:not([disabled
 .task{
   cursor: pointer;
   position: relative;
-  border-radius: 50%;
-  @apply inline-block px-2 text-white text-center text-sm font-light  sm:text-lg sm:font-semibold sm:px-2.5 md:text-xl md:font-bold; /* px-4 py-2 text-xl */
+  @apply inline-block px-2 text-white text-center text-sm font-light rounded-full sm:text-lg sm:font-semibold sm:px-2.5 md:text-xl md:font-bold; /* px-4 py-2 text-xl */
 }
 
 .task-done{

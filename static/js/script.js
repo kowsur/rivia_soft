@@ -191,7 +191,6 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
       // //GMTString
       // console.log(date.toGMTString())
       // console.log(date.toGMTString().slice(0, 16))
-      console.log(field, field_data)
       continue
     }
 

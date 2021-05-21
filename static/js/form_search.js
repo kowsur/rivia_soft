@@ -59,19 +59,20 @@ search_boxes.forEach((search_box) => {
   })
 })
 function update_options(records, repr_format, select_element, options_container, option_element_tag='span') {
-  // clear options and select default
+  // clear options
   options_container.innerHTML = ''
+  // select previously selected one default
   let currently_selected_option = select_element.options[select_element.selectedIndex]
-  if (currently_selected_option.value){
-    let selected = document.createElement(option_element_tag)
-    selected.classList.add('option')
-    selected.classList.add('selected')
-    selected.value = currently_selected_option.value
-    selected.setAttribute('data-value', currently_selected_option.value)
-    selected.textContent = currently_selected_option.textContent
-    options_container.appendChild(selected)
-    selected.addEventListener('click', option_selected)
-  }
+  // if (currently_selected_option.value){
+  //   let selected = document.createElement(option_element_tag)
+  //   selected.classList.add('option')
+  //   selected.classList.add('selected')
+  //   selected.value = currently_selected_option.value
+  //   selected.setAttribute('data-value', currently_selected_option.value)
+  //   selected.textContent = currently_selected_option.textContent
+  //   options_container.appendChild(selected)
+  //   selected.addEventListener('click', option_selected)
+  // }
 
   // update options
   for (let record of records){
@@ -127,13 +128,14 @@ function option_selected(event) {
   // options_container.prepend(clicked_option)
   //New according to requirements
   options_container.innerHTML = ''
-  options_container.appendChild(clicked_option)
+  // options_container.appendChild(clicked_option)
 
   // Update search_bar
   let search_bar = search_field.querySelector('input[name="search"]')
-  search_bar.placeholder = text
-  // search_bar.value = text
-  search_bar.value = ''
+  // search_bar.placeholder = text
+  search_bar.value = text
+  options_container.innerHTML = ''
+  search_bar.focus()
   return true
 }
 

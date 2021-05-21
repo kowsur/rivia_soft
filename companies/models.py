@@ -237,7 +237,7 @@ class SelfassesmentTracker(models.Model):
         related_name='selfassesment_tracker_client_id',
         blank=False,
         null=False)
-    creation_date = models.DateTimeField(verbose_name='Tracker creation datetime', editable=False, blank=True, null=False, default=timezone.localtime)
+    creation_date = models.DateTimeField(verbose_name='Creation Datetime', editable=False, blank=True, null=False, default=timezone.localtime)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)
     deadline = models.DateField(verbose_name='Deadline', blank=False, null=False, default=timezone.localtime)
     is_completed = models.BooleanField(verbose_name='Status', blank=True, null=False, default=False)

@@ -25,5 +25,6 @@ for (let task of tasks){
     let data = await response.json()
     
     methods.populate_with_data(data)
+    task.textContent = data.length
   })
 }

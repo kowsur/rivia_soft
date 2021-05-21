@@ -414,13 +414,15 @@ def add_all_selfassesment_to_selfassesment_account_submission_w_submission_year(
 @login_required
 def home_selfassesment_tracker(request):
   pk_field = 'tracker_id'
-  exclude_fields = set(['tracker_id', 'is_updated', 'creation_date'])
+  exclude_fields = set(['tracker_id', 'is_updated'])
+  include_fields = ['tracker_id', 'client_id', 'job_description', 'deadline', 'is_completed', 'complete_date', 'done_by', 'created_by','creation_date',]
+
   keep_include_fields = True
   context = {
     **URLS,
     'model_fields': get_field_names_from_model(SelfassesmentTracker),
-    'template_tag': generate_template_tag_for_model(SelfassesmentTracker, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
-    'data_container': generate_data_container_table(SelfassesmentTracker, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    'template_tag': generate_template_tag_for_model(SelfassesmentTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    'data_container': generate_data_container_table(SelfassesmentTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
     
     'page_title': 'View Selfassesment Tracker',
     'caption': 'View Selfassesment Tracker',

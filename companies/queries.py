@@ -105,7 +105,7 @@ def db_search_SelfassesmentTracker(search_text: str, user_email='', is_superuser
         records = SelfassesmentTracker.objects.filter(Query)
     else:
         records = SelfassesmentTracker.objects.filter(Query)[:limit]
-    return records.order_by('is_completed', 'deadline')
+    return records.order_by('is_completed', '-pk')
 
 def db_all_SelfassesmentTracker(user_email='', is_superuser=False, limit=-1):
     Query = Q()
@@ -117,4 +117,4 @@ def db_all_SelfassesmentTracker(user_email='', is_superuser=False, limit=-1):
         records = SelfassesmentTracker.objects.filter(Query)
     else:
         records = SelfassesmentTracker.objects.filter(Query)[:limit]
-    return records.order_by('is_completed', 'deadline')
+    return records.order_by('is_completed', '-pk')

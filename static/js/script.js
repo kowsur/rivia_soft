@@ -1,6 +1,24 @@
-// clear messsage after 10 seconds
+dayjs.extend(window.dayjs_plugin_customParseFormat)
+
+// datetime format
+const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone // get user timezone
+const time_format = "HH:mm"
+const date_format = "YYYY-MM-DD"
+const datetime_format = `${date_format} ${time_format}`
+
+const search_date_format = "YYYY-MM-DD"
+const search_time_format = "HH:mm:ss:SSS"
+const search_datetime_format = `${date_format} ${time_format}`
+
+// let date = dayjs()
+// console.log(date.format(datetime_format))
+// console.log(date.format(date_format))
+
+//Cache foriegn key fields
 const CACHE = {}
 const loading_indicator_selector = '#loading-indicator'
+
+// clear messsage after 10 seconds
 let delete_message_after = 10000 //milisecond
 setTimeout(function(){
   let messages = document.getElementsByClassName('message')
@@ -139,28 +157,41 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
         req_method: 'GET'
       }
       if (!CACHE[data_url]){
-        CACHE[data_url] = await fetch_url(kwargs).then(response => response.json()).then(data => data)
+        fetch_url(kwargs).then(response => response.json()).then(data => {
+          CACHE[data_url] = data
+          td.textContent = repr_format.format(CACHE[data_url])
+          td.removeAttribute('data-url')
+          td.removeAttribute('data-repr-format')
+        })
+      }else{
+        td.textContent = repr_format.format(CACHE[data_url])
+        td.removeAttribute('data-url')
+        td.removeAttribute('data-repr-format')
       }
-      td.textContent = repr_format.format(CACHE[data_url])
-      td.removeAttribute('data-url')
-      td.removeAttribute('data-repr-format')
       continue
     }
 
-    let date = new Date(field_data)
-    if (!isNaN(date)){
+    // date data
+    let date = dayjs(field_data)
+    if (!isNaN(date) && typeof(field_data)==="string" && ((field_data[4]==='-' && field_data[7]==='-') || field_data[2]===':')){
       //this is date field so show it in local format 
 
       // when field_data.length > 10 it's a datetime
-      if (field_data.length>10) td.textContent = date.toLocaleString()
+      // if (field_data.length>10) td.textContent = date.toLocaleString()
+      if (field_data.length>10) td.textContent = date.format(datetime_format)
+      
       // when field_data.length == 10 it's a date
-      if (field_data.length==10) td.textContent = date.toLocaleDateString()
+      // if (field_data.length==10) td.textContent = date.toLocaleDateString()
+      if (field_data.length==10) td.textContent = date.format(date_format)
+
       // when field_data.length < 10 it's a time
-      if (field_data.length<10) td.textContent = date.toLocaleTimeString()
+      // if (field_data.length<10) td.textContent = date.toLocaleTimeString()
+      if (field_data.length<10) td.textContent = date.format(time_format)
       
       // //GMTString
       // console.log(date.toGMTString())
       // console.log(date.toGMTString().slice(0, 16))
+      console.log(field, field_data)
       continue
     }
 

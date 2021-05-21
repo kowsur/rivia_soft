@@ -1,3 +1,5 @@
+//table cell compare attribute name = "data-cmp"
+
 dayjs.extend(window.dayjs_plugin_customParseFormat)
 
 // datetime format
@@ -137,6 +139,9 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
     if (!td || field_data==null) continue
     td.classList.add('whitespace-nowrap') // show text in one line
     
+    // data to compare elements in table_sort.js
+    td.setAttribute('data-cmp', field_data)
+    
     // Boolean data
     if(typeof field_data === "boolean"){
       //data is boolean so show it as checkbox
@@ -162,11 +167,13 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
           td.textContent = repr_format.format(CACHE[data_url])
           td.removeAttribute('data-url')
           td.removeAttribute('data-repr-format')
+          td.setAttribute('data-cmp', repr_format.format(CACHE[data_url]))
         })
       }else{
         td.textContent = repr_format.format(CACHE[data_url])
         td.removeAttribute('data-url')
         td.removeAttribute('data-repr-format')
+        td.setAttribute('data-cmp', repr_format.format(CACHE[data_url]))
       }
       continue
     }

@@ -75,7 +75,7 @@ class Selfassesment(models.Model):
     client_name = models.CharField(verbose_name='Full Name / Business Name', max_length=100, blank=False, null=False, db_index=True)
     
     # Personal Info
-    date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=True)
+    date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=False)
     PAYE_number = models.CharField(verbose_name='PAYE Number', max_length=255, blank=True, null=True, unique=True, db_index=True)
     personal_phone_number = models.CharField(verbose_name='Personal Phone numbers', max_length=255, blank=False, null=True, db_index=True)
     personal_email = models.EmailField(verbose_name='Personal Email', max_length=320, blank=True, null=True)

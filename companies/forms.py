@@ -24,7 +24,7 @@ class SelfassesmentCreationForm(forms.ModelForm):
         widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate(), 'placehoder': 'Registration date'})
     )
     date_of_birth = forms.DateField(
-        required=False,
+        required=True,
         widget=forms.DateInput(attrs={'type': 'date',})
     )
 
@@ -97,6 +97,7 @@ class SelfassesmentChangeForm(forms.ModelForm):
         widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate(), 'placehoder': 'Registration date'})
     )
     date_of_birth = forms.DateField(
+        required=True,
         widget=forms.DateInput(attrs={'type': 'date',})
     )
     

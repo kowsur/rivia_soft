@@ -263,3 +263,52 @@ class SelfassesmentTracker(models.Model):
         if self.job_description:
             return f"{self.job_description}"
         return f"Deadline: {self.deadline} | Created By: {self.created_by}"
+
+
+
+class Issue(models.Model):
+    
+    class Meta:
+        verbose_name = 'Issue'
+        verbose_name_plural = 'Issues'
+    
+    issue_id = models.AutoField(
+        verbose_name='Issue Id',
+        primary_key=True,
+        unique=True,
+        editable=False,
+        blank=True,
+        null=False,
+        db_index=True) # auto incrementing primary field
+    
+    description = models.TextField(
+        verbose_name='Type Name',
+        max_length=255,
+        blank=False,
+        null=False,
+        default='New Issue',
+        db_index=True
+        )
+    
+    def __str__(self) -> str:
+        return f"{self.issue_id} - {self.description[:30]}"
+
+
+class TrackerHasIssues(models.Model):
+    tracker_id = models.ForeignKey(
+        to='companies.SelfassesmentTracker',
+        on_delete=models.CASCADE,
+        verbose_name='Tracker Id',
+        to_field='tracker_id',
+        related_name='TrackerHasIssues_tracker_id',
+        blank=False,
+        null=False)
+    issue_id = models.ForeignKey(
+        to='companies.Issue',
+        on_delete=models.PROTECT,
+        verbose_name='Tracker Id',
+        to_field='tracker_id',
+        related_name='TrackerHasIssues_issue_id',
+        blank=False,
+        null=False)
+     

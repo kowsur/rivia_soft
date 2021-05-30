@@ -134,6 +134,10 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Expire user session when browser closes
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+# Set session cookie max age to 1 hour
+SESSION_COOKIE_AGE = 3600
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/

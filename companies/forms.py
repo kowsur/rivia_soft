@@ -18,13 +18,15 @@ all_users_url_path = '/u/all/'
 Selfassesment_client_id_repr_format = r"👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} ☎{fields.business_phone_number}"
 CustomUser_repr_format = r"📨{fields.email} 👥{fields.first_name}"
 
+date_format = '%Y-%m-%d'
+
 class SelfassesmentCreationForm(forms.ModelForm):
     date_of_registration = forms.DateField(
         label='Registration date',
         widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate(), 'placehoder': 'Registration date'})
     )
     date_of_birth = forms.DateField(
-        required=True,
+        required=False,
         widget=forms.DateInput(attrs={'type': 'date',})
     )
 
@@ -97,7 +99,7 @@ class SelfassesmentChangeForm(forms.ModelForm):
         widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate(), 'placehoder': 'Registration date'})
     )
     date_of_birth = forms.DateField(
-        required=True,
+        required=False,
         widget=forms.DateInput(attrs={'type': 'date',})
     )
     
@@ -293,7 +295,7 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
 
 
 class SelfassesmentTrackerCreationForm(forms.ModelForm):
-    deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate(), 'min': timezone.localdate()}))
+    deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.datetime.strftime(timezone.now(), date_format), 'min': timezone.datetime.strftime(timezone.now(), date_format)}))
     client_id = SearchableModelField(
         queryset=Selfassesment.objects.all(),
         label = 'Client Name',

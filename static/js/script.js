@@ -212,22 +212,17 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
       continue
     }
 
-    // show field_data as text
-    td.textContent = field_data
+    // show preformatted text
+    td.appendChild(formated_text)
 
-    
-    if (field_data && field_data.length>=30){
-      td.innerHTML = ''
-      td.appendChild(formated_text)
-      // text is too large. set max width for the cell.
-      td.classList.remove('whitespace-nowrap')
-      td.classList.add('whitespace-normal')
-      td.style.minWidth = '37ch'
-      td.style.textAlign = 'justify'
+    // pretty-format text
+    td.classList.remove('whitespace-nowrap')
+    td.classList.add('whitespace-normal')
+    td.style.minWidth = '37ch'
+    td.style.textAlign = 'justify'
 
-      formated_text.style.maxWidth = '37ch'
-      formated_text.style.whiteSpace = 'pre-wrap'
-    }
+    formated_text.style.maxWidth = '37ch'
+    formated_text.style.whiteSpace = 'pre-wrap'
   }
   return instance;
 }

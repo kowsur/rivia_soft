@@ -138,6 +138,8 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
     let td = instance.getElementById(field)
     
     if (!td || field_data==null) continue
+    formated_text.innerHTML = field_data
+    
     td.classList.add('whitespace-nowrap') // show text in one line
     
     // data to compare elements in table_sort.js
@@ -212,20 +214,18 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
 
     // show field_data as text
     td.textContent = field_data
-    formated_text.innerHTML = field_data
 
-    td.innerHTML = ''
-    td.appendChild(formated_text)
-
-
+    
     if (field_data && field_data.length>=30){
+      td.innerHTML = ''
+      td.appendChild(formated_text)
       // text is too large. set max width for the cell.
       td.classList.remove('whitespace-nowrap')
       td.classList.add('whitespace-normal')
-      td.style.minWidth = '35ch'
+      td.style.minWidth = '37ch'
       td.style.textAlign = 'justify'
 
-      formated_text.style.maxWidth = '35ch'
+      formated_text.style.maxWidth = '37ch'
       formated_text.style.whiteSpace = 'pre-wrap'
     }
   }

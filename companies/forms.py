@@ -18,12 +18,15 @@ all_users_url_path = '/u/all/'
 Selfassesment_client_id_repr_format = r"👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} ☎{fields.business_phone_number}"
 CustomUser_repr_format = r"📨{fields.email} 👥{fields.first_name}"
 
-date_format = '%Y-%m-%d'
+
+def get_date_today(date_format = '%Y-%m-%d'):
+    today = timezone.datetime.strftime(timezone.now(), date_format)
+    return today
 
 class SelfassesmentCreationForm(forms.ModelForm):
     date_of_registration = forms.DateField(
         label='Registration date',
-        widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate(), 'placehoder': 'Registration date'})
+        widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today, 'placehoder': 'Registration date'})
     )
     date_of_birth = forms.DateField(
         required=False,
@@ -96,7 +99,7 @@ class SelfassesmentCreationForm(forms.ModelForm):
 class SelfassesmentChangeForm(forms.ModelForm):
     date_of_registration = forms.DateField(
         label='Registration date',
-        widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate(), 'placehoder': 'Registration date'})
+        widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today, 'placehoder': 'Registration date'})
     )
     date_of_birth = forms.DateField(
         required=False,
@@ -173,7 +176,7 @@ class SelfassesmentDeleteForm(forms.ModelForm):
 
 
 class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
-    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate()}))
+    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today}))
     client_id = SearchableModelField(
         queryset=Selfassesment.objects.all(),
         label = 'Client Name',
@@ -257,7 +260,7 @@ class SelfassesmentAccountSubmissionDeleteForm(forms.ModelForm):
 
 
 class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelForm):
-    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate()}))
+    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today}))
     submitted_by = SearchableModelField(
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
@@ -295,7 +298,7 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
 
 
 class SelfassesmentTrackerCreationForm(forms.ModelForm):
-    deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.datetime.strftime(timezone.now(), date_format), 'min': timezone.datetime.strftime(timezone.now(), date_format)}))
+    deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today, 'min': get_date_today}))
     client_id = SearchableModelField(
         queryset=Selfassesment.objects.all(),
         label = 'Client Name',
@@ -316,13 +319,15 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
             # 'done_by', #request.user
             'client_id',
             'job_description',
+            'remarks',
+            'has_issue',
             'deadline', #default timezone now
             # 'complete_date', #default timezone now
             # 'is_completed',
             )
     def clean_deadline(self):
         input_date = self.cleaned_data['deadline']
-        current_date = timezone.localdate()
+        current_date = timezone.now().date()
         if input_date>=current_date:
             return input_date
         raise ValidationError("Deadline can't be a previous date.")

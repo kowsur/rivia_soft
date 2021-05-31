@@ -289,7 +289,6 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
             'tax_year', 
             'submitted_by', 
             'prepared_by', 
-            'remarks',
             'date_of_submission')
 
     def __init__(self, *args, **kwargs):
@@ -325,14 +324,20 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
             # 'complete_date', #default timezone now
             # 'is_completed',
             )
+
     def clean_deadline(self):
         input_date = self.cleaned_data['deadline']
         current_date = timezone.now().date()
-        if input_date>=current_date:
-            return input_date
-        raise ValidationError("Deadline can't be a previous date.")
-        
+        if not input_date>=current_date:
+            raise ValidationError("Deadline can't be a previous date.")
+        return input_date
 
+    def clean_remarks(self):
+        remarks = self.cleaned_data.get('remarks').strip()
+        issue = self.data.get('has_issue')
+        if issue and not remarks:
+            raise ValidationError("Tracker has issue therefore remarks is required")
+        return remarks
 
 class SelfassesmentTrackerChangeForm(forms.ModelForm):
     # complete_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
@@ -369,8 +374,17 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
             # 'done_by',
             'client_id',
             'job_description',
+            'remarks',
+            'has_issue',
             # 'complete_date',
             'is_completed',)
+    
+    def clean_remarks(self):
+        remarks = self.cleaned_data.get('remarks').strip()
+        issue = self.data.get('has_issue')
+        if issue and not remarks:
+            raise ValidationError("Tracker has issue therefore remarks is required")
+        return remarks
 
 class SelfassesmentTrackerDeleteForm(forms.ModelForm):
     agree = forms.BooleanField(label='I want to proceed.', required=True)

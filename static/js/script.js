@@ -134,6 +134,7 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
   // fill the template
   for (let field of model_fields){
     let field_data = data.fields[field]
+    let formated_text = document.createElement('pre')
     let td = instance.getElementById(field)
     
     if (!td || field_data==null) continue
@@ -164,16 +165,24 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
       if (!CACHE[data_url]){
         fetch_url(kwargs).then(response => response.json()).then(data => {
           CACHE[data_url] = data
+          if (!repr_format){
+            td.textContent = CACHE[data_url]
+          }else{
+            td.textContent = repr_format.format(CACHE[data_url])
+            td.removeAttribute('data-url')
+            td.removeAttribute('data-repr-format')
+            td.setAttribute('data-cmp', repr_format.format(CACHE[data_url]))
+          }
+        })
+      }else{
+        if (!repr_format){
+          td.textContent = CACHE[data_url]
+        }else{
           td.textContent = repr_format.format(CACHE[data_url])
           td.removeAttribute('data-url')
           td.removeAttribute('data-repr-format')
           td.setAttribute('data-cmp', repr_format.format(CACHE[data_url]))
-        })
-      }else{
-        td.textContent = repr_format.format(CACHE[data_url])
-        td.removeAttribute('data-url')
-        td.removeAttribute('data-repr-format')
-        td.setAttribute('data-cmp', repr_format.format(CACHE[data_url]))
+        }
       }
       continue
     }
@@ -203,6 +212,11 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
 
     // show field_data as text
     td.textContent = field_data
+    formated_text.innerHTML = field_data
+
+    td.innerHTML = ''
+    td.appendChild(formated_text)
+
 
     if (field_data && field_data.length>=30){
       // text is too large. set max width for the cell.
@@ -210,6 +224,9 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
       td.classList.add('whitespace-normal')
       td.style.minWidth = '35ch'
       td.style.textAlign = 'justify'
+
+      formated_text.style.maxWidth = '35ch'
+      formated_text.style.whiteSpace = 'pre-wrap'
     }
   }
   return instance;

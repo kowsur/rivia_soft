@@ -145,27 +145,13 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
     // data to compare elements in table_sort.js
     td.setAttribute('data-cmp', field_data)
 
-    // Number data
-    if (typeof field_data == 'number'){
-      td.textContent = field_data
-      continue
-    }
-    
-    // Boolean data
-    if(typeof field_data === "boolean"){
-      //data is boolean so show it as checkbox
-      let checked_checkbox = `<input type="checkbox" checked="" disabled>`
-      let unchecked_checkbox = `<input type="checkbox" disabled>`
-      if(field_data) {td.innerHTML=checked_checkbox} else{td.innerHTML=unchecked_checkbox}
-      continue
-    }
     
     // Foreign Data
     let data_url = td.getAttribute('data-url')
     let repr_format = td.getAttribute('data-repr-format')
     if (data_url && field_data){
       //this is a foreign key field. fetch the data and format it
-      data_url = `${data_url}${field_data}/`
+      data_url = `${data_url}${field_data}`
       let kwargs = {
         url: data_url,
         req_method: 'GET'
@@ -192,6 +178,21 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
           td.setAttribute('data-cmp', repr_format.format(CACHE[data_url]))
         }
       }
+      continue
+    }
+
+    // Number data
+    if (typeof field_data == 'number'){
+      td.textContent = field_data
+      continue
+    }
+    
+    // Boolean data
+    if(typeof field_data === "boolean"){
+      //data is boolean so show it as checkbox
+      let checked_checkbox = `<input type="checkbox" checked="" disabled>`
+      let unchecked_checkbox = `<input type="checkbox" disabled>`
+      if(field_data) {td.innerHTML=checked_checkbox} else{td.innerHTML=unchecked_checkbox}
       continue
     }
 

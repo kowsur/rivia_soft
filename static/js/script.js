@@ -209,6 +209,7 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
       td.classList.remove('whitespace-nowrap')
       td.classList.add('whitespace-normal')
       td.style.minWidth = '35ch'
+      td.style.textAlign = 'justify'
     }
   }
   return instance;

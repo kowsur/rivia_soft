@@ -415,7 +415,7 @@ def add_all_selfassesment_to_selfassesment_account_submission_w_submission_year(
 def home_selfassesment_tracker(request):
   pk_field = 'tracker_id'
   exclude_fields = set(['tracker_id', 'is_updated'])
-  include_fields = ['tracker_id', 'client_id', 'job_description', 'deadline', 'is_completed', 'complete_date', 'done_by', 'created_by','creation_date',]
+  include_fields = ['tracker_id', 'client_id', 'job_description', 'deadline', 'remarks','is_completed', 'has_issue', 'complete_date', 'done_by', 'created_by','creation_date', 'issue_created_by']
 
   keep_include_fields = True
   context = {
@@ -462,6 +462,8 @@ def create_selfassesment_tracker(request):
     if form.is_valid():
       assesment = form.save()
       assesment.created_by = request.user
+      if not assesment.issue_created_by and assesment.has_issue:
+        assesment.issue_created_by = request.user
       assesment.save()
       messages.success(request, f'New Selfassesment Tracker has been created with id {assesment.tracker_id}!')
       context['form'] = SelfassesmentTrackerCreationForm(initial={'created_by': request.user.user_id})
@@ -495,11 +497,16 @@ def update_selfassesment_tracker(request, tracker_id:int):
     context['form'] = form
     if form.is_valid():
       assesment = form.save(commit=False)
-      assesment.done_by = request.user
+      if not assesment.issue_created_by and assesment.has_issue:
+        assesment.issue_created_by = request.user
       if form.cleaned_data.get('is_completed')==True:
         assesment.complete_date = timezone.localtime()
+        assesment.done_by = request.user
+        assesment.has_issue = False
       assesment.save()
       messages.success(request, f'Selfassesment Tracker has been updated having id {tracker_id}!')
+      if assesment.is_completed:
+        return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
     else:
       messages.error(request, f'Updating Selfassesment Tracker having id {tracker_id} failed due to invalid data!')
   return render(request, template_name='companies/update.html', context=context)

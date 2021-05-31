@@ -308,6 +308,14 @@ class Issue(models.Model):
 
 
 class TrackerHasIssues(models.Model):
+    id = models.AutoField(
+        verbose_name='Issue Id',
+        primary_key=True,
+        unique=True,
+        editable=False,
+        blank=True,
+        null=False,
+        db_index=True) # auto id
     tracker_id = models.ForeignKey(
         to='companies.SelfassesmentTracker',
         on_delete=models.CASCADE,

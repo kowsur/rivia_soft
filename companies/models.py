@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models.fields import related
+from django.db.models.deletion import SET_NULL
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR
@@ -75,7 +75,7 @@ class Selfassesment(models.Model):
     client_name = models.CharField(verbose_name='Full Name / Business Name', max_length=100, blank=False, null=False, db_index=True)
     
     # Personal Info
-    date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=False)
+    date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=True)
     PAYE_number = models.CharField(verbose_name='PAYE Number', max_length=255, blank=True, null=True, unique=True, db_index=True)
     personal_phone_number = models.CharField(verbose_name='Personal Phone numbers', max_length=255, blank=False, null=True, db_index=True)
     personal_email = models.EmailField(verbose_name='Personal Email', max_length=320, blank=True, null=True)
@@ -239,8 +239,20 @@ class SelfassesmentTracker(models.Model):
         null=False)
     creation_date = models.DateTimeField(verbose_name='Creation Datetime', editable=False, blank=True, null=False, default=timezone.localtime)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)
+    remarks = models.TextField(verbose_name="Remarks", blank=True, null=True, default='')
+    has_issue = models.BooleanField(verbose_name="Has Issue", default=False)
+    issue_created_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.SET_NULL,
+        verbose_name='Issue Created By',
+        related_name='selfassesment_tracker_issue_created_by',
+        to_field='user_id',
+        editable=False,
+        blank=True,
+        null=True
+        )
     deadline = models.DateField(verbose_name='Deadline', blank=False, null=False, default=timezone.localtime)
-    is_completed = models.BooleanField(verbose_name='Status', blank=True, null=False, default=False)
+    is_completed = models.BooleanField(verbose_name='Completed', blank=True, null=False, default=False)
     complete_date = models.DateField(verbose_name='Complete Date', blank=True, null=True)
     done_by = models.ForeignKey(
         to='users.CustomUser',
@@ -258,6 +270,7 @@ class SelfassesmentTracker(models.Model):
         to_field='user_id',
         blank=False,
         null=True)
+    
 
     def __str__(self) -> str:
         if self.job_description:
@@ -307,7 +320,7 @@ class TrackerHasIssues(models.Model):
         to='companies.Issue',
         on_delete=models.PROTECT,
         verbose_name='Tracker Id',
-        to_field='tracker_id',
+        to_field='issue_id',
         related_name='TrackerHasIssues_issue_id',
         blank=False,
         null=False)

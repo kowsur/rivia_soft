@@ -144,6 +144,12 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
     
     // data to compare elements in table_sort.js
     td.setAttribute('data-cmp', field_data)
+
+    // Number data
+    if (typeof field_data == 'number'){
+      td.textContent = field_data
+      continue
+    }
     
     // Boolean data
     if(typeof field_data === "boolean"){
@@ -216,13 +222,16 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
     td.appendChild(formated_text)
 
     // pretty-format text
-    td.classList.remove('whitespace-nowrap')
     td.classList.add('whitespace-normal')
-    td.style.minWidth = '37ch'
     td.style.textAlign = 'justify'
+    td.style.minWidth = `${field_data.length+1}ch`
+    if (field_data.length >= 37){
+      td.classList.remove('whitespace-nowrap')
+      td.style.minWidth = '37ch'
+      formated_text.style.maxWidth = '37ch'
+      formated_text.style.whiteSpace = 'pre-wrap'
+    }
 
-    formated_text.style.maxWidth = '37ch'
-    formated_text.style.whiteSpace = 'pre-wrap'
   }
   return instance;
 }

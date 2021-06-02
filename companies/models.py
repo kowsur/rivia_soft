@@ -5,6 +5,11 @@ from django.utils.translation import gettext_lazy as _
 from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR
 
 
+class dummyModelField:
+    def __init__(self) -> None:
+        pass
+
+
 class SelfassesmentType(models.Model):
     
     class Meta:
@@ -132,7 +137,7 @@ class Selfassesment(models.Model):
         null=False)
 
     def __str__(self) -> str:
-        return f'👥{self.client_name} 📁{self.client_file_number} 📞{self.personal_phone_number} ☎{self.business_phone_number}'
+        return f'👥{self.client_name} 📁{self.client_file_number} 📞{self.personal_phone_number} 📭{self.personal_post_code}'
     
     def __repr__(self) -> str:
         return str(self)

@@ -15,7 +15,7 @@ from users.models import CustomUser
 search_users_url_path = '/u/search/'
 all_users_url_path = '/u/all/'
 
-Selfassesment_client_id_repr_format = r"👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} ☎{fields.business_phone_number}"
+Selfassesment_client_id_repr_format = r"👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} 📭{fields.personal_post_code}"
 CustomUser_repr_format = r"📨{fields.email} 👥{fields.first_name}"
 
 

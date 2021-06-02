@@ -1,3 +1,4 @@
+from datetime import timedelta
 import json
 from django.http.response import Http404, HttpResponse
 from django.core.serializers import serialize
@@ -55,12 +56,14 @@ URLS = {
 def home_selfassesment(request):
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_id', 'is_active', 'client_file_number', 'client_name', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent']
+  include_fields = ['client_id', 'incomplete_tasks', 'is_active', 'client_file_number', 'client_name', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent']
   keep_include_fields = True
   show_others = False
+  model_fields = get_field_names_from_model(Selfassesment)
+  model_fields.append('incomplete_tasks')
   context = {
     **URLS,
-    'model_fields': get_field_names_from_model(Selfassesment),
+    'model_fields': model_fields,
     'template_tag': generate_template_tag_for_model(Selfassesment, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
     'data_container': generate_data_container_table(Selfassesment, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
 
@@ -98,7 +101,36 @@ def create_selfassesment(request):
       assesment.set_defaults()
       assesment.created_by = request.user
       assesment.save()
-      messages.success(request, f'New Selfassesment has been created with id {assesment.client_id}!')
+      
+      job_description = 'Issues\n'
+
+      if not assesment.UTR:
+        tracker = SelfassesmentTracker()
+        tracker.client_id = assesment
+        tracker.deadline = timezone.now()+timedelta(2)
+        tracker.has_issue = True
+        tracker.job_description = job_description + '    - Apply/ask for UTR\n'
+        tracker.save()
+        messages.success(request, f"New Selfassesment Tracker has been created for {assesment} because it doesn't have UTR!")
+
+      if not assesment.NINO:
+        tracker = SelfassesmentTracker()
+        tracker.client_id = assesment
+        tracker.deadline = timezone.now()+timedelta(2)
+        tracker.has_issue = True
+        tracker.job_description = job_description + '    - Ask for NINO\n'
+        tracker.save()
+        messages.success(request, f"New Selfassesment Tracker has been created for {assesment} because it doesn't have NINO!")
+
+      if not assesment.HMRC_agent:
+        tracker = SelfassesmentTracker()
+        tracker.client_id = assesment
+        tracker.deadline = timezone.now()+timedelta(2)
+        tracker.has_issue = True
+        tracker.job_description = job_description + '    - Apply for agent\n'
+        tracker.save()
+        messages.success(request, f"New Selfassesment Tracker has been created for {assesment} because HMRC agent is inactive!")
+
       context['form'] = SelfassesmentCreationForm(initial={'client_file_number': Selfassesment.get_next_file_number()})
   return render(request, template_name='companies/create.html', context=context)
 
@@ -548,6 +580,7 @@ def search_selfassesment_tracker(request, limit: int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
     # get search text from url query parameter
     search_text = request.GET.get('q', '').strip()
+    client_id = request.GET.get('client_id', None)
 
     # if tasks query paramter exists then return tasks
     if request.GET.get('tasks'):
@@ -558,6 +591,11 @@ def search_selfassesment_tracker(request, limit: int=-1):
         'previous_incomplete_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False)
       }
       records = tasks.get(request.GET.get('tasks'), [])
+      records.order_by('deadline')
+      data = serialize(queryset=records, format='json')
+      return HttpResponse(data, content_type='application/json')
+    if not client_id==None:
+      records = SelfassesmentTracker.objects.filter(client_id=client_id)
       records.order_by('deadline')
       data = serialize(queryset=records, format='json')
       return HttpResponse(data, content_type='application/json')

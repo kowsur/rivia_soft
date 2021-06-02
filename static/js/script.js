@@ -94,9 +94,17 @@ if (search_bar){
   let current_url = window.location.href
   let url = new URL(current_url)
   let open_query = url.searchParams.get('q')
+  let client_id = url.searchParams.get('client_id')
+  if (client_id) {client_id = client_id.trim()}
   if (open_query){open_query=open_query.trim()}
 
-  if (open_query){
+  if (client_id){
+    typingTimer = setTimeout(async (client_id, search_url)=>{
+      let search_records = await db_search_records_client_id(client_id, search_url)
+      populate_with_data(search_records)
+    }, 10, client_id, (DATA.search_url)); // search with text
+  }
+  else if (open_query){
     typingTimer = setTimeout(async (search_text, search_url)=>{
       let search_records = await db_search_records(search_text, search_url)
       populate_with_data(search_records)
@@ -136,9 +144,17 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
     let field_data = data.fields[field]
     let formated_text = document.createElement('pre')
     let td = instance.getElementById(field)
-    
-    if (!td || field_data==null) continue
-    formated_text.innerHTML = field_data
+    if (!td) continue
+
+    let data_field = td.getAttribute('data-field')
+    if (data_field) {
+      let field_data_format = `{${data_field}}`
+      field_data = field_data_format.format(data)
+      console.log(field_data)
+    }
+    if (field_data==null) continue
+
+    formated_text.innerHTML = makeSafeHTML(`${field_data}`)
     
     td.classList.add('whitespace-nowrap') // show text in one line
     
@@ -151,32 +167,44 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
     let repr_format = td.getAttribute('data-repr-format')
     if (data_url && field_data){
       //this is a foreign key field. fetch the data and format it
-      data_url = `${data_url}${field_data}`
+      (!URL_HasQueryParams(data_url)) ? data_url = `${data_url}${field_data}/`: data_url = `${data_url}${field_data}`
+
       let kwargs = {
         url: data_url,
         req_method: 'GET'
       }
       if (!CACHE[data_url]){
-        fetch_url(kwargs).then(response => response.json()).then(data => {
-          CACHE[data_url] = data
-          if (!repr_format){
-            td.textContent = CACHE[data_url]
-          }else{
-            td.textContent = repr_format.format(CACHE[data_url])
-            td.removeAttribute('data-url')
-            td.removeAttribute('data-repr-format')
-            td.setAttribute('data-cmp', repr_format.format(CACHE[data_url]))
+        fetch_url(kwargs).then(response => response.json()).then(resp => {
+          CACHE[data_url] = resp
+          let string = repr_format.format(CACHE[data_url])
+          let len = parseInt(string)
+        
+          td.textContent = string
+          td.removeAttribute('data-url')
+          td.removeAttribute('data-repr-format')
+          td.setAttribute('data-cmp', string)
+
+          if (field=='incomplete_tasks'){
+            td.innerHTML = `<a href="/companies/SATrc/home/?client_id=${data.pk}">${string}</a>`
+          }
+          if (len>0) {
+            td.style.color = 'red'
+            td.style.fontWeight = 'bold'
           }
         })
       }else{
-        if (!repr_format){
-          td.textContent = CACHE[data_url]
-        }else{
-          td.textContent = repr_format.format(CACHE[data_url])
-          td.removeAttribute('data-url')
-          td.removeAttribute('data-repr-format')
-          td.setAttribute('data-cmp', repr_format.format(CACHE[data_url]))
+        let string = repr_format.format(CACHE[data_url])
+        let len = parseInt(string)
+
+        td.textContent = string
+        td.removeAttribute('data-url')
+        td.removeAttribute('data-repr-format')
+        td.setAttribute('data-cmp', string)
+        
+        if (field=='incomplete_tasks'){
+          td.innerHTML = `<a href="/companies/SATrc/home/?client_id=${data.pk}">${string}</a>`
         }
+        if (len>0) td.style.color = 'red'
       }
       continue
     }
@@ -289,7 +317,21 @@ export async function db_search_records(search_text, search_url = DATA.search_ur
     .then(data=>data) // recieve json data 
   return records; // return data
 }
+export async function db_search_records_client_id(client_id, search_url = DATA.search_url) {
+  let loading_indicator = document.querySelector(loading_indicator_selector)
+  loading_indicator.classList.remove('hidden')
 
+  let params = {client_id: client_id}
+  let search_param = new URLSearchParams(params).toString()
+  let kwargs = {
+    url: `${search_url}?${search_param}`,
+    req_method: 'GET'
+  }
+  const records = await fetch_url(kwargs)
+    .then(res => res.json()) // convert response to JSON
+    .then(data=>data) // recieve json data 
+  return records; // return data
+}
 
 
 
@@ -326,6 +368,19 @@ export async function fetch_url({url, req_method, data_object={}, headers={'Cont
     return response
   }
 }
+
+
+// Url has query params
+function URL_HasQueryParams(url){
+  let parsed_url = new URL(url, document.location)
+  return Boolean(parsed_url.search.trim())
+}
+
+// Make markup safe
+function makeSafeHTML(string){
+  return string.replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+}
+
 
 // Javascript object compare
 export function deepCompare () {

@@ -109,6 +109,7 @@ def create_selfassesment(request):
         tracker.client_id = assesment
         tracker.deadline = timezone.now()+timedelta(2)
         tracker.has_issue = True
+        tracker.new_customer = True
         tracker.job_description = job_description + '    - Apply/ask for UTR\n'
         tracker.save()
         messages.success(request, f"New Selfassesment Tracker has been created for {assesment} because it doesn't have UTR!")
@@ -118,6 +119,7 @@ def create_selfassesment(request):
         tracker.client_id = assesment
         tracker.deadline = timezone.now()+timedelta(2)
         tracker.has_issue = True
+        tracker.new_customer = True
         tracker.job_description = job_description + '    - Ask for NINO\n'
         tracker.save()
         messages.success(request, f"New Selfassesment Tracker has been created for {assesment} because it doesn't have NINO!")
@@ -127,6 +129,7 @@ def create_selfassesment(request):
         tracker.client_id = assesment
         tracker.deadline = timezone.now()+timedelta(2)
         tracker.has_issue = True
+        tracker.new_customer = True
         tracker.job_description = job_description + '    - Apply for agent\n'
         tracker.save()
         messages.success(request, f"New Selfassesment Tracker has been created for {assesment} because HMRC agent is inactive!")

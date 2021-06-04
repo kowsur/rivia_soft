@@ -275,7 +275,15 @@ class SelfassesmentTracker(models.Model):
         to_field='user_id',
         blank=False,
         null=True)
-    
+    assigned_to = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Assigned to',
+        related_name='selfassesment_tracker_assigned_to',
+        to_field='user_id',
+        blank=True,
+        null=True)
+    new_customer = models.BooleanField(verbose_name="New customer", blank=True, editable=False, default=False, null=True)
 
     def __str__(self) -> str:
         if self.job_description:

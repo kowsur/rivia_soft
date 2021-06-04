@@ -309,6 +309,18 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
         fk_field='client_id',
         empty_label=None
         )
+    assigned_to = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = CustomUser_repr_format,
+        model = CustomUser,
+        choices = CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field = 'user_id',
+        disabled = False,
+        required = False,
+        empty_label = None # remove default option '------' from select menu
+        )
     
     class Meta:
         model = SelfassesmentTracker
@@ -316,6 +328,7 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
             # 'tracker_id',
             # 'created_by', #request.user
             # 'done_by', #request.user
+            'assigned_to',
             'client_id',
             'job_description',
             'remarks',
@@ -353,6 +366,18 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
         empty_label=None,
         disabled=True
         )
+    assigned_to = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = CustomUser_repr_format,
+        model = CustomUser,
+        choices = CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field = 'user_id',
+        disabled = False,
+        required = False,
+        empty_label = None # remove default option '------' from select menu
+        )
     # done_by = SearchableModelField(
     #     queryset=CustomUser.objects.all(),
     #     search_url = search_users_url_path,
@@ -372,6 +397,7 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
             # 'tracker_id',
             # 'created_by',
             # 'done_by',
+            'assigned_to',
             'client_id',
             'job_description',
             'remarks',

@@ -50,6 +50,7 @@ def generate_template_tag_for_model(
       'done_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
       'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
       'prepared_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
+      'assigned_to': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
       'client_id': { 'details_url_without_argument': Selfassesment_details_url_without_argument, 'repr-format': Selfassesment_repr_format },
       'incomplete_tasks': { 'details_url_without_argument': '/companies/SATrc/search/?client_id=', 'repr-format': r'{length}'}
       }

@@ -15,16 +15,21 @@ from users.models import CustomUser
 search_users_url_path = '/u/search/'
 all_users_url_path = '/u/all/'
 
-Selfassesment_client_id_repr_format = r"👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} ☎{fields.business_phone_number}"
+Selfassesment_client_id_repr_format = r"👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} 📭{fields.personal_post_code}"
 CustomUser_repr_format = r"📨{fields.email} 👥{fields.first_name}"
+
+
+def get_date_today(date_format = '%Y-%m-%d'):
+    today = timezone.datetime.strftime(timezone.now(), date_format)
+    return today
 
 class SelfassesmentCreationForm(forms.ModelForm):
     date_of_registration = forms.DateField(
         label='Registration date',
-        widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate(), 'placehoder': 'Registration date'})
+        widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today, 'placehoder': 'Registration date'})
     )
     date_of_birth = forms.DateField(
-        required=True,
+        required=False,
         widget=forms.DateInput(attrs={'type': 'date',})
     )
 
@@ -94,10 +99,10 @@ class SelfassesmentCreationForm(forms.ModelForm):
 class SelfassesmentChangeForm(forms.ModelForm):
     date_of_registration = forms.DateField(
         label='Registration date',
-        widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate(), 'placehoder': 'Registration date'})
+        widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today, 'placehoder': 'Registration date'})
     )
     date_of_birth = forms.DateField(
-        required=True,
+        required=False,
         widget=forms.DateInput(attrs={'type': 'date',})
     )
     
@@ -171,7 +176,7 @@ class SelfassesmentDeleteForm(forms.ModelForm):
 
 
 class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
-    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate()}))
+    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today}))
     client_id = SearchableModelField(
         queryset=Selfassesment.objects.all(),
         label = 'Client Name',
@@ -255,7 +260,7 @@ class SelfassesmentAccountSubmissionDeleteForm(forms.ModelForm):
 
 
 class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelForm):
-    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate()}))
+    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today}))
     submitted_by = SearchableModelField(
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
@@ -284,7 +289,6 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
             'tax_year', 
             'submitted_by', 
             'prepared_by', 
-            'remarks',
             'date_of_submission')
 
     def __init__(self, *args, **kwargs):
@@ -293,7 +297,7 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
 
 
 class SelfassesmentTrackerCreationForm(forms.ModelForm):
-    deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': timezone.localdate(), 'min': timezone.localdate()}))
+    deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today, 'min': get_date_today}))
     client_id = SearchableModelField(
         queryset=Selfassesment.objects.all(),
         label = 'Client Name',
@@ -305,6 +309,18 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
         fk_field='client_id',
         empty_label=None
         )
+    assigned_to = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = CustomUser_repr_format,
+        model = CustomUser,
+        choices = CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field = 'user_id',
+        disabled = False,
+        required = False,
+        empty_label = None # remove default option '------' from select menu
+        )
     
     class Meta:
         model = SelfassesmentTracker
@@ -312,20 +328,29 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
             # 'tracker_id',
             # 'created_by', #request.user
             # 'done_by', #request.user
+            'assigned_to',
             'client_id',
             'job_description',
+            'remarks',
+            'has_issue',
             'deadline', #default timezone now
             # 'complete_date', #default timezone now
             # 'is_completed',
             )
+
     def clean_deadline(self):
         input_date = self.cleaned_data['deadline']
-        current_date = timezone.localdate()
-        if input_date>=current_date:
-            return input_date
-        raise ValidationError("Deadline can't be a previous date.")
-        
+        current_date = timezone.now().date()
+        if not input_date>=current_date:
+            raise ValidationError("Deadline can't be a previous date.")
+        return input_date
 
+    def clean_remarks(self):
+        remarks = self.cleaned_data.get('remarks').strip()
+        issue = self.data.get('has_issue')
+        if issue and not remarks:
+            raise ValidationError("Tracker has issue therefore remarks is required")
+        return remarks
 
 class SelfassesmentTrackerChangeForm(forms.ModelForm):
     # complete_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
@@ -340,6 +365,18 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
         fk_field='client_id',
         empty_label=None,
         disabled=True
+        )
+    assigned_to = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = CustomUser_repr_format,
+        model = CustomUser,
+        choices = CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field = 'user_id',
+        disabled = False,
+        required = False,
+        empty_label = None # remove default option '------' from select menu
         )
     # done_by = SearchableModelField(
     #     queryset=CustomUser.objects.all(),
@@ -360,10 +397,20 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
             # 'tracker_id',
             # 'created_by',
             # 'done_by',
+            'assigned_to',
             'client_id',
             'job_description',
+            'remarks',
+            'has_issue',
             # 'complete_date',
             'is_completed',)
+    
+    def clean_remarks(self):
+        remarks = self.cleaned_data.get('remarks').strip()
+        issue = self.data.get('has_issue')
+        if issue and not remarks:
+            raise ValidationError("Tracker has issue therefore remarks is required")
+        return remarks
 
 class SelfassesmentTrackerDeleteForm(forms.ModelForm):
     agree = forms.BooleanField(label='I want to proceed.', required=True)

@@ -1,8 +1,13 @@
 from django.db import models
-from django.db.models.fields import related
+from django.db.models.deletion import SET_NULL
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR
+
+
+class dummyModelField:
+    def __init__(self) -> None:
+        pass
 
 
 class SelfassesmentType(models.Model):
@@ -75,7 +80,7 @@ class Selfassesment(models.Model):
     client_name = models.CharField(verbose_name='Full Name / Business Name', max_length=100, blank=False, null=False, db_index=True)
     
     # Personal Info
-    date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=False)
+    date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=True)
     PAYE_number = models.CharField(verbose_name='PAYE Number', max_length=255, blank=True, null=True, unique=True, db_index=True)
     personal_phone_number = models.CharField(verbose_name='Personal Phone numbers', max_length=255, blank=False, null=True, db_index=True)
     personal_email = models.EmailField(verbose_name='Personal Email', max_length=320, blank=True, null=True)
@@ -132,7 +137,7 @@ class Selfassesment(models.Model):
         null=False)
 
     def __str__(self) -> str:
-        return f'👥{self.client_name} 📁{self.client_file_number} 📞{self.personal_phone_number} ☎{self.business_phone_number}'
+        return f'👥{self.client_name} 📁{self.client_file_number} 📞{self.personal_phone_number} 📭{self.personal_post_code}'
     
     def __repr__(self) -> str:
         return str(self)
@@ -239,8 +244,20 @@ class SelfassesmentTracker(models.Model):
         null=False)
     creation_date = models.DateTimeField(verbose_name='Creation Datetime', editable=False, blank=True, null=False, default=timezone.localtime)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)
+    remarks = models.TextField(verbose_name="Remarks", blank=True, null=True, default='')
+    has_issue = models.BooleanField(verbose_name="Has Issue", default=False)
+    issue_created_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.SET_NULL,
+        verbose_name='Issue Created By',
+        related_name='selfassesment_tracker_issue_created_by',
+        to_field='user_id',
+        editable=False,
+        blank=True,
+        null=True
+        )
     deadline = models.DateField(verbose_name='Deadline', blank=False, null=False, default=timezone.localtime)
-    is_completed = models.BooleanField(verbose_name='Status', blank=True, null=False, default=False)
+    is_completed = models.BooleanField(verbose_name='Completed', blank=True, null=False, default=False)
     complete_date = models.DateField(verbose_name='Complete Date', blank=True, null=True)
     done_by = models.ForeignKey(
         to='users.CustomUser',
@@ -258,8 +275,74 @@ class SelfassesmentTracker(models.Model):
         to_field='user_id',
         blank=False,
         null=True)
+    assigned_to = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Assigned to',
+        related_name='selfassesment_tracker_assigned_to',
+        to_field='user_id',
+        blank=True,
+        null=True)
+    new_customer = models.BooleanField(verbose_name="New customer", blank=True, editable=False, default=False, null=True)
 
     def __str__(self) -> str:
         if self.job_description:
             return f"{self.job_description}"
         return f"Deadline: {self.deadline} | Created By: {self.created_by}"
+
+
+
+class Issue(models.Model):
+    
+    class Meta:
+        verbose_name = 'Issue'
+        verbose_name_plural = 'Issues'
+    
+    issue_id = models.AutoField(
+        verbose_name='Issue Id',
+        primary_key=True,
+        unique=True,
+        editable=False,
+        blank=True,
+        null=False,
+        db_index=True) # auto incrementing primary field
+    
+    description = models.TextField(
+        verbose_name='Type Name',
+        max_length=255,
+        blank=False,
+        null=False,
+        default='New Issue',
+        db_index=True
+        )
+    
+    def __str__(self) -> str:
+        return f"{self.issue_id} - {self.description[:30]}"
+
+
+class TrackerHasIssues(models.Model):
+    id = models.AutoField(
+        verbose_name='Issue Id',
+        primary_key=True,
+        unique=True,
+        editable=False,
+        blank=True,
+        null=False,
+        db_index=True) # auto id
+    tracker_id = models.ForeignKey(
+        to='companies.SelfassesmentTracker',
+        on_delete=models.CASCADE,
+        verbose_name='Tracker Id',
+        to_field='tracker_id',
+        related_name='TrackerHasIssues_tracker_id',
+        blank=False,
+        null=False)
+    issue_id = models.ForeignKey(
+        to='companies.Issue',
+        on_delete=models.PROTECT,
+        verbose_name='Tracker Id',
+        to_field='issue_id',
+        related_name='TrackerHasIssues_issue_id',
+        blank=False,
+        null=False)
+     

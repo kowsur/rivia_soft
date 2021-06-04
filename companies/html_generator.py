@@ -6,7 +6,7 @@ from django.db import models
 # user_repr_format = r"📨{email} 👥{first_name}"
 user_repr_format = r"👥{first_name} {last_name}"
 user_details_url_without_argument = '/u/details/'
-Selfassesment_repr_format = r"👥{client_name} 📁{client_file_number} 📞{personal_phone_number} ☎{business_phone_number}"
+Selfassesment_repr_format = r"👥{client_name} 📁{client_file_number} 📞{personal_phone_number} 📭{personal_post_code}"
 Selfassesment_details_url_without_argument = '/companies/SA/details/'
 Selfassesment_type_repr_format = r"{type_name}"
 Selfassesment_type_details_url_without_argument = '/companies/SAT/details/'
@@ -19,7 +19,10 @@ def get_field_names_from_model(django_model:models.Model):
   return field_names
 
 def get_header_name_from_field_name(django_model, field_name):
-  return django_model._meta.get_field(field_name).verbose_name
+  try:
+    return django_model._meta.get_field(field_name).verbose_name
+  except:
+    return 'Incomplete Tasks'
 
 def is_includeable(field, include_fields=[], exclude_fields=[], keep_include_fields=True, show_others=False):
   # skip if exclude_fields contains the field and keep_include_fields is False
@@ -43,10 +46,13 @@ def generate_template_tag_for_model(
     tag_id='data-template',
     fk_fields = {
       'created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
+      'issue_created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
       'done_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
       'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
       'prepared_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
-      'client_id': { 'details_url_without_argument': Selfassesment_details_url_without_argument, 'repr-format': Selfassesment_repr_format }
+      'assigned_to': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
+      'client_id': { 'details_url_without_argument': Selfassesment_details_url_without_argument, 'repr-format': Selfassesment_repr_format },
+      'incomplete_tasks': { 'details_url_without_argument': '/companies/SATrc/search/?client_id=', 'repr-format': r'{length}'}
       }
   ):
   
@@ -102,9 +108,14 @@ def generate_template_tag_for_model(
         inner_template_tr += f'<td class="data-cell" id="pk"></td>\n'
       continue
     if field in fk_fields:
-      inner_template_tr+=f"""
-      <td class="data-cell" id="{field}"
-        data-url="{fk_fields[field]['details_url_without_argument']}" data-repr-format="{fk_fields[field]['repr-format']}"></td>\n"""
+      if field=='incomplete_tasks':
+        inner_template_tr+=f"""
+        <td class="data-cell" id="{field}"
+          data-field="pk" data-url="{fk_fields[field]['details_url_without_argument']}" data-repr-format="{fk_fields[field]['repr-format']}"></td>\n"""
+      else:
+        inner_template_tr+=f"""
+        <td class="data-cell" id="{field}"
+          data-field="fields.{field}" data-url="{fk_fields[field]['details_url_without_argument']}" data-repr-format="{fk_fields[field]['repr-format']}"></td>\n"""
     else:
       inner_template_tr += f'<td class="data-cell" id="{field}"></td>\n'
   

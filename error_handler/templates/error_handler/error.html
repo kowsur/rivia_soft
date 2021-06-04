@@ -6,7 +6,9 @@
 {% endblock title %}
 
 {% block content %}
-<h1> {{ error_code }}: {{ message }} </h1>
+<div class="http-error">
+  <h1 class="error-message">Error {{ error_code }}: {{ message }} </h1>
 
-<p>{{ hint }}</p>
+  <p class="error-hint">{{ hint }}</p>
+</div>
 {% endblock content %}

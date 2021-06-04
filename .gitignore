@@ -1,6 +1,7 @@
 *env*/
 *data.*
 todo.txt
+db.sqlite3*
 
 #Server Setup
 config.json

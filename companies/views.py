@@ -468,10 +468,11 @@ def home_selfassesment_tracker(request):
     'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_update_url,
     'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_delete_url,
     'task_counts': True,
-    'completed_tasks': SelfassesmentTracker.objects.filter(is_completed=True).count(),
+    'new_customers': SelfassesmentTracker.objects.filter(new_customer=True).count(),
     'future_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime()).count(),
     'todays_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.localtime()).count(),
     'previous_incomplete_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False).count(),
+    'task_has_issue': SelfassesmentTracker.objects.filter(has_issue=True).count(),
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -588,17 +589,18 @@ def search_selfassesment_tracker(request, limit: int=-1):
     # if tasks query paramter exists then return tasks
     if request.GET.get('tasks'):
       tasks = {
-        'completed_tasks': SelfassesmentTracker.objects.filter(is_completed=True),
+        'new_customers': SelfassesmentTracker.objects.filter(new_customer=True),
         'future_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime()),
         'todays_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.localtime()),
-        'previous_incomplete_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False)
+        'previous_incomplete_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False),
+        'task_has_issue': SelfassesmentTracker.objects.filter(has_issue=True)
       }
       records = tasks.get(request.GET.get('tasks'), [])
       records.order_by('deadline')
       data = serialize(queryset=records, format='json')
       return HttpResponse(data, content_type='application/json')
     if not client_id==None:
-      records = SelfassesmentTracker.objects.filter(client_id=client_id)
+      records = SelfassesmentTracker.objects.filter(client_id=client_id, is_completed=False)
       records.order_by('deadline')
       data = serialize(queryset=records, format='json')
       return HttpResponse(data, content_type='application/json')

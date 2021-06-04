@@ -248,6 +248,9 @@ div.search_field > input[name="search"]:focus-visible ~ div.select:not([disabled
 .task-previous{
   @apply bg-red-600;
 }
+.task-issue{
+  background-color: #9a1565;
+}
 .task-tooltip{
   display: none;
   position: absolute;

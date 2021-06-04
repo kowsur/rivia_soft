@@ -150,7 +150,6 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
     if (data_field) {
       let field_data_format = `{${data_field}}`
       field_data = field_data_format.format(data)
-      console.log(field_data)
     }
     if (field_data==null) continue
 

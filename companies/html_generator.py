@@ -1,16 +1,10 @@
 from django.db import models
+from .url_variables import URL_PATHS, URL_NAMES, Full_URL_PATHS_WITHOUT_ARGUMENTS, URL_NAMES_PREFIXED_WITH_APP_NAME
 
-
+from .repr_formats import HTML_Generator
 
 # foreign key fields
-# user_repr_format = r"📨{email} 👥{first_name}"
-user_repr_format = r"👥{first_name} {last_name}"
 user_details_url_without_argument = '/u/details/'
-Selfassesment_repr_format = r"👥{client_name} 📁{client_file_number} 📞{personal_phone_number} 📭{personal_post_code}"
-Selfassesment_details_url_without_argument = '/companies/SA/details/'
-Selfassesment_type_repr_format = r"{type_name}"
-Selfassesment_type_details_url_without_argument = '/companies/SAT/details/'
-
 
 def get_field_names_from_model(django_model:models.Model):
   field_names = []
@@ -38,6 +32,7 @@ def generate_template_tag_for_model(
     pk_field='id',
     exclude_fields = [],
     include_fields = [],
+    extra_fields=[],
     ordering = [],
     keep_include_fields = True,
     show_others = True,
@@ -45,13 +40,13 @@ def generate_template_tag_for_model(
     tag_name='data-template',
     tag_id='data-template',
     fk_fields = {
-      'created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
-      'issue_created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
-      'done_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
-      'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
-      'prepared_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
-      'assigned_to': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': user_repr_format },
-      'client_id': { 'details_url_without_argument': Selfassesment_details_url_without_argument, 'repr-format': Selfassesment_repr_format },
+      'created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'issue_created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'done_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'prepared_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'assigned_to': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_details_url, 'repr-format': HTML_Generator.Selfassesment_client_id_repr_format },
       'incomplete_tasks': { 'details_url_without_argument': '/companies/SATrc/search/?client_id=', 'repr-format': r'{length}'}
       }
   ):
@@ -134,6 +129,7 @@ def generate_data_container_table(
     pk_field='id',
     exclude_fields=[],
     include_fields=[],
+    extra_fields=[],
     keep_include_fields=True,
     ordering = [],
     show_id = True,

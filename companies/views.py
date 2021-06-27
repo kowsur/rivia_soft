@@ -1,3 +1,4 @@
+from pprint import pp
 from datetime import timedelta
 import json
 from django.http.response import Http404, HttpResponse
@@ -14,12 +15,13 @@ from .forms import Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form
 from .forms import SelfassesmentTrackerCreationForm, SelfassesmentTrackerChangeForm, SelfassesmentTrackerDeleteForm
 
 from .forms import LimitedCreationForm, LimitedChangeForm, LimitedDeleteForm
+from .forms import LimitedTrackerCreationForm, LimitedTrackerChangeForm, LimitedTrackerDeleteForm
 
 #models
 from .models import Selfassesment, SelfassesmentAccountSubmission
 from .models import SelfassesmentTracker
 
-from .models import Limited
+from .models import Limited, LimitedTracker
 
 #export
 from .export_models import export_to_csv
@@ -30,6 +32,7 @@ from .queries import db_search_SelfassesmentAccountSubmission, db_all_Selfassesm
 from .queries import db_search_SelfassesmentTracker, db_all_SelfassesmentTracker
 
 from .queries import db_all_Limited, db_search_Limited
+from .queries import db_search_LimitedTracker, db_all_LimitedTracker
 
 # serializers
 from rest_framework.decorators import api_view
@@ -45,6 +48,7 @@ from .url_variables import *
 
 # html generator
 from .html_generator import get_field_names_from_model, generate_template_tag_for_model, generate_data_container_table
+from .repr_formats import HTML_Generator
 
 application_name = APPLICATION_NAME
 # these path names will be passed to templates to use in the navbar links
@@ -54,6 +58,7 @@ URLS = {
   **Full_URL_PATHS_WITHOUT_ARGUMENTS.get_dict(),
   **URL_NAMES_PREFIXED_WITH_APP_NAME.get_dict()
 }
+user_details_url_without_argument = '/u/details/'
 
 # =============================================================================================================
 # =============================================================================================================
@@ -816,6 +821,225 @@ def export_limited(request):
   show_others = False
   export_to_csv(
     django_model = Limited,
+    write_to = response,
+    include_fields = include_fields,
+    exclude_fields = exclude_fields,
+    keep_include_fields = keep_include_fields,
+    show_others = show_others
+    )
+  return response
+
+
+
+# =============================================================================================================
+# =============================================================================================================
+# LimitedTracker
+@login_required
+def home_limited_tracker(request):
+  pk_field = 'tracker_id'
+  exclude_fields = set(['tracker_id', 'is_updated'])
+  include_fields = ['tracker_id', 'client_id', 'job_description', 'deadline', 'remarks','is_completed', 'has_issue', 'complete_date', 'done_by', 'created_by','creation_date', 'issue_created_by']
+  fk_fields = {
+      'created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'issue_created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'done_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'prepared_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'assigned_to': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': HTML_Generator.Limited_client_id_repr_format },
+      'incomplete_tasks': { 'details_url_without_argument': '/companies/SATrc/search/?client_id=', 'repr-format': r'{length}'}
+      }
+
+  keep_include_fields = True
+  context = {
+    **URLS,
+    'model_fields': get_field_names_from_model(LimitedTracker),
+    'template_tag': generate_template_tag_for_model(LimitedTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, fk_fields=fk_fields),
+    'data_container': generate_data_container_table(LimitedTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    
+    'page_title': 'View Limited Tracker',
+    'caption': 'View Limited Tracker',
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_create_name,
+    'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_export_name,
+    'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_viewall_url,
+    'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_search_url,
+    'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_update_url,
+    'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_delete_url,
+    'task_counts': True,
+    'new_customers': LimitedTracker.objects.filter(new_customer=True).count(),
+    'future_incomplete_tasks': LimitedTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime()).count(),
+    'todays_incomplete_tasks': LimitedTracker.objects.filter(is_completed=False, deadline=timezone.localtime()).count(),
+    'previous_incomplete_tasks': LimitedTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False).count(),
+    'task_has_issue': LimitedTracker.objects.filter(has_issue=True).count(),
+  }
+  pp(context)
+  return render(request=request, template_name='companies/home.html', context=context)
+
+@login_required
+def view_limited_tracker(request):
+  return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name)
+
+@login_required
+def create_limited_tracker(request):
+  context = {
+    **URLS,
+
+    'page_title': 'Create Limited Tracker',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name,
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_create_name,
+    'form_title': 'Limited Tracker Creation Form',
+    'form': LimitedTrackerCreationForm(initial={'created_by': request.user.user_id})
+  }
+
+  if request.method == 'POST':
+    form = LimitedTrackerCreationForm(request.POST, initial={'created_by': request.user.user_id})
+    context['form'] = form
+    if form.is_valid():
+      assesment = form.save()
+      assesment.created_by = request.user
+      if not assesment.issue_created_by and assesment.has_issue:
+        assesment.issue_created_by = request.user
+      assesment.save()
+      messages.success(request, f'New Limited Tracker has been created with id {assesment.tracker_id}!')
+      context['form'] = LimitedTrackerCreationForm(initial={'created_by': request.user.user_id})
+  return render(request, template_name='companies/create.html', context=context)
+
+@login_required
+def update_limited_tracker(request, tracker_id:int):
+  context = {
+    **URLS,
+    'page_title': f'Update Limited Tracker',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name,
+    'id': tracker_id,
+    'update_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_update_name,
+    'form_title': 'Limited Update Form',
+    'form': LimitedTrackerChangeForm()
+  }
+
+  try:
+    record =  LimitedTracker.objects.get(tracker_id=tracker_id)
+    context['form'] = LimitedTrackerChangeForm(instance=record)
+    if record.is_completed:
+      messages.error(request, message=f"Task {tracker_id} is completed therefore can't be updated!")
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name)
+  except LimitedTracker.DoesNotExist:
+    messages.error(request, f'Limited Tracker having id {tracker_id} does not exists!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name)
+    raise Http404
+
+  if request.method == 'POST':
+    form = LimitedTrackerChangeForm(request.POST, instance=record)
+    context['form'] = form
+    if form.is_valid():
+      assesment = form.save(commit=False)
+      if not assesment.issue_created_by and assesment.has_issue:
+        assesment.issue_created_by = request.user
+      if form.cleaned_data.get('is_completed')==True:
+        assesment.complete_date = timezone.localtime()
+        assesment.done_by = request.user
+        assesment.has_issue = False
+      assesment.save()
+      messages.success(request, f'Limited Tracker has been updated having id {tracker_id}!')
+      if assesment.is_completed:
+        return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name)
+    else:
+      messages.error(request, f'Updating Limited Tracker having id {tracker_id} failed due to invalid data!')
+  return render(request, template_name='companies/update.html', context=context)
+
+@login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to delete this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name)
+def delete_limited_tracker(request, tracker_id:int):
+  context = {
+    **URLS,
+    'page_title': 'Delete Limited Tracker',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name,
+    'id': tracker_id,
+    'delete_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_delete_name,
+    'form_title': "Limited Tracker Delete Form",
+    'form': LimitedTrackerDeleteForm()
+  }
+
+  try:
+    record =  LimitedTracker.objects.get(tracker_id=tracker_id)
+  except LimitedTracker.DoesNotExist:
+    messages.error(request, f'Limited Tracker record with id {tracker_id}, you are looking for does not exist!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name)
+
+  if request.method == 'POST':
+    form = LimitedTrackerDeleteForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      record.delete()
+      messages.success(request, f'Limited Tracker has been deleted having id {tracker_id}!')
+    else:
+      messages.error(request, f'Deletion of Limited Tracker having id {tracker_id} failed')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name)
+  return render(request, template_name='companies/delete.html', context=context)
+
+@login_required
+def search_limited_tracker(request, limit: int=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    # get search text from url query parameter
+    search_text = request.GET.get('q', '').strip()
+    client_id = request.GET.get('client_id', None)
+
+    # if tasks query paramter exists then return tasks
+    if request.GET.get('tasks'):
+      tasks = {
+        'new_customers': LimitedTracker.objects.filter(new_customer=True),
+        'future_incomplete_tasks': LimitedTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime()),
+        'todays_incomplete_tasks': LimitedTracker.objects.filter(is_completed=False, deadline=timezone.localtime()),
+        'previous_incomplete_tasks': LimitedTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False),
+        'task_has_issue': LimitedTracker.objects.filter(has_issue=True)
+      }
+      records = tasks.get(request.GET.get('tasks'), [])
+      records.order_by('deadline')
+      data = serialize(queryset=records, format='json')
+      return HttpResponse(data, content_type='application/json')
+    if not client_id==None:
+      records = LimitedTracker.objects.filter(client_id=client_id, is_completed=False)
+      records.order_by('deadline')
+      data = serialize(queryset=records, format='json')
+      return HttpResponse(data, content_type='application/json')
+    
+    # filter results using the search_text
+    if not search_text:
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_viewall_name)
+    
+    records = db_search_LimitedTracker(
+      search_text=search_text,
+      user_email=request.user.email,
+      is_superuser=request.user.is_superuser,
+      limit=limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
+
+@login_required
+def all_limited_tracker(request, limit=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    records = db_all_LimitedTracker(
+      user_email=request.user.email,
+      is_superuser=request.user.is_superuser,
+      limit=limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
+
+@login_required
+def export_limited_tracker(request):
+  response = HttpResponse(
+    content_type='text/csv; charset=utf-8',
+    headers={'Content-Disposition': f'attachment; filename="limited_tracker_{timezone.localtime()}.csv"'},
+  )
+  include_fields = []
+  exclude_fields = set(['tracker_id', 'is_updated', 'creation_date'])
+  keep_include_fields = True
+  show_others = True
+  export_to_csv(
+    django_model = LimitedTracker,
     write_to = response,
     include_fields = include_fields,
     exclude_fields = exclude_fields,

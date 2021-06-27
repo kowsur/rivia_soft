@@ -21,15 +21,16 @@ from .views import home_limited, create_limited, update_limited, \
     delete_limited, search_limited, all_limited, get_details_limited, \
     export_limited
 
+# limited tracker
+from .views import home_limited_tracker, create_limited_tracker, update_limited_tracker, \
+    delete_limited_tracker, search_limited_tracker, all_limited_tracker, export_limited_tracker
+
 # # limited account submission view function
 # from .views import home_limited_account_submission, create_limited_account_submission, \
 #     update_limited_account_submission, delete_limited_account_submission,               \
 #     search_limited_account_submission, all_limited_account_submission,                  \
 #     export_limited_account_submission, add_all_limited_to_limited_account_submission_w_submission_year
 
-# # limited tracker
-# from .views import home_limited_tracker, create_limited_tracker, update_limited_tracker, \
-#     delete_limited_tracker, search_limited_tracker, all_limited_tracker, export_limited_tracker
 
 from .url_variables import APPLICATION_NAME, URL_PATHS, URL_NAMES
 from .url_variables import *
@@ -223,34 +224,34 @@ urlpatterns = [
     #     name = URL_NAMES.add_all_Limited_to_Limited_Account_Submission_name),
 
 
-    # # =============================================================================================================
-    # # LimitedTracker
-    # path(route = URL_PATHS.Limited_Tracker_home_url,
-    #     view = home_limited_tracker,
-    #     name = URL_NAMES.Limited_Tracker_home_name),
+    # =============================================================================================================
+    # LimitedTracker
+    path(route = URL_PATHS.Limited_Tracker_home_url,
+        view = home_limited_tracker,
+        name = URL_NAMES.Limited_Tracker_home_name),
 
-    # path(route = URL_PATHS.Limited_Tracker_create_url,
-    #     view = create_limited_tracker,
-    #     name = URL_NAMES.Limited_Tracker_create_name),
+    path(route = URL_PATHS.Limited_Tracker_create_url,
+        view = create_limited_tracker,
+        name = URL_NAMES.Limited_Tracker_create_name),
 
-    # path(route = URL_PATHS.Limited_Tracker_update_url,
-    #     view = update_limited_tracker,
-    #     name = URL_NAMES.Limited_Tracker_update_name),
+    path(route = URL_PATHS.Limited_Tracker_update_url,
+        view = update_limited_tracker,
+        name = URL_NAMES.Limited_Tracker_update_name),
 
-    # path(route = URL_PATHS.Limited_Tracker_delete_url,
-    #     view = delete_limited_tracker,
-    #     name = URL_NAMES.Limited_Tracker_delete_name),
+    path(route = URL_PATHS.Limited_Tracker_delete_url,
+        view = delete_limited_tracker,
+        name = URL_NAMES.Limited_Tracker_delete_name),
 
-    # path(route = URL_PATHS.Limited_Tracker_search_url,
-    #     view = search_limited_tracker,
-    #     name = URL_NAMES.Limited_Tracker_search_name),
+    path(route = URL_PATHS.Limited_Tracker_search_url,
+        view = search_limited_tracker,
+        name = URL_NAMES.Limited_Tracker_search_name),
 
-    # path(route = URL_PATHS.Limited_Tracker_viewall_url,
-    #     view = all_limited_tracker,
-    #     name = URL_NAMES.Limited_Tracker_viewall_name),
+    path(route = URL_PATHS.Limited_Tracker_viewall_url,
+        view = all_limited_tracker,
+        name = URL_NAMES.Limited_Tracker_viewall_name),
     
-    # path(route = URL_PATHS.Limited_Tracker_export_url,
-    #     view = export_limited_tracker,
-    #     name = URL_NAMES.Limited_Tracker_export_name
-    # ),
+    path(route = URL_PATHS.Limited_Tracker_export_url,
+        view = export_limited_tracker,
+        name = URL_NAMES.Limited_Tracker_export_name
+    ),
 ]

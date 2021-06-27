@@ -6,7 +6,9 @@ from .fields import SearchableModelField, Select, Fieldset
 from .url_variables import Full_URL_PATHS_WITHOUT_ARGUMENTS
 
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
-from .models import Limited
+from .models import Limited, LimitedTracker
+
+from .repr_formats import Forms
 
 # dummy import
 # next line before migrating
@@ -16,9 +18,6 @@ from .models import Limited
 from users.models import CustomUser
 search_users_url_path = '/u/search/'
 all_users_url_path = '/u/all/'
-
-Selfassesment_client_id_repr_format = r"👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} 📭{fields.personal_post_code}"
-CustomUser_repr_format = r"📨{fields.email} 👥{fields.first_name}"
 
 
 def get_date_today(date_format = '%Y-%m-%d'):
@@ -184,7 +183,7 @@ class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
         label = 'Client Name',
         search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
         all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
-        repr_format = Selfassesment_client_id_repr_format,
+        repr_format = Forms.Selfassesment_client_id_repr_format,
         model=Selfassesment,
         choices=Selfassesment.objects.all().only('client_id', 'client_name'),
         fk_field='client_id',
@@ -218,7 +217,7 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         label = 'Client Name',
         search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
         all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
-        repr_format = Selfassesment_client_id_repr_format,
+        repr_format = Forms.Selfassesment_client_id_repr_format,
         model=Selfassesment,
         choices=Selfassesment.objects.all().only('client_id', 'client_name'),
         fk_field='client_id',
@@ -229,7 +228,7 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
         all_url = all_users_url_path,
-        repr_format = CustomUser_repr_format,
+        repr_format = Forms.CustomUser_repr_format,
         model=CustomUser,
         choices=CustomUser.objects.all().only('user_id', 'first_name'),
         fk_field='user_id',
@@ -267,7 +266,7 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
         all_url = all_users_url_path,
-        repr_format = CustomUser_repr_format,
+        repr_format = Forms.CustomUser_repr_format,
         model=CustomUser,
         choices=CustomUser.objects.all().only('user_id', 'first_name'),
         fk_field='user_id',
@@ -277,7 +276,7 @@ class Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form(forms.ModelFo
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
         all_url = all_users_url_path,
-        repr_format = CustomUser_repr_format,
+        repr_format = Forms.CustomUser_repr_format,
         model=CustomUser,
         choices=CustomUser.objects.all().only('user_id', 'first_name'),
         fk_field='user_id',
@@ -305,7 +304,7 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
         label = 'Client Name',
         search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
         all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
-        repr_format = Selfassesment_client_id_repr_format,
+        repr_format = Forms.Selfassesment_client_id_repr_format,
         model=Selfassesment,
         choices=Selfassesment.objects.all().only('client_id', 'client_name'),
         fk_field='client_id',
@@ -315,7 +314,7 @@ class SelfassesmentTrackerCreationForm(forms.ModelForm):
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
         all_url = all_users_url_path,
-        repr_format = CustomUser_repr_format,
+        repr_format = Forms.CustomUser_repr_format,
         model = CustomUser,
         choices = CustomUser.objects.all().only('user_id', 'first_name'),
         fk_field = 'user_id',
@@ -361,7 +360,7 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
         label = 'Client Name',
         search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
         all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
-        repr_format = Selfassesment_client_id_repr_format,
+        repr_format = Forms.Selfassesment_client_id_repr_format,
         model=Selfassesment,
         choices=Selfassesment.objects.all().only('client_id', 'client_name'),
         fk_field='client_id',
@@ -372,7 +371,7 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
         all_url = all_users_url_path,
-        repr_format = CustomUser_repr_format,
+        repr_format = Forms.CustomUser_repr_format,
         model = CustomUser,
         choices = CustomUser.objects.all().only('user_id', 'first_name'),
         fk_field = 'user_id',
@@ -384,7 +383,7 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
     #     queryset=CustomUser.objects.all(),
     #     search_url = search_users_url_path,
     #     all_url = all_users_url_path,
-    #     repr_format = CustomUser_repr_format,
+    #     repr_format = Forms.CustomUser_repr_format,
     #     model = CustomUser,
     #     choices = CustomUser.objects.all().only('user_id', 'first_name'),
     #     fk_field = 'user_id',
@@ -577,3 +576,127 @@ class LimitedDeleteForm(forms.ModelForm):
     class Meta:
         model = Limited
         fields = ()
+
+
+class LimitedTrackerCreationForm(forms.ModelForm):
+    deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today, 'min': get_date_today}))
+    client_id = SearchableModelField(
+        queryset=Limited.objects.all(),
+        label = 'Client Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
+        repr_format = Forms.Limited_client_id_repr_format,
+        model=Limited,
+        choices=Limited.objects.all().only('client_id', 'client_name'),
+        fk_field='client_id',
+        empty_label=None
+        )
+    assigned_to = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = Forms.CustomUser_repr_format,
+        model = CustomUser,
+        choices = CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field = 'user_id',
+        disabled = False,
+        required = False,
+        empty_label = None # remove default option '------' from select menu
+        )
+    
+    class Meta:
+        model = LimitedTracker
+        fields = (
+            # 'tracker_id',
+            # 'created_by', #request.user
+            # 'done_by', #request.user
+            'assigned_to',
+            'client_id',
+            'job_description',
+            'remarks',
+            'has_issue',
+            'deadline', #default timezone now
+            # 'complete_date', #default timezone now
+            # 'is_completed',
+            )
+
+    def clean_deadline(self):
+        input_date = self.cleaned_data['deadline']
+        current_date = timezone.now().date()
+        if not input_date>=current_date:
+            raise ValidationError("Deadline can't be a previous date.")
+        return input_date
+
+    def clean_remarks(self):
+        remarks = self.cleaned_data.get('remarks').strip()
+        issue = self.data.get('has_issue')
+        if issue and not remarks:
+            raise ValidationError("Tracker has issue therefore remarks is required")
+        return remarks
+
+class LimitedTrackerChangeForm(forms.ModelForm):
+    # complete_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    client_id = SearchableModelField(
+        queryset=Limited.objects.all(),
+        label = 'Client Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
+        repr_format = Forms.Limited_client_id_repr_format,
+        model=Limited,
+        choices=Limited.objects.all().only('client_id', 'client_name'),
+        fk_field='client_id',
+        empty_label=None,
+        disabled=True
+        )
+    assigned_to = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = Forms.CustomUser_repr_format,
+        model = CustomUser,
+        choices = CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field = 'user_id',
+        disabled = False,
+        required = False,
+        empty_label = None # remove default option '------' from select menu
+        )
+    # done_by = SearchableModelField(
+    #     queryset=CustomUser.objects.all(),
+    #     search_url = search_users_url_path,
+    #     all_url = all_users_url_path,
+    #     repr_format = Forms.CustomUser_repr_format,
+    #     model = CustomUser,
+    #     choices = CustomUser.objects.all().only('user_id', 'first_name'),
+    #     fk_field = 'user_id',
+    #     disabled = True,
+    #     required = False,
+    #     empty_label = None # remove default option '------' from select menu
+    #     )
+    
+    class Meta:
+        model = LimitedTracker
+        fields = (
+            # 'tracker_id',
+            # 'created_by',
+            # 'done_by',
+            'assigned_to',
+            'client_id',
+            'job_description',
+            'remarks',
+            'has_issue',
+            # 'complete_date',
+            'is_completed',)
+    
+    def clean_remarks(self):
+        remarks = self.cleaned_data.get('remarks').strip()
+        issue = self.data.get('has_issue')
+        if issue and not remarks:
+            raise ValidationError("Tracker has issue therefore remarks is required")
+        return remarks
+
+class LimitedTrackerDeleteForm(forms.ModelForm):
+    agree = forms.BooleanField(label='I want to proceed.', required=True)
+    class Meta:
+        model = Limited
+        fields = ()
+

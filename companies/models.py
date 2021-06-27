@@ -134,7 +134,7 @@ class Selfassesment(models.Model):
         verbose_name='Bank Account Holder Name',
         max_length=100,
         blank=True,
-        null=False)
+        null=True)
 
     def __str__(self) -> str:
         return f'👥{self.client_name} 📁{self.client_file_number} 📞{self.personal_phone_number} 📭{self.personal_post_code}'
@@ -150,8 +150,9 @@ class Selfassesment(models.Model):
     #     super().save(*args, **kwargs)
     
     def set_defaults(self):
-        if not isinstance(self.client_file_number, int):
-            self.client_file_number = self.client_id
+        if not self.client_file_number:
+            self.client_file_number = Selfassesment.get_next_file_number()
+        
         if not self.bank_account_holder_name:
             self.bank_account_holder_name = self.client_name
         self.save()
@@ -182,6 +183,9 @@ class SelfassesmentAccountSubmission(models.Model):
     class Meta:
         verbose_name = _("Selfassesment Submission")
         verbose_name_plural = _("Selfassesment Submissions")
+        unique_together = (
+                ('client_id', 'tax_year',),
+            )
 
     submission_id = models.AutoField(verbose_name='Submission ID', primary_key=True, null=False, db_index=True, editable=False)
     client_id = models.ForeignKey(
@@ -191,7 +195,7 @@ class SelfassesmentAccountSubmission(models.Model):
         to_field='client_id',
         related_name='selfassesment_account_submission_client_id',
         blank=False,
-        null=False)
+        null=True)
     date_of_submission = models.DateField(verbose_name='Submission date', blank=True, null=True, default=timezone.localtime)
     tax_year = models.CharField(verbose_name='Tax Year', max_length=10, blank=True)
     submitted_by = models.ForeignKey(
@@ -241,8 +245,8 @@ class SelfassesmentTracker(models.Model):
         to_field='client_id',
         related_name='selfassesment_tracker_client_id',
         blank=False,
-        null=False)
-    creation_date = models.DateTimeField(verbose_name='Creation Datetime', editable=False, blank=True, null=False, default=timezone.localtime)
+        null=True)
+    creation_date = models.DateTimeField(verbose_name='Creation Datetime', editable=False, blank=True, null=True, default=timezone.localtime)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)
     remarks = models.TextField(verbose_name="Remarks", blank=True, null=True, default='')
     has_issue = models.BooleanField(verbose_name="Has Issue", default=False)
@@ -256,7 +260,7 @@ class SelfassesmentTracker(models.Model):
         blank=True,
         null=True
         )
-    deadline = models.DateField(verbose_name='Deadline', blank=False, null=False, default=timezone.localtime)
+    deadline = models.DateField(verbose_name='Deadline', blank=False, null=True, default=timezone.localtime)
     is_completed = models.BooleanField(verbose_name='Completed', blank=True, null=False, default=False)
     complete_date = models.DateField(verbose_name='Complete Date', blank=True, null=True)
     done_by = models.ForeignKey(
@@ -345,4 +349,135 @@ class TrackerHasIssues(models.Model):
         related_name='TrackerHasIssues_issue_id',
         blank=False,
         null=False)
-     
+
+
+#############################################################################################################
+class Limited(models.Model):
+
+    class Meta:
+        verbose_name = _("Limited")
+        verbose_name_plural = _("Limiteds")
+    
+    # identifier
+    client_id = models.AutoField(
+        verbose_name='Unique ID for client',
+        primary_key=True,
+        unique=True,
+        blank=True,
+        null=False,
+        editable=False,
+        db_index=True) # auto incrementing primary field
+    created_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.SET_NULL,
+        verbose_name='Created by',
+        related_name='limited_created_by',
+        to_field='user_id',
+        blank=True,
+        null=True)
+
+    date_of_registration = models.DateField(verbose_name='Registration date', blank=False, null=True, default=timezone.localtime)
+    is_active = models.BooleanField(verbose_name='Active Status', blank=False, null=False, default=True)
+    remarks = models.TextField(_("Remarks"), blank=True, null=True)
+    
+    client_file_number = models.DecimalField(verbose_name='File Number', max_digits=19, decimal_places=3, unique=True, blank=False, null=True, editable=True)
+    client_name = models.CharField(verbose_name='Business Name', max_length=100, blank=False, null=False, db_index=True)
+    company_reg_number = models.CharField(verbose_name='Company Registration Number', max_length=100, blank=False, null=True, db_index=True)
+    company_auth_code = models.CharField(verbose_name='Company Authentication Code', max_length=100, blank=False, null=True, db_index=True)
+    
+    # Director Info
+    date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=True)
+    PAYE_number = models.CharField(verbose_name='PAYE Number', max_length=255, blank=True, null=True, unique=True, db_index=True)
+    director_phone_number = models.CharField(verbose_name='Director Phone numbers', max_length=255, blank=False, null=True, db_index=True)
+    director_email = models.EmailField(verbose_name='Director Email', max_length=320, blank=True, null=True)
+    director_address = models.TextField(verbose_name='Director Address', blank=True, null=True, db_index=True)
+    director_post_code =models.CharField(verbose_name='Director Postal Code', max_length=10, blank=True, null=True)
+    gateway_id = models.CharField(verbose_name='Director Gateway ID', max_length=255, blank=True, null=True, unique=True)
+    gateway_password = models.CharField(verbose_name='Gateway Password', max_length=255, blank=True, null=True)
+    
+    # Business Info
+    AOR_number = models.CharField(verbose_name='Account Office Reference number', max_length=511, blank=True, null=True, db_index=True)
+    business_phone_number = models.CharField(verbose_name='Business Phone numbers', max_length=255, blank=True, null=True, db_index=True)
+    business_email = models.EmailField(verbose_name='Business Email', max_length=320, blank=True, null=True)
+    business_address = models.TextField(verbose_name='Business Address', blank=True, null=True, db_index=True)
+    business_post_code = models.CharField(verbose_name='Business Postal Code', max_length=10, blank=True, null=True)
+
+    # HMRC Details
+    HMRC_referance = models.CharField(verbose_name='HMRC Referance', max_length=1023, blank=True, null=True)
+    UTR = models.CharField(
+        verbose_name='UTR',
+        max_length=10,
+        blank=True,
+        null=True,
+        db_index=True,
+        unique=True,
+        validators=[UTR_VALIDATOR])
+    NINO = models.CharField(
+        verbose_name='NINO',
+        max_length=9,
+        blank=True,
+        null=True,
+        unique=True,
+        validators=[NINO_VALIDATOR])
+    HMRC_agent = models.BooleanField(verbose_name="HMRC agent active status", default=False, blank=False, null=False)
+    
+    # Bank Info
+    bank_name = models.CharField(verbose_name='Name of Bank', max_length=100, blank=True, null=True)
+    bank_account_number = models.CharField(
+        verbose_name='Account number in Bank',
+        max_length=8,
+        blank=True,
+        null=True,
+        # unique=True,
+        validators=[BANK_ACCOUNT_NUMBER_VALIDATOR])
+    bank_sort_code = models.CharField(
+        verbose_name='Bank Sort Code',
+        max_length=6,
+        blank=True,
+        null=True,
+        validators=[SORT_CODE_VALIDATOR])
+    bank_account_holder_name = models.CharField(
+        verbose_name='Bank Account Holder Name',
+        max_length=100,
+        blank=True,
+        null=True)
+    
+    vat = models.CharField(
+        verbose_name='VAT',
+        max_length=255,
+        blank=True,
+        null=True)
+
+    def __str__(self) -> str:
+        return f'🏢{self.client_name} 📂{self.client_file_number} ☎{self.director_phone_number} 📭{self.director_post_code}'
+    
+    def __repr__(self) -> str:
+        return str(self)
+
+    # def save(self, *args, **kwargs):
+    #     if not self.bank_account_holder_name:
+    #         self.bank_account_holder_name = self.client_name
+    #     if not type(self.client_file_number)==type(int):
+    #         self.client_file_number = self.client_id
+    #     super().save(*args, **kwargs)
+    
+    def set_defaults(self):
+        if not self.client_file_number:
+            self.client_file_number = Limited.get_max_file_number()
+
+        if not self.bank_account_holder_name:
+            self.bank_account_holder_name = self.client_name
+        self.save()
+
+    @classmethod
+    def get_max_file_number(cls):
+      try:
+        max_num = cls.objects.all().order_by("-client_file_number")[0].client_file_number
+        max_num = int(max_num)
+        return max_num
+      except IndexError:
+        return 0
+    
+    @classmethod
+    def get_next_file_number(cls):
+      return cls.get_max_file_number()+1

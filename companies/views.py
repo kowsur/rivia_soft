@@ -13,9 +13,13 @@ from .forms import SelfassesmentAccountSubmissionCreationForm, SelfassesmentAcco
 from .forms import Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form
 from .forms import SelfassesmentTrackerCreationForm, SelfassesmentTrackerChangeForm, SelfassesmentTrackerDeleteForm
 
+from .forms import LimitedCreationForm, LimitedChangeForm, LimitedDeleteForm
+
 #models
 from .models import Selfassesment, SelfassesmentAccountSubmission
 from .models import SelfassesmentTracker
+
+from .models import Limited
 
 #export
 from .export_models import export_to_csv
@@ -25,10 +29,12 @@ from .queries import db_search_Selfassesment, db_all_Selfassesment
 from .queries import db_search_SelfassesmentAccountSubmission, db_all_SelfassesmentAccountSubmission
 from .queries import db_search_SelfassesmentTracker, db_all_SelfassesmentTracker
 
+from .queries import db_all_Limited, db_search_Limited
+
 # serializers
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import CustomUserSerializer, SelfassesmentSerializer
+from .serializers import CustomUserSerializer, SelfassesmentSerializer, LimitedSerializer
 
 #permissions
 from .decorators import allowed_for_staff, allowed_for_superuser
@@ -56,7 +62,7 @@ URLS = {
 def home_selfassesment(request):
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_id', 'incomplete_tasks', 'is_active', 'client_file_number', 'client_name', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent']
+  include_fields = ['client_id', 'incomplete_tasks', 'vat', 'is_active', 'client_file_number', 'client_name', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent']
   keep_include_fields = True
   show_others = False
   model_fields = get_field_names_from_model(Selfassesment)
@@ -182,7 +188,7 @@ def update_selfassesment(request, client_id:int):
 def delete_selfassesment(request, client_id:int):
   context = {
     **URLS,
-    'page_title': '',
+    'page_title': 'Delete Selfassesment',
     'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_home_name,
     'id': client_id,
     'delete_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_delete_name,
@@ -298,11 +304,11 @@ def create_selfassesment_account_submission(request):
     context['form'] = form
     if form.is_valid():
       assesment = form.save()
-      if not assesment.submitted_by:
-        assesment.submitted_by = request.user
-      assesment.set_defaults()
+      assesment.prepared_by = request.user
       messages.success(request, f'New Selfassesment Account Submission has been created with id {assesment.submission_id}!')
       context['form'] = SelfassesmentAccountSubmissionCreationForm(initial={'submitted_by': request.user.user_id})
+    else:
+      messages.error(request, f'Action failed due to invalid data!')
   return render(request, template_name='companies/create.html', context=context)
 
 @login_required
@@ -329,7 +335,10 @@ def update_selfassesment_account_submission(request, submission_id:int):
     form = SelfassesmentAccountSubmissionChangeForm(request.POST, instance=record)
     context['form'] = form
     if form.is_valid():
-      assesment = form.save()
+      assesment = form.save(commit=False)
+      if assesment.is_submitted and assesment.submitted_by==None:
+        assesment.submitted_by = request.user
+      assesment.save()
       messages.success(request, f'Selfassesment Account Submission has been updated having id {submission_id}!')
     else:
       messages.error(request, f'Updating Selfassesment Account Submission having id {submission_id} failed due to invalid data!')
@@ -641,6 +650,172 @@ def export_selfassesment_tracker(request):
   show_others = True
   export_to_csv(
     django_model = SelfassesmentTracker,
+    write_to = response,
+    include_fields = include_fields,
+    exclude_fields = exclude_fields,
+    keep_include_fields = keep_include_fields,
+    show_others = show_others
+    )
+  return response
+
+
+# =============================================================================================================
+# =============================================================================================================
+# Limited
+@login_required
+def home_limited(request):
+  pk_field = 'client_id'
+  exclude_fields = []
+  include_fields = ['client_id', 'incomplete_tasks', 'is_active', 'client_file_number', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent']
+  keep_include_fields = True
+  show_others = False
+  model_fields = get_field_names_from_model(Limited)
+  model_fields.append('incomplete_tasks')
+  context = {
+    **URLS,
+    'model_fields': model_fields,
+    'template_tag': generate_template_tag_for_model(Limited, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+    'data_container': generate_data_container_table(Limited, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+
+    'caption': 'View Limited',
+    'page_title': 'View Limited',
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_create_name,
+    'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_export_name,
+    'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
+    'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
+    'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url,
+    'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_delete_url,
+  }
+  return render(request=request, template_name='companies/home.html', context=context)
+
+@login_required
+def view_limited(request):
+  return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name)
+
+@login_required
+def create_limited(request):
+  context = {
+    **URLS,
+    'page_title': 'Create Limited',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name,
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_create_name,
+    'form_title': 'Limited Account Year Assign Form',
+    'form': LimitedCreationForm(initial={'client_file_number': Limited.get_next_file_number()})
+  }
+
+  if request.method == 'POST':
+    form = LimitedCreationForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      assesment = form.save()
+      assesment.set_defaults()
+      assesment.created_by = request.user
+      assesment.save()
+      messages.success(request, f"New Limited has been created {assesment}!")
+
+      context['form'] = LimitedCreationForm(initial={'client_file_number': Limited.get_next_file_number()})
+  return render(request, template_name='companies/create.html', context=context)
+
+@login_required
+def get_details_limited(request, client_id=None):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    record = get_object_or_404(Limited, client_id=client_id)
+    response = LimitedSerializer(instance=record).data
+    return HttpResponse(json.dumps(response))
+  raise Http404
+
+@login_required
+def update_limited(request, client_id:int):
+  context = {
+    **URLS,
+    'page_title': f'Update Limited',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name,
+    'id': client_id,
+    'update_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_update_name,
+    'form_title': 'Limited Update Form',
+    'form': LimitedChangeForm()
+  }
+
+  try:
+    record =  Limited.objects.get(client_id=client_id)
+    context['form'] = LimitedChangeForm(instance=record)
+  except Limited.DoesNotExist:
+    messages.error(request, f'Limited Account having id {client_id} does not exists!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name)
+    raise Http404
+
+  if request.method == 'POST':
+    form = LimitedChangeForm(request.POST, instance=record)
+    context['form'] = form
+    if form.is_valid():
+      assesment = form.save()
+      messages.success(request, f'Limited has been updated having id {client_id}!')
+    else:
+      messages.error(request, f'Updating Limited {client_id} failed due to invalid data!')
+  return render(request, template_name='companies/update.html', context=context)
+
+@login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to delete this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name)
+def delete_limited(request, client_id:int):
+  context = {
+    **URLS,
+    'page_title': 'Delte Limited',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name,
+    'id': client_id,
+    'delete_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_delete_name,
+    'form_title': "Limited Delete Form",
+    'form': LimitedDeleteForm()
+  }
+  try:
+    record =  Limited.objects.get(client_id=client_id)
+  except Limited.DoesNotExist:
+    messages.error(request, f'Limited record with id {client_id}, you are looking for does not exist!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name)
+
+  if request.method == 'POST':
+    form = LimitedDeleteForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      record.delete()
+      messages.success(request, f'Limited has been deleted having id {client_id}!')
+    else:
+      messages.error(request, f'Limited deletion of id {client_id} failed!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name)
+  return render(request, template_name='companies/delete.html', context=context)
+
+@login_required
+def search_limited(request, limit: int=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    search_text = request.GET.get('q', '')
+    if search_text.strip()=='':
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_viewall_name)
+    records = db_search_Limited(search_text, limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
+
+@login_required
+def all_limited(request, limit=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    records = db_all_Limited(limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
+
+@login_required
+def export_limited(request):
+  response = HttpResponse(
+    content_type='text/csv',
+    headers={'Content-Disposition': f'attachment; filename="limited_{timezone.localtime()}.csv"'},
+  )
+  include_fields = ['is_active', 'client_file_number', 'client_name', 'company_reg_number', 'company_auth_code', 'remakrs', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent']
+  exclude_fields = ['client_id',]
+  keep_include_fields = True
+  show_others = False
+  export_to_csv(
+    django_model = Limited,
     write_to = response,
     include_fields = include_fields,
     exclude_fields = exclude_fields,

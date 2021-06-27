@@ -1,6 +1,6 @@
 from django.db.models import Q
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
-from .models import Limited
+from .models import Limited, LimitedTracker
 
 # =============================================================================================================
 # =============================================================================================================
@@ -168,3 +168,42 @@ def db_all_Limited(limit=-1):
     if limit<=-1:
         return Limited.objects.all()
     return Limited.objects.all()[:limit]
+
+
+# =============================================================================================================
+# =============================================================================================================
+# LimitedTracker
+def db_search_LimitedTracker(search_text: str, user_email='', is_superuser=False, limit=-1):
+    Query = Q(job_description__icontains                  = search_text) |\
+            Q(deadline__icontains                         = search_text) |\
+            Q(client_id__client_name__icontains           = search_text) |\
+            Q(client_id__director_phone_number__icontains = search_text) |\
+            Q(client_id__business_phone_number__icontains = search_text) |\
+            Q(client_id__client_file_number__icontains    = search_text) |\
+            Q(created_by__first_name__icontains           = search_text) |\
+            Q(created_by__last_name__icontains            = search_text) |\
+            Q(done_by__first_name__icontains              = search_text) |\
+            Q(done_by__last_name__icontains               = search_text)
+    
+    # # created by should be the current logged in user
+    # if not is_superuser:
+    #     Query &= Q(created_by__email = user_email)
+    
+    # Filter records from db using query
+    if limit==-1:
+        records = LimitedTracker.objects.filter(Query)
+    else:
+        records = LimitedTracker.objects.filter(Query)[:limit]
+    return records.order_by('is_completed', '-pk')
+
+def db_all_LimitedTracker(user_email='', is_superuser=False, limit=-1):
+    Query = Q()
+    # # created by should be the current logged in user
+    # if not is_superuser:
+    #     Query = Query & Q(created_by__email = user_email)
+    
+    if limit==-1:
+        records = LimitedTracker.objects.filter(Query)
+    else:
+        records = LimitedTracker.objects.filter(Query)[:limit]
+    return records.order_by('is_completed', '-pk')

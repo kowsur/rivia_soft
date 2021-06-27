@@ -481,3 +481,67 @@ class Limited(models.Model):
     @classmethod
     def get_next_file_number(cls):
       return cls.get_max_file_number()+1
+
+
+class LimitedTracker(models.Model):
+
+    class Meta:
+        verbose_name = _("Limited Tracker")
+        verbose_name_plural = _("Limited Trackers")
+
+    tracker_id = models.AutoField(verbose_name = 'Tracker ID', blank=True, null=False, primary_key=True, db_index=True)
+    client_id = models.ForeignKey(
+        to='companies.Limited',
+        on_delete=models.CASCADE,
+        verbose_name='Client ID',
+        to_field='client_id',
+        related_name='limited_tracker_client_id',
+        blank=False,
+        null=True)
+    creation_date = models.DateTimeField(verbose_name='Creation Datetime', editable=False, blank=True, null=True, default=timezone.localtime)
+    job_description = models.TextField(verbose_name='Description', blank=True, null=True)
+    remarks = models.TextField(verbose_name="Remarks", blank=True, null=True, default='')
+    has_issue = models.BooleanField(verbose_name="Has Issue", default=False)
+    issue_created_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.SET_NULL,
+        verbose_name='Issue Created By',
+        related_name='limited_tracker_issue_created_by',
+        to_field='user_id',
+        editable=False,
+        blank=True,
+        null=True
+        )
+    deadline = models.DateField(verbose_name='Deadline', blank=False, null=True, default=timezone.localtime)
+    is_completed = models.BooleanField(verbose_name='Completed', blank=True, null=False, default=False)
+    complete_date = models.DateField(verbose_name='Complete Date', blank=True, null=True)
+    done_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.SET_NULL,
+        verbose_name='Done By',
+        related_name='limited_tracker_done_by',
+        to_field='user_id',
+        blank=True,
+        null=True)
+    created_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Created By',
+        related_name='limited_tracker_created_by',
+        to_field='user_id',
+        blank=False,
+        null=True)
+    assigned_to = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Assigned to',
+        related_name='limited_tracker_assigned_to',
+        to_field='user_id',
+        blank=True,
+        null=True)
+    new_customer = models.BooleanField(verbose_name="New customer", blank=True, editable=False, default=False, null=True)
+
+    def __str__(self) -> str:
+        if self.job_description:
+            return f"{self.job_description}"
+        return f"Deadline: {self.deadline} | Created By: {self.created_by}"

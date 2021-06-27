@@ -1,5 +1,6 @@
 from django.db.models import Q
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
+from .models import Limited
 
 # =============================================================================================================
 # =============================================================================================================
@@ -118,3 +119,52 @@ def db_all_SelfassesmentTracker(user_email='', is_superuser=False, limit=-1):
     else:
         records = SelfassesmentTracker.objects.filter(Query)[:limit]
     return records.order_by('is_completed', '-pk')
+
+
+
+# =============================================================================================================
+# =============================================================================================================
+# Limited
+def db_search_Limited(search_text: str, limit=-1):
+    Query = Q(date_of_registration__icontains          = search_text) |\
+            Q(remarks__icontains                       = search_text) |\
+            Q(client_name__icontains                   = search_text) |\
+            Q(company_reg_number__icontains            = search_text) |\
+            Q(company_auth_code__icontains             = search_text) |\
+            Q(date_of_birth__icontains                 = search_text) |\
+            Q(PAYE_number__icontains                   = search_text) |\
+            Q(director_phone_number__icontains         = search_text) |\
+            Q(director_email__icontains                = search_text) |\
+            Q(director_address__icontains              = search_text) |\
+            Q(director_post_code__icontains            = search_text) |\
+            Q(AOR_number__icontains                    = search_text) |\
+            Q(business_phone_number__icontains         = search_text) |\
+            Q(business_email__icontains                = search_text) |\
+            Q(business_address__icontains              = search_text) |\
+            Q(business_post_code__icontains            = search_text) |\
+            Q(HMRC_agent__icontains                    = search_text) |\
+            Q(HMRC_referance__icontains                = search_text) |\
+            Q(UTR__icontains                           = search_text) |\
+            Q(NINO__icontains                          = search_text) |\
+            Q(gateway_id__icontains                    = search_text) |\
+            Q(gateway_password__icontains              = search_text) |\
+            Q(bank_name__icontains                     = search_text) |\
+            Q(bank_account_number__icontains           = search_text) |\
+            Q(bank_sort_code__icontains                = search_text) |\
+            Q(bank_account_holder_name__icontains      = search_text)
+
+    try:
+        num = float(search_text)
+        Query |= Q(client_id          = num) |\
+                 Q(client_file_number = num)
+    except Exception:
+        pass
+    
+    if limit==-1:
+        return Limited.objects.filter(Query)
+    return Limited.objects.filter(Query)[:limit]
+
+def db_all_Limited(limit=-1):
+    if limit<=-1:
+        return Limited.objects.all()
+    return Limited.objects.all()[:limit]

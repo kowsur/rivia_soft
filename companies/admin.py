@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker, SelfassesmentType
+from .models import Limited
 
 
 admin.site.register(SelfassesmentType)
@@ -198,3 +199,6 @@ class SelfassesmentAccountSubmissionAdmin(admin.ModelAdmin):
     'is_submitted')
   ordering = ('tax_year', 'is_submitted', 'is_paid')
 admin.site.register(SelfassesmentAccountSubmission, SelfassesmentAccountSubmissionAdmin)
+
+
+admin.site.register(Limited)

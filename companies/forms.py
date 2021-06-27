@@ -1,10 +1,12 @@
 from django.utils.translation import ugettext_lazy as _
 from django import forms
-from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from .fields import SearchableModelField, Select, Fieldset
 from .url_variables import Full_URL_PATHS_WITHOUT_ARGUMENTS
+
+from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
+from .models import Limited
 
 # dummy import
 # next line before migrating
@@ -416,4 +418,162 @@ class SelfassesmentTrackerDeleteForm(forms.ModelForm):
     agree = forms.BooleanField(label='I want to proceed.', required=True)
     class Meta:
         model = Selfassesment
+        fields = ()
+
+##################################################################################################
+class LimitedCreationForm(forms.ModelForm):
+    date_of_registration = forms.DateField(
+        label='Registration date',
+        widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today, 'placehoder': 'Registration date'})
+    )
+    date_of_birth = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date',})
+    )
+
+    class Meta:
+        model = Limited
+        fields = (
+            # 'client_id',
+            # 'created_by',
+            # 'is_updated',
+            'date_of_registration',
+            'is_active',
+            'remarks',
+
+            'client_file_number',
+            'client_name',
+            'company_reg_number',
+            'company_auth_code',
+
+            'date_of_birth',
+            'PAYE_number',
+            'director_phone_number',
+            'director_email',
+            'director_address',
+            'director_post_code',
+
+            'AOR_number',
+            'business_phone_number',
+            'business_email',
+            'business_address',
+            'business_post_code',
+
+            'HMRC_agent',
+            'HMRC_referance',
+            'UTR',
+            'NINO',
+            'gateway_id',
+            'gateway_password',
+            
+            'bank_name',
+            'bank_account_number',
+            'bank_sort_code',
+            'bank_account_holder_name',
+
+            'vat',
+            )
+        fieldsets = (
+            Fieldset(
+                title = 'Client Info',
+                fields = ('client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', )
+                ),
+            Fieldset(
+                title = 'Personal Info',
+                fields = ('date_of_birth', 'director_phone_number', 'director_email', 'director_address', 'director_post_code', )
+                ),
+            Fieldset(
+                title = 'HMRC Details',
+                fields =  ('HMRC_referance', 'UTR', 'NINO', 'HMRC_agent', 'gateway_id', 'gateway_password', )
+            ),
+            Fieldset(
+                title = 'Business Info', 
+                fields = ('business_phone_number', 'business_email', 'business_address', 'business_post_code', 'PAYE_number', 'AOR_number', )
+                ),
+            Fieldset(
+                title = 'Bank Info',
+                fields = ('bank_name', 'bank_account_number', 'bank_sort_code', 'bank_account_holder_name', 'vat',)
+                ),
+        )
+
+
+class LimitedChangeForm(forms.ModelForm):
+    date_of_registration = forms.DateField(
+        label='Registration date',
+        widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today, 'placehoder': 'Registration date'})
+    )
+    date_of_birth = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date',})
+    )
+    
+    class Meta:
+        model = Limited
+        fields = (
+            # 'client_id',
+            # 'created_by',
+            # 'is_updated',
+            'date_of_registration',
+            'is_active',
+            'remarks',
+
+            'client_file_number',
+            'client_name',
+            'company_reg_number',
+            'company_auth_code',
+
+            'date_of_birth',
+            'PAYE_number',
+            'director_phone_number',
+            'director_email',
+            'director_address',
+            'director_post_code',
+
+            'AOR_number',
+            'business_phone_number',
+            'business_email',
+            'business_address',
+            'business_post_code',
+
+            'HMRC_agent',
+            'HMRC_referance',
+            'UTR',
+            'NINO',
+            'gateway_id',
+            'gateway_password',
+            
+            'bank_name',
+            'bank_account_number',
+            'bank_sort_code',
+            'bank_account_holder_name',
+
+            'vat',
+            )
+        fieldsets = (
+            Fieldset(
+                title = 'Client Info',
+                fields = ('client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', )
+                ),
+            Fieldset(
+                title = 'Personal Info',
+                fields = ('date_of_birth', 'director_phone_number', 'director_email', 'director_address', 'director_post_code', )
+                ),
+            Fieldset(
+                title = 'HMRC Details',
+                fields =  ('HMRC_referance', 'UTR', 'NINO', 'HMRC_agent', 'gateway_id', 'gateway_password', )
+            ),
+            Fieldset(
+                title = 'Business Info', 
+                fields = ('business_phone_number', 'business_email', 'business_address', 'business_post_code', 'PAYE_number', 'AOR_number', )
+                ),
+            Fieldset(
+                title = 'Bank Info',
+                fields = ('bank_name', 'bank_account_number', 'bank_sort_code', 'bank_account_holder_name', 'vat',)
+                ),
+        )
+
+class LimitedDeleteForm(forms.ModelForm):
+    agree = forms.BooleanField(label='I want to proceed.', required=True)
+    class Meta:
+        model = Limited
         fields = ()

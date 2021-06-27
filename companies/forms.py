@@ -11,7 +11,7 @@ from .models import Limited, LimitedTracker
 from .repr_formats import Forms
 
 # dummy import
-# next line before migrating
+# uncomment next line before migrating
 # from .dummy_class import *
 
 
@@ -478,7 +478,7 @@ class LimitedCreationForm(forms.ModelForm):
                 fields = ('client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', )
                 ),
             Fieldset(
-                title = 'Personal Info',
+                title = 'Director Info',
                 fields = ('date_of_birth', 'director_phone_number', 'director_email', 'director_address', 'director_post_code', )
                 ),
             Fieldset(
@@ -554,7 +554,7 @@ class LimitedChangeForm(forms.ModelForm):
                 fields = ('client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', )
                 ),
             Fieldset(
-                title = 'Personal Info',
+                title = 'Director Info',
                 fields = ('date_of_birth', 'director_phone_number', 'director_email', 'director_address', 'director_post_code', )
                 ),
             Fieldset(

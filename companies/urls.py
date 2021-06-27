@@ -16,6 +16,20 @@ from .views import home_selfassesment_account_submission, create_selfassesment_a
 from .views import home_selfassesment_tracker, create_selfassesment_tracker, update_selfassesment_tracker, \
     delete_selfassesment_tracker, search_selfassesment_tracker, all_selfassesment_tracker, export_selfassesment_tracker
 
+# limited view functions
+from .views import home_limited, create_limited, update_limited, \
+    delete_limited, search_limited, all_limited, get_details_limited, \
+    export_limited
+
+# # limited account submission view function
+# from .views import home_limited_account_submission, create_limited_account_submission, \
+#     update_limited_account_submission, delete_limited_account_submission,               \
+#     search_limited_account_submission, all_limited_account_submission,                  \
+#     export_limited_account_submission, add_all_limited_to_limited_account_submission_w_submission_year
+
+# # limited tracker
+# from .views import home_limited_tracker, create_limited_tracker, update_limited_tracker, \
+#     delete_limited_tracker, search_limited_tracker, all_limited_tracker, export_limited_tracker
 
 from .url_variables import APPLICATION_NAME, URL_PATHS, URL_NAMES
 from .url_variables import *
@@ -133,4 +147,110 @@ urlpatterns = [
         view = export_selfassesment_tracker,
         name = URL_NAMES.Selfassesment_Tracker_export_name
     ),
+
+
+    # =============================================================================================================
+    # =============================================================================================================
+    # Limited
+    path(route = URL_PATHS.Limited_home_url,
+        view = home_limited,
+        name = URL_NAMES.Limited_home_name),
+
+    path(route = URL_PATHS.Limited_create_url,
+        view = create_limited,
+        name = URL_NAMES.Limited_create_name),
+
+    path(route = URL_PATHS.Limited_details_url,
+        view = get_details_limited,
+        name = URL_NAMES.Limited_details_name
+    ),
+
+    path(route = URL_PATHS.Limited_update_url,
+        view = update_limited,
+        name = URL_NAMES.Limited_update_name),
+
+    path(route = URL_PATHS.Limited_delete_url,
+        view = delete_limited,
+        name= URL_NAMES.Limited_delete_name),
+
+    path(route = URL_PATHS.Limited_search_url,
+        view = search_limited,
+        name = URL_NAMES.Limited_search_name), # fetch only
+
+    path(route = URL_PATHS.Limited_viewall_url,
+        view = all_limited,
+        name = URL_NAMES.Limited_viewall_name), # fetch only
+    
+    path(route = URL_PATHS.Limited_export_url,
+        view = export_limited,
+        name = URL_NAMES.Limited_export_name
+    ),
+
+
+    # # LimitedAccountSubmission
+    # path(route = URL_PATHS.Limited_Account_Submission_home_url,
+    #     view = home_limited_account_submission,
+    #     name = URL_NAMES.Limited_Account_Submission_home_name),
+
+    # path(route = URL_PATHS.Limited_Account_Submission_create_url,
+    #     view = create_limited_account_submission,
+    #     name = URL_NAMES.Limited_Account_Submission_create_name),
+
+    # path(route = URL_PATHS.Limited_Account_Submission_update_url,
+    #     view = update_limited_account_submission,
+    #     name = URL_NAMES.Limited_Account_Submission_update_name),
+
+    # path(route = URL_PATHS.Limited_Account_Submission_delete_url,
+    #     view = delete_limited_account_submission,
+    #     name = URL_NAMES.Limited_Account_Submission_delete_name),
+
+    # path(route = URL_PATHS.Limited_Account_Submission_search_url,
+    #     view = search_limited_account_submission,
+    #     name = URL_NAMES.Limited_Account_Submission_search_name),
+
+    # path(route = URL_PATHS.Limited_Account_Submission_viewall_url,
+    #     view = all_limited_account_submission,
+    #     name = URL_NAMES.Limited_Account_Submission_viewall_name),
+    
+    # path(route = URL_PATHS.Limited_Account_Submission_export_url,
+    #     view = export_limited_account_submission,
+    #     name = URL_NAMES.Limited_Account_Submission_export_name
+    # ),
+
+    # # Add all Limited to LimitedAccountSubmission
+    # path(route = URL_PATHS.add_all_Limited_to_Limited_Account_Submission_url,
+    #     view = add_all_limited_to_limited_account_submission_w_submission_year,
+    #     name = URL_NAMES.add_all_Limited_to_Limited_Account_Submission_name),
+
+
+    # # =============================================================================================================
+    # # LimitedTracker
+    # path(route = URL_PATHS.Limited_Tracker_home_url,
+    #     view = home_limited_tracker,
+    #     name = URL_NAMES.Limited_Tracker_home_name),
+
+    # path(route = URL_PATHS.Limited_Tracker_create_url,
+    #     view = create_limited_tracker,
+    #     name = URL_NAMES.Limited_Tracker_create_name),
+
+    # path(route = URL_PATHS.Limited_Tracker_update_url,
+    #     view = update_limited_tracker,
+    #     name = URL_NAMES.Limited_Tracker_update_name),
+
+    # path(route = URL_PATHS.Limited_Tracker_delete_url,
+    #     view = delete_limited_tracker,
+    #     name = URL_NAMES.Limited_Tracker_delete_name),
+
+    # path(route = URL_PATHS.Limited_Tracker_search_url,
+    #     view = search_limited_tracker,
+    #     name = URL_NAMES.Limited_Tracker_search_name),
+
+    # path(route = URL_PATHS.Limited_Tracker_viewall_url,
+    #     view = all_limited_tracker,
+    #     name = URL_NAMES.Limited_Tracker_viewall_name),
+    
+    # path(route = URL_PATHS.Limited_Tracker_export_url,
+    #     view = export_limited_tracker,
+    #     name = URL_NAMES.Limited_Tracker_export_name
+    # ),
 ]

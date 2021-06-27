@@ -27,8 +27,8 @@ Limited_name = 'LTD'
 Limited_Account_Submission_path = 'LAS'
 Limited_Account_Submission_name = 'LAS'
 
-LimitedTracker_path = 'LTDTrc'
-LimitedTracker_name = 'LTDTrc'
+Limited_Tracker_path = 'LTDTrc'
+Limited_Tracker_name = 'LTDTrc'
 
 
 class Dict_Duck_type:
@@ -81,6 +81,35 @@ class URL_PATHS(Dict_Duck_type):
   Selfassesment_Tracker_export_url = f'{Selfassesment_Tracker_path}/{export_suffix}/'
 
 
+  # Limited
+  Limited_home_url = f'{Limited_path}/{home_suffix}/'
+  Limited_create_url = f'{Limited_path}/{create_suffix}/'
+  Limited_details_url = f'{Limited_path}/{details_suffix}/<int:client_id>/'
+  Limited_update_url = f'{Limited_path}/{update_suffix}/<int:client_id>/'
+  Limited_delete_url = f'{Limited_path}/{delete_suffix}/<int:client_id>/'
+  Limited_search_url = f'{Limited_path}/{search_suffix}/' # fetch only
+  Limited_viewall_url = f'{Limited_path}/{viewall_suffix}/' # fetch only
+  Limited_export_url = f'{Limited_path}/{export_suffix}/'
+
+  # Limited Account Submission
+  Limited_Account_Submission_home_url = f'{Limited_Account_Submission_path}/{home_suffix}/'
+  Limited_Account_Submission_create_url = f'{Limited_Account_Submission_path}/{create_suffix}/'
+  Limited_Account_Submission_update_url = f'{Limited_Account_Submission_path}/{update_suffix}/<int:submission_id>/'
+  Limited_Account_Submission_delete_url = f'{Limited_Account_Submission_path}/{delete_suffix}/<int:submission_id>/'
+  Limited_Account_Submission_search_url = f'{Limited_Account_Submission_path}/{search_suffix}/' # fetch only
+  Limited_Account_Submission_viewall_url = f'{Limited_Account_Submission_path}/{viewall_suffix}/' # fetch only
+  Limited_Account_Submission_export_url = f'{Limited_Account_Submission_path}/{export_suffix}/'
+  add_all_Limited_to_Limited_Account_Submission_url = f'add_all/{Limited_path}/to/{Limited_Account_Submission_path}/'
+
+  # Tracker
+  Limited_Tracker_home_url = f'{Limited_Tracker_path}/{home_suffix}/'
+  Limited_Tracker_create_url = f'{Limited_Tracker_path}/{create_suffix}/'
+  Limited_Tracker_update_url = f'{Limited_Tracker_path}/{update_suffix}/<int:tracker_id>/'
+  Limited_Tracker_delete_url = f'{Limited_Tracker_path}/{delete_suffix}/<int:tracker_id>/'
+  Limited_Tracker_search_url = f'{Limited_Tracker_path}/{search_suffix}/' # fetch only
+  Limited_Tracker_viewall_url = f'{Limited_Tracker_path}/{viewall_suffix}/' # fetch only
+  Limited_Tracker_export_url = f'{Limited_Tracker_path}/{export_suffix}/'
+
 
 # Only use in urls.py to set url names
 class URL_NAMES(Dict_Duck_type):
@@ -114,6 +143,36 @@ class URL_NAMES(Dict_Duck_type):
   Selfassesment_Tracker_export_name = f'{Selfassesment_Tracker_name}_{export_suffix}'
 
 
+  # Limited
+  Limited_home_name = f'{Limited_name}_{home_suffix}'
+  Limited_create_name = f'{Limited_name}_{create_suffix}'
+  Limited_details_name = f'{Limited_path}_{details_suffix}'
+  Limited_update_name = f'{Limited_name}_{update_suffix}'
+  Limited_delete_name = f'{Limited_name}_{delete_suffix}'
+  Limited_search_name = f'{Limited_name}_{search_suffix}' # fetch only
+  Limited_viewall_name = f'{Limited_name}_{viewall_suffix}' # fetch only
+  Limited_export_name = f'{Limited_name}_{export_suffix}'
+
+  # Limited Account Submission
+  Limited_Account_Submission_home_name = f'{Limited_Account_Submission_name}_{home_suffix}'
+  Limited_Account_Submission_create_name = f'{Limited_Account_Submission_name}_{create_suffix}'
+  Limited_Account_Submission_update_name = f'{Limited_Account_Submission_name}_{update_suffix}'
+  Limited_Account_Submission_delete_name = f'{Limited_Account_Submission_name}_{delete_suffix}'
+  Limited_Account_Submission_search_name = f'{Limited_Account_Submission_name}_{search_suffix}' # fetch only
+  Limited_Account_Submission_viewall_name = f'{Limited_Account_Submission_name}_{viewall_suffix}' # fetch only
+  Limited_Account_Submission_export_name = f'{Limited_Account_Submission_name}_{export_suffix}'
+  add_all_Limited_to_Limited_Account_Submission_name = f'add_all_{Limited_name}_to_{Limited_Account_Submission_name}'
+
+  # Tracker
+  Limited_Tracker_home_name = f'{Limited_Tracker_name}_{home_suffix}'
+  Limited_Tracker_create_name = f'{Limited_Tracker_name}_{create_suffix}'
+  Limited_Tracker_update_name = f'{Limited_Tracker_name}_{update_suffix}'
+  Limited_Tracker_delete_name = f'{Limited_Tracker_name}_{delete_suffix}'
+  Limited_Tracker_search_name = f'{Limited_Tracker_name}_{search_suffix}' # fetch only
+  Limited_Tracker_viewall_name = f'{Limited_Tracker_name}_{viewall_suffix}' # fetch only
+  Limited_Tracker_export_name = f'{Limited_Tracker_name}_{export_suffix}'
+
+
 # Should be passed in templates for JavaScript to fetch() api calls
 class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
   # Selfassesment
@@ -125,7 +184,6 @@ class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
   Selfassesment_search_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{search_suffix}/' # fetch only
   Selfassesment_viewall_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{viewall_suffix}/' # fetch only
   Selfassesment_export_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{export_suffix}/'
-
 
   # Selfassesment Account Submission
   Selfassesment_Account_Submission_home_url = f'/{APPLICATION_NAME}/{Selfassesment_Account_Submission_path}/{home_suffix}/'
@@ -147,6 +205,36 @@ class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
   Selfassesment_Tracker_export_url = f'/{APPLICATION_NAME}/{Selfassesment_Tracker_path}/{export_suffix}/'
 
 
+  # Limited
+  Limited_home_url = f'/{APPLICATION_NAME}/{Limited_path}/{home_suffix}/'
+  Limited_create_url = f'/{APPLICATION_NAME}/{Limited_path}/{create_suffix}/'
+  Limited_details_url = f'/{APPLICATION_NAME}/{Limited_path}/{details_suffix}/'
+  Limited_update_url = f'/{APPLICATION_NAME}/{Limited_path}/{update_suffix}/'
+  Limited_delete_url = f'/{APPLICATION_NAME}/{Limited_path}/{delete_suffix}/'
+  Limited_search_url = f'/{APPLICATION_NAME}/{Limited_path}/{search_suffix}/' # fetch only
+  Limited_viewall_url = f'/{APPLICATION_NAME}/{Limited_path}/{viewall_suffix}/' # fetch only
+  Limited_export_url = f'/{APPLICATION_NAME}/{Limited_path}/{export_suffix}/'
+
+  # Limited Account Submission
+  Limited_Account_Submission_home_url = f'/{APPLICATION_NAME}/{Limited_Account_Submission_path}/{home_suffix}/'
+  Limited_Account_Submission_create_url = f'/{APPLICATION_NAME}/{Limited_Account_Submission_path}/{create_suffix}/'
+  Limited_Account_Submission_update_url = f'/{APPLICATION_NAME}/{Limited_Account_Submission_path}/{update_suffix}/'
+  Limited_Account_Submission_delete_url = f'/{APPLICATION_NAME}/{Limited_Account_Submission_path}/{delete_suffix}/'
+  Limited_Account_Submission_search_url = f'/{APPLICATION_NAME}/{Limited_Account_Submission_path}/{search_suffix}/' # fetch only
+  Limited_Account_Submission_viewall_url = f'/{APPLICATION_NAME}/{Limited_Account_Submission_path}/{viewall_suffix}/' # fetch only
+  Limited_Account_Submission_export_url = f'/{APPLICATION_NAME}/{Limited_Account_Submission_path}/{export_suffix}/'
+  add_all_Limited_to_Limited_Account_Submission_url = f'add_all/{Limited_path}/to/{Limited_Account_Submission_path}/'
+
+  # Tracker
+  Limited_Tracker_home_url = f'/{APPLICATION_NAME}/{Limited_Tracker_path}/{home_suffix}/'
+  Limited_Tracker_create_url = f'/{APPLICATION_NAME}/{Limited_Tracker_path}/{create_suffix}/'
+  Limited_Tracker_update_url = f'/{APPLICATION_NAME}/{Limited_Tracker_path}/{update_suffix}/'
+  Limited_Tracker_delete_url = f'/{APPLICATION_NAME}/{Limited_Tracker_path}/{delete_suffix}/'
+  Limited_Tracker_search_url = f'/{APPLICATION_NAME}/{Limited_Tracker_path}/{search_suffix}/' # fetch only
+  Limited_Tracker_viewall_url = f'/{APPLICATION_NAME}/{Limited_Tracker_path}/{viewall_suffix}/' # fetch only
+  Limited_Tracker_export_url = f'/{APPLICATION_NAME}/{Limited_Tracker_path}/{export_suffix}/'
+
+
 # Should be used in templates to reffer to links
 class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
   # Selfassesment
@@ -158,7 +246,6 @@ class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
   Selfassesment_search_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{search_suffix}' # fetch only
   Selfassesment_viewall_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{viewall_suffix}' # fetch only
   Selfassesment_export_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{export_suffix}'
-
 
   # Selfassesment Account Submission
   Selfassesment_Account_Submission_home_name = f'{APPLICATION_NAME}:{Selfassesment_Account_Submission_name}_{home_suffix}'
@@ -180,39 +267,31 @@ class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
   Selfassesment_Tracker_export_name = f'{APPLICATION_NAME}:{Selfassesment_Tracker_name}_{export_suffix}'
 
 
+  # Limited
+  Limited_home_name = f'{APPLICATION_NAME}:{Limited_name}_{home_suffix}'
+  Limited_create_name = f'{APPLICATION_NAME}:{Limited_name}_{create_suffix}'
+  Limited_details_name = f'{APPLICATION_NAME}:{Limited_path}_{details_suffix}'
+  Limited_update_name = f'{APPLICATION_NAME}:{Limited_name}_{update_suffix}'
+  Limited_delete_name = f'{APPLICATION_NAME}:{Limited_name}_{delete_suffix}'
+  Limited_search_name = f'{APPLICATION_NAME}:{Limited_name}_{search_suffix}' # fetch only
+  Limited_viewall_name = f'{APPLICATION_NAME}:{Limited_name}_{viewall_suffix}' # fetch only
+  Limited_export_name = f'{APPLICATION_NAME}:{Limited_name}_{export_suffix}'
 
-def gen_urls(
-    prefixes=['Selfassesment', 'Selfassesment_Account_Submission', 'Selfassesment_Tracker'],
-    paths=['home', 'create', 'viewall'],
-    paths_w_args=['update', 'delete'],
-    id_param='<int:client_id>',
-    search='search',
-    open='{',
-    close='}'):
-  for prefix in prefixes:
-    for path in paths:
-      print(f"{prefix}_{path}_url = f'{open}{prefix}_path{close}/{open}{path}_suffix{close}/'")
-    for path in paths_w_args:
-      print(f"{prefix}_{path}_url = f'{open}{prefix}_path{close}/{open}{path}_suffix{close}/{id_param}/'")
-    print(f"{prefix}_search_url = f'{open}{prefix}_path{close}/{open}{search}_suffix{close}/'")
-    print('')
+  # Limited Account Submission
+  Limited_Account_Submission_home_name = f'{APPLICATION_NAME}:{Limited_Account_Submission_name}_{home_suffix}'
+  Limited_Account_Submission_create_name = f'{APPLICATION_NAME}:{Limited_Account_Submission_name}_{create_suffix}'
+  Limited_Account_Submission_update_name = f'{APPLICATION_NAME}:{Limited_Account_Submission_name}_{update_suffix}'
+  Limited_Account_Submission_delete_name = f'{APPLICATION_NAME}:{Limited_Account_Submission_name}_{delete_suffix}'
+  Limited_Account_Submission_search_name = f'{APPLICATION_NAME}:{Limited_Account_Submission_name}_{search_suffix}' # fetch only
+  Limited_Account_Submission_viewall_name = f'{APPLICATION_NAME}:{Limited_Account_Submission_name}_{viewall_suffix}' # fetch only
+  Limited_Account_Submission_export_name = f'{APPLICATION_NAME}:{Limited_Account_Submission_name}_{export_suffix}'
+  add_all_Limited_to_Limited_Account_Submission_name = f'{APPLICATION_NAME}:add_all_{Limited_name}_to_{Limited_Account_Submission_name}'
 
-def gen_names(
-    prefixes=['Selfassesment', 'Selfassesment_Account_Submission', 'Selfassesment_Tracker'],
-    paths=['home', 'create', 'update', 'delete', 'search', 'viewall'],
-    open='{',
-    close='}'):
-  for prefix in prefixes:
-    for path in paths:
-      print(f"{prefix}_{path}_name = f'{open}{prefix}_name{close}_{open}{path}_suffix{close}'")
-    print('')
-
-def gen_names(
-    prefixes=['Selfassesment', 'Selfassesment_Account_Submission', 'Selfassesment_Tracker'],
-    paths=['home', 'create', 'update', 'delete', 'search', 'viewall'],
-    open='{',
-    close='}'):
-  for prefix in prefixes:
-    for path in paths:
-      print(f"{prefix}_{path}_name = f'{open}APPLICATION_NAME{close}:{open}{prefix}_name{close}_{open}{path}_suffix{close}'")
-    print('')
+  # Tracker
+  Limited_Tracker_home_name = f'{APPLICATION_NAME}:{Limited_Tracker_name}_{home_suffix}'
+  Limited_Tracker_create_name = f'{APPLICATION_NAME}:{Limited_Tracker_name}_{create_suffix}'
+  Limited_Tracker_update_name = f'{APPLICATION_NAME}:{Limited_Tracker_name}_{update_suffix}'
+  Limited_Tracker_delete_name = f'{APPLICATION_NAME}:{Limited_Tracker_name}_{delete_suffix}'
+  Limited_Tracker_search_name = f'{APPLICATION_NAME}:{Limited_Tracker_name}_{search_suffix}' # fetch only
+  Limited_Tracker_viewall_name = f'{APPLICATION_NAME}:{Limited_Tracker_name}_{viewall_suffix}' # fetch only
+  Limited_Tracker_export_name = f'{APPLICATION_NAME}:{Limited_Tracker_name}_{export_suffix}'

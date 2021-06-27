@@ -1,4 +1,3 @@
-from pprint import pp
 from datetime import timedelta
 import json
 from django.http.response import Http404, HttpResponse
@@ -872,7 +871,6 @@ def home_limited_tracker(request):
     'previous_incomplete_tasks': LimitedTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False).count(),
     'task_has_issue': LimitedTracker.objects.filter(has_issue=True).count(),
   }
-  pp(context)
   return render(request=request, template_name='companies/home.html', context=context)
 
 @login_required

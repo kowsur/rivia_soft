@@ -30,6 +30,12 @@
     {% csrf_token %}
     <h1 class="py-3 text-lg font-bold text-center rounded shadow-lg create select-none">{{ form_title }}</h1>
     
+    <ol style="margin-top: 10px; margin-bottom: 10px; list-style: inside;">
+      {% for error in form|get_attr:'errors.__all__' %}
+        <li style="color: red; display: list-item;">{{ error }}</li>
+      {% endfor %}
+    </ol>
+    
 
     {% if form|get_attr:'Meta.fieldsets' %}
       {% comment %} fieldsets exists so organize them {% endcomment %}
@@ -43,7 +49,7 @@
               <!-- input container -->
               <div class="w-full mt-3.5">
                 <!-- input label -->
-                <label for="{{ 'id_'|addstr:field.name }}">{{field.label }}
+                <label for="{{ 'id_'|addstr:field.name }}">{{ field.label }}
                   {% if field.field.required %}
                   <!-- required indicator -->
                   {% include "companies/required_indicator.html" %}
@@ -62,12 +68,13 @@
       {% endfor %}
     {% else %}
       {% comment %} fieldsets doesn't exist so show all the fields {% endcomment %}
+
       {% for field in form %}
       <div class="flex flex-col align-middle items-start w-full">
         <!-- input container -->
         <div class="w-full mt-3.5">
           <!-- input label -->
-          <label for="{{ 'id_'|addstr:field.name }}">{{field.label }}
+          <label for="{{ 'id_'|addstr:field.name }}">{{ field.label }}
             {% if field.field.required %}
             <!-- required indicator -->
             {% include "companies/required_indicator.html" %}

@@ -167,6 +167,7 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
     if (data_url && field_data){
       //this is a foreign key field. fetch the data and format it
       (!URL_HasQueryParams(data_url)) ? data_url = `${data_url}${field_data}/`: data_url = `${data_url}${field_data}`
+      if (field_data=='null') continue
 
       let kwargs = {
         url: data_url,

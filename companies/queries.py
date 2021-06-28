@@ -1,6 +1,9 @@
 from django.db.models import Q
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
-from .models import Limited, LimitedTracker
+from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker
+from datetime import date, datetime
+from django.utils import timezone
+from itertools import chain
 
 # =============================================================================================================
 # =============================================================================================================
@@ -207,3 +210,40 @@ def db_all_LimitedTracker(user_email='', is_superuser=False, limit=-1):
     else:
         records = LimitedTracker.objects.filter(Query)[:limit]
     return records.order_by('is_completed', '-pk')
+
+# LimitedSubmissionDeadlineTracker
+def db_search_LimitedSubmissionDeadlineTracker(search_text: str, limit=-1):
+    Query = Q(period__icontains                     = search_text) |\
+            Q(our_deadline__icontains               = search_text) |\
+            Q(client_id__client_name__icontains               = search_text) |\
+            Q(client_id__director_phone_number__icontains               = search_text) |\
+            Q(client_id__director_post_code__icontains               = search_text) |\
+            Q(HMRC_deadline__icontains              = search_text) |\
+            Q(submission_date__icontains            = search_text) |\
+            Q(remarks__icontains                    = search_text) |\
+            Q(last_updated_on__icontains            = search_text)|\
+            Q(is_submitted__icontains               = search_text) |\
+            Q(updated_by__email__icontains          = search_text) |\
+            Q(updated_by__first_name__icontains     = search_text) |\
+            Q(updated_by__last_name__icontains      = search_text) |\
+            Q(is_documents_uploaded__icontains      = search_text)
+    try:
+        num = float(search_text)
+        Query |= Q(submission_id                = int(num)) |\
+                Q(client_id__client_file_number = num)
+    except Exception:
+        pass
+    
+    if limit==-1:
+        return LimitedSubmissionDeadlineTracker.objects.filter(Query)
+    return LimitedSubmissionDeadlineTracker.objects.filter(Query)[:limit]
+
+
+def db_all_LimitedSubmissionDeadlineTracker(limit=-1):
+    records = LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__gte = timezone.now())
+    records = records.order_by('HMRC_deadline')
+    other_records = LimitedSubmissionDeadlineTracker.objects.filter().exclude(HMRC_deadline__gte = timezone.now()).order_by()
+    records = chain(records, other_records)
+    if limit<=-1:
+        return records
+    return records[:limit]

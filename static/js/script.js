@@ -183,6 +183,11 @@ export async function get_tr_for_table(data, template=template, model_fields=fie
           td.removeAttribute('data-url')
           td.removeAttribute('data-repr-format')
           td.setAttribute('data-cmp', string)
+          
+          let hrefURL = td.getAttribute('data-href-url')
+          if (hrefURL){
+            td.innerHTML = `<a href="${hrefURL}${field_data}">${makeSafeHTML(string)}</a>`
+          }
 
           if (field=='incomplete_tasks'){
             td.innerHTML = `<a href="/companies/SATrc/home/?client_id=${data.pk}">${string}</a>`

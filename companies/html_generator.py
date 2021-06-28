@@ -108,9 +108,17 @@ def generate_template_tag_for_model(
         <td class="data-cell" id="{field}"
           data-field="pk" data-url="{fk_fields[field]['details_url_without_argument']}" data-repr-format="{fk_fields[field]['repr-format']}"></td>\n"""
       else:
+        data_attrs = f'''
+        data-field="fields.{field}" 
+        data-url="{fk_fields[field]['details_url_without_argument']}" 
+        data-repr-format="{fk_fields[field]['repr-format']}" 
+        '''
+        if fk_fields[field].get('href-url'):
+          data_attrs += f'''data-href-url= "{fk_fields[field]['href-url']}"'''
+
         inner_template_tr+=f"""
         <td class="data-cell" id="{field}"
-          data-field="fields.{field}" data-url="{fk_fields[field]['details_url_without_argument']}" data-repr-format="{fk_fields[field]['repr-format']}"></td>\n"""
+          {data_attrs}></td>\n"""
     else:
       inner_template_tr += f'<td class="data-cell" id="{field}"></td>\n'
   

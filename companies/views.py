@@ -15,12 +15,11 @@ from .forms import SelfassesmentTrackerCreationForm, SelfassesmentTrackerChangeF
 
 from .forms import LimitedCreationForm, LimitedChangeForm, LimitedDeleteForm
 from .forms import LimitedTrackerCreationForm, LimitedTrackerChangeForm, LimitedTrackerDeleteForm
+from .forms import LimitedSubmissionDeadlineTrackerCreationForm, LimitedSubmissionDeadlineTrackerChangeForm, LimitedSubmissionDeadlineTrackerDeleteForm
 
 #models
-from .models import Selfassesment, SelfassesmentAccountSubmission
-from .models import SelfassesmentTracker
-
-from .models import Limited, LimitedTracker
+from .models import  Selfassesment, SelfassesmentTracker, SelfassesmentAccountSubmission
+from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker
 
 #export
 from .export_models import export_to_csv
@@ -32,6 +31,7 @@ from .queries import db_search_SelfassesmentTracker, db_all_SelfassesmentTracker
 
 from .queries import db_all_Limited, db_search_Limited
 from .queries import db_search_LimitedTracker, db_all_LimitedTracker
+from .queries import db_search_LimitedSubmissionDeadlineTracker, db_all_LimitedSubmissionDeadlineTracker
 
 # serializers
 from rest_framework.decorators import api_view
@@ -480,7 +480,8 @@ def home_selfassesment_tracker(request):
     'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_search_url,
     'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_update_url,
     'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_delete_url,
-    'task_counts': True,
+    'counts': True,
+    'tracker_task_counts': True,
     'new_customers': SelfassesmentTracker.objects.filter(new_customer=True).count(),
     'future_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime()).count(),
     'todays_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.localtime()).count(),
@@ -670,7 +671,7 @@ def export_selfassesment_tracker(request):
 def home_limited(request):
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_id', 'incomplete_tasks', 'is_active', 'client_file_number', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent']
+  include_fields = ['client_id', 'is_active', 'client_file_number', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent']
   keep_include_fields = True
   show_others = False
   model_fields = get_field_names_from_model(Limited)
@@ -703,7 +704,7 @@ def create_limited(request):
     'page_title': 'Create Limited',
     'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name,
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_create_name,
-    'form_title': 'Limited Account Year Assign Form',
+    'form_title': 'Register Limited Company Form',
     'form': LimitedCreationForm(initial={'client_file_number': Limited.get_next_file_number()})
   }
 
@@ -717,6 +718,11 @@ def create_limited(request):
       assesment.save()
       messages.success(request, f"New Limited has been created {assesment}!")
 
+      submission = LimitedSubmissionDeadlineTracker()
+      submission.client_id = assesment
+      submission.updated_by = request.user
+      submission.save()
+      messages.success(request, f'New Limited Submission has been created {submission}!')
       context['form'] = LimitedCreationForm(initial={'client_file_number': Limited.get_next_file_number()})
   return render(request, template_name='companies/create.html', context=context)
 
@@ -864,7 +870,8 @@ def home_limited_tracker(request):
     'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_search_url,
     'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_update_url,
     'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_delete_url,
-    'task_counts': True,
+    'counts': True,
+    'tracker_task_counts': True,
     'new_customers': LimitedTracker.objects.filter(new_customer=True).count(),
     'future_incomplete_tasks': LimitedTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime()).count(),
     'todays_incomplete_tasks': LimitedTracker.objects.filter(is_completed=False, deadline=timezone.localtime()).count(),
@@ -1038,6 +1045,200 @@ def export_limited_tracker(request):
   show_others = True
   export_to_csv(
     django_model = LimitedTracker,
+    write_to = response,
+    include_fields = include_fields,
+    exclude_fields = exclude_fields,
+    keep_include_fields = keep_include_fields,
+    show_others = show_others
+    )
+  return response
+
+
+# Limited Submission Deadline Tracker
+
+# =============================================================================================================
+# =============================================================================================================
+# LimitedSubmissionDeadlineTracker
+@login_required
+def home_limited_submission_deadline_tracker(request):
+  pk_field = 'submission_id'
+  keep_include_fields = True
+  fk_fields = {
+      'updated_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': HTML_Generator.Limited_client_id_repr_format, 'href-url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url,},
+      }
+  context = {
+    **URLS,
+    'model_fields': get_field_names_from_model(LimitedSubmissionDeadlineTracker),
+    'template_tag': generate_template_tag_for_model(LimitedSubmissionDeadlineTracker, pk_field=pk_field, show_id=True, fk_fields=fk_fields),
+    'data_container': generate_data_container_table(LimitedSubmissionDeadlineTracker, pk_field=pk_field, show_id=True),
+    
+    'caption': 'View Limited Submission Deadline Tracker',
+    'page_title': 'View Limited Submission Deadline Tracker',
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_create_name,
+    'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_export_name,
+    'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_viewall_url,
+    'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_search_url,
+    'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_update_url,
+    'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_delete_url,
+
+    'counts': True,
+    'limited_submission_counts': True,
+    'submission_deadline_not_set': LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline=None).count(),
+    'submission_deadline_missed': LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False).count()
+  }
+  return render(request=request, template_name='companies/home.html', context=context)
+
+@login_required
+def view_limited_submission_deadline_tracker(request):
+  return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)
+
+@login_required
+def create_limited_submission_deadline_tracker(request):
+  context = {
+    **URLS,
+
+    'page_title': 'Create Limited Submission Deadline Tracker',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name,
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_create_name,
+    'form_title': 'Limited Submission Deadline Tracker Creation Form',
+    'form': LimitedSubmissionDeadlineTrackerCreationForm()
+  }
+
+  if request.method == 'POST':
+    form = LimitedSubmissionDeadlineTrackerCreationForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      assesment = form.save()
+      assesment.set_defaults(request)
+      assesment.save()
+      messages.success(request, f'New Limited Submission Deadline Tracker has been created with id {assesment.submission_id}!')
+      context['form'] = LimitedSubmissionDeadlineTrackerCreationForm()
+    else:
+      messages.error(request, f'Action failed due to invalid data!')
+  return render(request, template_name='companies/create.html', context=context)
+
+@login_required
+def update_limited_submission_deadline_tracker(request, submission_id:int):
+  context = {
+    **URLS,
+    'page_title': f'Update Limited Submission Deadline Tracker',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name,
+    'id': submission_id,
+    'update_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_update_name,
+    'form_title': 'Limited Submission Deadline Tracker Update Form',
+    'form': LimitedSubmissionDeadlineTrackerChangeForm()
+  }
+
+  try:
+    record =  LimitedSubmissionDeadlineTracker.objects.get(submission_id=submission_id)
+    if record.is_submitted:
+      messages.error(request, message=f"Limited Submission Deadline Tracker {submission_id} is submitted therefore can't be updated!")
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)
+    context['form'] = LimitedSubmissionDeadlineTrackerChangeForm(instance=record)
+  except LimitedSubmissionDeadlineTracker.DoesNotExist:
+    messages.error(request, f'Limited Submission Deadline Tracker having id {submission_id} does not exists!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)
+    raise Http404
+
+  if request.method == 'POST':
+    form = LimitedSubmissionDeadlineTrackerChangeForm(request.POST, instance=record)
+    context['form'] = form
+    if form.is_valid():
+      assesment = form.save(commit=False)
+      assesment.set_defaults(request)
+      assesment.save()
+      context['form'] = LimitedSubmissionDeadlineTrackerChangeForm(instance=assesment)
+      messages.success(request, f'Limited Submission Deadline Tracker has been updated having id {submission_id}!')
+      if assesment.is_submitted:
+        new_assesment = LimitedSubmissionDeadlineTracker()
+        new_assesment.client_id = assesment.client_id
+        new_assesment.updated_by = request.user
+        new_assesment.save()
+        messages.success(request, f'New Limited Submission Deadline Tracker has been created {new_assesment}')
+        return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)
+    else:
+      messages.error(request, f'Updating Limited Submission Deadline Tracker having id {submission_id} failed due to invalid data!')
+  return render(request, template_name='companies/update.html', context=context)
+
+@login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to delete this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)
+def delete_limited_submission_deadline_tracker(request, submission_id:int):
+  context = {
+    **URLS,
+    'page_title': 'Delete Limited Submission Deadline Tracker',
+    'id': submission_id,
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name,
+    'delete_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_delete_name,
+    'form_title': "Limited Submission Deadline Tracker Delete Form",
+    'form': LimitedSubmissionDeadlineTrackerDeleteForm()
+  }
+
+  try:
+    record = LimitedSubmissionDeadlineTracker.objects.get(submission_id=submission_id)
+  except LimitedSubmissionDeadlineTracker.DoesNotExist:
+    messages.error(request, f'Limited Submission Deadline Tracker record with id {submission_id}, you are looking for does not exist!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)
+  
+  if request.method == 'POST':
+    form = LimitedSubmissionDeadlineTrackerDeleteForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      record.delete()
+      messages.success(request, f'Limited Submission Deadline Tracker has been deleted having id {submission_id}!')
+    else:
+      messages.error(request, f'Deletion of Limited Submission Deadline Tracker having id {submission_id} failed!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)
+  return render(request, template_name='companies/delete.html', context=context)
+
+@login_required
+def search_limited_submission_deadline_tracker(request, limit: int=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    # get search text from url query parameter
+    search_text = request.GET.get('q', '').strip()
+    tasks_key = request.GET.get('tasks')
+
+    # if tasks query paramter exists then return tasks
+    if tasks_key:
+      tasks = {
+        'submission_deadline_not_set': LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline = None),
+        'submission_deadline_missed': LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False)
+      }
+      records = tasks.get(tasks_key, [])
+      data = serialize(queryset=records, format='json')
+      return HttpResponse(data, content_type='application/json')
+    
+    # filter results using the search_text
+    if search_text.strip()=='':
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_viewall_name)
+    records = db_search_LimitedSubmissionDeadlineTracker(search_text, limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
+
+@login_required
+def all_limited_submission_deadline_tracker(request, limit=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    records = db_all_LimitedSubmissionDeadlineTracker(limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
+
+@login_required
+def export_limited_submission_deadline_tracker(request):
+  response = HttpResponse(
+    content_type='text/csv',
+    headers={'Content-Disposition': f'attachment; filename="limited_submission_deadline_tracker_{timezone.localtime()}.csv"'},
+  )
+  include_fields = []
+  exclude_fields = ['submission_id']
+  keep_include_fields = False
+  show_others = True
+  export_to_csv(
+    django_model = LimitedSubmissionDeadlineTracker,
     write_to = response,
     include_fields = include_fields,
     exclude_fields = exclude_fields,

@@ -23,7 +23,7 @@ const loading_indicator_selector = '#loading-indicator'
 // clear messsage after 10 seconds
 let delete_message_after = 10000 //milisecond
 setTimeout(function(){
-  let messages = document.getElementsByClassName('message')
+  let messages = document.querySelectorAll('.message')
   if (messages){
     for (let element of messages){
       element.remove()

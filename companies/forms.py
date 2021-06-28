@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.core.exceptions import ValidationError
@@ -6,7 +7,7 @@ from .fields import SearchableModelField, Select, Fieldset
 from .url_variables import Full_URL_PATHS_WITHOUT_ARGUMENTS
 
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
-from .models import Limited, LimitedTracker
+from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker
 
 from .repr_formats import Forms
 
@@ -419,6 +420,7 @@ class SelfassesmentTrackerDeleteForm(forms.ModelForm):
         model = Selfassesment
         fields = ()
 
+
 ##################################################################################################
 class LimitedCreationForm(forms.ModelForm):
     date_of_registration = forms.DateField(
@@ -577,12 +579,12 @@ class LimitedDeleteForm(forms.ModelForm):
         model = Limited
         fields = ()
 
-
+# Limited Tracker
 class LimitedTrackerCreationForm(forms.ModelForm):
     deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today, 'min': get_date_today}))
     client_id = SearchableModelField(
         queryset=Limited.objects.all(),
-        label = 'Client Name',
+        label = 'Business Name',
         search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
         all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
         repr_format = Forms.Limited_client_id_repr_format,
@@ -638,7 +640,7 @@ class LimitedTrackerChangeForm(forms.ModelForm):
     # complete_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     client_id = SearchableModelField(
         queryset=Limited.objects.all(),
-        label = 'Client Name',
+        label = 'Business Name',
         search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
         all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
         repr_format = Forms.Limited_client_id_repr_format,
@@ -700,3 +702,99 @@ class LimitedTrackerDeleteForm(forms.ModelForm):
         model = Limited
         fields = ()
 
+# Limited Submission Deadline Tracker
+class LimitedSubmissionDeadlineTrackerCreationForm(forms.ModelForm):
+    client_id = SearchableModelField(
+        queryset=Limited.objects.all(),
+        label = 'Business Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
+        repr_format = Forms.Limited_client_id_repr_format,
+        model=Limited,
+        choices=Limited.objects.all().only('client_id', 'client_name'),
+        fk_field='client_id',
+        empty_label=None,
+        disabled=False
+        )
+    our_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    HMRC_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    submission_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    
+    class Meta:
+        model = LimitedSubmissionDeadlineTracker
+        fields = (
+            # "submission_id",
+            "client_id",
+            "period",
+            "our_deadline",
+            "HMRC_deadline",
+            "is_submitted",
+            "submitted_by",
+            "submission_date",
+            "is_documents_uploaded",
+            "remarks",
+            # "updated_by",
+            # "last_updated_on",
+            )
+    def clean_submission_date(self):
+        is_submitted = self.cleaned_data.get('is_submitted')
+        submission_date = self.cleaned_data.get('submission_date')
+        if is_submitted == True and not type(submission_date)==type(date(2021, 6, 28)):
+            raise ValidationError('Is Submitted is True therefore Submission Date is required.')
+        return submission_date
+
+# Limited Submission Deadline Tracker
+class LimitedSubmissionDeadlineTrackerChangeForm(forms.ModelForm):
+    client_id = SearchableModelField(
+        queryset=Limited.objects.all(),
+        label = 'Business Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
+        repr_format = Forms.Limited_client_id_repr_format,
+        model=Limited,
+        choices=Limited.objects.all().only('client_id', 'client_name'),
+        fk_field='client_id',
+        empty_label=None,
+        disabled=False
+        )
+    our_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    HMRC_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    submission_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    
+    class Meta:
+        model = LimitedSubmissionDeadlineTracker
+        fields = (
+            # "submission_id",
+            "client_id",
+            "period",
+            "our_deadline",
+            "HMRC_deadline",
+            "is_submitted",
+            "submitted_by",
+            "submission_date",
+            "is_documents_uploaded",
+            "remarks",
+            # "updated_by",
+            # "last_updated_on",
+            )
+    def clean_submission_date(self):
+        is_submitted = self.cleaned_data.get('is_submitted')
+        submission_date = self.cleaned_data.get('submission_date')
+        if is_submitted == True and not type(submission_date)==type(date(2021, 6, 28)):
+            raise ValidationError('Is Submitted is True therefore Submission Date is required.')
+        return submission_date
+
+class LimitedSubmissionDeadlineTrackerDeleteForm(forms.ModelForm):
+    agree = forms.BooleanField(label='I want to proceed.', required=True)
+    class Meta:
+        model = LimitedSubmissionDeadlineTracker
+        fields = ()
+
+# Limited Submission Deadline Tracker (Limited Submission on nav bar)
+#   - updated_by - fk CustomUser.id(user who updates or creates the record)
+
+# (when is_submitted=True) create new entry in LSDT
+#   - limited_id = entry.limited_id
+
+# LSDT - view
+#   show count - where (HMRC_deadline = None) like Trackers

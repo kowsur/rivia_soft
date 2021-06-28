@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR
 
+from datetime import timedelta, datetime, date
 
 class dummyModelField:
     def __init__(self) -> None:
@@ -70,7 +71,7 @@ class Selfassesment(models.Model):
         to_field='type_id',
         blank=False,
         null=True)
-    date_of_registration = models.DateField(verbose_name='Registration date', blank=False, null=False, default=timezone.localtime)
+    date_of_registration = models.DateField(verbose_name='Registration date', blank=False, null=False, default=timezone.now)
     # identifies wheather the record is updated needs superuser permission
     is_updated = models.BooleanField(_('Update Status'), default=True, editable=False)
     is_active = models.BooleanField(verbose_name='Active Status', blank=False, null=False, default=True)
@@ -196,7 +197,7 @@ class SelfassesmentAccountSubmission(models.Model):
         related_name='selfassesment_account_submission_client_id',
         blank=False,
         null=True)
-    date_of_submission = models.DateField(verbose_name='Submission date', blank=True, null=True, default=timezone.localtime)
+    date_of_submission = models.DateField(verbose_name='Submission date', blank=True, null=True, default=timezone.now)
     tax_year = models.CharField(verbose_name='Tax Year', max_length=10, blank=True)
     submitted_by = models.ForeignKey(
         to='users.CustomUser', 
@@ -246,7 +247,7 @@ class SelfassesmentTracker(models.Model):
         related_name='selfassesment_tracker_client_id',
         blank=False,
         null=True)
-    creation_date = models.DateTimeField(verbose_name='Creation Datetime', editable=False, blank=True, null=True, default=timezone.localtime)
+    creation_date = models.DateTimeField(verbose_name='Creation Datetime', editable=False, blank=True, null=True, default=timezone.now)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)
     remarks = models.TextField(verbose_name="Remarks", blank=True, null=True, default='')
     has_issue = models.BooleanField(verbose_name="Has Issue", default=False)
@@ -260,7 +261,7 @@ class SelfassesmentTracker(models.Model):
         blank=True,
         null=True
         )
-    deadline = models.DateField(verbose_name='Deadline', blank=False, null=True, default=timezone.localtime)
+    deadline = models.DateField(verbose_name='Deadline', blank=False, null=True, default=timezone.now)
     is_completed = models.BooleanField(verbose_name='Completed', blank=True, null=False, default=False)
     complete_date = models.DateField(verbose_name='Complete Date', blank=True, null=True)
     done_by = models.ForeignKey(
@@ -376,7 +377,7 @@ class Limited(models.Model):
         blank=True,
         null=True)
 
-    date_of_registration = models.DateField(verbose_name='Registration date', blank=False, null=True, default=timezone.localtime)
+    date_of_registration = models.DateField(verbose_name='Registration date', blank=False, null=True, default=timezone.now)
     is_active = models.BooleanField(verbose_name='Active Status', blank=False, null=False, default=True)
     remarks = models.TextField(_("Remarks"), blank=True, null=True)
     
@@ -498,7 +499,7 @@ class LimitedTracker(models.Model):
         related_name='limited_tracker_client_id',
         blank=False,
         null=True)
-    creation_date = models.DateTimeField(verbose_name='Creation Datetime', editable=False, blank=True, null=True, default=timezone.localtime)
+    creation_date = models.DateTimeField(verbose_name='Creation Datetime', editable=False, blank=True, null=True, default=timezone.now)
     job_description = models.TextField(verbose_name='Description', blank=True, null=True)
     remarks = models.TextField(verbose_name="Remarks", blank=True, null=True, default='')
     has_issue = models.BooleanField(verbose_name="Has Issue", default=False)
@@ -512,7 +513,7 @@ class LimitedTracker(models.Model):
         blank=True,
         null=True
         )
-    deadline = models.DateField(verbose_name='Deadline', blank=False, null=True, default=timezone.localtime)
+    deadline = models.DateField(verbose_name='Deadline', blank=False, null=True, default=timezone.now)
     is_completed = models.BooleanField(verbose_name='Completed', blank=True, null=False, default=False)
     complete_date = models.DateField(verbose_name='Complete Date', blank=True, null=True)
     done_by = models.ForeignKey(
@@ -545,3 +546,67 @@ class LimitedTracker(models.Model):
         if self.job_description:
             return f"{self.job_description}"
         return f"Deadline: {self.deadline} | Created By: {self.created_by}"
+
+
+class LimitedSubmissionDeadlineTracker(models.Model):
+    class Meta:
+        verbose_name = _("Limited Submission")
+        verbose_name_plural = _("Limited Submissions")
+
+    submission_id = models.AutoField(verbose_name='Submission ID', primary_key=True, null=False, db_index=True, editable=False)
+    client_id = models.ForeignKey(
+        to='companies.Limited',
+        on_delete=models.CASCADE,
+        verbose_name='Client ID',
+        to_field='client_id',
+        related_name='limited_account_submission_client_id',
+        blank=False,
+        null=True)
+    period = models.CharField(
+        verbose_name='Period',
+        max_length=63,
+        blank=True,
+        null=True,
+        default='',
+        db_index=False
+    )
+    our_deadline = models.DateField(verbose_name='Our Deadline', blank=True, null=True)
+    HMRC_deadline = models.DateField(verbose_name='HMRC Deadline', blank=False, null=True)
+    is_submitted = models.BooleanField(verbose_name='Is Submitted', default=False, null=False)
+    submitted_by = models.TextField(verbose_name='Submitted By', blank=True, default='', null=True)
+    submission_date = models.DateField(verbose_name='Submission Date', blank=True, null=True)
+    is_documents_uploaded = models.BooleanField(verbose_name='Is Documents Uploaded', default=False, null=False)
+    remarks = models.TextField(verbose_name='Remarks', blank=True, null=True)
+    updated_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Last Updated By',
+        related_name='limited_submission_updated_by',
+        to_field='user_id',
+        blank=False,
+        null=True)
+    last_updated_on = models.DateTimeField(verbose_name='Last Updated On', default=timezone.now, null=True)
+
+
+    def __str__(self) -> str:
+        return f"{self.submission_id} - {self.client_id}"
+
+
+    def set_defaults(self, request):
+        self.updated_by = request.user
+        self.last_updated_on = timezone.now()
+        if not type(self.HMRC_deadline) == type(date(2021, 6, 28)):
+            raise ValueError("HMRC_deadline should be an instance of datetime.date")
+        
+        # set self.our_deadline 30 days before the self.HMRC_deadline
+        self.our_deadline = self.HMRC_deadline - timedelta(30)
+        self.save()
+
+
+# Limited Submission Deadline Tracker (Limited Submission on nav bar)
+
+# (when is_submitted=True) create new entry in LSDT
+#   - limited_id = entry.limited_id
+
+# LSDT - view
+#   show count - where (HMRC_deadline = None) like Trackers

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load companies_tags %}
 
 {% block title %}
   {{ page_title }}
@@ -44,23 +45,23 @@
     {% if tracker_task_counts %}    
       <div class="task-container">
         <span class="task task-issue" data-tasks='task_has_issue'>
-          {{ task_has_issue }}
+          <span id="task-count">{{ task_has_issue }}</span>
           <span class="task-tooltip">Tasks having issue.</span>
         </span>
         <span class="task task-previous" data-tasks='previous_incomplete_tasks'>
-          {{ previous_incomplete_tasks }}
+          <span id="task-count">{{ previous_incomplete_tasks }}</span>
           <span class="task-tooltip">Previous remaining tasks.</span>
         </span>
         <span class="task task-today" data-tasks='todays_incomplete_tasks'>
-          {{ todays_incomplete_tasks }}
+          <span id="task-count">{{ todays_incomplete_tasks }}</span>
           <span class="task-tooltip">Todays remaining tasks.</span>
         </span>
         <span class="task task-upcoming" data-tasks='future_incomplete_tasks'>
-          {{ future_incomplete_tasks }}
+          <span id="task-count">{{ future_incomplete_tasks }}</span>
           <span class="task-tooltip">Upcoming tasks.</span>
         </span>
         <span class="task task-done" data-tasks='new_customers'>
-          {{ new_customers }}
+          <span id="task-count">{{ new_customers }}</span>
           <span class="task-tooltip">New Customers.</span>
         </span>
       </div>
@@ -127,10 +128,11 @@
 {% endautoescape %}
 
 <!-- data -->
-<input hidden aria-hidden="true" type="url" name="all_url" value="{{ viewall_url }}">
-<input hidden aria-hidden="true" type="url" name="search_url_without_argument" value="{{ search_url }}">
-<input hidden aria-hidden="true" type="url" name="update_url_without_argument" value="{{ update_url }}">
-<input hidden aria-hidden="true" type="url" name="delete_url_without_argument" value="{{ delete_url }}">
-<pre hidden aria-hidden="true" name="model_fields">{{ model_fields }}</pre>
+{% autoescape off %}
+<pre type="application/json" style="display: none;">
+  {{ frontend_data|convert_to_JSON }}
+</pre>
+{% endautoescape %}
+
 <script src='{% static "js/table_sort.js" %}'></script>
 {% endblock content %}

@@ -30,6 +30,8 @@ Limited_Submission_Deadline_Tracker_name = 'LAS'
 Limited_Tracker_path = 'LTDTrc'
 Limited_Tracker_name = 'LTDTrc'
 
+Merged_Tracker = 'MTrc'
+
 
 class Dict_Duck_type:
   @classmethod
@@ -110,6 +112,10 @@ class URL_PATHS(Dict_Duck_type):
   Limited_Tracker_viewall_url = f'{Limited_Tracker_path}/{viewall_suffix}/' # fetch only
   Limited_Tracker_export_url = f'{Limited_Tracker_path}/{export_suffix}/'
 
+  # Merged Tracker
+  Merged_Tracker_home_url = f'{Merged_Tracker}/{home_suffix}/'
+  Merged_Tracker_export_url = f'{Merged_Tracker}/{export_suffix}/'
+
 
 # Only use in urls.py to set url names
 class URL_NAMES(Dict_Duck_type):
@@ -172,6 +178,11 @@ class URL_NAMES(Dict_Duck_type):
   Limited_Tracker_viewall_name = f'{Limited_Tracker_name}_{viewall_suffix}' # fetch only
   Limited_Tracker_export_name = f'{Limited_Tracker_name}_{export_suffix}'
 
+  # Merged Tracker
+  Merged_Tracker_home_name = f'{Merged_Tracker}_{home_suffix}'
+  Merged_Tracker_export_name = f'{Merged_Tracker}_{export_suffix}'
+
+
 
 # Should be passed in templates for JavaScript to fetch() api calls
 class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
@@ -232,6 +243,11 @@ class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
   Limited_Tracker_search_url = f'/{APPLICATION_NAME}/{Limited_Tracker_path}/{search_suffix}/' # fetch only
   Limited_Tracker_viewall_url = f'/{APPLICATION_NAME}/{Limited_Tracker_path}/{viewall_suffix}/' # fetch only
   Limited_Tracker_export_url = f'/{APPLICATION_NAME}/{Limited_Tracker_path}/{export_suffix}/'
+
+  # Merged Tracker
+  Merged_Tracker_home_url = f'/{APPLICATION_NAME}/{Merged_Tracker}/{home_suffix}/'
+  Merged_Tracker_export_url = f'/{APPLICATION_NAME}/{Merged_Tracker}/{export_suffix}'
+
 
 
 # Should be used in templates to reffer to links
@@ -294,3 +310,7 @@ class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
   Limited_Tracker_search_name = f'{APPLICATION_NAME}:{Limited_Tracker_name}_{search_suffix}' # fetch only
   Limited_Tracker_viewall_name = f'{APPLICATION_NAME}:{Limited_Tracker_name}_{viewall_suffix}' # fetch only
   Limited_Tracker_export_name = f'{APPLICATION_NAME}:{Limited_Tracker_name}_{export_suffix}'
+
+  # Merged Tracker
+  Merged_Tracker_home_name = f'{APPLICATION_NAME}:{Merged_Tracker}_{home_suffix}'
+  Merged_Tracker_export_name = f'{APPLICATION_NAME}:{Merged_Tracker}_{export_suffix}'

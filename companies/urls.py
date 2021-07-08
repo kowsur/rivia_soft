@@ -29,7 +29,7 @@ from .views import home_limited_tracker, create_limited_tracker, update_limited_
 from .views import home_limited_submission_deadline_tracker, create_limited_submission_deadline_tracker, \
     update_limited_submission_deadline_tracker, delete_limited_submission_deadline_tracker,               \
     search_limited_submission_deadline_tracker, all_limited_submission_deadline_tracker,                  \
-    export_limited_submission_deadline_tracker
+    export_limited_submission_deadline_tracker, merged_tracker_home, merged_tracker_export
 
 
 from .url_variables import APPLICATION_NAME, URL_PATHS, URL_NAMES
@@ -249,4 +249,16 @@ urlpatterns = [
         view = export_limited_tracker,
         name = URL_NAMES.Limited_Tracker_export_name
     ),
+
+    # =============================================================================================================
+    # Merged Tracker
+    path(route = URL_PATHS.Merged_Tracker_home_url,
+        view = merged_tracker_home,
+        name = URL_NAMES.Merged_Tracker_home_name
+    ),
+    
+    path(route = URL_PATHS.Merged_Tracker_export_url,
+        view = merged_tracker_export,
+        name = URL_NAMES.Merged_Tracker_export_name
+    )
 ]

@@ -13,6 +13,11 @@ def addstr(arg1, arg2):
     concatinated = str(arg1) + str(arg2)
     return mark_safe(concatinated)
 
+@register.filter(name='convert_to_JSON')
+def convert_obj_to_JSON(obj):
+    """converts python object to JSON string"""
+    return json.dumps(obj)
+
 @register.filter('dir')
 def get_dir(obj):
     attrs = {}

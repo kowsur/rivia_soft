@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load static %}
+{% load companies_tags %}
+
+{% block title %}
+  {{ page_title }}
+{% endblock title %}
+
+{% block head %}
+<link rel="search" type="application/opensearchdescription+xml" title="Stack Overflow" href='/opensearch.xml' />
+{% endblock head %}
+
+{% block content %}
+
+<!-- messages -->
+{% if messages %}
+{% for message in messages %}
+<h1 class='message {{ message.tags }}'>
+  {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+  {{ message }}
+</h1>
+{% endfor %}
+{% endif %}
+
+{% if caption %}
+  <h1 class="mt-5 text-2xl text-center">{{ caption }}</h1>
+{% endif %}
+
+<!-- searchbar -->
+{% include "companies/searchbar.html" %}
+
+<div id="create_options_container" class="shadow-lg">
+  <div id="merged_tracker_create_options" class="relative rounded-md">
+    <button id="merged_tracker_create_options_close" class="block px-4 py-2 mt-2 text-sm font-semibold rounded-lg md:mt-2 delete focus:outline-none focus:shadow-outline">Close</button>
+    <a href="{% url create_limited_tracker %}">Create Limited Tracker</a>
+    <a href="{% url create_selfassesment_tracker %}">Create Selfassesment Tracker</a>
+  </div>
+</div>
+<!-- represent data -->
+<div class="relative max-w-min mx-auto">
+  <!-- tasks -->
+  {% if counts %}  
+    {% if tracker_task_counts %}    
+    <div class="task-container">
+      <span class="task task-issue" data-tasks='task_has_issue'>
+        <span id="task-count">{{ task_has_issue }}</span>
+        <span class="task-tooltip">Tasks having issue.</span>
+      </span>
+      <span class="task task-previous" data-tasks='previous_incomplete_tasks'>
+        <span id="task-count">{{ previous_incomplete_tasks }}</span>
+        <span class="task-tooltip">Previous remaining tasks.</span>
+      </span>
+      <span class="task task-today" data-tasks='todays_incomplete_tasks'>
+        <span id="task-count">{{ todays_incomplete_tasks }}</span>
+        <span class="task-tooltip">Todays remaining tasks.</span>
+      </span>
+      <span class="task task-upcoming" data-tasks='future_incomplete_tasks'>
+        <span id="task-count">{{ future_incomplete_tasks }}</span>
+        <span class="task-tooltip">Upcoming tasks.</span>
+      </span>
+      <span class="task task-done" data-tasks='new_customers'>
+        <span id="task-count">{{ new_customers }}</span>
+        <span class="task-tooltip">New Customers.</span>
+      </span>
+    </div>
+    {% endif %}
+
+    <script src='{% static "/static/js/tracker_search.js" %}' type='module'></script>
+  {% endif %}
+  
+  <div class="action-container">
+    <!-- create -->
+    <span class="action action-create">
+      <a href="#" id='merged_tracker_create'>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="16"></line>
+          <line x1="8" y1="12" x2="16" y2="12"></line>
+        </svg>
+      </a>
+      <span class="action-tooltip">Create</span>
+    </span>
+    <!-- refresh -->
+    <span class="action action-reload">
+      <svg id="i-reload" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+        <path d="M29 16 C29 22 24 29 16 29 8 29 3 22 3 16 3 10 8 3 16 3 21 3 25 6 27 9 M20 10 L27 9 28 2" />
+      </svg>
+      <span class="action-tooltip">Reload</span>
+    </span>
+    <!-- export -->
+    <span class="action action-export">
+      <a href="{% url export_name %}">
+        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" fill="white" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 92 92" enable-background="new 0 0 92 92" xml:space="preserve">
+          <path id="XMLID_1022_" d="M73,76.5v5c0,2.2-1.9,3.5-4.1,3.5H3.6C1.4,85,0,83.8,0,81.5V32.1c0-2.2,1.4-4.2,3.6-4.2h11.7
+            c2.2,0,4,1.8,4,4s-1.8,4-4,4H8V77h57v-0.5c0-2.2,1.8-4,4-4S73,74.3,73,76.5z M90.8,39.2L66,64.5c-1.2,1.2-2.9,1.5-4.4,0.9
+            C60,64.7,59,63.3,59,61.6V50.7c-8-0.2-27.2,0.6-34.2,12.9c-0.7,1.3-2.1,2.1-3.5,2.1c-0.3,0-0.7,0-1-0.1c-1.8-0.5-3-2.1-3-3.9
+            c0-0.6,0-16.1,11.6-27.6C36.2,26.6,46,22.6,59,21.9V11c0-1.6,1-3.1,2.5-3.7C63.1,6.7,64.8,7,66,8.2l24.9,25.3
+            C92.4,35.1,92.4,37.6,90.8,39.2z M82.2,36.3L67,20.9v4.9c0,2.2-1.7,4-4,4c-12.4,0-21.9,3.3-28.4,9.9c-3,3-5,6.3-6.3,9.5
+            c9.4-5.6,21.3-6.6,28.6-6.6c3.8,0,6.3,0.3,6.6,0.3c2,0.2,3.5,2,3.5,4v4.9L82.2,36.3z"/>
+        </svg>
+      </a>
+      <span class="action-tooltip">Export</span>
+    </span>
+  </div>
+  <!-- data -->
+  {% autoescape off %}
+    {{ data_container }}
+  {% endautoescape %}
+  <span class="absolute top-0 right-0 bg-indigo-600 text-white px-2 py-1 text-xs font-normal sm:text-sm sm:font-normal md:text-base md:font-medium" id="loading-indicator">Loading Data</span>
+</div>
+
+<!-- data template -->
+{% autoescape off %}
+  {{ selfassesment_tracker_template }}
+{% endautoescape %}
+
+{% autoescape off %}
+  {{ limited_tracker_template }}
+{% endautoescape %}
+
+<!-- data -->
+<pre type="application/json" style="display: none;">
+  {{ frontend_data|convert_to_JSON }}
+</pre>
+
+<script defer type="module" src='{% static "js/merged_tracker.js" %}'></script>
+<script src='{% static "js/table_sort.js" %}'></script>
+{% endblock content %}

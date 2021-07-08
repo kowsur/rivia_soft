@@ -112,6 +112,50 @@
   }
 }
 
+/* Options for merged tracker page */
+#create_options_container{
+  background-color: #111827;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  display: none;
+  z-index: 500;
+  margin: auto;
+  inset: 0;
+}
+#merged_tracker_create_options{
+  background-color: #175448ed;
+  width: 300px;
+  aspect-ratio: 1/.5;
+  padding: 20px;
+	inset: 0;
+	margin: auto;
+	position: fixed;
+	display:  flex;
+	flex-direction: column;
+	gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+#merged_tracker_create_options a{
+  min-width: max-content;
+  @apply create px-4 py-2 rounded-md shadow-xl;
+}
+#merged_tracker_create_options_close{
+  position: absolute;
+  top: -10%;
+  right: 0;
+  transform: translateY(-100%)
+}
+@media (prefers-color-scheme: light){
+  #create_options_container{
+    background-color: white;
+  }
+  #merged_tracker_create_options{
+    background-color: #1cd576;
+  }
+}
+
 .success{
   @apply bg-green-700 text-gray-50;
 }

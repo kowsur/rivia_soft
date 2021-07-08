@@ -1,8 +1,11 @@
-import * as methods from './script.js';
+import { populate_with_data } from './table.js';
+import { fetch_url } from './fetch_data.js';
+import DATA from './parse_data.js';
 
-let search_url = document.querySelector('input[name="search_url_without_argument"]').value
-let task_containser = document.querySelector('.task-container')
-let tasks = task_containser.querySelectorAll('.task')
+
+let search_url = DATA['search_url']
+let task_container = document.querySelector('.task-container')
+let tasks = task_container.querySelectorAll('.task')
 for (let task of tasks){
   task.addEventListener('click', async (event) => {
     let task = event.currentTarget
@@ -21,12 +24,12 @@ for (let task of tasks){
       req_method: 'GET',
       headers: { 'Content-Type': 'application/json' }
     }
-    let response = await methods.fetch_url(kwargs)
+    let response = await fetch_url(kwargs)
     let data = await response.json()
     
-    methods.populate_with_data(data)
+    populate_with_data(data)
 
-    let regex = /\s*\d+[\s]*/gm;
-    task.innerHTML = task.innerHTML.replace(regex, data.length)
+    let counts = task.querySelector('#task-count')
+    counts.innerHTML = data.length
   })
 }

@@ -73,18 +73,22 @@ def home_selfassesment(request):
   model_fields.append('incomplete_tasks')
   context = {
     **URLS,
-    'model_fields': model_fields,
+    'caption': 'View Selfassesment',
+    'page_title': 'View Selfassesment',
+    
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_create_name,
+    'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_export_name,
+
     'template_tag': generate_template_tag_for_model(Selfassesment, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
     'data_container': generate_data_container_table(Selfassesment, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
 
-    'caption': 'View Selfassesment',
-    'page_title': 'View Selfassesment',
-    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_create_name,
-    'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_export_name,
-    'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
-    'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
-    'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_update_url,
-    'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_delete_url,
+    'frontend_data':{
+      'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
+      'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
+      'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_update_url,
+      'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_delete_url,  
+      'model_fields': model_fields
+    },
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -270,20 +274,25 @@ def home_selfassesment_account_submission(request):
   keep_include_fields = True
   context = {
     **URLS,
-    'model_fields': get_field_names_from_model(SelfassesmentAccountSubmission),
-    'template_tag': generate_template_tag_for_model(SelfassesmentAccountSubmission, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
-    'data_container': generate_data_container_table(SelfassesmentAccountSubmission, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
-    
     'caption': 'View Selfassesment Account Submission',
     'page_title': 'View Selfassesment Account Submission',
+    
+    'add_all_url': URL_NAMES_PREFIXED_WITH_APP_NAME.add_all_Selfassesment_to_Selfassesment_Account_Submission_name,
+    'add_all_text': 'Add all Selfassesment to Selfassesment Account Submission',
+
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_create_name,
     'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_export_name,
-    'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_viewall_url,
-    'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_search_url,
-    'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_update_url,
-    'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_delete_url,
-    'add_all_url': URL_NAMES_PREFIXED_WITH_APP_NAME.add_all_Selfassesment_to_Selfassesment_Account_Submission_name,
-    'add_all_text': 'Add all Selfassesment to Selfassesment Account Submission'
+
+    'template_tag': generate_template_tag_for_model(SelfassesmentAccountSubmission, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    'data_container': generate_data_container_table(SelfassesmentAccountSubmission, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+
+    'frontend_data':{
+      'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_viewall_url,
+      'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_search_url,
+      'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_update_url,
+      'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_delete_url,  
+      'model_fields': get_field_names_from_model(SelfassesmentAccountSubmission)
+    },
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -459,6 +468,21 @@ def add_all_selfassesment_to_selfassesment_account_submission_w_submission_year(
 # =============================================================================================================
 # =============================================================================================================
 # SelfassesmentTracker
+def get_selfassesment_trackers_where_tasks_customers_are_new():
+  return SelfassesmentTracker.objects.filter(new_customer=True)
+
+def get_selfassesment_trackers_where_future_tasks_are_incomplete():
+  return SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime())
+
+def get_selfassesment_trackers_where_todays_tasks_are_incomplete():
+  return SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.localtime())
+
+def get_selfassesment_trackers_where_previous_tasks_are_incomplete():
+  return SelfassesmentTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False)
+
+def get_selfassesment_trackers_where_tasks_has_issues():
+  return SelfassesmentTracker.objects.filter(has_issue=True)
+
 @login_required
 def home_selfassesment_tracker(request):
   pk_field = 'tracker_id'
@@ -468,25 +492,30 @@ def home_selfassesment_tracker(request):
   keep_include_fields = True
   context = {
     **URLS,
-    'model_fields': get_field_names_from_model(SelfassesmentTracker),
-    'template_tag': generate_template_tag_for_model(SelfassesmentTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
-    'data_container': generate_data_container_table(SelfassesmentTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
-    
     'page_title': 'View Selfassesment Tracker',
     'caption': 'View Selfassesment Tracker',
+
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_create_name,
     'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_export_name,
-    'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_viewall_url,
-    'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_search_url,
-    'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_update_url,
-    'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_delete_url,
+
     'counts': True,
     'tracker_task_counts': True,
-    'new_customers': SelfassesmentTracker.objects.filter(new_customer=True).count(),
-    'future_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime()).count(),
-    'todays_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.localtime()).count(),
-    'previous_incomplete_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False).count(),
-    'task_has_issue': SelfassesmentTracker.objects.filter(has_issue=True).count(),
+    'new_customers': get_selfassesment_trackers_where_tasks_customers_are_new().count(),
+    'future_incomplete_tasks': get_selfassesment_trackers_where_future_tasks_are_incomplete().count(),
+    'todays_incomplete_tasks': get_selfassesment_trackers_where_todays_tasks_are_incomplete().count(),
+    'previous_incomplete_tasks': get_selfassesment_trackers_where_previous_tasks_are_incomplete().count(),
+    'task_has_issue': get_selfassesment_trackers_where_tasks_has_issues().count(),
+
+    'template_tag': generate_template_tag_for_model(SelfassesmentTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    'data_container': generate_data_container_table(SelfassesmentTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+
+    'frontend_data':{
+      'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_viewall_url,
+      'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_search_url,
+      'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_update_url,
+      'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_delete_url,  
+      'model_fields': get_field_names_from_model(SelfassesmentTracker)
+    },
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -500,7 +529,7 @@ def create_selfassesment_tracker(request):
     **URLS,
 
     'page_title': 'Create Selfassesment Tracker',
-    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name,
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_home_name,
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_create_name,
     'form_title': 'Selfassesment Tracker Creation Form',
     'form': SelfassesmentTrackerCreationForm(initial={'created_by': request.user.user_id})
@@ -603,11 +632,11 @@ def search_selfassesment_tracker(request, limit: int=-1):
     # if tasks query paramter exists then return tasks
     if request.GET.get('tasks'):
       tasks = {
-        'new_customers': SelfassesmentTracker.objects.filter(new_customer=True),
-        'future_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime()),
-        'todays_incomplete_tasks': SelfassesmentTracker.objects.filter(is_completed=False, deadline=timezone.localtime()),
-        'previous_incomplete_tasks': SelfassesmentTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False),
-        'task_has_issue': SelfassesmentTracker.objects.filter(has_issue=True)
+        'new_customers': get_selfassesment_trackers_where_tasks_customers_are_new(),
+        'future_incomplete_tasks': get_selfassesment_trackers_where_future_tasks_are_incomplete(),
+        'todays_incomplete_tasks': get_selfassesment_trackers_where_todays_tasks_are_incomplete(),
+        'previous_incomplete_tasks': get_selfassesment_trackers_where_previous_tasks_are_incomplete(),
+        'task_has_issue': get_selfassesment_trackers_where_tasks_has_issues()
       }
       records = tasks.get(request.GET.get('tasks'), [])
       records.order_by('deadline')
@@ -678,18 +707,22 @@ def home_limited(request):
   model_fields.append('incomplete_tasks')
   context = {
     **URLS,
-    'model_fields': model_fields,
+    'caption': 'View Limited',
+    'page_title': 'View Limited',
+
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_create_name,
+    'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_export_name,
+
     'template_tag': generate_template_tag_for_model(Limited, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
     'data_container': generate_data_container_table(Limited, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
 
-    'caption': 'View Limited',
-    'page_title': 'View Limited',
-    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_create_name,
-    'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_export_name,
-    'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
-    'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
-    'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url,
-    'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_delete_url,
+    'frontend_data':{
+      'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
+      'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
+      'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url,
+      'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_delete_url,  
+      'model_fields': model_fields
+    },
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -839,6 +872,21 @@ def export_limited(request):
 # =============================================================================================================
 # =============================================================================================================
 # LimitedTracker
+def get_limited_trackers_where_tasks_customers_are_new():
+  return LimitedTracker.objects.filter(new_customer=True)
+
+def get_limited_trackers_where_future_tasks_are_incomplete():
+  return LimitedTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime())
+
+def get_limited_trackers_where_todays_tasks_are_incomplete():
+  return LimitedTracker.objects.filter(is_completed=False, deadline=timezone.localtime())
+
+def get_limited_trackers_where_previous_tasks_are_incomplete():
+  return LimitedTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False)
+
+def get_limited_trackers_where_tasks_has_issues():
+  return LimitedTracker.objects.filter(has_issue=True)
+
 @login_required
 def home_limited_tracker(request):
   pk_field = 'tracker_id'
@@ -851,32 +899,37 @@ def home_limited_tracker(request):
       'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'prepared_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'assigned_to': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
-      'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': HTML_Generator.Limited_client_id_repr_format },
+      'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': HTML_Generator.Limited_client_id_repr_format, 'href-url':Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url },
       'incomplete_tasks': { 'details_url_without_argument': '/companies/SATrc/search/?client_id=', 'repr-format': r'{length}'}
       }
 
   keep_include_fields = True
   context = {
     **URLS,
-    'model_fields': get_field_names_from_model(LimitedTracker),
-    'template_tag': generate_template_tag_for_model(LimitedTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, fk_fields=fk_fields),
-    'data_container': generate_data_container_table(LimitedTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
-    
     'page_title': 'View Limited Tracker',
     'caption': 'View Limited Tracker',
+    
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_create_name,
     'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_export_name,
-    'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_viewall_url,
-    'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_search_url,
-    'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_update_url,
-    'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_delete_url,
+    
     'counts': True,
     'tracker_task_counts': True,
-    'new_customers': LimitedTracker.objects.filter(new_customer=True).count(),
-    'future_incomplete_tasks': LimitedTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime()).count(),
-    'todays_incomplete_tasks': LimitedTracker.objects.filter(is_completed=False, deadline=timezone.localtime()).count(),
-    'previous_incomplete_tasks': LimitedTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False).count(),
-    'task_has_issue': LimitedTracker.objects.filter(has_issue=True).count(),
+    'new_customers': get_limited_trackers_where_tasks_customers_are_new().count(),
+    'future_incomplete_tasks': get_limited_trackers_where_future_tasks_are_incomplete().count(),
+    'todays_incomplete_tasks': get_limited_trackers_where_todays_tasks_are_incomplete().count(),
+    'previous_incomplete_tasks': get_limited_trackers_where_previous_tasks_are_incomplete().count(),
+    'task_has_issue': get_limited_trackers_where_tasks_has_issues().count(),
+
+    'template_tag': generate_template_tag_for_model(LimitedTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, fk_fields=fk_fields),
+    'data_container': generate_data_container_table(LimitedTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+
+    'frontend_data':{
+      'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_viewall_url,
+      'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_search_url,
+      'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_update_url,
+      'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_delete_url,  
+      'model_fields': get_field_names_from_model(LimitedTracker)
+    },
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -890,7 +943,7 @@ def create_limited_tracker(request):
     **URLS,
 
     'page_title': 'Create Limited Tracker',
-    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name,
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_home_name,
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_create_name,
     'form_title': 'Limited Tracker Creation Form',
     'form': LimitedTrackerCreationForm(initial={'created_by': request.user.user_id})
@@ -1059,6 +1112,12 @@ def export_limited_tracker(request):
 # =============================================================================================================
 # =============================================================================================================
 # LimitedSubmissionDeadlineTracker
+def get_limited_submissions_where_deadline_not_set():
+  return LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline = None)
+
+def get_limited_submissions_where_deadline_missed():
+  return LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False)
+
 @login_required
 def home_limited_submission_deadline_tracker(request):
   pk_field = 'submission_id'
@@ -1070,23 +1129,27 @@ def home_limited_submission_deadline_tracker(request):
       }
   context = {
     **URLS,
-    'model_fields': get_field_names_from_model(LimitedSubmissionDeadlineTracker),
-    'template_tag': generate_template_tag_for_model(LimitedSubmissionDeadlineTracker, pk_field=pk_field, show_id=True, fk_fields=fk_fields),
-    'data_container': generate_data_container_table(LimitedSubmissionDeadlineTracker, pk_field=pk_field, show_id=True),
-    
     'caption': 'View Limited Submission Deadline Tracker',
     'page_title': 'View Limited Submission Deadline Tracker',
+    
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_create_name,
     'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_export_name,
-    'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_viewall_url,
-    'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_search_url,
-    'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_update_url,
-    'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_delete_url,
 
     'counts': True,
     'limited_submission_counts': True,
-    'submission_deadline_not_set': LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline=None).count(),
-    'submission_deadline_missed': LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False).count()
+    'submission_deadline_not_set': get_limited_submissions_where_deadline_not_set().count(),
+    'submission_deadline_missed': get_limited_submissions_where_deadline_missed().count(),
+
+    'template_tag': generate_template_tag_for_model(LimitedSubmissionDeadlineTracker, pk_field=pk_field, show_id=True, fk_fields=fk_fields),
+    'data_container': generate_data_container_table(LimitedSubmissionDeadlineTracker, pk_field=pk_field, show_id=True),
+
+    'frontend_data':{
+      'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_viewall_url,
+      'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_search_url,
+      'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_update_url,
+      'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_delete_url,  
+      'model_fields': get_field_names_from_model(LimitedSubmissionDeadlineTracker)
+    },
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -1204,8 +1267,8 @@ def search_limited_submission_deadline_tracker(request, limit: int=-1):
     # if tasks query paramter exists then return tasks
     if tasks_key:
       tasks = {
-        'submission_deadline_not_set': LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline = None),
-        'submission_deadline_missed': LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False)
+        'submission_deadline_not_set': get_limited_submissions_where_deadline_not_set(),
+        'submission_deadline_missed': get_limited_submissions_where_deadline_missed()
       }
       records = tasks.get(tasks_key, [])
       data = serialize(queryset=records, format='json')
@@ -1246,3 +1309,79 @@ def export_limited_submission_deadline_tracker(request):
     show_others = show_others
     )
   return response
+
+###########################################
+# Merged trackers view
+@login_required
+def merged_tracker_home(request):
+  pk_field = 'tracker_id'
+  exclude_fields = ['is_updated']
+  include_fields = ['tracker_id', 'client_id', 'job_description', 'deadline', 'remarks','is_completed', 'has_issue', 'complete_date', 'done_by', 'created_by','creation_date', 'issue_created_by']
+  limited_tracker_fk_fields = {
+    'created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+    'issue_created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+    'done_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+    'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+    'prepared_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+    'assigned_to': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+    'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': HTML_Generator.Limited_client_id_repr_format, 'href-url':Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url },
+    'incomplete_tasks': { 'details_url_without_argument': '/companies/LTrc/search/?client_id=', 'repr-format': r'{length}'}
+    }
+  selfassesment_tracker_fk_fields = {
+    'created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+    'issue_created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+    'done_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+    'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+    'prepared_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+    'assigned_to': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+    'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_details_url, 'repr-format': HTML_Generator.Selfassesment_client_id_repr_format, 'href-url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_update_url },
+    'incomplete_tasks': { 'details_url_without_argument': '/companies/SATrc/search/?client_id=', 'repr-format': r'{length}'}
+    }
+
+  keep_include_fields = True
+  context = {
+    **URLS,
+    'page_title': 'View Tracker',
+    'caption': 'View Tracker',
+
+    'export_name': URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_export_name,
+
+    'create_limited_tracker': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_create_name,
+    'create_selfassesment_tracker': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_create_name,
+
+    'counts': True,
+    'tracker_task_counts': True,
+    'new_customers': get_limited_trackers_where_tasks_customers_are_new().count() + get_selfassesment_trackers_where_tasks_customers_are_new().count(),
+    'future_incomplete_tasks': get_limited_trackers_where_future_tasks_are_incomplete().count() + get_selfassesment_trackers_where_future_tasks_are_incomplete().count(),
+    'todays_incomplete_tasks': get_limited_trackers_where_todays_tasks_are_incomplete().count() + get_selfassesment_trackers_where_todays_tasks_are_incomplete().count(),
+    'previous_incomplete_tasks': get_limited_trackers_where_previous_tasks_are_incomplete().count() + get_selfassesment_trackers_where_previous_tasks_are_incomplete().count(),
+    'task_has_issue': get_limited_trackers_where_tasks_has_issues().count() + get_selfassesment_trackers_where_tasks_has_issues().count(),
+
+    'data_container': generate_data_container_table(LimitedTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    'selfassesment_tracker_template': generate_template_tag_for_model(SelfassesmentTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, fk_fields=selfassesment_tracker_fk_fields, tag_id="selfassesment_tracker_template"),
+    'limited_tracker_template': generate_template_tag_for_model(LimitedTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, fk_fields=limited_tracker_fk_fields, tag_id="limited_tracker_template"),
+
+    'frontend_data': {
+      "Limited": {
+        'create_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_create_url,
+        'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_viewall_url,
+        'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_search_url,
+        'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_update_url,
+        'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_delete_url,
+        "model_fields": get_field_names_from_model(SelfassesmentTracker),
+      },
+      "Selfassesment": {
+        'create_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_create_url,
+        'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_viewall_url,
+        'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_search_url,
+        'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_update_url,
+        'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_delete_url,
+        "model_fields": get_field_names_from_model(LimitedTracker),
+      },
+    },
+  }
+  return render(request, 'companies/merged_tracker.html', context=context)
+
+@login_required
+def merged_tracker_export(request):
+  return HttpResponse('merged tracker export url')

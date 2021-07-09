@@ -41,7 +41,7 @@ application_name = app_name
 
 urlpatterns = [
     path(route='',
-        view=home_selfassesment,
+        view=merged_tracker_home,
         name='home'),
 
     # =============================================================================================================

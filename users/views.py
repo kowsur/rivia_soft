@@ -60,7 +60,7 @@ def login_user(request):
                 login(request, user)
                 if next_url:
                     return redirect(next_url)
-                return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
+                return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_home_name)
         context['message'] = 'Incorrect email or password.'
     return render(request, 'users/login.html', context=context)
 

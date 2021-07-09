@@ -468,6 +468,8 @@ def add_all_selfassesment_to_selfassesment_account_submission_w_submission_year(
 # =============================================================================================================
 # =============================================================================================================
 # SelfassesmentTracker
+selfassesment_tracker_home_redirect_page = URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_home_name
+
 def get_selfassesment_trackers_where_tasks_customers_are_new():
   return SelfassesmentTracker.objects.filter(new_customer=True)
 
@@ -521,7 +523,7 @@ def home_selfassesment_tracker(request):
 
 @login_required
 def view_selfassesment_tracker(request):
-  return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
+  return redirect(selfassesment_tracker_home_redirect_page)
 
 @login_required
 def create_selfassesment_tracker(request):
@@ -529,7 +531,7 @@ def create_selfassesment_tracker(request):
     **URLS,
 
     'page_title': 'Create Selfassesment Tracker',
-    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_home_name,
+    'view_url': selfassesment_tracker_home_redirect_page,
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_create_name,
     'form_title': 'Selfassesment Tracker Creation Form',
     'form': SelfassesmentTrackerCreationForm(initial={'created_by': request.user.user_id})
@@ -553,7 +555,7 @@ def update_selfassesment_tracker(request, tracker_id:int):
   context = {
     **URLS,
     'page_title': f'Update Selfassesment Tracker',
-    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name,
+    'view_url': selfassesment_tracker_home_redirect_page,
     'id': tracker_id,
     'update_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_update_name,
     'form_title': 'Selfassesment Update Form',
@@ -565,10 +567,10 @@ def update_selfassesment_tracker(request, tracker_id:int):
     context['form'] = SelfassesmentTrackerChangeForm(instance=record)
     if record.is_completed:
       messages.error(request, message=f"Task {tracker_id} is completed therefore can't be updated!")
-      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
+      return redirect(selfassesment_tracker_home_redirect_page)
   except SelfassesmentTracker.DoesNotExist:
     messages.error(request, f'Selfassesment Tracker having id {tracker_id} does not exists!')
-    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
+    return redirect(selfassesment_tracker_home_redirect_page)
     raise Http404
 
   if request.method == 'POST':
@@ -585,7 +587,7 @@ def update_selfassesment_tracker(request, tracker_id:int):
       assesment.save()
       messages.success(request, f'Selfassesment Tracker has been updated having id {tracker_id}!')
       if assesment.is_completed:
-        return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
+        return redirect(selfassesment_tracker_home_redirect_page)
     else:
       messages.error(request, f'Updating Selfassesment Tracker having id {tracker_id} failed due to invalid data!')
   return render(request, template_name='companies/update.html', context=context)
@@ -593,12 +595,12 @@ def update_selfassesment_tracker(request, tracker_id:int):
 @login_required
 @allowed_for_superuser(
   message="Sorry! You are not authorized to delete this.",
-  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
+  redirect_to=selfassesment_tracker_home_redirect_page)
 def delete_selfassesment_tracker(request, tracker_id:int):
   context = {
     **URLS,
     'page_title': 'Delete Selfassesment Tracker',
-    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name,
+    'view_url': selfassesment_tracker_home_redirect_page,
     'id': tracker_id,
     'delete_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_delete_name,
     'form_title': "Selfassesment Tracker Delete Form",
@@ -609,7 +611,7 @@ def delete_selfassesment_tracker(request, tracker_id:int):
     record =  SelfassesmentTracker.objects.get(tracker_id=tracker_id)
   except SelfassesmentTracker.DoesNotExist:
     messages.error(request, f'Selfassesment Tracker record with id {tracker_id}, you are looking for does not exist!')
-    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
+    return redirect(selfassesment_tracker_home_redirect_page)
 
   if request.method == 'POST':
     form = SelfassesmentTrackerDeleteForm(request.POST)
@@ -619,7 +621,7 @@ def delete_selfassesment_tracker(request, tracker_id:int):
       messages.success(request, f'Selfassesment Tracker has been deleted having id {tracker_id}!')
     else:
       messages.error(request, f'Deletion of Selfassesment Tracker having id {tracker_id} failed')
-    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_home_name)
+    return redirect(selfassesment_tracker_home_redirect_page)
   return render(request, template_name='companies/delete.html', context=context)
 
 @login_required
@@ -872,6 +874,8 @@ def export_limited(request):
 # =============================================================================================================
 # =============================================================================================================
 # LimitedTracker
+limited_tracker_home_redirect_page = URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_home_name
+
 def get_limited_trackers_where_tasks_customers_are_new():
   return LimitedTracker.objects.filter(new_customer=True)
 
@@ -935,7 +939,7 @@ def home_limited_tracker(request):
 
 @login_required
 def view_limited_tracker(request):
-  return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name)
+  return redirect(limited_tracker_home_redirect_page)
 
 @login_required
 def create_limited_tracker(request):
@@ -943,7 +947,7 @@ def create_limited_tracker(request):
     **URLS,
 
     'page_title': 'Create Limited Tracker',
-    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_home_name,
+    'view_url': limited_tracker_home_redirect_page,
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_create_name,
     'form_title': 'Limited Tracker Creation Form',
     'form': LimitedTrackerCreationForm(initial={'created_by': request.user.user_id})
@@ -967,7 +971,7 @@ def update_limited_tracker(request, tracker_id:int):
   context = {
     **URLS,
     'page_title': f'Update Limited Tracker',
-    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name,
+    'view_url': limited_tracker_home_redirect_page,
     'id': tracker_id,
     'update_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_update_name,
     'form_title': 'Limited Update Form',
@@ -979,10 +983,10 @@ def update_limited_tracker(request, tracker_id:int):
     context['form'] = LimitedTrackerChangeForm(instance=record)
     if record.is_completed:
       messages.error(request, message=f"Task {tracker_id} is completed therefore can't be updated!")
-      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name)
+      return redirect(limited_tracker_home_redirect_page)
   except LimitedTracker.DoesNotExist:
     messages.error(request, f'Limited Tracker having id {tracker_id} does not exists!')
-    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name)
+    return redirect(limited_tracker_home_redirect_page)
     raise Http404
 
   if request.method == 'POST':
@@ -999,7 +1003,7 @@ def update_limited_tracker(request, tracker_id:int):
       assesment.save()
       messages.success(request, f'Limited Tracker has been updated having id {tracker_id}!')
       if assesment.is_completed:
-        return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name)
+        return redirect(limited_tracker_home_redirect_page)
     else:
       messages.error(request, f'Updating Limited Tracker having id {tracker_id} failed due to invalid data!')
   return render(request, template_name='companies/update.html', context=context)
@@ -1012,7 +1016,7 @@ def delete_limited_tracker(request, tracker_id:int):
   context = {
     **URLS,
     'page_title': 'Delete Limited Tracker',
-    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name,
+    'view_url': limited_tracker_home_redirect_page,
     'id': tracker_id,
     'delete_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_delete_name,
     'form_title': "Limited Tracker Delete Form",
@@ -1023,7 +1027,7 @@ def delete_limited_tracker(request, tracker_id:int):
     record =  LimitedTracker.objects.get(tracker_id=tracker_id)
   except LimitedTracker.DoesNotExist:
     messages.error(request, f'Limited Tracker record with id {tracker_id}, you are looking for does not exist!')
-    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name)
+    return redirect(limited_tracker_home_redirect_page)
 
   if request.method == 'POST':
     form = LimitedTrackerDeleteForm(request.POST)
@@ -1033,7 +1037,7 @@ def delete_limited_tracker(request, tracker_id:int):
       messages.success(request, f'Limited Tracker has been deleted having id {tracker_id}!')
     else:
       messages.error(request, f'Deletion of Limited Tracker having id {tracker_id} failed')
-    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_home_name)
+    return redirect(limited_tracker_home_redirect_page)
   return render(request, template_name='companies/delete.html', context=context)
 
 @login_required

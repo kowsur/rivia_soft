@@ -25,9 +25,6 @@
     input:hover, textarea:hover, select:hover{ @apply bg-gray-600; }
     input:focus, textarea:focus, select:focus{ @apply text-gray-100 bg-gray-800 ring-2; }
   }
-  input[type='checkbox']{
-    @apply h-full;
-  }
   input[type='number'], input[type='time'], input[type='date'], input[type='datetimelocal'], input[type='datetime']{
     @apply w-max inline;
   }
@@ -194,12 +191,6 @@
 /* round table corners */
 .data-wrapper, table{
   @apply rounded-xl;
-}
-.data-wrapper{
-  border-top-left-radius: 10px;
-  border-top-right-radius: 30px;
-  border-bottom-left-radius: 33px;
-  border-bottom-right-radius: 63px;
 }
 
 .data-head .data-head-row{

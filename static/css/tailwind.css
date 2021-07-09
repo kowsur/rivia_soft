@@ -200,12 +200,23 @@
 .data-head-row th{
   @apply cursor-pointer;
 }
+.data-head-row th:hover{
+  background-color: #1f2937;
+}
+@media (prefers-color-scheme: light){
+  .data-head-row th:hover{
+    background-color: #d1d5db;
+  }
+}
 
 .data-row{
   @apply h-full bg-gray-300 dark:bg-gray-800;
 }
 .data-row:hover{
-  @apply bg-gray-400 text-gray-900 dark:bg-gray-700 dark:text-white;
+  @apply bg-[#b1b7c0] text-gray-900 dark:bg-gray-700 dark:text-white;
+}
+table a:hover{
+  text-decoration: underline;
 }
 
 .data-id{

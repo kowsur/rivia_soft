@@ -10,7 +10,8 @@ def export_to_csv(
     ordering = [],
     keep_include_fields = True,
     show_others = True,
-    fk_fields = []
+    fk_fields = [],
+    write_header_row=True,
     ):
   model_fields = get_field_names_from_model(django_model)
   writer = csv.writer(write_to)
@@ -35,7 +36,8 @@ def export_to_csv(
     header.append(col_name)
     columns.append(field)
   # write header row
-  writer.writerow(header)
+  if write_header_row:
+    writer.writerow(header)
   del(header)
 
   records = django_model.objects.all()

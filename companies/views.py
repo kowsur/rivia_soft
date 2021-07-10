@@ -1390,7 +1390,7 @@ def merged_tracker_home(request):
 def merged_tracker_export(request):
   response = HttpResponse(
     content_type='text/csv; charset=utf-8',
-    headers={'Content-Disposition': f'attachment; filename="limited_tracker_{timezone.localtime()}.csv"'},
+    headers={'Content-Disposition': f'attachment; filename="merged_tracker_{timezone.localtime()}.csv"'},
   )
   include_fields = []
   exclude_fields = set(['is_updated'])
@@ -1410,6 +1410,7 @@ def merged_tracker_export(request):
     include_fields = include_fields,
     exclude_fields = exclude_fields,
     keep_include_fields = keep_include_fields,
-    show_others = show_others
+    show_others = show_others,
+    write_header_row=False
     )
   return response

@@ -1388,4 +1388,28 @@ def merged_tracker_home(request):
 
 @login_required
 def merged_tracker_export(request):
-  return HttpResponse('merged tracker export url')
+  response = HttpResponse(
+    content_type='text/csv; charset=utf-8',
+    headers={'Content-Disposition': f'attachment; filename="limited_tracker_{timezone.localtime()}.csv"'},
+  )
+  include_fields = []
+  exclude_fields = set(['is_updated'])
+  keep_include_fields = True
+  show_others = True
+  export_to_csv(
+    django_model = LimitedTracker,
+    write_to = response,
+    include_fields = include_fields,
+    exclude_fields = exclude_fields,
+    keep_include_fields = keep_include_fields,
+    show_others = show_others
+    )
+  export_to_csv(
+    django_model = SelfassesmentTracker,
+    write_to = response,
+    include_fields = include_fields,
+    exclude_fields = exclude_fields,
+    keep_include_fields = keep_include_fields,
+    show_others = show_others
+    )
+  return response

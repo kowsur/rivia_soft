@@ -449,6 +449,7 @@ class LimitedCreationForm(forms.ModelForm):
 
             'date_of_birth',
             'PAYE_number',
+            'director_name',
             'director_phone_number',
             'director_email',
             'director_address',
@@ -481,7 +482,7 @@ class LimitedCreationForm(forms.ModelForm):
                 ),
             Fieldset(
                 title = 'Director Info',
-                fields = ('date_of_birth', 'director_phone_number', 'director_email', 'director_address', 'director_post_code', )
+                fields = ('date_of_birth', 'director_name', 'director_phone_number', 'director_email', 'director_address', 'director_post_code', )
                 ),
             Fieldset(
                 title = 'HMRC Details',
@@ -525,6 +526,7 @@ class LimitedChangeForm(forms.ModelForm):
 
             'date_of_birth',
             'PAYE_number',
+            'director_name',
             'director_phone_number',
             'director_email',
             'director_address',
@@ -557,7 +559,7 @@ class LimitedChangeForm(forms.ModelForm):
                 ),
             Fieldset(
                 title = 'Director Info',
-                fields = ('date_of_birth', 'director_phone_number', 'director_email', 'director_address', 'director_post_code', )
+                fields = ('date_of_birth', 'director_name', 'director_phone_number', 'director_email', 'director_address', 'director_post_code', )
                 ),
             Fieldset(
                 title = 'HMRC Details',

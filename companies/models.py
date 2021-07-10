@@ -389,6 +389,7 @@ class Limited(models.Model):
     # Director Info
     date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=True)
     PAYE_number = models.CharField(verbose_name='PAYE Number', max_length=255, blank=True, null=True, unique=True, db_index=True)
+    director_name = models.CharField(verbose_name='Director Name', max_length=255, blank=True, null=True)
     director_phone_number = models.CharField(verbose_name='Director Phone numbers', max_length=255, blank=False, null=True, db_index=True)
     director_email = models.EmailField(verbose_name='Director Email', max_length=320, blank=True, null=True)
     director_address = models.TextField(verbose_name='Director Address', blank=True, null=True, db_index=True)

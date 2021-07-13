@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.urls.exceptions import NoReverseMatch
 
 #forms
 from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm
@@ -15,6 +16,7 @@ from .forms import SelfassesmentTrackerCreationForm, SelfassesmentTrackerChangeF
 
 from .forms import LimitedCreationForm, LimitedChangeForm, LimitedDeleteForm
 from .forms import LimitedTrackerCreationForm, LimitedTrackerChangeForm, LimitedTrackerDeleteForm
+from .forms import MergedTrackerCreateionForm
 from .forms import LimitedSubmissionDeadlineTrackerCreationForm, LimitedSubmissionDeadlineTrackerChangeForm, LimitedSubmissionDeadlineTrackerDeleteForm
 
 #models
@@ -47,7 +49,7 @@ from .url_variables import *
 
 # html generator
 from .html_generator import get_field_names_from_model, generate_template_tag_for_model, generate_data_container_table
-from .repr_formats import HTML_Generator
+from .repr_formats import HTML_Generator, Forms as FK_Formats
 
 application_name = APPLICATION_NAME
 # these path names will be passed to templates to use in the navbar links
@@ -58,6 +60,9 @@ URLS = {
   **URL_NAMES_PREFIXED_WITH_APP_NAME.get_dict()
 }
 user_details_url_without_argument = '/u/details/'
+
+from pprint import pp
+
 
 # =============================================================================================================
 # =============================================================================================================
@@ -471,7 +476,7 @@ def add_all_selfassesment_to_selfassesment_account_submission_w_submission_year(
 selfassesment_tracker_home_redirect_page = URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_home_name
 
 def get_selfassesment_trackers_where_tasks_customers_are_new():
-  return SelfassesmentTracker.objects.filter(new_customer=True)
+  return SelfassesmentTracker.objects.filter(new_customer=True, is_completed=False)
 
 def get_selfassesment_trackers_where_future_tasks_are_incomplete():
   return SelfassesmentTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime())
@@ -536,8 +541,10 @@ def create_selfassesment_tracker(request):
     'form_title': 'Selfassesment Tracker Creation Form',
     'form': SelfassesmentTrackerCreationForm(initial={'created_by': request.user.user_id})
   }
+  redirect_to = None
 
   if request.method == 'POST':
+    redirect_to = request.POST.get('redirect_to', None)
     form = SelfassesmentTrackerCreationForm(request.POST, initial={'created_by': request.user.user_id})
     context['form'] = form
     if form.is_valid():
@@ -548,7 +555,15 @@ def create_selfassesment_tracker(request):
       assesment.save()
       messages.success(request, f'New Selfassesment Tracker has been created with id {assesment.tracker_id}!')
       context['form'] = SelfassesmentTrackerCreationForm(initial={'created_by': request.user.user_id})
+  try:
+    if not redirect_to:
+      redirect_to = request.GET.get('redirect_to')
+    if redirect_to:
+      return redirect(redirect_to, permanent=True)
+  except NoReverseMatch:
+    raise Http404
   return render(request, template_name='companies/create.html', context=context)
+
 
 @login_required
 def update_selfassesment_tracker(request, tracker_id:int):
@@ -877,7 +892,7 @@ def export_limited(request):
 limited_tracker_home_redirect_page = URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_home_name
 
 def get_limited_trackers_where_tasks_customers_are_new():
-  return LimitedTracker.objects.filter(new_customer=True)
+  return LimitedTracker.objects.filter(new_customer=True, is_completed=False)
 
 def get_limited_trackers_where_future_tasks_are_incomplete():
   return LimitedTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime())
@@ -952,8 +967,10 @@ def create_limited_tracker(request):
     'form_title': 'Limited Tracker Creation Form',
     'form': LimitedTrackerCreationForm(initial={'created_by': request.user.user_id})
   }
+  redirect_to = None
 
   if request.method == 'POST':
+    redirect_to = request.POST.get('redirect_to', None)
     form = LimitedTrackerCreationForm(request.POST, initial={'created_by': request.user.user_id})
     context['form'] = form
     if form.is_valid():
@@ -964,6 +981,14 @@ def create_limited_tracker(request):
       assesment.save()
       messages.success(request, f'New Limited Tracker has been created with id {assesment.tracker_id}!')
       context['form'] = LimitedTrackerCreationForm(initial={'created_by': request.user.user_id})
+
+  try:
+    if not redirect_to:
+      redirect_to = request.GET.get('redirect_to', None)
+    if redirect_to:
+      return redirect(redirect_to)
+  except NoReverseMatch:
+    raise Http404
   return render(request, template_name='companies/create.html', context=context)
 
 @login_required
@@ -1316,8 +1341,10 @@ def export_limited_submission_deadline_tracker(request):
 
 ###########################################
 # Merged trackers view
+merged_tracker_home_redirect_page = URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_home_name
+
 @login_required
-def merged_tracker_home(request):
+def home_merged_tracker(request):
   pk_field = 'tracker_id'
   exclude_fields = ['is_updated']
   include_fields = ['tracker_id', 'client_id', 'job_description', 'deadline', 'remarks','is_completed', 'has_issue', 'complete_date', 'done_by', 'created_by','creation_date', 'issue_created_by']
@@ -1348,6 +1375,7 @@ def merged_tracker_home(request):
     'page_title': 'View Tracker',
     'caption': 'View Tracker',
 
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_create_name,
     'export_name': URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_export_name,
 
     'create_limited_tracker': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_create_name,
@@ -1387,7 +1415,40 @@ def merged_tracker_home(request):
   return render(request, 'companies/merged_tracker.html', context=context)
 
 @login_required
-def merged_tracker_export(request):
+def create_merged_tracker(request):
+  context = {
+    **URLS,
+    'page_title': 'Create Tracker',
+    
+    'view_url': merged_tracker_home_redirect_page,
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_create_name,
+
+    'form_title': 'Tracker Creation Form',
+    'form': MergedTrackerCreateionForm(),
+
+    'redirect_to': URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_create_name,
+
+    'frontend_data':{
+      "Limited": {
+        'create_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Tracker_create_url,
+        'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
+        'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
+        'repr_format': FK_Formats.Limited_client_id_repr_format,
+        'redirect_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_create_name
+      },
+      "Selfassesment": {
+        'create_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Tracker_create_url,
+        'viewall_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
+        'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
+        'repr_format': FK_Formats.Selfassesment_client_id_repr_format,
+        'redirect_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_create_name
+      },
+    }
+  }
+  return render(request, template_name='companies/merged_tracker_create.html', context=context)
+
+@login_required
+def export_merged_tracker(request):
   response = HttpResponse(
     content_type='text/csv; charset=utf-8',
     headers={'Content-Disposition': f'attachment; filename="merged_tracker_{timezone.localtime()}.csv"'},

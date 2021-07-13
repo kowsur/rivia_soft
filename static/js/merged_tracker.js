@@ -1,5 +1,6 @@
 import { fetch_url, db_all_records, db_search_records, db_search_records_client_id } from './fetch_data.js'
 import { populate_with_data } from './table.js'
+import { removeAllEventListeners } from './utilities.js'
 import DATA from './parse_data.js'
 
 
@@ -8,20 +9,20 @@ const limited_template_query_string = 'template#limited_tracker_template'
 const Selfassesment = DATA.Selfassesment
 const selfassesment_template_query_string = 'template#selfassesment_tracker_template'
 
-// Merged tracker Create Options
-const create_btn = document.querySelector('#merged_tracker_create')
-const create_options = document.querySelector('#create_options_container')
-const create_options_close_btn = document.querySelector('#merged_tracker_create_options_close')
+// // Merged tracker Create Options
+// const create_btn = document.querySelector('#merged_tracker_create')
+// const create_options = document.querySelector('#create_options_container')
+// const create_options_close_btn = document.querySelector('#merged_tracker_create_options_close')
 
-create_btn.addEventListener('click', (event) => {
-  event.preventDefault()
-  create_options.style.display = 'flex'
-})
+// create_btn.addEventListener('click', (event) => {
+//   event.preventDefault()
+//   create_options.style.display = 'flex'
+// })
 
-create_options_close_btn.addEventListener('click', (event)=>{
-  event.preventDefault()
-  create_options.style.display = 'none'
-})
+// create_options_close_btn.addEventListener('click', (event)=>{
+//   event.preventDefault()
+//   create_options.style.display = 'none'
+// })
 
 //table cell compare attribute name = "data-cmp"
 
@@ -147,11 +148,4 @@ async function searchTrackersTasks(
   let response = await fetch_url(kwargs)
   let data = await response.json()
   return data
-}
-
-
-function removeAllEventListeners(element){
-  let new_element = element.cloneNode(true);
-  element.parentNode.replaceChild(new_element, element);
-  return new_element
 }

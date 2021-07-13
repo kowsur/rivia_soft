@@ -19,13 +19,13 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 from django.http import FileResponse
-from companies.views import merged_tracker_home
+from companies.views import home_merged_tracker
 
 urlpatterns = [
-    path('', merged_tracker_home),
+    path('', home_merged_tracker),
     path('companies/', include('companies.urls'), name='companies'),
     path('u/', include('users.urls')),
-    path('admin/', admin.site.urls, name='admin'),
+    path('only-admins-can-access-this/', admin.site.urls, name='admin'),
     path('opensearch.xml', lambda request: FileResponse(open('I:/Projects/rs/static/osd.xml','rb')), name='opensearch'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

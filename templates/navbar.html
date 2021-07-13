@@ -1,3 +1,5 @@
+{% load admin_urls %}
+
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 <div class="w-full text-gray-700 bg-white dark:text-gray-200 dark:bg-gray-800">
   <div x-data="{ open: false }" class="flex flex-col md:items-center md:justify-between md:flex-row max-w-screen-xl px-4 md:px-6 lg:px-8 mx-auto">
@@ -138,7 +140,7 @@
          <div class="px-2 py-2 bg-white rounded-md shadow dark:bg-gray-800">
           {% if user.is_superuser %}
             <!-- admin -->
-            <a class="block px-4 py-2 mt-2 text-sm font-semibold rounded-lg md:mt-0 focus:outline-none focus:shadow-outline create" href="/admin/">Admin Pannel</a>
+            <a class="block px-4 py-2 mt-2 text-sm font-semibold rounded-lg md:mt-0 focus:outline-none focus:shadow-outline create" href="{% url 'admin:index' %}">Admin Pannel</a>
             
             <!-- logout -->
             <a class="block px-4 py-2 mt-2 text-sm font-semibold rounded-lg md:mt-2 delete focus:outline-none focus:shadow-outline" href="{% url 'users_logout' %}">Logout</a>

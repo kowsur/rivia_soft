@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from itertools import chain
 from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.core.exceptions import ValidationError
@@ -704,6 +705,64 @@ class LimitedTrackerDeleteForm(forms.ModelForm):
         model = Limited
         fields = ()
 
+# Merged Tracker
+class MergedTrackerCreateionForm(forms.ModelForm):
+    deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today, 'min': get_date_today}))
+    client_id = SearchableModelField(
+        queryset=Limited.objects.all(),
+        label = 'Business Name/Client Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
+        repr_format = Forms.Limited_client_id_repr_format,
+        model=Limited,
+        choices=chain(Limited.objects.all().only('client_id', 'client_name'), Selfassesment.objects.all().only('client_id', 'client_name')),
+        fk_field='client_id',
+        empty_label=None
+        )
+    assigned_to = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = Forms.CustomUser_repr_format,
+        model = CustomUser,
+        choices = CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field = 'user_id',
+        disabled = False,
+        required = False,
+        empty_label = None # remove default option '------' from select menu
+        )
+    
+    class Meta:
+        model = LimitedTracker
+        fields = (
+            # 'tracker_id',
+            # 'created_by', #request.user
+            # 'done_by', #request.user
+            'assigned_to',
+            'client_id',
+            'job_description',
+            'remarks',
+            'has_issue',
+            'deadline', #default timezone now
+            # 'complete_date', #default timezone now
+            # 'is_completed',
+            )
+
+    def clean_deadline(self):
+        input_date = self.cleaned_data['deadline']
+        current_date = timezone.now().date()
+        if not input_date>=current_date:
+            raise ValidationError("Deadline can't be a previous date.")
+        return input_date
+
+    def clean_remarks(self):
+        remarks = self.cleaned_data.get('remarks').strip()
+        issue = self.data.get('has_issue')
+        if issue and not remarks:
+            raise ValidationError("Tracker has issue therefore remarks is required")
+        return remarks
+
+
 # Limited Submission Deadline Tracker
 class LimitedSubmissionDeadlineTrackerCreationForm(forms.ModelForm):
     client_id = SearchableModelField(
@@ -800,3 +859,5 @@ class LimitedSubmissionDeadlineTrackerDeleteForm(forms.ModelForm):
 
 # LSDT - view
 #   show count - where (HMRC_deadline = None) like Trackers
+
+

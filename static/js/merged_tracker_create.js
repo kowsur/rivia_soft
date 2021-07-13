@@ -3,7 +3,7 @@ import { fetch_url, db_all_records, db_search_records } from './fetch_data.js'
 import DATA from './parse_data.js'
 
 let typingTimer;
-let doneTypingInterval = 400;
+let doneTypingInterval = 300;
 
 let old_form = document.querySelector('form')
 removeAllEventListeners(old_form)

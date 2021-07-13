@@ -114,6 +114,7 @@ class URL_PATHS(Dict_Duck_type):
 
   # Merged Tracker
   Merged_Tracker_home_url = f'{Merged_Tracker}/{home_suffix}/'
+  Merged_Tracker_create_url = f'{Merged_Tracker}/{create_suffix}/'
   Merged_Tracker_export_url = f'{Merged_Tracker}/{export_suffix}/'
 
 
@@ -180,6 +181,7 @@ class URL_NAMES(Dict_Duck_type):
 
   # Merged Tracker
   Merged_Tracker_home_name = f'{Merged_Tracker}_{home_suffix}'
+  Merged_Tracker_create_name = f'{Merged_Tracker}_{create_suffix}'
   Merged_Tracker_export_name = f'{Merged_Tracker}_{export_suffix}'
 
 
@@ -246,6 +248,7 @@ class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
 
   # Merged Tracker
   Merged_Tracker_home_url = f'/{APPLICATION_NAME}/{Merged_Tracker}/{home_suffix}/'
+  Merged_Tracker_create_url = f'/{APPLICATION_NAME}/{Merged_Tracker}/{create_suffix}/'
   Merged_Tracker_export_url = f'/{APPLICATION_NAME}/{Merged_Tracker}/{export_suffix}'
 
 
@@ -313,4 +316,5 @@ class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
 
   # Merged Tracker
   Merged_Tracker_home_name = f'{APPLICATION_NAME}:{Merged_Tracker}_{home_suffix}'
+  Merged_Tracker_create_name = f'{APPLICATION_NAME}:{Merged_Tracker}_{create_suffix}'
   Merged_Tracker_export_name = f'{APPLICATION_NAME}:{Merged_Tracker}_{export_suffix}'

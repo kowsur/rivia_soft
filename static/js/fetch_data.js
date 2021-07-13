@@ -1,4 +1,4 @@
-import { deepCompare } from "./utilities.js"
+import { deepCompare, catchErrorAndLog } from "./utilities.js"
 import DATA from "./parse_data.js";
 
 
@@ -44,42 +44,37 @@ export async function db_search_records_client_id(client_id, search_url = DATA.s
 // =============================================================================================================================
 // Api caller
 export async function fetch_url({url, req_method, data_object={}, headers={'Content-Type': 'application/json'}, others={}}){
-  try {
-    showLoadingIndicator()
-    req_method = req_method.toUpperCase()
-    if (deepCompare(others, {})){
-      others = {
-        credentials: 'same-origin',
-        cache: 'no-cache',
-        mode: 'cors', // no-cors, *cors, same-origin
-        redirect: 'follow', // manual, *follow, error
-        referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin,
-                                      // same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      }
+  catchErrorAndLog(showLoadingIndicator)
+  req_method = req_method.toUpperCase()
+  if (deepCompare(others, {})){
+    others = {
+      credentials: 'same-origin',
+      cache: 'no-cache',
+      mode: 'cors', // no-cors, *cors, same-origin
+      redirect: 'follow', // manual, *follow, error
+      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin,
+                                    // same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
     }
-    if (req_method==='GET'){
-      // send GET request
-      const response = await fetch( url, {
+  }
+  if (req_method==='GET'){
+    // send GET request
+    const response = await fetch( url, {
+      method: req_method,
+      headers: headers,
+      ...others
+    })
+    catchErrorAndLog(hideLoadingIndicator)
+    return response
+  }else{
+    // send other requests
+    const response = await fetch( url, {
         method: req_method,
         headers: headers,
+        body: data_object,
         ...others
       })
-      hideLoadingIndicator()
-      return response
-    }else{
-      // send other requests
-      const response = await fetch( url, {
-          method: req_method,
-          headers: headers,
-          body: data_object,
-          ...others
-        })
-      hideLoadingIndicator()
-      return response
-    }
-    
-  } catch (error) {
-    console.log(error)
+    catchErrorAndLog(hideLoadingIndicator())
+    return response
   }
 }
 

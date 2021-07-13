@@ -117,6 +117,28 @@ export function dateFormat(date, raw_date_string){
 
 //=======================================================================================================
 
+// catch error and log
+export function catchErrorAndLog(func, ...args){
+  try{
+    func(...args)
+  }catch(error){
+    let devLocations = ['127.0.0.1', 'localhost', '192.168.0']
+    for(let location of devLocations){
+      if(window.location.host.match(location)){
+        console.log(error)
+        break
+      }
+    }
+  };
+}
+
+export function removeAllEventListeners(element){
+  let new_element = element.cloneNode(true);
+  element.parentNode.replaceChild(new_element, element);
+  return new_element
+}
+
+
 // Javascript object compare
 export function deepCompare () {
   var i, l, leftChain, rightChain;
@@ -239,6 +261,15 @@ function sleep(milliseconds) {
   do {
     currentDate = Date.now();
   } while (currentDate - date < milliseconds);
+}
+
+function sleepCallback(milliseconds, func, ...args) {
+  const date = Date.now();
+  let currentDate = null;
+  do {
+    currentDate = Date.now();
+  } while (currentDate - date < milliseconds);
+  func(...args)
 }
 
 

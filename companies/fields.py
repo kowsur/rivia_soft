@@ -1,6 +1,5 @@
 from django import forms
 from django.forms import widgets
-from .models import Selfassesment
 from typing import *
 from collections import namedtuple
 from django.db.models.query import QuerySet
@@ -23,6 +22,7 @@ class Select(widgets.ChoiceWidget):
         self.all_url = all_url
         self.model = model
         self.fk_field = fk_field
+        self.choices = choices
         if self.fk_field==None:
             self.fk_field = self.model._meta.pk.name
         if kwargs.get('label'):
@@ -38,6 +38,7 @@ class Select(widgets.ChoiceWidget):
         context['repr_format'] = self.repr_format
         context['search_url'] = self.search_url
         context['all_url'] = self.all_url
+        context['choices'] = self.choices
         # get pk field
         # print(self.model._meta.pk.name)
 

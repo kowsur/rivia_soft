@@ -177,6 +177,7 @@ async function searchOptions(search_text){
     let option = createOption(record, 'Selfassesment')
     options_container.appendChild(option)
   })
+  client_id_search.focus()
 }
 
 async function loadAllOptions(){
@@ -192,6 +193,7 @@ async function loadAllOptions(){
     let option = createOption(record, 'Selfassesment')
     options_container.appendChild(option)
   })
+  client_id_search.focus()
 }
 
 

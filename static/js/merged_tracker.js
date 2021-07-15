@@ -95,7 +95,6 @@ export function loadAllTrackers(){
     let selfassesment_all_records = db_all_records(Selfassesment.viewall_url)
     
     Promise.all([limited_all_records, selfassesment_all_records]).then(data=>{
-      console.log(data)
       let [limited_all_records, selfassesment_all_records] = data
 
       populate_with_data(limited_all_records, limited_template_query_string, Limited.model_fields, Limited.update_url, Limited.delete_url, true)

@@ -138,8 +138,8 @@ for (let task of tasks){
     Promise.all([limited_search_records, selfassesment_search_records]).then(data=>{
       [limited_search_records, selfassesment_search_records] = data
 
-      populate_with_data(limited_data, limited_template_query_string, Limited.model_fields, Limited.update_url, Limited.delete_url, true)
-      populate_with_data(selfassesment_data, selfassesment_template_query_string, Selfassesment.model_fields, Selfassesment.update_url, Selfassesment.delete_url, false)
+      populate_with_data(limited_search_records, limited_template_query_string, Limited.model_fields, Limited.update_url, Limited.delete_url, true)
+      populate_with_data(selfassesment_search_records, selfassesment_template_query_string, Selfassesment.model_fields, Selfassesment.update_url, Selfassesment.delete_url, false)
       
       let counts = task.querySelector('#task-count')
       counts.innerHTML = limited_search_records.length + selfassesment_search_records.length

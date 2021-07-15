@@ -141,6 +141,8 @@ client_id_search.addEventListener('input', (event)=>{
   typingTimer = setTimeout(async ()=>{
     if (!search_text) loadAllOptions()
     else searchOptions(search_text)
+
+    client_id_search.focus()
   }, doneTypingInterval)
 })
 
@@ -156,7 +158,6 @@ options_container.addEventListener('click', (event)=>{
   let text = clickedOption.textContent
   let selectOption = `<option value="${value}" selected>${text}</option>`
   
-  selectElement.innerHTML = ''
   selectElement.innerHTML = selectOption
   
   client_id_search.value = clickedOption.textContent
@@ -165,35 +166,41 @@ options_container.addEventListener('click', (event)=>{
 
 
 async function searchOptions(search_text){
-  options_container.innerHTML = ''
-  let limited_records = await db_search_records(search_text, DATA.Limited.search_url)
-  let selfassesment_records = await db_search_records(search_text, DATA.Selfassesment.search_url)
-
-  limited_records.forEach((record)=>{
-    let option = createOption(record, 'Limited')
-    options_container.appendChild(option)
+  let limited_records = db_search_records(search_text, DATA.Limited.search_url)
+  let selfassesment_records = db_search_records(search_text, DATA.Selfassesment.search_url)
+  
+  Promise.all([limited_records, selfassesment_records]).then(data => {
+    [limited_records, selfassesment_records] = data
+    
+    options_container.innerHTML = ''
+    limited_records.forEach((record)=>{
+      let option = createOption(record, 'Limited')
+      options_container.appendChild(option)
+    })
+    selfassesment_records.forEach((record)=>{
+      let option = createOption(record, 'Selfassesment')
+      options_container.appendChild(option)
+    })
   })
-  selfassesment_records.forEach((record)=>{
-    let option = createOption(record, 'Selfassesment')
-    options_container.appendChild(option)
-  })
-  client_id_search.focus()
 }
 
 async function loadAllOptions(){
-  options_container.innerHTML = ''
-  let limited_all_records = await db_all_records(DATA.Limited.viewall_url)
-  let selfassesment_all_records = await db_all_records(DATA.Selfassesment.viewall_url)
-
-  limited_all_records.forEach((record)=>{
-    let option = createOption(record, 'Limited')
-    options_container.appendChild(option)
+  let limited_all_records = db_all_records(DATA.Limited.viewall_url)
+  let selfassesment_all_records = db_all_records(DATA.Selfassesment.viewall_url)
+  
+  Promise.all([limited_all_records, selfassesment_all_records]).then(data=> {
+    [limited_all_records, selfassesment_all_records] = data
+    
+    options_container.innerHTML = ''
+    limited_all_records.forEach((record)=>{
+      let option = createOption(record, 'Limited')
+      options_container.appendChild(option)
+    })
+    selfassesment_all_records.forEach((record)=>{
+      let option = createOption(record, 'Selfassesment')
+      options_container.appendChild(option)
+    })
   })
-  selfassesment_all_records.forEach((record)=>{
-    let option = createOption(record, 'Selfassesment')
-    options_container.appendChild(option)
-  })
-  client_id_search.focus()
 }
 
 

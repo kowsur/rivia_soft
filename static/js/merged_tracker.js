@@ -91,20 +91,30 @@ if (search_bar){
 
 export function loadAllTrackers(){
   setTimeout(async ()=>{
-    let all_records = await db_all_records(Limited.viewall_url)
-    populate_with_data(all_records, limited_template_query_string, Limited.model_fields, Limited.update_url, Limited.delete_url, true)
-    all_records = await db_all_records(Selfassesment.viewall_url)
-    populate_with_data(all_records, selfassesment_template_query_string, Selfassesment.model_fields, Selfassesment.update_url, Selfassesment.delete_url, false)
-  }, 10); // search with text
+    let limited_all_records = db_all_records(Limited.viewall_url)
+    let selfassesment_all_records = db_all_records(Selfassesment.viewall_url)
+    
+    Promise.all([limited_all_records, selfassesment_all_records]).then(data=>{
+      console.log(data)
+      let [limited_all_records, selfassesment_all_records] = data
+
+      populate_with_data(limited_all_records, limited_template_query_string, Limited.model_fields, Limited.update_url, Limited.delete_url, true)
+      populate_with_data(selfassesment_all_records, selfassesment_template_query_string, Selfassesment.model_fields, Selfassesment.update_url, Selfassesment.delete_url, false)
+    })
+  }, 0); // search with text
 }
 
 export function searchTrackers(doneTypingInterval, search_text, limited_search_url, selfassesment_search_url){
   typingTimer = setTimeout(async (search_text, limited_search_url, selfassesment_search_url)=>{
-    let limited_search_records = await db_search_records(search_text, limited_search_url)
-    populate_with_data(limited_search_records, limited_template_query_string, Limited.model_fields, Limited.update_url, Limited.delete_url, true)
+    let limited_search_records = db_search_records(search_text, limited_search_url)
+    let selfassesment_search_records = db_search_records(search_text, selfassesment_search_url)
 
-    let selfassesment_search_records = await db_search_records(search_text, selfassesment_search_url)
-    populate_with_data(selfassesment_search_records, selfassesment_template_query_string, Selfassesment.model_fields, Selfassesment.update_url, Selfassesment.delete_url, false)
+    Promise.all([limited_search_records, selfassesment_search_records]).then(data=>{
+      [limited_search_records, selfassesment_search_records] = data
+
+      populate_with_data(limited_search_records, limited_template_query_string, Limited.model_fields, Limited.update_url, Limited.delete_url, true)
+      populate_with_data(selfassesment_search_records, selfassesment_template_query_string, Selfassesment.model_fields, Selfassesment.update_url, Selfassesment.delete_url, false)
+    })
   }, doneTypingInterval, search_text, limited_search_url, selfassesment_search_url); // search with text
 }
 
@@ -123,14 +133,18 @@ for (let task of tasks){
 
     let search_param = new URLSearchParams(params).toString()
 
-    let limited_data = await searchTrackersTasks(Limited.search_url, search_param)
-    populate_with_data(limited_data, limited_template_query_string, Limited.model_fields, Limited.update_url, Limited.delete_url, true)
+    let limited_search_records = searchTrackersTasks(Limited.search_url, search_param)
+    let selfassesment_search_records = searchTrackersTasks(Selfassesment.search_url, search_param)
     
-    let selfassesment_data = await searchTrackersTasks(Selfassesment.search_url, search_param)
-    populate_with_data(selfassesment_data, selfassesment_template_query_string, Selfassesment.model_fields, Selfassesment.update_url, Selfassesment.delete_url, false)
+    Promise.all([limited_search_records, selfassesment_search_records]).then(data=>{
+      [limited_search_records, selfassesment_search_records] = data
 
-    let counts = task.querySelector('#task-count')
-    counts.innerHTML = limited_data.length + selfassesment_data.length
+      populate_with_data(limited_data, limited_template_query_string, Limited.model_fields, Limited.update_url, Limited.delete_url, true)
+      populate_with_data(selfassesment_data, selfassesment_template_query_string, Selfassesment.model_fields, Selfassesment.update_url, Selfassesment.delete_url, false)
+      
+      let counts = task.querySelector('#task-count')
+      counts.innerHTML = limited_search_records.length + selfassesment_search_records.length
+    })
   })
 }
 

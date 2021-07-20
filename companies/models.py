@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import fields
 from django.db.models.deletion import SET_NULL
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -603,11 +604,89 @@ class LimitedSubmissionDeadlineTracker(models.Model):
         self.our_deadline = self.HMRC_deadline - timedelta(30)
         self.save()
 
+# Limited VAT Tracker
+class LimitedVATTracker(models.Model):
+    class Meta:
+        verbose_name = _("Limited VAT Tracker")
+        verbose_name_plural = _("Limited VAT Trackers")
 
-# Limited Submission Deadline Tracker (Limited Submission on nav bar)
+    vat_id = models.AutoField(verbose_name='VAT Tracker ID', primary_key=True, null=False, db_index=True, editable=False)
+    client_id = models.ForeignKey(
+        to='companies.Limited',
+        on_delete=models.CASCADE,
+        verbose_name='Client ID',
+        to_field='client_id',
+        related_name='limited_vat_client_id',
+        blank=False,
+        null=True)
+    period_start = models.DateField(verbose_name='Period Start', blank=False, null=True)
+    period_end = models.DateField(verbose_name='Period End', blank=False, null=True)
+    HMRC_deadline = models.DateField(verbose_name='HMRC Deadline', blank=True, null=True)
+    is_submitted = models.BooleanField(verbose_name='Is Submitted', default=False, null=False)
+    submitted_by = models.TextField(verbose_name='Submitted By', blank=True, default='', null=True)
+    submission_date = models.DateField(verbose_name='Submission Date', blank=True, null=True)
+    is_documents_uploaded = models.BooleanField(verbose_name='Is Documents Uploaded', default=False, null=False)
+    remarks = models.TextField(verbose_name='Remarks', blank=True, null=True)
+    updated_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Last Updated By',
+        related_name='limited_vat_updated_by',
+        to_field='user_id',
+        blank=False,
+        null=True)
+    last_updated_on = models.DateTimeField(verbose_name='Last Updated On', default=timezone.now, null=True)
 
-# (when is_submitted=True) create new entry in LSDT
-#   - limited_id = entry.limited_id
+    def __str__(self) -> str:
+        return f"{self.vat_id} - {self.client_id}"
 
-# LSDT - view
-#   show count - where (HMRC_deadline = None) like Trackers
+    def set_defaults(self, request):
+        self.updated_by = request.user
+        self.last_updated_on = timezone.now()
+        
+        if self.period_end:
+            # set self.our_deadline 30 days before the self.HMRC_deadline
+            self.HMRC_deadline = self.period_end + timedelta(30)
+        self.save()
+
+
+# Limited Confirmation Statement Tracker
+class LimitedConfirmationStatementTracker(models.Model):
+    class Meta:
+        verbose_name = _("Limited Confirmation Statement")
+        verbose_name_plural = _("Limited Confirmation Statements")
+
+    statement_id = models.AutoField(verbose_name='Statement ID', primary_key=True, null=False, db_index=True, editable=False)
+    client_id = models.ForeignKey(
+        to='companies.Limited',
+        on_delete=models.CASCADE,
+        verbose_name='Client ID',
+        to_field='client_id',
+        related_name='limited_confirmation_client_id',
+        blank=False,
+        null=True)
+    HMRC_deadline = models.DateField(verbose_name='HMRC Deadline', blank=False, null=True)
+    is_submitted = models.BooleanField(verbose_name='Is Submitted', default=False, null=False)
+    submitted_by = models.TextField(verbose_name='Submitted By', blank=True, default='', null=True)
+    submission_date = models.DateField(verbose_name='Submission Date', blank=True, null=True)
+    is_documents_uploaded = models.BooleanField(verbose_name='Is Documents Uploaded', default=False, null=False)
+    remarks = models.TextField(verbose_name='Remarks', blank=True, null=True)
+    updated_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Last Updated By',
+        related_name='limited_confirmation_updated_by',
+        to_field='user_id',
+        blank=False,
+        null=True)
+    last_updated_on = models.DateTimeField(verbose_name='Last Updated On', default=timezone.now, null=True)
+
+
+    def __str__(self) -> str:
+        return f"{self.statement_id} - {self.client_id}"
+
+
+    def set_defaults(self, request):
+        self.updated_by = request.user
+        self.last_updated_on = timezone.now()
+        self.save()

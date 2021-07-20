@@ -68,11 +68,37 @@
     {% elif limited_submission_counts %}
       <div class="task-container">
         <span class="task task-issue" data-tasks='submission_deadline_not_set'>
-          {{ submission_deadline_not_set }}
+          <span id="task-count">{{ submission_deadline_not_set }}</span>
           <span class="task-tooltip">Limited Submission HMRC Deadline not set.</span>
         </span>
         <span class="task task-previous" data-tasks='submission_deadline_missed'>
-          {{ submission_deadline_missed }}
+          <span id="task-count">{{ submission_deadline_missed }}</span>
+          <span class="task-tooltip">Missed Deadlines.</span>
+        </span>
+      </div>
+    {% elif limited_vat_counts %}
+      <div class="task-container">
+        <span class="task task-issue" data-tasks='submission_deadline_not_set'>
+          <span id="task-count">{{ submission_deadline_not_set }}</span>
+          <span class="task-tooltip">Limited Submission HMRC Deadline not set.</span>
+        </span>
+        <span class="task task-previous" data-tasks='submission_deadline_missed'>
+          <span id="task-count">{{ submission_deadline_missed }}</span>
+          <span class="task-tooltip">Missed Deadlines.</span>
+        </span>
+        <span class="task task-previous" data-tasks='period_diff_gt_3months'>
+          <span id="task-count">{{ period_diff_gt_3months }}</span>
+          <span class="task-tooltip">Warnings(Period difference more than 3 months).</span>
+        </span>
+      </div>
+    {% elif limited_statement_counts %}
+      <div class="task-container">
+        <span class="task task-issue" data-tasks='statement_deadline_not_set'>
+          <span id="task-count">{{ statement_deadline_not_set }}</span>
+          <span class="task-tooltip">Limited Submission HMRC Deadline not set.</span>
+        </span>
+        <span class="task task-previous" data-tasks='statement_deadline_missed'>
+          <span id="task-count">{{ statement_deadline_missed }}</span>
           <span class="task-tooltip">Missed Deadlines.</span>
         </span>
       </div>

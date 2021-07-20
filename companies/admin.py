@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker, SelfassesmentType
-from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker
+from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 
 
 admin.site.register(SelfassesmentType)
@@ -204,3 +204,5 @@ admin.site.register(SelfassesmentAccountSubmission, SelfassesmentAccountSubmissi
 admin.site.register(Limited)
 admin.site.register(LimitedTracker)
 admin.site.register(LimitedSubmissionDeadlineTracker)
+admin.site.register(LimitedVATTracker)
+admin.site.register(LimitedConfirmationStatementTracker)

@@ -1,4 +1,7 @@
 from datetime import timedelta
+import re
+from dateutil.relativedelta import relativedelta
+
 import json
 from django.http.response import Http404, HttpResponse
 from django.core.serializers import serialize
@@ -7,6 +10,7 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls.exceptions import NoReverseMatch
+from django.db.models import DurationField, F, ExpressionWrapper
 
 #forms
 from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm
@@ -18,10 +22,12 @@ from .forms import LimitedCreationForm, LimitedChangeForm, LimitedDeleteForm
 from .forms import LimitedTrackerCreationForm, LimitedTrackerChangeForm, LimitedTrackerDeleteForm
 from .forms import MergedTrackerCreateionForm
 from .forms import LimitedSubmissionDeadlineTrackerCreationForm, LimitedSubmissionDeadlineTrackerChangeForm, LimitedSubmissionDeadlineTrackerDeleteForm
+from .forms import LimitedVATTrackerCreationForm, LimitedVATTrackerChangeForm, LimitedVATTrackerDeleteForm
+from .forms import LimitedConfirmationStatementTrackerCreationForm, LimitedConfirmationStatementTrackerChangeForm, LimitedConfirmationStatementTrackerDeleteForm
 
 #models
 from .models import  Selfassesment, SelfassesmentTracker, SelfassesmentAccountSubmission
-from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker
+from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 
 #export
 from .export_models import export_to_csv
@@ -34,6 +40,8 @@ from .queries import db_search_SelfassesmentTracker, db_all_SelfassesmentTracker
 from .queries import db_all_Limited, db_search_Limited
 from .queries import db_search_LimitedTracker, db_all_LimitedTracker
 from .queries import db_search_LimitedSubmissionDeadlineTracker, db_all_LimitedSubmissionDeadlineTracker
+from .queries import db_search_LimitedVATTracker, db_all_LimitedVATTracker
+from .queries import db_search_LimitedConfirmationStatementTracker, db_all_LimitedConfirmationStatementTracker
 
 # serializers
 from rest_framework.decorators import api_view
@@ -768,11 +776,27 @@ def create_limited(request):
       assesment.save()
       messages.success(request, f"New Limited has been created {assesment}!")
 
+      # Create record in Limited Submission Deadline Tracker
       submission = LimitedSubmissionDeadlineTracker()
       submission.client_id = assesment
       submission.updated_by = request.user
       submission.save()
       messages.success(request, f'New Limited Submission has been created {submission}!')
+
+      # Create record in Limited Confirmation Statement Tracker
+      statement = LimitedConfirmationStatementTracker()
+      statement.client_id = assesment
+      statement.set_defaults(request)
+      messages.success(request, f'New Limited Confirmation Statement has been created {submission}!')
+
+      # Create record in Limited VAT Tracker
+      if assesment.vat:
+        for i in range(3):
+          vat = LimitedVATTracker()
+          vat.client_id = assesment
+          vat.updated_by = request.user
+          vat.save()
+          messages.success(request, f'New Limited VAT Tracker has been created {vat}')
       context['form'] = LimitedCreationForm(initial={'client_file_number': Limited.get_next_file_number()})
   return render(request, template_name='companies/create.html', context=context)
 
@@ -797,7 +821,8 @@ def update_limited(request, client_id:int):
   }
 
   try:
-    record =  Limited.objects.get(client_id=client_id)
+    record = Limited.objects.get(client_id=client_id)
+    had_vat = bool(record.vat)
     context['form'] = LimitedChangeForm(instance=record)
   except Limited.DoesNotExist:
     messages.error(request, f'Limited Account having id {client_id} does not exists!')
@@ -810,6 +835,16 @@ def update_limited(request, client_id:int):
     if form.is_valid():
       assesment = form.save()
       messages.success(request, f'Limited has been updated having id {client_id}!')
+      
+      if not had_vat and assesment.vat:
+        # Create record in Limited VAT Tracker
+        print('Create VAT')
+        for i in range(3):
+          vat = LimitedVATTracker()
+          vat.client_id = record
+          vat.updated_by = request.user
+          vat.save()
+          messages.success(request, f'New Limited VAT Tracker has been created {vat}')
     else:
       messages.error(request, f'Updating Limited {client_id} failed due to invalid data!')
   return render(request, template_name='companies/update.html', context=context)
@@ -1338,6 +1373,425 @@ def export_limited_submission_deadline_tracker(request):
     show_others = show_others
     )
   return response
+
+
+# =============================================================================================================
+# =============================================================================================================
+# LimitedVATTracker
+def get_limited_vats_where_deadline_not_set():
+  return LimitedVATTracker.objects.filter(HMRC_deadline = None)
+
+def get_limited_vats_where_deadline_missed():
+  return LimitedVATTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False)
+
+def get_limited_vats_where_period_difference_more_than_3months():
+  return LimitedVATTracker.objects.annotate(
+  diff=ExpressionWrapper(F('period_end') - F('period_start') , 
+  output_field=DurationField())).filter(diff__gte=timedelta(90), is_submitted=False)
+
+@login_required
+def home_limited_vat_tracker(request):
+  pk_field = 'vat_id'
+  keep_include_fields = True
+  fk_fields = {
+      'updated_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': HTML_Generator.Limited_client_id_repr_format, 'href-url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url,},
+      }
+  context = {
+    **URLS,
+    'caption': 'View VAT Tracker',
+    'page_title': 'View VAT Tracker',
+    
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_create_name,
+    'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_export_name,
+
+    'counts': True,
+    'limited_vat_counts': True,
+    'submission_deadline_not_set': get_limited_vats_where_deadline_not_set().count(),
+    'submission_deadline_missed': get_limited_vats_where_deadline_missed().count(),
+    'period_diff_gt_3months': get_limited_vats_where_period_difference_more_than_3months().count(),
+
+    'template_tag': generate_template_tag_for_model(LimitedVATTracker, pk_field=pk_field, show_id=True, fk_fields=fk_fields),
+    'data_container': generate_data_container_table(LimitedVATTracker, pk_field=pk_field, show_id=True),
+
+    'frontend_data':{
+      'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_VAT_Tracker_viewall_url,
+      'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_VAT_Tracker_search_url,
+      'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_VAT_Tracker_update_url,
+      'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_VAT_Tracker_delete_url,  
+      'model_fields': get_field_names_from_model(LimitedVATTracker)
+    },
+  }
+  return render(request=request, template_name='companies/home.html', context=context)
+
+@login_required
+def view_limited_vat_tracker(request):
+  return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_home_name)
+
+@login_required
+def create_limited_vat_tracker(request):
+  context = {
+    **URLS,
+
+    'page_title': 'Create Limited VAT Tracker',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_home_name,
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_create_name,
+    'form_title': 'Limited VAT Tracker Creation Form',
+    'form': LimitedVATTrackerCreationForm()
+  }
+
+  if request.method == 'POST':
+    form = LimitedVATTrackerCreationForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      assesment = form.save()
+      assesment.set_defaults(request)
+      assesment.save()
+      messages.success(request, f'New Limited VAT Tracker has been created with id {assesment.vat_id}!')
+      context['form'] = LimitedVATTrackerCreationForm()
+    else:
+      messages.error(request, f'Action failed due to invalid data!')
+  return render(request, template_name='companies/create.html', context=context)
+
+@login_required
+def update_limited_vat_tracker(request, vat_id:int):
+  context = {
+    **URLS,
+    'page_title': f'Update Limited VAT Tracker',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_home_name,
+    'id': vat_id,
+    'update_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_update_name,
+    'form_title': 'Limited VAT Tracker Update Form',
+    'form': LimitedVATTrackerChangeForm()
+  }
+
+  try:
+    record =  LimitedVATTracker.objects.get(vat_id=vat_id)
+    if record.is_submitted:
+      messages.error(request, message=f"Limited VAT Tracker {vat_id} is submitted therefore can't be updated!")
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_home_name)
+    context['form'] = LimitedVATTrackerChangeForm(instance=record)
+  except LimitedVATTracker.DoesNotExist:
+    messages.error(request, f'Limited VAT Tracker having id {vat_id} does not exists!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_home_name)
+    raise Http404
+
+  if request.method == 'POST':
+    form = LimitedVATTrackerChangeForm(request.POST, instance=record)
+    context['form'] = form
+    if form.is_valid():
+      assesment = form.save(commit=False)
+      assesment.set_defaults(request)
+      assesment.save()
+      
+      # Create Limited VAT Tracker
+      if assesment.is_submitted:
+        vat = LimitedVATTracker()
+        vat.client_id = assesment.client_id
+        vat.updated_by = request.user
+        vat.save()
+        messages.success(request, f'New Limited VAT Tracker has been created {vat}')
+
+      context['form'] = LimitedVATTrackerChangeForm(instance=assesment)
+      messages.success(request, f'Limited VAT Tracker has been updated having id {vat_id}!')
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_home_name)
+    else:
+      messages.error(request, f'Updating Limited VAT Tracker having id {vat_id} failed due to invalid data!')
+  return render(request, template_name='companies/update.html', context=context)
+
+@login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to delete this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_home_name)
+def delete_limited_vat_tracker(request, vat_id:int):
+  context = {
+    **URLS,
+    'page_title': 'Delete Limited VAT Tracker',
+    'id': vat_id,
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_home_name,
+    'delete_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_delete_name,
+    'form_title': "Limited VAT Tracker Delete Form",
+    'form': LimitedVATTrackerDeleteForm()
+  }
+
+  try:
+    record = LimitedVATTracker.objects.get(vat_id=vat_id)
+  except LimitedVATTracker.DoesNotExist:
+    messages.error(request, f'Limited VAT Tracker record with id {vat_id}, you are looking for does not exist!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_home_name)
+  
+  if request.method == 'POST':
+    form = LimitedVATTrackerDeleteForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      record.delete()
+      messages.success(request, f'Limited VAT Tracker has been deleted having id {vat_id}!')
+    else:
+      messages.error(request, f'Deletion of Limited VAT Tracker having id {vat_id} failed!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_home_name)
+  return render(request, template_name='companies/delete.html', context=context)
+
+@login_required
+def search_limited_vat_tracker(request, limit: int=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    # get search text from url query parameter
+    search_text = request.GET.get('q', '').strip()
+    tasks_key = request.GET.get('tasks')
+
+    # if tasks query paramter exists then return tasks
+    if tasks_key:
+      tasks = {
+        'submission_deadline_not_set': get_limited_vats_where_deadline_not_set(),
+        'submission_deadline_missed': get_limited_vats_where_deadline_missed(),
+        'period_diff_gt_3months': get_limited_vats_where_period_difference_more_than_3months()
+      }
+      records = tasks.get(tasks_key, [])
+      data = serialize(queryset=records, format='json')
+      return HttpResponse(data, content_type='application/json')
+    
+    # filter results using the search_text
+    if search_text.strip()=='':
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_viewall_name)
+    records = db_search_LimitedVATTracker(search_text, limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
+
+@login_required
+def all_limited_vat_tracker(request, limit=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    records = db_all_LimitedVATTracker(limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
+
+@login_required
+def export_limited_vat_tracker(request):
+  response = HttpResponse(
+    content_type='text/csv',
+    headers={'Content-Disposition': f'attachment; filename="limited_vat_tracker_{timezone.localtime()}.csv"'},
+  )
+  include_fields = []
+  exclude_fields = ['vat_id']
+  keep_include_fields = False
+  show_others = True
+  export_to_csv(
+    django_model = LimitedVATTracker,
+    write_to = response,
+    include_fields = include_fields,
+    exclude_fields = exclude_fields,
+    keep_include_fields = keep_include_fields,
+    show_others = show_others
+    )
+  return response
+
+
+# =============================================================================================================
+# =============================================================================================================
+# LimitedConfirmationStatementTracker
+def get_limited_statements_where_deadline_not_set():
+  return LimitedConfirmationStatementTracker.objects.filter(HMRC_deadline = None)
+
+def get_limited_statements_where_deadline_missed():
+  return LimitedConfirmationStatementTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False)
+
+
+@login_required
+def home_limited_confirmation_statement_tracker(request):
+  pk_field = 'statement_id'
+  keep_include_fields = True
+  fk_fields = {
+      'updated_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': HTML_Generator.Limited_client_id_repr_format, 'href-url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url,},
+      }
+  context = {
+    **URLS,
+    'caption': 'View Confirmation Statement Tracker',
+    'page_title': 'View Confirmation Statement Tracker',
+    
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_create_name,
+    'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_export_name,
+
+    'counts': True,
+    'limited_statement_counts': True,
+    'statement_deadline_not_set': get_limited_statements_where_deadline_not_set().count(),
+    'statement_deadline_missed': get_limited_statements_where_deadline_missed().count(),
+
+    'template_tag': generate_template_tag_for_model(LimitedConfirmationStatementTracker, pk_field=pk_field, show_id=True, fk_fields=fk_fields),
+    'data_container': generate_data_container_table(LimitedConfirmationStatementTracker, pk_field=pk_field, show_id=True),
+
+    'frontend_data':{
+      'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Confirmation_Statement_Tracker_viewall_url,
+      'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Confirmation_Statement_Tracker_search_url,
+      'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Confirmation_Statement_Tracker_update_url,
+      'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Confirmation_Statement_Tracker_delete_url,  
+      'model_fields': get_field_names_from_model(LimitedConfirmationStatementTracker)
+    },
+  }
+  return render(request=request, template_name='companies/home.html', context=context)
+
+@login_required
+def view_limited_confirmation_statement_tracker(request):
+  return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_home_name)
+
+@login_required
+def create_limited_confirmation_statement_tracker(request):
+  context = {
+    **URLS,
+
+    'page_title': 'Create Limited Confirmation Statement Tracker',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_home_name,
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_create_name,
+    'form_title': 'Limited Confirmation Statement Tracker Creation Form',
+    'form': LimitedConfirmationStatementTrackerCreationForm()
+  }
+
+  if request.method == 'POST':
+    form = LimitedConfirmationStatementTrackerCreationForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      assesment = form.save()
+      assesment.set_defaults(request)
+      assesment.save()
+      messages.success(request, f'New Limited Confirmation Statement Tracker has been created with id {assesment.statement_id}!')
+      context['form'] = LimitedConfirmationStatementTrackerCreationForm()
+    else:
+      messages.error(request, f'Action failed due to invalid data!')
+  return render(request, template_name='companies/create.html', context=context)
+
+@login_required
+def update_limited_confirmation_statement_tracker(request, statement_id:int):
+  context = {
+    **URLS,
+    'page_title': f'Update Limited Confirmation Statement Tracker',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_home_name,
+    'id': statement_id,
+    'update_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_update_name,
+    'form_title': 'Limited Confirmation Statement Tracker Update Form',
+    'form': LimitedConfirmationStatementTrackerChangeForm()
+  }
+
+  try:
+    record =  LimitedConfirmationStatementTracker.objects.get(statement_id=statement_id)
+    if record.is_submitted:
+      messages.error(request, message=f"Limited Confirmation Statement Tracker {statement_id} is submitted therefore can't be updated!")
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_home_name)
+    context['form'] = LimitedConfirmationStatementTrackerChangeForm(instance=record)
+  except LimitedConfirmationStatementTracker.DoesNotExist:
+    messages.error(request, f'Limited Confirmation Statement Tracker having id {statement_id} does not exists!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_home_name)
+    raise Http404
+
+  if request.method == 'POST':
+    form = LimitedConfirmationStatementTrackerChangeForm(request.POST, instance=record)
+    context['form'] = form
+    if form.is_valid():
+      assesment = form.save(commit=False)
+      assesment.set_defaults(request)
+      assesment.save()
+      
+      # Create Limited Confirmation Statement Tracker
+      if assesment.is_submitted:
+        statement = LimitedConfirmationStatementTracker()
+        statement.client_id = assesment.client_id
+        statement.set_defaults(request)
+        statement.save()
+        messages.success(request, f'New Limited Confirmation Statement Tracker has been created {statement}!')
+
+      context['form'] = LimitedConfirmationStatementTrackerChangeForm(instance=assesment)
+      messages.success(request, f'Limited Confirmation Statement Tracker has been updated having id {statement_id}!')
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_home_name)
+    else:
+      messages.error(request, f'Updating Limited Confirmation Statement Tracker having id {statement_id} failed due to invalid data!')
+  return render(request, template_name='companies/update.html', context=context)
+
+@login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to delete this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_home_name)
+def delete_limited_confirmation_statement_tracker(request, statement_id:int):
+  context = {
+    **URLS,
+    'page_title': 'Delete Limited Confirmation Statement Tracker',
+    'id': statement_id,
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_home_name,
+    'delete_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_delete_name,
+    'form_title': "Limited Confirmation Statement Tracker Delete Form",
+    'form': LimitedConfirmationStatementTrackerDeleteForm()
+  }
+
+  try:
+    record = LimitedConfirmationStatementTracker.objects.get(statement_id=statement_id)
+  except LimitedConfirmationStatementTracker.DoesNotExist:
+    messages.error(request, f'Limited Confirmation Statement Tracker record with id {statement_id}, you are looking for does not exist!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_home_name)
+  
+  if request.method == 'POST':
+    form = LimitedConfirmationStatementTrackerDeleteForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      record.delete()
+      messages.success(request, f'Limited Confirmation Statement Tracker has been deleted having id {statement_id}!')
+    else:
+      messages.error(request, f'Deletion of Limited Confirmation Statement Tracker having id {statement_id} failed!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_home_name)
+  return render(request, template_name='companies/delete.html', context=context)
+
+@login_required
+def search_limited_confirmation_statement_tracker(request, limit: int=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    # get search text from url query parameter
+    search_text = request.GET.get('q', '').strip()
+    tasks_key = request.GET.get('tasks')
+
+    # if tasks query paramter exists then return tasks
+    if tasks_key:
+      tasks = {
+        'statement_deadline_not_set': get_limited_statements_where_deadline_not_set(),
+        'statement_deadline_missed': get_limited_statements_where_deadline_missed(),
+      }
+      records = tasks.get(tasks_key, [])
+      data = serialize(queryset=records, format='json')
+      return HttpResponse(data, content_type='application/json')
+    
+    # filter results using the search_text
+    if search_text.strip()=='':
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_viewall_name)
+    records = db_search_LimitedConfirmationStatementTracker(search_text, limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
+
+@login_required
+def all_limited_confirmation_statement_tracker(request, limit=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    records = db_all_LimitedConfirmationStatementTracker(limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
+
+@login_required
+def export_limited_confirmation_statement_tracker(request):
+  response = HttpResponse(
+    content_type='text/csv',
+    headers={'Content-Disposition': f'attachment; filename="limited_confirmation_statement_tracker_{timezone.localtime()}.csv"'},
+  )
+  include_fields = []
+  exclude_fields = ['statement_id']
+  keep_include_fields = False
+  show_others = True
+  export_to_csv(
+    django_model = LimitedConfirmationStatementTracker,
+    write_to = response,
+    include_fields = include_fields,
+    exclude_fields = exclude_fields,
+    keep_include_fields = keep_include_fields,
+    show_others = show_others
+    )
+  return response
+
 
 ###########################################
 # Merged trackers view

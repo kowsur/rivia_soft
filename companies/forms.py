@@ -8,7 +8,7 @@ from .fields import SearchableModelField, Select, Fieldset
 from .url_variables import Full_URL_PATHS_WITHOUT_ARGUMENTS
 
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
-from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker
+from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 
 from .repr_formats import Forms
 
@@ -851,13 +851,188 @@ class LimitedSubmissionDeadlineTrackerDeleteForm(forms.ModelForm):
         model = LimitedSubmissionDeadlineTracker
         fields = ()
 
-# Limited Submission Deadline Tracker (Limited Submission on nav bar)
-#   - updated_by - fk CustomUser.id(user who updates or creates the record)
 
-# (when is_submitted=True) create new entry in LSDT
-#   - limited_id = entry.limited_id
+# Limited VAT Tracker
+class LimitedVATTrackerCreationForm(forms.ModelForm):
+    client_id = SearchableModelField(
+        queryset=Limited.objects.all(),
+        label = 'Business Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
+        repr_format = Forms.Limited_client_id_repr_format,
+        model=Limited,
+        choices=Limited.objects.all().only('client_id', 'client_name'),
+        fk_field='client_id',
+        empty_label=None,
+        disabled=False
+        )
+    period_start = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    period_end = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    # HMRC_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    submission_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    
+    class Meta:
+        model = LimitedVATTracker
+        fields = (
+            # "vat_id",
+            "client_id",
+            "period_start",
+            "period_end",
+            # "HMRC_deadline",
+            "is_submitted",
+            "submitted_by",
+            "submission_date",
+            "is_documents_uploaded",
+            "remarks",
+            # "updated_by",
+            # "last_updated_on",
+            )
 
-# LSDT - view
-#   show count - where (HMRC_deadline = None) like Trackers
+    def clean_period_end(self):
+        if self.cleaned_data.get('period_start') > self.cleaned_data.get('period_end'):
+            raise ValidationError("Period end can't be smaller than the period start.")
+        return self.cleaned_data.get('period_end')
+    
+    def clean_submission_date(self):
+        is_submitted = self.cleaned_data.get('is_submitted')
+        submission_date = self.cleaned_data.get('submission_date')
+        if is_submitted == True and not type(submission_date)==type(date(2021, 6, 28)):
+            raise ValidationError('Is Submitted is True therefore Submission Date is required.')
+        return submission_date
 
+# Limited Submission Deadline Tracker
+class LimitedVATTrackerChangeForm(forms.ModelForm):
+    client_id = SearchableModelField(
+        queryset=Limited.objects.all(),
+        label = 'Business Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
+        repr_format = Forms.Limited_client_id_repr_format,
+        model=Limited,
+        choices=Limited.objects.all().only('client_id', 'client_name'),
+        fk_field='client_id',
+        empty_label=None,
+        disabled=False
+        )
+    period_start = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    period_end = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    # HMRC_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    submission_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    
+    class Meta:
+        model = LimitedVATTracker
+        fields = (
+            # "vat_id",
+            "client_id",
+            "period_start",
+            "period_end",
+            # "HMRC_deadline",
+            "is_submitted",
+            "submitted_by",
+            "submission_date",
+            "is_documents_uploaded",
+            "remarks",
+            # "updated_by",
+            # "last_updated_on",
+            )
+    def clean_period_end(self):
+        if self.cleaned_data.get('period_start') > self.cleaned_data.get('period_end'):
+            raise ValidationError("Period end can't be smaller than the period start.")
+        return self.cleaned_data.get('period_end')
+    
+    def clean_submission_date(self):
+        is_submitted = self.cleaned_data.get('is_submitted')
+        submission_date = self.cleaned_data.get('submission_date')
+        if is_submitted == True and not type(submission_date)==type(date(2021, 6, 28)):
+            raise ValidationError('Is Submitted is True therefore Submission Date is required.')
+        return submission_date
 
+class LimitedVATTrackerDeleteForm(forms.ModelForm):
+    agree = forms.BooleanField(label='I want to proceed.', required=True)
+    class Meta:
+        model = LimitedVATTracker
+        fields = ()
+
+# Limited Confirmation Statement Tracker
+class LimitedConfirmationStatementTrackerCreationForm(forms.ModelForm):
+    client_id = SearchableModelField(
+        queryset=Limited.objects.all(),
+        label = 'Business Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
+        repr_format = Forms.Limited_client_id_repr_format,
+        model=Limited,
+        choices=Limited.objects.all().only('client_id', 'client_name'),
+        fk_field='client_id',
+        empty_label=None,
+        disabled=False
+        )
+    HMRC_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    submission_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    
+    class Meta:
+        model = LimitedConfirmationStatementTracker
+        fields = (
+            # "statement_id",
+            "client_id",
+            "HMRC_deadline",
+            "is_submitted",
+            "submitted_by",
+            "submission_date",
+            "is_documents_uploaded",
+            "remarks",
+            # "updated_by",
+            # "last_updated_on",
+            )
+
+    def clean_submission_date(self):
+        is_submitted = self.cleaned_data.get('is_submitted')
+        submission_date = self.cleaned_data.get('submission_date')
+        if is_submitted == True and not type(submission_date)==type(date(2021, 6, 28)):
+            raise ValidationError('Is Submitted is True therefore Submission Date is required.')
+        return submission_date
+
+# Limited Confirmation Statement Tracker
+class LimitedConfirmationStatementTrackerChangeForm(forms.ModelForm):
+    client_id = SearchableModelField(
+        queryset=Limited.objects.all(),
+        label = 'Business Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
+        repr_format = Forms.Limited_client_id_repr_format,
+        model=Limited,
+        choices=Limited.objects.all().only('client_id', 'client_name'),
+        fk_field='client_id',
+        empty_label=None,
+        disabled=False
+        )
+    HMRC_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    submission_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    
+    class Meta:
+        model = LimitedConfirmationStatementTracker
+        fields = (
+            # "statement_id",
+            "client_id",
+            "HMRC_deadline",
+            "is_submitted",
+            "submitted_by",
+            "submission_date",
+            "is_documents_uploaded",
+            "remarks",
+            # "updated_by",
+            # "last_updated_on",
+            )
+
+    def clean_submission_date(self):
+        is_submitted = self.cleaned_data.get('is_submitted')
+        submission_date = self.cleaned_data.get('submission_date')
+        if is_submitted == True and not type(submission_date)==type(date(2021, 6, 28)):
+            raise ValidationError('Is Submitted is True therefore Submission Date is required.')
+        return submission_date
+
+class LimitedConfirmationStatementTrackerDeleteForm(forms.ModelForm):
+    agree = forms.BooleanField(label='I want to proceed.', required=True)
+    class Meta:
+        model = LimitedConfirmationStatementTracker
+        fields = ()

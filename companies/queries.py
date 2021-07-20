@@ -1,6 +1,6 @@
 from django.db.models import Q
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
-from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker
+from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 from datetime import date, datetime
 from django.utils import timezone
 from itertools import chain
@@ -112,7 +112,7 @@ def db_search_SelfassesmentTracker(search_text: str, user_email='', is_superuser
     return records.order_by('is_completed', '-pk')
 
 def db_all_SelfassesmentTracker(user_email='', is_superuser=False, limit=-1):
-    Query = Q()
+    Query = Q(is_completed=False)
     # # created by should be the current logged in user
     # if not is_superuser:
     #     Query = Query & Q(created_by__email = user_email)
@@ -200,7 +200,7 @@ def db_search_LimitedTracker(search_text: str, user_email='', is_superuser=False
     return records.order_by('is_completed', '-pk')
 
 def db_all_LimitedTracker(user_email='', is_superuser=False, limit=-1):
-    Query = Q()
+    Query = Q(is_completed=False)
     # # created by should be the current logged in user
     # if not is_superuser:
     #     Query = Query & Q(created_by__email = user_email)
@@ -243,6 +243,79 @@ def db_all_LimitedSubmissionDeadlineTracker(limit=-1):
     records = LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__gte = timezone.now())
     records = records.order_by('HMRC_deadline')
     other_records = LimitedSubmissionDeadlineTracker.objects.filter().exclude(HMRC_deadline__gte = timezone.now()).order_by()
+    records = chain(records, other_records)
+    if limit<=-1:
+        return records
+    return records[:limit]
+
+
+# LimitedVATTracker
+def db_search_LimitedVATTracker(search_text: str, limit=-1):
+    Query = Q(client_id__client_name__icontains               = search_text) |\
+            Q(client_id__director_phone_number__icontains               = search_text) |\
+            Q(client_id__director_post_code__icontains               = search_text) |\
+            Q(period_start__icontains              = search_text) |\
+            Q(period_end__icontains              = search_text) |\
+            Q(HMRC_deadline__icontains              = search_text) |\
+            Q(submission_date__icontains            = search_text) |\
+            Q(remarks__icontains                    = search_text) |\
+            Q(last_updated_on__icontains            = search_text)|\
+            Q(is_submitted__icontains               = search_text) |\
+            Q(updated_by__email__icontains          = search_text) |\
+            Q(updated_by__first_name__icontains     = search_text) |\
+            Q(updated_by__last_name__icontains      = search_text) |\
+            Q(is_documents_uploaded__icontains      = search_text)
+    try:
+        num = float(search_text)
+        Query |= Q(vat_id                = int(num)) |\
+                Q(client_id__client_file_number = num)
+    except Exception:
+        pass
+    
+    if limit==-1:
+        return LimitedVATTracker.objects.filter(Query)
+    return LimitedVATTracker.objects.filter(Query)[:limit]
+
+
+def db_all_LimitedVATTracker(limit=-1):
+    records = LimitedVATTracker.objects.filter(HMRC_deadline__gte = timezone.now())
+    records = records.order_by('HMRC_deadline')
+    other_records = LimitedVATTracker.objects.filter().exclude(HMRC_deadline__gte = timezone.now()).order_by()
+    records = chain(records, other_records)
+    if limit<=-1:
+        return records
+    return records[:limit]
+
+# LimitedConfirmationStatementTracker
+def db_search_LimitedConfirmationStatementTracker(search_text: str, limit=-1):
+    Query = Q(client_id__client_name__icontains               = search_text) |\
+            Q(client_id__director_phone_number__icontains               = search_text) |\
+            Q(client_id__director_post_code__icontains               = search_text) |\
+            Q(HMRC_deadline__icontains              = search_text) |\
+            Q(submission_date__icontains            = search_text) |\
+            Q(remarks__icontains                    = search_text) |\
+            Q(last_updated_on__icontains            = search_text)|\
+            Q(is_submitted__icontains               = search_text) |\
+            Q(updated_by__email__icontains          = search_text) |\
+            Q(updated_by__first_name__icontains     = search_text) |\
+            Q(updated_by__last_name__icontains      = search_text) |\
+            Q(is_documents_uploaded__icontains      = search_text)
+    try:
+        num = float(search_text)
+        Query |= Q(statement_id                = int(num)) |\
+                Q(client_id__client_file_number = num)
+    except Exception:
+        pass
+    
+    if limit==-1:
+        return LimitedConfirmationStatementTracker.objects.filter(Query)
+    return LimitedConfirmationStatementTracker.objects.filter(Query)[:limit]
+
+
+def db_all_LimitedConfirmationStatementTracker(limit=-1):
+    records = LimitedConfirmationStatementTracker.objects.filter(HMRC_deadline__gte = timezone.now())
+    records = records.order_by('HMRC_deadline')
+    other_records = LimitedConfirmationStatementTracker.objects.filter().exclude(HMRC_deadline__gte = timezone.now()).order_by()
     records = chain(records, other_records)
     if limit<=-1:
         return records

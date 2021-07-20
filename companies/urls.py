@@ -34,6 +34,14 @@ from .views import home_limited_submission_deadline_tracker, create_limited_subm
     search_limited_submission_deadline_tracker, all_limited_submission_deadline_tracker,                  \
     export_limited_submission_deadline_tracker
 
+# limited vat tracker
+from .views import home_limited_vat_tracker, create_limited_vat_tracker, update_limited_vat_tracker, \
+    delete_limited_vat_tracker, search_limited_vat_tracker, all_limited_vat_tracker, export_limited_vat_tracker
+
+from .views import home_limited_confirmation_statement_tracker, create_limited_confirmation_statement_tracker, \
+    update_limited_confirmation_statement_tracker, delete_limited_confirmation_statement_tracker, \
+    search_limited_confirmation_statement_tracker, all_limited_confirmation_statement_tracker, \
+    export_limited_confirmation_statement_tracker
 
 from .url_variables import APPLICATION_NAME, URL_PATHS, URL_NAMES
 from .url_variables import *
@@ -251,6 +259,68 @@ urlpatterns = [
     path(route = URL_PATHS.Limited_Tracker_export_url,
         view = export_limited_tracker,
         name = URL_NAMES.Limited_Tracker_export_name
+    ),
+    
+    # =============================================================================================================
+    # Limited VAT Tracker
+    path(route = URL_PATHS.Limited_VAT_Tracker_home_url,
+        view = home_limited_vat_tracker,
+        name = URL_NAMES.Limited_VAT_Tracker_home_name),
+
+    path(route = URL_PATHS.Limited_VAT_Tracker_create_url,
+        view = create_limited_vat_tracker,
+        name = URL_NAMES.Limited_VAT_Tracker_create_name),
+
+    path(route = URL_PATHS.Limited_VAT_Tracker_update_url,
+        view = update_limited_vat_tracker,
+        name = URL_NAMES.Limited_VAT_Tracker_update_name),
+
+    path(route = URL_PATHS.Limited_VAT_Tracker_delete_url,
+        view = delete_limited_vat_tracker,
+        name = URL_NAMES.Limited_VAT_Tracker_delete_name),
+
+    path(route = URL_PATHS.Limited_VAT_Tracker_search_url,
+        view = search_limited_vat_tracker,
+        name = URL_NAMES.Limited_VAT_Tracker_search_name),
+    
+    path(route = URL_PATHS.Limited_VAT_Tracker_viewall_url,
+        view = all_limited_vat_tracker,
+        name = URL_NAMES.Limited_VAT_Tracker_viewall_name),
+    
+    path(route = URL_PATHS.Limited_VAT_Tracker_export_url,
+        view = export_limited_vat_tracker,
+        name = URL_NAMES.Limited_VAT_Tracker_export_name
+    ),
+    
+    # =============================================================================================================
+    # Limited Confirmation Statement Tracker
+    path(route = URL_PATHS.Limited_Confirmation_Statement_Tracker_home_url,
+        view = home_limited_confirmation_statement_tracker,
+        name = URL_NAMES.Limited_Confirmation_Statement_Tracker_home_name),
+
+    path(route = URL_PATHS.Limited_Confirmation_Statement_Tracker_create_url,
+        view = create_limited_confirmation_statement_tracker,
+        name = URL_NAMES.Limited_Confirmation_Statement_Tracker_create_name),
+
+    path(route = URL_PATHS.Limited_Confirmation_Statement_Tracker_update_url,
+        view = update_limited_confirmation_statement_tracker,
+        name = URL_NAMES.Limited_Confirmation_Statement_Tracker_update_name),
+
+    path(route = URL_PATHS.Limited_Confirmation_Statement_Tracker_delete_url,
+        view = delete_limited_confirmation_statement_tracker,
+        name = URL_NAMES.Limited_Confirmation_Statement_Tracker_delete_name),
+
+    path(route = URL_PATHS.Limited_Confirmation_Statement_Tracker_search_url,
+        view = search_limited_confirmation_statement_tracker,
+        name = URL_NAMES.Limited_Confirmation_Statement_Tracker_search_name),
+    
+    path(route = URL_PATHS.Limited_Confirmation_Statement_Tracker_viewall_url,
+        view = all_limited_confirmation_statement_tracker,
+        name = URL_NAMES.Limited_Confirmation_Statement_Tracker_viewall_name),
+    
+    path(route = URL_PATHS.Limited_Confirmation_Statement_Tracker_export_url,
+        view = export_limited_confirmation_statement_tracker,
+        name = URL_NAMES.Limited_Confirmation_Statement_Tracker_export_name
     ),
 
     # =============================================================================================================

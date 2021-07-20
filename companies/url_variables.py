@@ -27,6 +27,12 @@ Limited_name = 'LTD'
 Limited_Submission_Deadline_Tracker_path = 'LAS'
 Limited_Submission_Deadline_Tracker_name = 'LAS'
 
+Limited_VAT_Tracker_path = 'LVATTrc'
+Limited_VAT_Tracker_name = 'LVATTrc'
+
+Limited_Confirmation_Statement_Tracker_path = 'LCSTrc'
+Limited_Confirmation_Statement_Tracker_name = 'LCSTrc'
+
 Limited_Tracker_path = 'LTDTrc'
 Limited_Tracker_name = 'LTDTrc'
 
@@ -101,7 +107,24 @@ class URL_PATHS(Dict_Duck_type):
   Limited_Submission_Deadline_Tracker_search_url = f'{Limited_Submission_Deadline_Tracker_path}/{search_suffix}/' # fetch only
   Limited_Submission_Deadline_Tracker_viewall_url = f'{Limited_Submission_Deadline_Tracker_path}/{viewall_suffix}/' # fetch only
   Limited_Submission_Deadline_Tracker_export_url = f'{Limited_Submission_Deadline_Tracker_path}/{export_suffix}/'
-  add_all_Limited_to_Limited_Submission_Deadline_Tracker_url = f'add_all/{Limited_path}/to/{Limited_Submission_Deadline_Tracker_path}/'
+  
+  # Limited VAT Tracker
+  Limited_VAT_Tracker_home_url = f'{Limited_VAT_Tracker_path}/{home_suffix}/'
+  Limited_VAT_Tracker_create_url = f'{Limited_VAT_Tracker_path}/{create_suffix}/'
+  Limited_VAT_Tracker_update_url = f'{Limited_VAT_Tracker_path}/{update_suffix}/<int:vat_id>/'
+  Limited_VAT_Tracker_delete_url = f'{Limited_VAT_Tracker_path}/{delete_suffix}/<int:vat_id>/'
+  Limited_VAT_Tracker_search_url = f'{Limited_VAT_Tracker_path}/{search_suffix}/' # fetch only
+  Limited_VAT_Tracker_viewall_url = f'{Limited_VAT_Tracker_path}/{viewall_suffix}/' # fetch only
+  Limited_VAT_Tracker_export_url = f'{Limited_VAT_Tracker_path}/{export_suffix}/'
+
+  # Limited Confirmation Statement Tracker
+  Limited_Confirmation_Statement_Tracker_home_url = f'{Limited_Confirmation_Statement_Tracker_path}/{home_suffix}/'
+  Limited_Confirmation_Statement_Tracker_create_url = f'{Limited_Confirmation_Statement_Tracker_path}/{create_suffix}/'
+  Limited_Confirmation_Statement_Tracker_update_url = f'{Limited_Confirmation_Statement_Tracker_path}/{update_suffix}/<int:statement_id>/'
+  Limited_Confirmation_Statement_Tracker_delete_url = f'{Limited_Confirmation_Statement_Tracker_path}/{delete_suffix}/<int:statement_id>/'
+  Limited_Confirmation_Statement_Tracker_search_url = f'{Limited_Confirmation_Statement_Tracker_path}/{search_suffix}/' # fetch only
+  Limited_Confirmation_Statement_Tracker_viewall_url = f'{Limited_Confirmation_Statement_Tracker_path}/{viewall_suffix}/' # fetch only
+  Limited_Confirmation_Statement_Tracker_export_url = f'{Limited_Confirmation_Statement_Tracker_path}/{export_suffix}/'
 
   # Tracker
   Limited_Tracker_home_url = f'{Limited_Tracker_path}/{home_suffix}/'
@@ -168,7 +191,24 @@ class URL_NAMES(Dict_Duck_type):
   Limited_Submission_Deadline_Tracker_search_name = f'{Limited_Submission_Deadline_Tracker_name}_{search_suffix}' # fetch only
   Limited_Submission_Deadline_Tracker_viewall_name = f'{Limited_Submission_Deadline_Tracker_name}_{viewall_suffix}' # fetch only
   Limited_Submission_Deadline_Tracker_export_name = f'{Limited_Submission_Deadline_Tracker_name}_{export_suffix}'
-  add_all_Limited_to_Limited_Submission_Deadline_Tracker_name = f'add_all_{Limited_name}_to_{Limited_Submission_Deadline_Tracker_name}'
+  
+  # Limited VAT Tracker
+  Limited_VAT_Tracker_home_name = f'{Limited_VAT_Tracker_name}_{home_suffix}'
+  Limited_VAT_Tracker_create_name = f'{Limited_VAT_Tracker_name}_{create_suffix}'
+  Limited_VAT_Tracker_update_name = f'{Limited_VAT_Tracker_name}_{update_suffix}'
+  Limited_VAT_Tracker_delete_name = f'{Limited_VAT_Tracker_name}_{delete_suffix}'
+  Limited_VAT_Tracker_search_name = f'{Limited_VAT_Tracker_name}_{search_suffix}' # fetch only
+  Limited_VAT_Tracker_viewall_name = f'{Limited_VAT_Tracker_name}_{viewall_suffix}' # fetch only
+  Limited_VAT_Tracker_export_name = f'{Limited_VAT_Tracker_name}_{export_suffix}'
+  
+  # Limited Confirmation Statement Tracker
+  Limited_Confirmation_Statement_Tracker_home_name = f'{Limited_Confirmation_Statement_Tracker_name}_{home_suffix}'
+  Limited_Confirmation_Statement_Tracker_create_name = f'{Limited_Confirmation_Statement_Tracker_name}_{create_suffix}'
+  Limited_Confirmation_Statement_Tracker_update_name = f'{Limited_Confirmation_Statement_Tracker_name}_{update_suffix}'
+  Limited_Confirmation_Statement_Tracker_delete_name = f'{Limited_Confirmation_Statement_Tracker_name}_{delete_suffix}'
+  Limited_Confirmation_Statement_Tracker_search_name = f'{Limited_Confirmation_Statement_Tracker_name}_{search_suffix}' # fetch only
+  Limited_Confirmation_Statement_Tracker_viewall_name = f'{Limited_Confirmation_Statement_Tracker_name}_{viewall_suffix}' # fetch only
+  Limited_Confirmation_Statement_Tracker_export_name = f'{Limited_Confirmation_Statement_Tracker_name}_{export_suffix}'
 
   # Tracker
   Limited_Tracker_home_name = f'{Limited_Tracker_name}_{home_suffix}'
@@ -237,6 +277,24 @@ class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
   Limited_Submission_Deadline_Tracker_viewall_url = f'/{APPLICATION_NAME}/{Limited_Submission_Deadline_Tracker_path}/{viewall_suffix}/' # fetch only
   Limited_Submission_Deadline_Tracker_export_url = f'/{APPLICATION_NAME}/{Limited_Submission_Deadline_Tracker_path}/{export_suffix}/'
 
+  # Limited VAT Tracker
+  Limited_VAT_Tracker_home_url = f'/{APPLICATION_NAME}/{Limited_VAT_Tracker_path}/{home_suffix}/'
+  Limited_VAT_Tracker_create_url = f'/{APPLICATION_NAME}/{Limited_VAT_Tracker_path}/{create_suffix}/'
+  Limited_VAT_Tracker_update_url = f'/{APPLICATION_NAME}/{Limited_VAT_Tracker_path}/{update_suffix}/'
+  Limited_VAT_Tracker_delete_url = f'/{APPLICATION_NAME}/{Limited_VAT_Tracker_path}/{delete_suffix}/'
+  Limited_VAT_Tracker_search_url = f'/{APPLICATION_NAME}/{Limited_VAT_Tracker_path}/{search_suffix}/' # fetch only
+  Limited_VAT_Tracker_viewall_url = f'/{APPLICATION_NAME}/{Limited_VAT_Tracker_path}/{viewall_suffix}/' # fetch only
+  Limited_VAT_Tracker_export_url = f'/{APPLICATION_NAME}/{Limited_VAT_Tracker_path}/{export_suffix}/'
+
+  # Limited Confirmation Statement Tracker
+  Limited_Confirmation_Statement_Tracker_home_url = f'/{APPLICATION_NAME}/{Limited_Confirmation_Statement_Tracker_path}/{home_suffix}/'
+  Limited_Confirmation_Statement_Tracker_create_url = f'/{APPLICATION_NAME}/{Limited_Confirmation_Statement_Tracker_path}/{create_suffix}/'
+  Limited_Confirmation_Statement_Tracker_update_url = f'/{APPLICATION_NAME}/{Limited_Confirmation_Statement_Tracker_path}/{update_suffix}/'
+  Limited_Confirmation_Statement_Tracker_delete_url = f'/{APPLICATION_NAME}/{Limited_Confirmation_Statement_Tracker_path}/{delete_suffix}/'
+  Limited_Confirmation_Statement_Tracker_search_url = f'/{APPLICATION_NAME}/{Limited_Confirmation_Statement_Tracker_path}/{search_suffix}/' # fetch only
+  Limited_Confirmation_Statement_Tracker_viewall_url = f'/{APPLICATION_NAME}/{Limited_Confirmation_Statement_Tracker_path}/{viewall_suffix}/' # fetch only
+  Limited_Confirmation_Statement_Tracker_export_url = f'/{APPLICATION_NAME}/{Limited_Confirmation_Statement_Tracker_path}/{export_suffix}/'
+
   # Tracker
   Limited_Tracker_home_url = f'/{APPLICATION_NAME}/{Limited_Tracker_path}/{home_suffix}/'
   Limited_Tracker_create_url = f'/{APPLICATION_NAME}/{Limited_Tracker_path}/{create_suffix}/'
@@ -303,7 +361,24 @@ class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
   Limited_Submission_Deadline_Tracker_search_name = f'{APPLICATION_NAME}:{Limited_Submission_Deadline_Tracker_name}_{search_suffix}' # fetch only
   Limited_Submission_Deadline_Tracker_viewall_name = f'{APPLICATION_NAME}:{Limited_Submission_Deadline_Tracker_name}_{viewall_suffix}' # fetch only
   Limited_Submission_Deadline_Tracker_export_name = f'{APPLICATION_NAME}:{Limited_Submission_Deadline_Tracker_name}_{export_suffix}'
-  add_all_Limited_to_Limited_Submission_Deadline_Tracker_name = f'{APPLICATION_NAME}:add_all_{Limited_name}_to_{Limited_Submission_Deadline_Tracker_name}'
+
+  # Limited VAT Tracker
+  Limited_VAT_Tracker_home_name = f'{APPLICATION_NAME}:{Limited_VAT_Tracker_name}_{home_suffix}'
+  Limited_VAT_Tracker_create_name = f'{APPLICATION_NAME}:{Limited_VAT_Tracker_name}_{create_suffix}'
+  Limited_VAT_Tracker_update_name = f'{APPLICATION_NAME}:{Limited_VAT_Tracker_name}_{update_suffix}'
+  Limited_VAT_Tracker_delete_name = f'{APPLICATION_NAME}:{Limited_VAT_Tracker_name}_{delete_suffix}'
+  Limited_VAT_Tracker_search_name = f'{APPLICATION_NAME}:{Limited_VAT_Tracker_name}_{search_suffix}' # fetch only
+  Limited_VAT_Tracker_viewall_name = f'{APPLICATION_NAME}:{Limited_VAT_Tracker_name}_{viewall_suffix}' # fetch only
+  Limited_VAT_Tracker_export_name = f'{APPLICATION_NAME}:{Limited_VAT_Tracker_name}_{export_suffix}'
+  
+  # Limited Confirmation Statement Tracker
+  Limited_Confirmation_Statement_Tracker_home_name = f'{APPLICATION_NAME}:{Limited_Confirmation_Statement_Tracker_name}_{home_suffix}'
+  Limited_Confirmation_Statement_Tracker_create_name = f'{APPLICATION_NAME}:{Limited_Confirmation_Statement_Tracker_name}_{create_suffix}'
+  Limited_Confirmation_Statement_Tracker_update_name = f'{APPLICATION_NAME}:{Limited_Confirmation_Statement_Tracker_name}_{update_suffix}'
+  Limited_Confirmation_Statement_Tracker_delete_name = f'{APPLICATION_NAME}:{Limited_Confirmation_Statement_Tracker_name}_{delete_suffix}'
+  Limited_Confirmation_Statement_Tracker_search_name = f'{APPLICATION_NAME}:{Limited_Confirmation_Statement_Tracker_name}_{search_suffix}' # fetch only
+  Limited_Confirmation_Statement_Tracker_viewall_name = f'{APPLICATION_NAME}:{Limited_Confirmation_Statement_Tracker_name}_{viewall_suffix}' # fetch only
+  Limited_Confirmation_Statement_Tracker_export_name = f'{APPLICATION_NAME}:{Limited_Confirmation_Statement_Tracker_name}_{export_suffix}'
 
   # Tracker
   Limited_Tracker_home_name = f'{APPLICATION_NAME}:{Limited_Tracker_name}_{home_suffix}'

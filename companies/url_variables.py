@@ -14,6 +14,9 @@ viewall_suffix = 'all'
 Selfassesment_path = 'SA'
 Selfassesment_name = 'SA'
 
+Selfassesment_Account_Submission_Tax_Year_path = 'SASTY'
+Selfassesment_Account_Submission_Tax_Year_name = 'SASTY'
+
 Selfassesment_Account_Submission_path = 'SAS'
 Selfassesment_Account_Submission_name = 'SAS'
 
@@ -68,6 +71,11 @@ class URL_PATHS(Dict_Duck_type):
   Selfassesment_search_url = f'{Selfassesment_path}/{search_suffix}/' # fetch only
   Selfassesment_viewall_url = f'{Selfassesment_path}/{viewall_suffix}/' # fetch only
   Selfassesment_export_url = f'{Selfassesment_path}/{export_suffix}/'
+
+  # Selfassesment Account Submission Tax Year
+  Selfassesment_Account_Submission_Tax_Year_details_url = f'{Selfassesment_Account_Submission_Tax_Year_path}/{details_suffix}/<int:id>/'
+  Selfassesment_Account_Submission_Tax_Year_search_url = f'{Selfassesment_Account_Submission_Tax_Year_path}/{search_suffix}/' # fetch only
+  Selfassesment_Account_Submission_Tax_Year_viewall_url = f'{Selfassesment_Account_Submission_Tax_Year_path}/{viewall_suffix}/' # fetch only
 
   # Selfassesment Account Submission
   Selfassesment_Account_Submission_home_url = f'{Selfassesment_Account_Submission_path}/{home_suffix}/'
@@ -152,6 +160,11 @@ class URL_NAMES(Dict_Duck_type):
   Selfassesment_search_name = f'{Selfassesment_name}_{search_suffix}' # fetch only
   Selfassesment_viewall_name = f'{Selfassesment_name}_{viewall_suffix}' # fetch only
   Selfassesment_export_name = f'{Selfassesment_name}_{export_suffix}'
+
+  # Selfassesment Account Submission Tax 
+  Selfassesment_Account_Submission_Tax_Year_details_name = f'{Selfassesment_Account_Submission_Tax_Year_path}_{details_suffix}'
+  Selfassesment_Account_Submission_Tax_Year_search_name = f'{Selfassesment_Account_Submission_Tax_Year_name}_{search_suffix}' # fetch only
+  Selfassesment_Account_Submission_Tax_Year_viewall_name = f'{Selfassesment_Account_Submission_Tax_Year_name}_{viewall_suffix}' # fetch only
 
   # Selfassesment Account Submission
   Selfassesment_Account_Submission_home_name = f'{Selfassesment_Account_Submission_name}_{home_suffix}'
@@ -238,6 +251,11 @@ class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
   Selfassesment_viewall_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{viewall_suffix}/' # fetch only
   Selfassesment_export_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{export_suffix}/'
 
+  # Selfassesment Account Submission Tax Year
+  Selfassesment_Account_Submission_Tax_Year_details_url = f'/{APPLICATION_NAME}/{Selfassesment_Account_Submission_Tax_Year_path}/{details_suffix}/'
+  Selfassesment_Account_Submission_Tax_Year_search_url = f'/{APPLICATION_NAME}/{Selfassesment_Account_Submission_Tax_Year_path}/{search_suffix}/' # fetch only
+  Selfassesment_Account_Submission_Tax_Year_viewall_url = f'/{APPLICATION_NAME}/{Selfassesment_Account_Submission_Tax_Year_path}/{viewall_suffix}/' # fetch only
+
   # Selfassesment Account Submission
   Selfassesment_Account_Submission_home_url = f'/{APPLICATION_NAME}/{Selfassesment_Account_Submission_path}/{home_suffix}/'
   Selfassesment_Account_Submission_create_url = f'/{APPLICATION_NAME}/{Selfassesment_Account_Submission_path}/{create_suffix}/'
@@ -322,6 +340,11 @@ class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
   Selfassesment_search_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{search_suffix}' # fetch only
   Selfassesment_viewall_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{viewall_suffix}' # fetch only
   Selfassesment_export_name = f'{APPLICATION_NAME}:{Selfassesment_name}_{export_suffix}'
+
+  # Selfassesment Account Submission Tax Year
+  Selfassesment_Account_Submission_Tax_Year_details_name = f'{APPLICATION_NAME}:{Selfassesment_Account_Submission_Tax_Year_path}_{details_suffix}'
+  Selfassesment_Account_Submission_Tax_Year_search_name = f'{APPLICATION_NAME}:{Selfassesment_Account_Submission_Tax_Year_name}_{search_suffix}' # fetch only
+  Selfassesment_Account_Submission_Tax_Yearviewall_name = f'{APPLICATION_NAME}:{Selfassesment_Account_Submission_Tax_Year_name}_{viewall_suffix}' # fetch onl
 
   # Selfassesment Account Submission
   Selfassesment_Account_Submission_home_name = f'{APPLICATION_NAME}:{Selfassesment_Account_Submission_name}_{home_suffix}'

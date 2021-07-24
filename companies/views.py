@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls.exceptions import NoReverseMatch
 from django.db.models import DurationField, F, ExpressionWrapper
+from django.db.utils import IntegrityError
 
 #forms
 from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm
@@ -26,7 +27,7 @@ from .forms import LimitedVATTrackerCreationForm, LimitedVATTrackerChangeForm, L
 from .forms import LimitedConfirmationStatementTrackerCreationForm, LimitedConfirmationStatementTrackerChangeForm, LimitedConfirmationStatementTrackerDeleteForm
 
 #models
-from .models import  Selfassesment, SelfassesmentTracker, SelfassesmentAccountSubmission
+from .models import  Selfassesment, SelfassesmentTracker, SelfassesmentAccountSubmission, SelfassesmentAccountSubmissionTaxYear
 from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 
 #export
@@ -34,6 +35,7 @@ from .export_models import export_to_csv
 
 #queries
 from .queries import db_search_Selfassesment, db_all_Selfassesment
+from .queries import db_search_SelfassesmentAccountSubmissionTaxYear, db_all_SelfassesmentAccountSubmissionTaxYear
 from .queries import db_search_SelfassesmentAccountSubmission, db_all_SelfassesmentAccountSubmission
 from .queries import db_search_SelfassesmentTracker, db_all_SelfassesmentTracker
 
@@ -46,7 +48,7 @@ from .queries import db_search_LimitedConfirmationStatementTracker, db_all_Limit
 # serializers
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializers import CustomUserSerializer, SelfassesmentSerializer, LimitedSerializer
+from .serializers import CustomUserSerializer, SelfassesmentAccountSubmissionTaxYearSerializer, SelfassesmentSerializer, LimitedSerializer
 
 #permissions
 from .decorators import allowed_for_staff, allowed_for_superuser
@@ -277,9 +279,58 @@ def serialized(request):
   
   return SelfassesmentSerializer()
 
+
+
+# =============================================================================================================
+# =============================================================================================================
+# SelfassesmentAccountSubmissionTaxYear
+
+@login_required
+def get_details_selfassesment_account_submission_tax_year(request, id=None):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    record = get_object_or_404(SelfassesmentAccountSubmissionTaxYear, id=id)
+    response = SelfassesmentAccountSubmissionTaxYearSerializer(instance=record).data
+    return HttpResponse(json.dumps(response))
+  raise Http404
+
+@login_required
+def search_selfassesment_account_submission_tax_year(request, limit: int=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    search_text = request.GET.get('q', '')
+    if search_text.strip()=='':
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_viewall_name)
+    records = db_search_SelfassesmentAccountSubmissionTaxYear(search_text, limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
+
+@login_required
+def all_selfassesment_account_submission_tax_year(request, limit=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    records = db_all_SelfassesmentAccountSubmissionTaxYear(limit)
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
+
 # =============================================================================================================
 # =============================================================================================================
 # SelfassesmentAccountSubmission
+def get_selfassesment_account_submissions_where_status_PROCESSING():
+  return SelfassesmentAccountSubmission.objects.filter(status="PROCESSING")
+
+def get_selfassesment_account_submissions_where_status_BOOK_APPOINTMENT():
+  return SelfassesmentAccountSubmission.objects.filter(status="BOOK APPOINTMENT")
+
+def get_selfassesment_account_submissions_where_status_READY_FOR_SUBMIT():
+  return SelfassesmentAccountSubmission.objects.filter(status="READY FOR SUBMIT")
+
+def get_selfassesment_account_submissions_where_status_WAITING_FOR_CONFIRMATION():
+  return SelfassesmentAccountSubmission.objects.filter(status="WAITING FOR CONFIRMATION")
+
+def get_selfassesment_account_submissions_where_status_SUBMITTED():
+  return SelfassesmentAccountSubmission.objects.filter(status="SUBMITTED")
+
+
 @login_required
 def home_selfassesment_account_submission(request):
   pk_field = 'submission_id'
@@ -290,14 +341,22 @@ def home_selfassesment_account_submission(request):
     'caption': 'View Selfassesment Account Submission',
     'page_title': 'View Selfassesment Account Submission',
     
-    'add_all_url': URL_NAMES_PREFIXED_WITH_APP_NAME.add_all_Selfassesment_to_Selfassesment_Account_Submission_name,
-    'add_all_text': 'Add all Selfassesment to Selfassesment Account Submission',
+    # 'add_all_url': URL_NAMES_PREFIXED_WITH_APP_NAME.add_all_Selfassesment_to_Selfassesment_Account_Submission_name,
+    # 'add_all_text': 'Add all Selfassesment to Selfassesment Account Submission',
 
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_create_name,
     'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_export_name,
 
     'template_tag': generate_template_tag_for_model(SelfassesmentAccountSubmission, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
     'data_container': generate_data_container_table(SelfassesmentAccountSubmission, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+
+    "counts": True,
+    "selfassesment_account_submission_counts": True,
+    "selfassesment_account_submission_status_PROCESSING": get_selfassesment_account_submissions_where_status_PROCESSING().count(),
+    "selfassesment_account_submission_status_BOOK_APPOINTMENT": get_selfassesment_account_submissions_where_status_BOOK_APPOINTMENT().count(),
+    "selfassesment_account_submission_status_READY_FOR_SUBMIT": get_selfassesment_account_submissions_where_status_READY_FOR_SUBMIT().count(),
+    "selfassesment_account_submission_status_WAITING_FOR_CONFIRMATION": get_selfassesment_account_submissions_where_status_WAITING_FOR_CONFIRMATION().count(),
+    "selfassesment_account_submission_status_SUBMITTED": get_selfassesment_account_submissions_where_status_SUBMITTED().count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_viewall_url,
@@ -322,17 +381,22 @@ def create_selfassesment_account_submission(request):
     'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_home_name,
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_create_name,
     'form_title': 'Selfassesment Account Submission Creation Form',
-    'form': SelfassesmentAccountSubmissionCreationForm(initial={'submitted_by': request.user.user_id})
+    'form': SelfassesmentAccountSubmissionCreationForm(initial={'submitted_by': request.user.user_id, 'tax_year': SelfassesmentAccountSubmissionTaxYear.get_max_year()})
   }
 
   if request.method == 'POST':
     form = SelfassesmentAccountSubmissionCreationForm(request.POST)
     context['form'] = form
     if form.is_valid():
-      assesment = form.save()
-      assesment.prepared_by = request.user
-      messages.success(request, f'New Selfassesment Account Submission has been created with id {assesment.submission_id}!')
-      context['form'] = SelfassesmentAccountSubmissionCreationForm(initial={'submitted_by': request.user.user_id})
+      try:
+        assesment = form.save()
+        assesment.prepared_by = request.user
+        assesment.set_defaults(request)
+        assesment.save()
+        messages.success(request, f'New Selfassesment Account Submission has been created with id {assesment.submission_id}!')
+        context['form'] = SelfassesmentAccountSubmissionCreationForm(initial={'submitted_by': request.user.user_id})
+      except IntegrityError:
+        messages.error(request, f"Selfassesment Account Submission can't be updated because Client Name, Tax Year and Status is SUBMITTED is not unique!")
     else:
       messages.error(request, f'Action failed due to invalid data!')
   return render(request, template_name='companies/create.html', context=context)
@@ -361,11 +425,13 @@ def update_selfassesment_account_submission(request, submission_id:int):
     form = SelfassesmentAccountSubmissionChangeForm(request.POST, instance=record)
     context['form'] = form
     if form.is_valid():
-      assesment = form.save(commit=False)
-      if assesment.is_submitted and assesment.submitted_by==None:
-        assesment.submitted_by = request.user
-      assesment.save()
-      messages.success(request, f'Selfassesment Account Submission has been updated having id {submission_id}!')
+      try:
+        assesment = form.save(commit=False)
+        assesment.set_defaults(request)
+        assesment.save()
+        messages.success(request, f'Selfassesment Account Submission has been updated having id {submission_id}!')
+      except IntegrityError:
+        messages.error(request, f"Selfassesment Account Submission can't be updated because Client Name, Tax Year and Status is SUBMITTED is not unique!")
     else:
       messages.error(request, f'Updating Selfassesment Account Submission having id {submission_id} failed due to invalid data!')
   return render(request, template_name='companies/update.html', context=context)
@@ -406,6 +472,20 @@ def delete_selfassesment_account_submission(request, submission_id:int):
 def search_selfassesment_account_submission(request, limit: int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
     search_text = request.GET.get('q', '')
+
+    # if tasks query paramter exists then return tasks
+    if request.GET.get('tasks'):
+      tasks = {
+            "selfassesment_account_submission_status_PROCESSING": get_selfassesment_account_submissions_where_status_PROCESSING(),
+            "selfassesment_account_submission_status_BOOK_APPOINTMENT": get_selfassesment_account_submissions_where_status_BOOK_APPOINTMENT(),
+            "selfassesment_account_submission_status_READY_FOR_SUBMIT": get_selfassesment_account_submissions_where_status_READY_FOR_SUBMIT(),
+            "selfassesment_account_submission_status_WAITING_FOR_CONFIRMATION": get_selfassesment_account_submissions_where_status_WAITING_FOR_CONFIRMATION(),
+            "selfassesment_account_submission_status_SUBMITTED": get_selfassesment_account_submissions_where_status_SUBMITTED(),
+      }
+      records = tasks.get(request.GET.get('tasks'), [])
+      data = serialize(queryset=records, format='json')
+      return HttpResponse(data, content_type='application/json')
+
     if search_text.strip()=='':
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_viewall_name)
     records = db_search_SelfassesmentAccountSubmission(search_text, limit)

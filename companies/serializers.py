@@ -1,7 +1,7 @@
 from django.db.models import fields
 from rest_framework import serializers
 from users.models import CustomUser
-from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
+from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentAccountSubmissionTaxYear, SelfassesmentTracker
 from .models import Limited
 
 
@@ -16,6 +16,11 @@ class SelfassesmentSerializer(serializers.ModelSerializer):
     model = Selfassesment
     # fields = '__all__'
     exclude = ['created_by']
+
+class SelfassesmentAccountSubmissionTaxYearSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = SelfassesmentAccountSubmissionTaxYear
+    fields = '__all__'
 
 class LimitedSerializer(serializers.ModelSerializer):
   class Meta:

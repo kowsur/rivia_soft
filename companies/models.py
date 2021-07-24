@@ -1,15 +1,11 @@
 from django.db import models
-from django.db.models import fields
+from django.db.models import constraints, fields
 from django.db.models.deletion import SET_NULL
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR
 
 from datetime import timedelta, datetime, date
-
-class dummyModelField:
-    def __init__(self) -> None:
-        pass
 
 
 class SelfassesmentType(models.Model):
@@ -179,15 +175,38 @@ class Selfassesment(models.Model):
         self.is_updated=False
         self.save()
 
+class SelfassesmentAccountSubmissionTaxYear(models.Model):
+    class Meta:
+        verbose_name = _("Selfassesment Tax Year")
+        verbose_name_plural = _("Selfassesment Tax Years")
+    id = models.AutoField(verbose_name='Tax Year ID', primary_key=True, null=False, db_index=True, editable=False)
+    tax_year = models.CharField(verbose_name='Tax Year', blank=False, null=False, max_length=12)
+
+    def __str__(self):
+        return f"📆 {self.tax_year}"
+    
+    @classmethod
+    def get_max_year(cls):
+        years = cls.objects.all().order_by('-id')
+        if years.count()>=1:
+            return years.first()
+        return None
 
 class SelfassesmentAccountSubmission(models.Model):
 
     class Meta:
         verbose_name = _("Selfassesment Submission")
         verbose_name_plural = _("Selfassesment Submissions")
-        unique_together = (
-                ('client_id', 'tax_year',),
-            )
+        constraints = [
+            models.UniqueConstraint(
+                fields = ('client_id', 'tax_year',),
+                condition = models.Q(status="SUBMITTED"),
+                name = "unique_client_id__tax_year__status_SUBMITTED",
+                )
+        ]
+        # unique_together = (
+        #         ('client_id', 'tax_year',),
+        #     )
 
     submission_id = models.AutoField(verbose_name='Submission ID', primary_key=True, null=False, db_index=True, editable=False)
     client_id = models.ForeignKey(
@@ -198,8 +217,24 @@ class SelfassesmentAccountSubmission(models.Model):
         related_name='selfassesment_account_submission_client_id',
         blank=False,
         null=True)
-    date_of_submission = models.DateField(verbose_name='Submission date', blank=True, null=True, default=timezone.now)
-    tax_year = models.CharField(verbose_name='Tax Year', max_length=10, blank=True)
+    request_date = models.DateField("Request Date", blank=False, null=True, default=timezone.now)
+    status_choices = (
+        ("PROCESSING", "PROCESSING",),
+        ("BOOK APPOINTMENT", "BOOK APPOINTMENT", ),
+        ("READY FOR SUBMIT", "READY FOR SUBMIT", ),
+        ("WAITING FOR CONFIRMATION", "WAITING FOR CONFIRMATION",),
+        ("SUBMITTED", "SUBMITTED",)
+    )
+    status = models.CharField("Status", blank=False, max_length=55, choices=status_choices, default="PROCESSING")
+    appointment_date = models.DateField(verbose_name='Appointment Date', blank=True, null=True, default=timezone.now)
+    tax_year = models.ForeignKey(
+        default=SelfassesmentAccountSubmissionTaxYear.get_max_year,
+        to=SelfassesmentAccountSubmissionTaxYear,
+        on_delete=models.RESTRICT,
+        to_field='id',
+        null=True,
+        blank=False)
+    remarks = models.TextField(verbose_name='Comments', blank=True, null=True)
     submitted_by = models.ForeignKey(
         to='users.CustomUser', 
         on_delete=models.CASCADE,
@@ -208,6 +243,7 @@ class SelfassesmentAccountSubmission(models.Model):
         to_field='user_id',
         blank=False,
         null=True)
+    is_submitted = models.BooleanField(verbose_name='Is Submitted', blank=True, null=False, default=False)
     prepared_by = models.ForeignKey(
         to='users.CustomUser',
         on_delete=models.CASCADE,
@@ -216,21 +252,50 @@ class SelfassesmentAccountSubmission(models.Model):
         to_field='user_id',
         blank=True,
         null=True)
-    remarks = models.TextField(verbose_name='Remarks', blank=True, null=True)
+    payment_status_choices = (
+        ("NOT PAID", "NOT PAID"),
+        ("PARTIALLY PAID", "PARTIALLY PAID"),
+        ("PAID", "PAID"),
+    )
+    payment_status = models.CharField("Payment Status", blank=False, max_length=55, choices=payment_status_choices, default="NOT PAID")
     paid_amount = models.BigIntegerField(verbose_name='Amount Paid', blank=True, null=True)
-    is_paid = models.BooleanField(verbose_name='Is Paid', blank=True, null=False, default=False)
-    is_submitted = models.BooleanField(verbose_name='Is Submitted', blank=True, null=False, default=False)
+
+    last_updated_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Last Updated By',
+        related_name='selfassesment_account_submission_last_updated_by',
+        to_field='user_id',
+        blank=False,
+        null=True)
+    last_updated_on = models.DateTimeField(verbose_name='Last Updated On', default=timezone.now, null=True)
 
     def __str__(self):
-        return f'Client: {self.client_id}, Submission Date: {self.date_of_submission}'
+        return f'Client: {self.client_id}, Tax Year: {self.tax_year}'
     
     def __repr__(self) -> str:
         return str(self)
     
-    def set_defaults(self):
-        self.prepared_by = self.submitted_by
-        self.save()
+    def set_defaults(self, request):
+        self.last_updated_by = request.user
+        self.last_updated_on = timezone.now()
         
+        if self.status == "SUBMITTED":
+            self.is_submitted = True
+            self.submitted_by = request.user
+            self.date_of_submission = timezone.now()
+        else:
+            self.submitted_by = None
+            self.is_submitted = False
+            self.date_of_submission = None
+        self.save()
+    
+    @classmethod
+    def get_request_date(cls, client_id, tax_year):
+        records = cls.objects.filter(client_id=client_id, tax_year=tax_year)
+        if records.count()>=1:
+            return records.first().request_date
+        return None
 
 
 class SelfassesmentTracker(models.Model):

@@ -7,8 +7,13 @@ from django.utils import timezone
 from .fields import SearchableModelField, Select, Fieldset
 from .url_variables import Full_URL_PATHS_WITHOUT_ARGUMENTS
 
-from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
+from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker, SelfassesmentAccountSubmissionTaxYear
 from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
+
+# from .queries import db_all_Limited, db_all_LimitedConfirmationStatementTracker, db_all_LimitedSubmissionDeadlineTracker, \
+#     db_all_LimitedTracker, db_all_LimitedVATTracker
+# from .queries import db_all_Selfassesment, db_all_SelfassesmentAccountSubmission, db_all_SelfassesmentAccountSubmissionTaxYear, \
+#     db_all_SelfassesmentTracker
 
 from .repr_formats import Forms
 
@@ -179,7 +184,6 @@ class SelfassesmentDeleteForm(forms.ModelForm):
 
 
 class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
-    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today}))
     client_id = SearchableModelField(
         queryset=Selfassesment.objects.all(),
         label = 'Client Name',
@@ -191,29 +195,60 @@ class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
         fk_field='client_id',
         empty_label=None
         )
+    tax_year = SearchableModelField(
+        queryset=SelfassesmentAccountSubmissionTaxYear.objects.all(),
+        label = 'Tax Year',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_Tax_Year_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_Tax_Year_viewall_url,
+        repr_format = Forms.Selfassemsent_tax_year_repr_format,
+        model=SelfassesmentAccountSubmissionTaxYear,
+        choices=SelfassesmentAccountSubmissionTaxYear.objects.all(),
+        fk_field='id',
+        empty_label=None
+    )
+    appointment_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date',}), required=False)
+    request_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date', "value": get_date_today()}), required=False)
 
     class Meta:
         model = SelfassesmentAccountSubmission
         fields = (
-            # 'is_updated',
-            # 'submission_id',
-            'client_id',
-            'date_of_submission', 
-            'tax_year', 
-            # 'submitted_by', 
-            # 'prepared_by', 
-            'remarks', 
-            # 'paid_amount', 
-            # 'is_paid', 
-            # 'is_submitted'
+            # "submission_id",
+            "client_id",
+            "status",
+            "appointment_date",
+            "tax_year",
+            "request_date",
+            "remarks",
+            "payment_status",
+            "paid_amount",
+            # "prepared_by",
+            # "submitted_by",
+            # "is_submitted",
+            # "last_updated_by",
+            # "last_updated_on",
             )
         labels = {
             'client_id': _('Client Name'),
         }
+    def clean_appointment_date(self):
+        status = self.cleaned_data.get('status')
+        appointment_date = self.cleaned_data.get('appointment_date')
+        if status=="BOOK APPOINTMENT" and not appointment_date:
+            raise ValidationError("Status is BOOK APPOINTMENT. Therefore, Appointment Date is required.")
+        return appointment_date
+    
+    def clean_request_date(self):
+        client_id = self.cleaned_data.get("client_id")
+        tax_year = self.cleaned_data.get("tax_year")
+        request_date = self.Meta.model.get_request_date(client_id, tax_year)
+        form_request_date = self.cleaned_data.get("request_date")
+        
+        if request_date: return request_date
+        if form_request_date: return form_request_date
+        raise ValidationError(f"Request Date is required because there isn't any previous records with Client ID: {client_id} and Tax Year: {tax_year}")
 
 
 class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
-    date_of_submission = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     client_id = SearchableModelField(
         queryset=Selfassesment.objects.all(),
         label = 'Client Name',
@@ -235,25 +270,53 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         choices=CustomUser.objects.all().only('user_id', 'first_name'),
         fk_field='user_id',
         empty_label=None,
-        disabled=False
+        disabled=False,
+        required = False
         )
+    tax_year = SearchableModelField(
+        queryset=SelfassesmentAccountSubmissionTaxYear.objects.all(),
+        label = 'Tax Year',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_Tax_Year_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_Tax_Year_viewall_url,
+        repr_format = Forms.Selfassemsent_tax_year_repr_format,
+        model=SelfassesmentAccountSubmissionTaxYear,
+        choices=SelfassesmentAccountSubmissionTaxYear.objects.all(),
+        fk_field='id',
+        empty_label=None
+    )
+    appointment_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    request_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
 
     class Meta:
         model = SelfassesmentAccountSubmission
         fields = (
-            # 'submission_id',
-            'client_id', 
-            'date_of_submission', 
-            'tax_year', 
-            # 'submitted_by', 
-            'prepared_by', 
-            'remarks', 
-            'paid_amount', 
-            'is_paid', 
-            'is_submitted')
+            # "submission_id",
+            "client_id",
+            "status",
+            "appointment_date",
+            # "request_date",
+            "tax_year",
+            "remarks",
+            "payment_status",
+            "paid_amount",
+            "prepared_by",
+            # "submitted_by",
+            # "is_submitted",
+            # "last_updated_by",
+            # "last_updated_on",
+            # 'is_updated',
+            )
         labels = {
             'client_id': _('Client Name'),
         }
+    def clean_appointment_date(self):
+        status = self.cleaned_data.get('status')
+        appointment_date = self.cleaned_data.get('appointment_date')
+        if status=="BOOK APPOINTMENT" and not appointment_date:
+            raise ValidationError("Status is BOOK APPOINTMENT. Therefore, Appointment Date is required.")
+        return appointment_date
+
+
 
 class SelfassesmentAccountSubmissionDeleteForm(forms.ModelForm):
     agree = forms.BooleanField(label='I want to proceed.', required=True)

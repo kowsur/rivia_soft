@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker, SelfassesmentType
+from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker, SelfassesmentType, SelfassesmentAccountSubmissionTaxYear
 from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 
 
@@ -171,8 +171,8 @@ class SelfassesmentAccountSubmissionAdmin(admin.ModelAdmin):
   #   'is_paid', 
   #   'is_submitted')
   model = SelfassesmentAccountSubmission
-  list_display = ('client_id', 'remarks', 'paid_amount', 'is_paid', 'is_submitted')
-  list_filter = ('is_paid', 'is_submitted')
+  list_display = ('client_id', 'remarks', 'paid_amount', 'is_submitted')
+  list_filter = ('is_submitted',)
   search_fields = (
     'submission_id',
     'client_id__client_name',
@@ -185,7 +185,6 @@ class SelfassesmentAccountSubmissionAdmin(admin.ModelAdmin):
     'client_id__business_phone_number',
     'client_id__business_address',
     'client_id__business_post_code',
-    'date_of_submission', 
     'tax_year', 
     'submitted_by__email', 
     'submitted_by__first_name', 
@@ -195,11 +194,10 @@ class SelfassesmentAccountSubmissionAdmin(admin.ModelAdmin):
     'prepared_by__last_name', 
     'remarks', 
     'paid_amount', 
-    'is_paid', 
     'is_submitted')
-  ordering = ('tax_year', 'is_submitted', 'is_paid')
+  ordering = ('tax_year', 'is_submitted',)
 admin.site.register(SelfassesmentAccountSubmission, SelfassesmentAccountSubmissionAdmin)
-
+admin.site.register(SelfassesmentAccountSubmissionTaxYear)
 
 admin.site.register(Limited)
 admin.site.register(LimitedTracker)

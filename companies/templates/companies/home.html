@@ -65,6 +65,29 @@
           <span class="task-tooltip">New Customers.</span>
         </span>
       </div>
+    {% elif selfassesment_account_submission_counts %}
+      <div class="task-container">
+        <span class="task task-previous" data-tasks='selfassesment_account_submission_status_PROCESSING'>
+          <span id="task-count">{{ selfassesment_account_submission_status_PROCESSING }}</span>
+          <span class="task-tooltip">Status - PROCESSING.</span>
+        </span>
+        <span class="task task-issue" data-tasks='selfassesment_account_submission_status_BOOK_APPOINTMENT'>
+          <span id="task-count">{{ selfassesment_account_submission_status_BOOK_APPOINTMENT }}</span>
+          <span class="task-tooltip">Status - BOOK APPOINTMENT.</span>
+        </span>
+        <span class="task task-today" data-tasks='selfassesment_account_submission_status_READY_FOR_SUBMIT'>
+          <span id="task-count">{{ selfassesment_account_submission_status_READY_FOR_SUBMIT }}</span>
+          <span class="task-tooltip">Status - READY FOR SUBMIT.</span>
+        </span>
+        <span class="task task-upcoming" data-tasks='selfassesment_account_submission_status_WAITING_FOR_CONFIRMATION'>
+          <span id="task-count">{{ selfassesment_account_submission_status_WAITING_FOR_CONFIRMATION }}</span>
+          <span class="task-tooltip">Status - WAITING FOR CONFIRMATION.</span>
+        </span>
+        <span class="task task-done" data-tasks='selfassesment_account_submission_status_SUBMITTED'>
+          <span id="task-count">{{ selfassesment_account_submission_status_SUBMITTED }}</span>
+          <span class="task-tooltip">Status - SUBMITTED.</span>
+        </span>
+      </div>
     {% elif limited_submission_counts %}
       <div class="task-container">
         <span class="task task-issue" data-tasks='submission_deadline_not_set'>

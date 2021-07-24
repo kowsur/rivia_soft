@@ -6,6 +6,10 @@ from .views import home_selfassesment, create_selfassesment, update_selfassesmen
     delete_selfassesment, search_selfassesment, all_selfassesment, get_details_selfassesment, \
     export_selfassesment
 
+# selfassesment account submission tax year
+from .views import search_selfassesment_account_submission_tax_year, all_selfassesment_account_submission_tax_year, \
+    get_details_selfassesment_account_submission_tax_year
+
 # selfassesment account submission view function
 from .views import home_selfassesment_account_submission, create_selfassesment_account_submission, \
     update_selfassesment_account_submission, delete_selfassesment_account_submission,               \
@@ -91,6 +95,19 @@ urlpatterns = [
         view = export_selfassesment,
         name = URL_NAMES.Selfassesment_export_name
     ),
+
+    # SelfassesmentAccountSubmissionTaxYear
+    path(route = URL_PATHS.Selfassesment_Account_Submission_Tax_Year_details_url,
+        view = get_details_selfassesment_account_submission_tax_year,
+        name = URL_NAMES.Selfassesment_Account_Submission_Tax_Year_details_name),
+
+    path(route = URL_PATHS.Selfassesment_Account_Submission_Tax_Year_search_url,
+        view = search_selfassesment_account_submission_tax_year,
+        name = URL_NAMES.Selfassesment_Account_Submission_Tax_Year_search_name),
+
+    path(route = URL_PATHS.Selfassesment_Account_Submission_Tax_Year_viewall_url,
+        view = all_selfassesment_account_submission_tax_year,
+        name = URL_NAMES.Selfassesment_Account_Submission_Tax_Year_viewall_name),
 
 
     # SelfassesmentAccountSubmission

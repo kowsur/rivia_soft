@@ -1,5 +1,5 @@
 from django.db.models import Q
-from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker
+from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker, SelfassesmentAccountSubmissionTaxYear
 from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 from datetime import date, datetime
 from django.utils import timezone
@@ -51,10 +51,33 @@ def db_all_Selfassesment(limit=-1):
         return Selfassesment.objects.all()
     return Selfassesment.objects.all()[:limit]
 
+# SelfassesmentAccountSubmissionTaxYear
+def db_search_SelfassesmentAccountSubmissionTaxYear(search_text:str, limit=-1):
+    Query = Q(tax_year__icontains = search_text)
+    try:
+        num = int(search_text)
+        Query |= Q(id = num)
+    except Exception:
+        pass
+
+    records = SelfassesmentAccountSubmissionTaxYear.objects.filter(Query).order_by('-id')
+    if limit==-1:
+        return records
+    return records[:limit]
+
+def db_all_SelfassesmentAccountSubmissionTaxYear(limit=-1):
+    records = SelfassesmentAccountSubmissionTaxYear.objects.all().order_by('-id')
+    if limit<=-1:
+        return records
+    return records[:limit]
+
 # SelfassesmentAccountSubmission
 def db_search_SelfassesmentAccountSubmission(search_text: str, limit=-1):
-    Query = Q(date_of_submission__icontains               = search_text) |\
-            Q(tax_year__icontains                         = search_text) |\
+    Query = Q(request_date__icontains                     = search_text) |\
+            Q(appointment_date__icontains                 = search_text) |\
+            Q(status__icontains                           = search_text) |\
+            Q(payment_status__iexact                      = search_text) |\
+            Q(tax_year__tax_year__icontains               = search_text) |\
             Q(client_id__client_name__icontains           = search_text) |\
             Q(client_id__personal_phone_number__icontains = search_text) |\
             Q(client_id__business_phone_number__icontains = search_text) |\
@@ -64,6 +87,9 @@ def db_search_SelfassesmentAccountSubmission(search_text: str, limit=-1):
             Q(prepared_by__email__icontains               = search_text) |\
             Q(prepared_by__first_name__icontains          = search_text) |\
             Q(prepared_by__last_name__icontains           = search_text) |\
+            Q(last_updated_by__email__icontains           = search_text) |\
+            Q(last_updated_by__first_name__icontains      = search_text) |\
+            Q(last_updated_by__last_name__icontains       = search_text) |\
             Q(remarks__icontains                          = search_text)
     try:
         num = int(search_text)
@@ -73,16 +99,18 @@ def db_search_SelfassesmentAccountSubmission(search_text: str, limit=-1):
                 Q(paid_amount                   = num)
     except Exception:
         pass
-    
+    records = SelfassesmentAccountSubmission.objects.filter(Query).order_by('-tax_year')
     if limit==-1:
-        return SelfassesmentAccountSubmission.objects.filter(Query)
-    return SelfassesmentAccountSubmission.objects.filter(Query)[:limit]
+        return records
+    return records[:limit]
 
 
 def db_all_SelfassesmentAccountSubmission(limit=-1):
+    # records = SelfassesmentAccountSubmission.objects.filter(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year())
+    records = SelfassesmentAccountSubmission.objects.all().order_by('-tax_year', '-request_date')
     if limit<=-1:
-        return SelfassesmentAccountSubmission.objects.all()
-    return SelfassesmentAccountSubmission.objects.all()[:limit]
+        return records
+    return records[:limit]
 
 
 # =============================================================================================================

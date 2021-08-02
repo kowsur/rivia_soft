@@ -285,7 +285,7 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         empty_label=None
     )
     appointment_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
-    request_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    # request_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
 
     class Meta:
         model = SelfassesmentAccountSubmission

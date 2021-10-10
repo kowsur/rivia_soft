@@ -72,6 +72,8 @@ user_details_url_without_argument = '/u/details/'
 from pprint import pp
 
 
+SELFASSESMENT_FK_FIELDS_FOR_EXPORT = ['client_name', 'client_file_number', 'HMRC_referance', 'personal_post_code']
+LIMITED_FK_FIELDS_FOR_EXPORT = ['client_name', 'client_file_number', 'director_phone_number', 'director_post_code']
 # =============================================================================================================
 # =============================================================================================================
 # Selfassesment
@@ -507,6 +509,9 @@ def export_selfassesment_account_submission(request):
   )
   include_fields = []
   exclude_fields = ['submission_id']
+  fk_fields = {
+    'client_id': SELFASSESMENT_FK_FIELDS_FOR_EXPORT
+  }
   keep_include_fields = False
   show_others = True
   export_to_csv(
@@ -515,7 +520,8 @@ def export_selfassesment_account_submission(request):
     include_fields = include_fields,
     exclude_fields = exclude_fields,
     keep_include_fields = keep_include_fields,
-    show_others = show_others
+    show_others = show_others,
+    fk_fields = fk_fields
     )
   return response
 
@@ -783,6 +789,9 @@ def export_selfassesment_tracker(request):
   )
   include_fields = []
   exclude_fields = set(['tracker_id', 'is_updated', 'creation_date'])
+  fk_fields = {
+    'client_id': SELFASSESMENT_FK_FIELDS_FOR_EXPORT
+  }
   keep_include_fields = True
   show_others = True
   export_to_csv(
@@ -791,7 +800,8 @@ def export_selfassesment_tracker(request):
     include_fields = include_fields,
     exclude_fields = exclude_fields,
     keep_include_fields = keep_include_fields,
-    show_others = show_others
+    show_others = show_others,
+    fk_fields = fk_fields
     )
   return response
 
@@ -1236,6 +1246,9 @@ def export_limited_tracker(request):
   )
   include_fields = []
   exclude_fields = set(['tracker_id', 'is_updated', 'creation_date'])
+  fk_fields = {
+    'client_id': LIMITED_FK_FIELDS_FOR_EXPORT
+  }
   keep_include_fields = True
   show_others = True
   export_to_csv(
@@ -1244,7 +1257,8 @@ def export_limited_tracker(request):
     include_fields = include_fields,
     exclude_fields = exclude_fields,
     keep_include_fields = keep_include_fields,
-    show_others = show_others
+    show_others = show_others,
+    fk_fields = fk_fields
     )
   return response
 
@@ -1440,6 +1454,9 @@ def export_limited_submission_deadline_tracker(request):
   )
   include_fields = []
   exclude_fields = ['submission_id']
+  fk_fields = {
+    'client_id': LIMITED_FK_FIELDS_FOR_EXPORT
+  }
   keep_include_fields = False
   show_others = True
   export_to_csv(
@@ -1448,7 +1465,8 @@ def export_limited_submission_deadline_tracker(request):
     include_fields = include_fields,
     exclude_fields = exclude_fields,
     keep_include_fields = keep_include_fields,
-    show_others = show_others
+    show_others = show_others,
+    fk_fields = fk_fields
     )
   return response
 
@@ -1651,6 +1669,9 @@ def export_limited_vat_tracker(request):
     headers={'Content-Disposition': f'attachment; filename="limited_vat_tracker_{timezone.localtime()}.csv"'},
   )
   include_fields = []
+  fk_fields = {
+    'client_id': LIMITED_FK_FIELDS_FOR_EXPORT
+  }
   exclude_fields = ['vat_id']
   keep_include_fields = False
   show_others = True
@@ -1660,7 +1681,8 @@ def export_limited_vat_tracker(request):
     include_fields = include_fields,
     exclude_fields = exclude_fields,
     keep_include_fields = keep_include_fields,
-    show_others = show_others
+    show_others = show_others,
+    fk_fields = fk_fields
     )
   return response
 
@@ -1858,6 +1880,9 @@ def export_limited_confirmation_statement_tracker(request):
   )
   include_fields = []
   exclude_fields = ['statement_id']
+  fk_fields = {
+    'client_id': LIMITED_FK_FIELDS_FOR_EXPORT
+  }
   keep_include_fields = False
   show_others = True
   export_to_csv(
@@ -1866,7 +1891,8 @@ def export_limited_confirmation_statement_tracker(request):
     include_fields = include_fields,
     exclude_fields = exclude_fields,
     keep_include_fields = keep_include_fields,
-    show_others = show_others
+    show_others = show_others,
+    fk_fields = fk_fields
     )
   return response
 

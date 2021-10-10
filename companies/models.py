@@ -1,11 +1,9 @@
 from django.db import models
-from django.db.models import constraints, fields
-from django.db.models.deletion import SET_NULL
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR
 
-from datetime import timedelta, datetime, date
+from datetime import timedelta, date
 
 
 class SelfassesmentType(models.Model):

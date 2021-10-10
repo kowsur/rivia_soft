@@ -160,3 +160,30 @@ export async function populate_with_data(
     tbody.appendChild(table_row)
   }
 }
+
+export async function populate_with_merged_data(
+  merged_data,
+  selfassesment_template_querySelector_string = template_querySelector,
+  selfassesment_model_fields=DATA.model_fields,
+  selfassesment_update_url=DATA.update_url,
+  selfassesment_delete_url=DATA.delete_url,
+  limited_template_querySelector_string = template_querySelector,
+  limited_model_fields=DATA.model_fields,
+  limited_update_url=DATA.update_url,
+  limited_delete_url=DATA.delete_url,
+  clear_table_before_insertion=true,
+  ){
+    let selfassesment_template = document.querySelector(selfassesment_template_querySelector_string) //find template
+    let limited_template = document.querySelector(limited_template_querySelector_string) //find template
+    
+    let tbody = document.querySelector('tbody#data') // find data container
+    if (clear_table_before_insertion) tbody.innerHTML='' // clear the container
+    
+    // Populate the table using the provided data
+    for (let record of merged_data){
+      let table_row=null;
+      if (record.model==='companies.selfassesmenttracker')table_row = await get_tr_for_table(record, selfassesment_template, selfassesment_model_fields, selfassesment_update_url, selfassesment_delete_url)
+      if (record.model==='companies.limitedtracker') table_row = await get_tr_for_table(record, limited_template, limited_model_fields, limited_update_url, limited_delete_url)
+      tbody.appendChild(table_row)
+    }
+}

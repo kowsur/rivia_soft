@@ -1,7 +1,8 @@
 import { fetch_url, db_all_records, db_search_records, db_search_records_client_id } from './fetch_data.js'
-import { populate_with_data } from './table.js'
+import { populate_with_merged_data } from './table.js'
 import { removeAllEventListeners } from './utilities.js'
 import DATA from './parse_data.js'
+import merge from './merged_tracker_sort_by_deadline.js';
 
 
 const Limited = DATA.Limited
@@ -96,9 +97,20 @@ export function loadAllTrackers(){
     
     Promise.all([limited_all_records, selfassesment_all_records]).then(data=>{
       let [limited_all_records, selfassesment_all_records] = data
+      let merged = merge(limited_all_records, selfassesment_all_records, true)
 
-      populate_with_data(limited_all_records, limited_template_query_string, Limited.model_fields, Limited.update_url, Limited.delete_url, true)
-      populate_with_data(selfassesment_all_records, selfassesment_template_query_string, Selfassesment.model_fields, Selfassesment.update_url, Selfassesment.delete_url, false)
+      populate_with_merged_data(
+        merged,
+        selfassesment_template_query_string,
+        Selfassesment.model_fields,
+        Selfassesment.update_url,
+        Selfassesment.delete_url,
+        limited_template_query_string,
+        Limited.model_fields,
+        Limited.update_url,
+        Limited.delete_url,
+        true
+        )
     })
   }, 0); // search with text
 }
@@ -109,10 +121,21 @@ export function searchTrackers(doneTypingInterval, search_text, limited_search_u
     let selfassesment_search_records = db_search_records(search_text, selfassesment_search_url)
 
     Promise.all([limited_search_records, selfassesment_search_records]).then(data=>{
-      [limited_search_records, selfassesment_search_records] = data
+      let [limited_search_records, selfassesment_search_records] = data
+      let merged = merge(limited_search_records, selfassesment_search_records)
 
-      populate_with_data(limited_search_records, limited_template_query_string, Limited.model_fields, Limited.update_url, Limited.delete_url, true)
-      populate_with_data(selfassesment_search_records, selfassesment_template_query_string, Selfassesment.model_fields, Selfassesment.update_url, Selfassesment.delete_url, false)
+      populate_with_merged_data(
+        merged,
+        selfassesment_template_query_string,
+        Selfassesment.model_fields,
+        Selfassesment.update_url,
+        Selfassesment.delete_url,
+        limited_template_query_string,
+        Limited.model_fields,
+        Limited.update_url,
+        Limited.delete_url,
+        true
+        )
     })
   }, doneTypingInterval, search_text, limited_search_url, selfassesment_search_url); // search with text
 }
@@ -136,13 +159,24 @@ for (let task of tasks){
     let selfassesment_search_records = searchTrackersTasks(Selfassesment.search_url, search_param)
     
     Promise.all([limited_search_records, selfassesment_search_records]).then(data=>{
-      [limited_search_records, selfassesment_search_records] = data
+      let [limited_search_records, selfassesment_search_records] = data
+      let merged = merge(limited_search_records, selfassesment_search_records)
 
-      populate_with_data(limited_search_records, limited_template_query_string, Limited.model_fields, Limited.update_url, Limited.delete_url, true)
-      populate_with_data(selfassesment_search_records, selfassesment_template_query_string, Selfassesment.model_fields, Selfassesment.update_url, Selfassesment.delete_url, false)
-      
+      populate_with_merged_data(
+        merged,
+        selfassesment_template_query_string,
+        Selfassesment.model_fields,
+        Selfassesment.update_url,
+        Selfassesment.delete_url,
+        limited_template_query_string,
+        Limited.model_fields,
+        Limited.update_url,
+        Limited.delete_url,
+        true
+        )
+    
       let counts = task.querySelector('#task-count')
-      counts.innerHTML = limited_search_records.length + selfassesment_search_records.length
+      counts.innerHTML = merged.length
     })
   })
 }

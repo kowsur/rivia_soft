@@ -1,6 +1,4 @@
 from datetime import timedelta
-import re
-from dateutil.relativedelta import relativedelta
 
 import json
 from django.http.response import Http404, HttpResponse
@@ -81,7 +79,7 @@ from pprint import pp
 def home_selfassesment(request):
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_id', 'incomplete_tasks', 'is_active', 'client_file_number', 'client_name', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent']
+  include_fields = ['client_file_number', 'client_name', 'is_active', 'incomplete_tasks', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent']
   keep_include_fields = True
   show_others = False
   model_fields = get_field_names_from_model(Selfassesment)
@@ -805,7 +803,7 @@ def export_selfassesment_tracker(request):
 def home_limited(request):
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_id', 'is_active', 'client_file_number', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent']
+  include_fields = ['client_file_number', 'client_name', 'is_active', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent']
   keep_include_fields = True
   show_others = False
   model_fields = get_field_names_from_model(Limited)

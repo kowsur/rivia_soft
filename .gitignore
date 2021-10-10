@@ -1,5 +1,8 @@
+.vscode/
+
+**/data/
+
 *env*/
-*data.*
 todo.txt
 db.sqlite3*
 

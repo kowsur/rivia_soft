@@ -94,8 +94,8 @@ def home_selfassesment(request):
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_create_name,
     'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_export_name,
 
-    'template_tag': generate_template_tag_for_model(Selfassesment, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
-    'data_container': generate_data_container_table(Selfassesment, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+    'template_tag': generate_template_tag_for_model(Selfassesment, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+    'data_container': generate_data_container_table(Selfassesment, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
@@ -826,8 +826,8 @@ def home_limited(request):
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_create_name,
     'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_export_name,
 
-    'template_tag': generate_template_tag_for_model(Limited, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
-    'data_container': generate_data_container_table(Limited, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+    'template_tag': generate_template_tag_for_model(Limited, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+    'data_container': generate_data_container_table(Limited, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,

@@ -37,7 +37,7 @@
   </div>
 </div>
 <!-- represent data -->
-<div class="relative max-w-min mx-auto">
+<div class="relative mx-auto max-w-min">
   <!-- tasks -->
   {% if counts %}  
     {% if tracker_task_counts %}    
@@ -61,6 +61,10 @@
       <span class="task task-done" data-tasks='new_customers'>
         <span id="task-count">{{ new_customers }}</span>
         <span class="task-tooltip">New Customers.</span>
+      </span>
+      <span class="task task-own" data-tasks='my_tasks'>
+        <span id="task-count">{{ my_tasks }}</span>
+        <span class="task-tooltip">My tasks.</span>
       </span>
     </div>
     {% endif %}
@@ -106,7 +110,7 @@
   {% autoescape off %}
     {{ data_container }}
   {% endautoescape %}
-  <span class="absolute top-0 right-0 bg-indigo-600 text-white px-2 py-1 text-xs font-normal sm:text-sm sm:font-normal md:text-base md:font-medium" id="loading-indicator">Loading Data</span>
+  <span class="absolute top-0 right-0 px-2 py-1 text-xs font-normal text-white bg-indigo-600 sm:text-sm sm:font-normal md:text-base md:font-medium" id="loading-indicator">Loading Data</span>
 </div>
 
 <!-- data template -->

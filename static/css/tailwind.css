@@ -6,15 +6,15 @@
   select { @apply form-select; }
   select[multiple] { @apply form-multiselect; }
   input	{ @apply form-input; }
-  input[type='checkbox']	{ @apply form-checkbox bg-red-500 checked:bg-green-500; }
+  input[type='checkbox']	{ @apply bg-red-500 form-checkbox checked:bg-green-500; }
   input[type='checkbox']:hover { @apply bg-red-300 checked:bg-green-300; }
   input[type='checkbox']:focus { @apply bg-red-800 checked:bg-green-800; }
   input[type='radio']	{ @apply form-radio; }
-  textarea { @apply form-textarea resize-x w-full h-28; }
+  textarea { @apply w-full resize-x form-textarea h-28; }
 
-  label{ @apply mb-1 mr-2 inline-block text-gray-800; }
-  input{ @apply px-4 py-2 h-10 w-full; }
-  input, textarea, select{ @apply  text-black bg-gray-100 fill-current rounded-md shadow-md appearance-none border-none bg-none outline-none z-10; }
+  label{ @apply inline-block mb-1 mr-2 text-gray-800; }
+  input{ @apply w-full h-10 px-4 py-2; }
+  input, textarea, select{ @apply  z-10 text-black bg-gray-100 border-none rounded-md shadow-md outline-none appearance-none fill-current bg-none; }
   input:hover, textarea:hover, select:hover{ @apply bg-gray-200; }
   input:focus, textarea:focus, select:focus{ @apply bg-blue-100 ring-2; }
 
@@ -26,7 +26,7 @@
     input:focus, textarea:focus, select:focus{ @apply text-gray-100 bg-gray-800 ring-2; }
   }
   input[type='number'], input[type='time'], input[type='date'], input[type='datetimelocal'], input[type='datetime']{
-    @apply w-max inline;
+    @apply inline w-max;
   }
   /* placeholder opacity for inputs */
   input, textarea, select{
@@ -37,7 +37,7 @@
 @layer components{
   /* customized button */
   button[type]{
-    @apply mt-6 px-4 py-2 w-full font-bold rounded-md outline-none bg-none border-none appearance-none;
+    @apply w-full px-4 py-2 mt-6 font-bold border-none rounded-md outline-none appearance-none bg-none;
   }
 
   .create{
@@ -86,7 +86,7 @@
 
   /* message styles */
   .message {
-    @apply w-full px-4 py-2 text-gray-50 max-w-screen-2xl md:px-6 lg:px-8 mx-auto mt-5 rounded-md;
+    @apply w-full px-4 py-2 mx-auto mt-5 rounded-md text-gray-50 max-w-screen-2xl md:px-6 lg:px-8;
   }
 
   /* form headers */
@@ -94,18 +94,18 @@
     @apply py-3 text-lg font-bold text-center rounded shadow-lg select-none;
   }
   .create-header{
-    @apply create text-white;
+    @apply text-white create;
   }
   .update-header{
-    @apply update text-white;
+    @apply text-white update;
   }
   .delete-header{
-    @apply delete text-white;
+    @apply text-white delete;
   }
   
   /* fieldset */
   h1.fieldset.title{
-    @apply bg-pink-600 text-white text-xl font-semibold mt-10 px-5 py-2 rounded-md;
+    @apply px-5 py-2 mt-10 text-xl font-semibold text-white bg-pink-600 rounded-md;
   }
 }
 
@@ -136,7 +136,7 @@
 }
 #merged_tracker_create_options a{
   min-width: max-content;
-  @apply create px-4 py-2 rounded-md shadow-xl;
+  @apply px-4 py-2 rounded-md shadow-xl create;
 }
 #merged_tracker_create_options_close{
   position: absolute;
@@ -164,10 +164,10 @@
 
 /* icons */
 .edit-icon{
-  @apply inline-block bg-transparent fill-current w-7 h-7 text-blue-800 hover:text-blue-600 active:text-blue-900;
+  @apply inline-block text-blue-800 bg-transparent fill-current w-7 h-7 hover:text-blue-600 active:text-blue-900;
 }
 .delete-icon{
-  @apply inline-block bg-transparent fill-current w-7 h-7 text-red-700 hover:text-red-500 active:text-red-800;
+  @apply inline-block text-red-700 bg-transparent fill-current w-7 h-7 hover:text-red-500 active:text-red-800;
 }
 
 
@@ -176,7 +176,7 @@
   @apply mx-auto;
 }
 .data-wrapper{
-  @apply overflow-auto relative mt-8 sm:mt-10 md:mt-12;
+  @apply relative mt-8 overflow-auto sm:mt-10 md:mt-12;
   max-height: 95vh;
 }
 .data-container{
@@ -184,7 +184,7 @@
 }
 
 .stick-top{
-  @apply sticky top-0 bg-gray-400 text-gray-900 dark:text-gray-300 dark:bg-gray-600 py-3;
+  @apply sticky top-0 py-3 text-gray-900 bg-gray-400 dark:text-gray-300 dark:bg-gray-600;
   -webkit-box-shadow: 0px 1px 0px 0px #ffff;
   box-shadow: 0px 1px 0px 0px #ffff;
 }
@@ -223,7 +223,7 @@ table a:hover{
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
-  @apply text-center px-3 py-2 whitespace-nowrap;
+  @apply px-3 py-2 text-center whitespace-nowrap;
 }
 .data-cell{
   @apply h-full px-3 py-2;
@@ -238,10 +238,10 @@ div.search_field > div.select > .option{
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
-  @apply bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-300 border-gray-400 border-2 px-3 py-2 text-sm border-opacity-50 border-b-0;
+  @apply px-3 py-2 text-sm text-gray-900 bg-gray-100 border-2 border-b-0 border-gray-400 border-opacity-50 dark:bg-gray-800 dark:text-gray-300;
 }
 div.search_field > div.select > .option:hover{
-  @apply bg-gray-400 dark:bg-gray-900 text-base font-bold py-3 border-blue-500 border-b-2 rounded-md;
+  @apply py-3 text-base font-bold bg-gray-400 border-b-2 border-blue-500 rounded-md dark:bg-gray-900;
 }
 div.search_field > div.select > .option:hover + .option{
   @apply border-t-0;
@@ -251,7 +251,7 @@ div.search_field > div.select > .option:last-child{
 }
 /* selected option */
 div.search_field > div.select > .selected{
-  @apply bg-gray-400 dark:bg-gray-900 text-base font-bold py-3 border-blue-500 border-opacity-50;
+  @apply py-3 text-base font-bold bg-gray-400 border-blue-500 border-opacity-50 dark:bg-gray-900;
 }
 
 /* searchable input field */
@@ -260,7 +260,7 @@ div.search_field > div.select{
   position: absolute;
   top: 100%;
   left: 0;
-  @apply max-h-72 rounded-md overflow-auto shadow-lg ring-2;
+  @apply overflow-auto rounded-md shadow-lg max-h-72 ring-2;
 }
 
 div.search_field > input[name="search"] ~ div.select:hover:not([disabled]),
@@ -303,12 +303,16 @@ div.search_field > input[name="search"]:focus-visible ~ div.select:not([disabled
 .task-issue{
   background-color: #9a1565;
 }
+.task-own{
+  background-color: #b430c2;
+}
+
 .task-tooltip{
   display: none;
   position: absolute;
   top: -30%;
   left: 0;
-  @apply transform -translate-y-full px-1 text-base font-normal text-gray-100 whitespace-nowrap bg-gray-600 rounded-md px-3 py-1;
+  @apply px-1 px-3 py-1 text-base font-normal text-gray-100 transform -translate-y-full bg-gray-600 rounded-md whitespace-nowrap;
 }
 .task-tooltip::after {
   content: " ";
@@ -345,7 +349,7 @@ div.search_field > input[name="search"]:focus-visible ~ div.select:not([disabled
 
 .action-container svg{
   color: white;
-  @apply h-5 w-5 sm:h-6 sm:w-6;
+  @apply w-5 h-5 sm:h-6 sm:w-6;
 }
 
 .action-create{
@@ -363,7 +367,7 @@ div.search_field > input[name="search"]:focus-visible ~ div.select:not([disabled
   position: absolute;
   top: -30%;
   right: 0;
-  @apply transform -translate-y-full px-1 text-base font-normal text-gray-100 whitespace-nowrap bg-gray-600 rounded-md px-3 py-1;
+  @apply px-1 px-3 py-1 text-base font-normal text-gray-100 transform -translate-y-full bg-gray-600 rounded-md whitespace-nowrap;
 }
 .action-tooltip::after {
   content: " ";

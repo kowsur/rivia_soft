@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.urls.exceptions import NoReverseMatch
 from django.db.models import DurationField, F, ExpressionWrapper
 from django.db.utils import IntegrityError
+from django.contrib.auth import get_user_model
 
 #forms
 from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm
@@ -582,6 +583,9 @@ def get_selfassesment_trackers_where_previous_tasks_are_incomplete():
 def get_selfassesment_trackers_where_tasks_has_issues():
   return SelfassesmentTracker.objects.filter(has_issue=True)
 
+def get_selfassesment_trackers_where_tasks_assigned_to_user(user):
+  return SelfassesmentTracker.objects.filter(assigned_to=user)
+
 @login_required
 def home_selfassesment_tracker(request):
   pk_field = 'tracker_id'
@@ -604,6 +608,7 @@ def home_selfassesment_tracker(request):
     'todays_incomplete_tasks': get_selfassesment_trackers_where_todays_tasks_are_incomplete().count(),
     'previous_incomplete_tasks': get_selfassesment_trackers_where_previous_tasks_are_incomplete().count(),
     'task_has_issue': get_selfassesment_trackers_where_tasks_has_issues().count(),
+    'my_tasks': get_selfassesment_trackers_where_tasks_assigned_to_user(request.user).count(),
 
     'template_tag': generate_template_tag_for_model(SelfassesmentTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
     'data_container': generate_data_container_table(SelfassesmentTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
@@ -745,7 +750,8 @@ def search_selfassesment_tracker(request, limit: int=-1):
         'future_incomplete_tasks': get_selfassesment_trackers_where_future_tasks_are_incomplete(),
         'todays_incomplete_tasks': get_selfassesment_trackers_where_todays_tasks_are_incomplete(),
         'previous_incomplete_tasks': get_selfassesment_trackers_where_previous_tasks_are_incomplete(),
-        'task_has_issue': get_selfassesment_trackers_where_tasks_has_issues()
+        'task_has_issue': get_selfassesment_trackers_where_tasks_has_issues(),
+        'my_tasks': get_selfassesment_trackers_where_tasks_assigned_to_user(request.user)
       }
       records = tasks.get(request.GET.get('tasks'), [])
       records.order_by('deadline')
@@ -1029,6 +1035,9 @@ def get_limited_trackers_where_previous_tasks_are_incomplete():
 def get_limited_trackers_where_tasks_has_issues():
   return LimitedTracker.objects.filter(has_issue=True)
 
+def get_limited_trackers_where_tasks_assigned_to_user(user):
+  return LimitedTracker.objects.filter(assigned_to=user)
+
 @login_required
 def home_limited_tracker(request):
   pk_field = 'tracker_id'
@@ -1061,6 +1070,7 @@ def home_limited_tracker(request):
     'todays_incomplete_tasks': get_limited_trackers_where_todays_tasks_are_incomplete().count(),
     'previous_incomplete_tasks': get_limited_trackers_where_previous_tasks_are_incomplete().count(),
     'task_has_issue': get_limited_trackers_where_tasks_has_issues().count(),
+    'my_tasks': get_limited_trackers_where_tasks_assigned_to_user(request.user).count(),
 
     'template_tag': generate_template_tag_for_model(LimitedTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, fk_fields=fk_fields),
     'data_container': generate_data_container_table(LimitedTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
@@ -1202,7 +1212,8 @@ def search_limited_tracker(request, limit: int=-1):
         'future_incomplete_tasks': LimitedTracker.objects.filter(is_completed=False, deadline__gt=timezone.localtime()),
         'todays_incomplete_tasks': LimitedTracker.objects.filter(is_completed=False, deadline=timezone.localtime()),
         'previous_incomplete_tasks': LimitedTracker.objects.filter(deadline__lt=timezone.localtime(), is_completed=False),
-        'task_has_issue': LimitedTracker.objects.filter(has_issue=True)
+        'task_has_issue': LimitedTracker.objects.filter(has_issue=True),
+        'my_tasks': get_limited_trackers_where_tasks_assigned_to_user(request.user),
       }
       records = tasks.get(request.GET.get('tasks'), [])
       records.order_by('deadline')
@@ -1946,6 +1957,7 @@ def home_merged_tracker(request):
     'todays_incomplete_tasks': get_limited_trackers_where_todays_tasks_are_incomplete().count() + get_selfassesment_trackers_where_todays_tasks_are_incomplete().count(),
     'previous_incomplete_tasks': get_limited_trackers_where_previous_tasks_are_incomplete().count() + get_selfassesment_trackers_where_previous_tasks_are_incomplete().count(),
     'task_has_issue': get_limited_trackers_where_tasks_has_issues().count() + get_selfassesment_trackers_where_tasks_has_issues().count(),
+    'my_tasks': get_limited_trackers_where_tasks_assigned_to_user(request.user).count() + get_selfassesment_trackers_where_tasks_assigned_to_user(request.user).count(),
 
     'data_container': generate_data_container_table(LimitedTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
     'selfassesment_tracker_template': generate_template_tag_for_model(SelfassesmentTracker, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, fk_fields=selfassesment_tracker_fk_fields, tag_id="selfassesment_tracker_template"),

@@ -584,7 +584,7 @@ def get_selfassesment_trackers_where_tasks_has_issues():
   return SelfassesmentTracker.objects.filter(has_issue=True)
 
 def get_selfassesment_trackers_where_tasks_assigned_to_user(user):
-  return SelfassesmentTracker.objects.filter(assigned_to=user)
+  return SelfassesmentTracker.objects.filter(assigned_to=user, is_completed=False)
 
 @login_required
 def home_selfassesment_tracker(request):
@@ -1036,7 +1036,7 @@ def get_limited_trackers_where_tasks_has_issues():
   return LimitedTracker.objects.filter(has_issue=True)
 
 def get_limited_trackers_where_tasks_assigned_to_user(user):
-  return LimitedTracker.objects.filter(assigned_to=user)
+  return LimitedTracker.objects.filter(assigned_to=user, is_completed=False)
 
 @login_required
 def home_limited_tracker(request):

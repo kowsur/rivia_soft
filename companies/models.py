@@ -447,7 +447,7 @@ class Limited(models.Model):
     
     client_file_number = models.DecimalField(verbose_name='File Number', max_digits=19, decimal_places=3, unique=True, blank=False, null=True, editable=True)
     client_name = models.CharField(verbose_name='Business Name', max_length=100, blank=False, null=False, db_index=True)
-    company_reg_number = models.CharField(verbose_name='Company Registration Number', max_length=100, blank=False, null=True, db_index=True)
+    company_reg_number = models.CharField(verbose_name='Company Registration Number', max_length=100, blank=False, null=True, unique=True, db_index=True)
     company_auth_code = models.CharField(verbose_name='Company Authentication Code', max_length=100, blank=False, null=True, db_index=True)
     
     # Director Info

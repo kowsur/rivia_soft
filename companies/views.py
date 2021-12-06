@@ -82,7 +82,7 @@ LIMITED_FK_FIELDS_FOR_EXPORT = ['client_name', 'client_file_number', 'director_p
 def home_selfassesment(request):
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_file_number', 'client_name', 'is_active', 'incomplete_tasks', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent']
+  include_fields = ['client_file_number', 'client_name', 'is_active', 'incomplete_tasks', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent', "created_by", "date_of_registration"]
   keep_include_fields = True
   show_others = False
   model_fields = get_field_names_from_model(Selfassesment)
@@ -243,6 +243,7 @@ def search_selfassesment(request, limit: int=-1):
     if search_text.strip()=='':
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_viewall_name)
     records = db_search_Selfassesment(search_text, limit)
+    records = records.order_by("-client_file_number")
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
   raise Http404
@@ -251,6 +252,7 @@ def search_selfassesment(request, limit: int=-1):
 def all_selfassesment(request, limit=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
     records = db_all_Selfassesment(limit)
+    records = records.order_by("-client_file_number")
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
   raise Http404
@@ -819,7 +821,7 @@ def export_selfassesment_tracker(request):
 def home_limited(request):
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_file_number', 'client_name', 'is_active', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent']
+  include_fields = ['client_file_number', 'client_name', 'is_active', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent', "created_by", "date_of_registration"]
   keep_include_fields = True
   show_others = False
   model_fields = get_field_names_from_model(Limited)
@@ -981,6 +983,7 @@ def search_limited(request, limit: int=-1):
     if search_text.strip()=='':
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_viewall_name)
     records = db_search_Limited(search_text, limit)
+    records = records.order_by("-client_file_number")
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
   raise Http404
@@ -989,6 +992,7 @@ def search_limited(request, limit: int=-1):
 def all_limited(request, limit=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
     records = db_all_Limited(limit)
+    records = records.order_by("-client_file_number")
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
   raise Http404

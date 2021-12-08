@@ -1,4 +1,4 @@
-from django.http.response import Http404, HttpResponse
+from django.http.response import Http404, HttpResponse, HttpResponseForbidden
 import json
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
@@ -7,9 +7,10 @@ from django.core.serializers import serialize
 from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
 
+
 # models and forms
 from .models import CustomUser
-from .forms import CustomUserLoginForm, CustomUserCreationForm, CustomUserSignupForm
+from .forms import CustomUserChangeForm, CustomUserLoginForm, CustomUserCreationForm, CustomUserSignupForm
 
 # queries
 from .queries import search_CustomUser, search_CustomUser_by_email
@@ -17,7 +18,18 @@ from .queries import search_CustomUser, search_CustomUser_by_email
 # serializer
 from .serializers import CustomUserSerializer
 
-from companies.url_variables import URL_NAMES_PREFIXED_WITH_APP_NAME
+from companies.url_variables import APPLICATION_NAME, URL_NAMES, URL_PATHS, Full_URL_PATHS_WITHOUT_ARGUMENTS, URL_NAMES_PREFIXED_WITH_APP_NAME
+from companies.url_variables import *
+
+
+application_name = APPLICATION_NAME
+# these path names will be passed to templates to use in the navbar links
+URLS = {
+  'home': f'{application_name}:home',
+
+  **Full_URL_PATHS_WITHOUT_ARGUMENTS.get_dict(),
+  **URL_NAMES_PREFIXED_WITH_APP_NAME.get_dict()
+}
 
 
 # Create your views here.
@@ -54,7 +66,7 @@ def login_user(request):
             password = request.POST.get('password')
             next_url = request.POST.get('next')
             # see if the user can login with the creedentials
-            user = authenticate(email=email, password=password)
+            user = authenticate(request=request, email=email, password=password)
             if user:
                 # if authenticated then let the user login
                 login(request, user)
@@ -64,9 +76,29 @@ def login_user(request):
         context['message'] = 'Incorrect email or password.'
     return render(request, 'users/login.html', context=context)
 
+@login_required
 def logout_user(request):
     logout(request)
     return redirect('users_login')
+
+@login_required
+def update_user(request, user_id=None):
+    user = get_object_or_404(CustomUser, user_id=user_id)
+    if user_id!=request.user.user_id or user_id==None:
+        return HttpResponseForbidden()
+    context = {
+        **URLS,
+        'page_title': f'Update Limited',
+        'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name,
+        'id': request.user.user_id,
+        'update_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_update_name,
+        'form_title': 'Limited Update Form',
+        'form': CustomUserChangeForm(instance=user)
+    }
+    if request.method=='POST':
+        form = CustomUserChangeForm()
+    return render(request, 'users/update_info.html', context = context)
+
 
 # Content-type to return the search results
 content_type = 'application/json'

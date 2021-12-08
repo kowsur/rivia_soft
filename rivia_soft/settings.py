@@ -64,12 +64,14 @@ INSTALLED_APPS = [
     # Project apps
     'error_handler',
     'users',
+    "user_logs",
     'companies',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'user_logs.middleware.UserLastSeenLoggerMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

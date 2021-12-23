@@ -210,6 +210,7 @@ def db_search_LimitedTracker(search_text: str, user_email='', is_superuser=False
             Q(client_id__client_name__icontains           = search_text) |\
             Q(client_id__director_phone_number__icontains = search_text) |\
             Q(client_id__business_phone_number__icontains = search_text) |\
+            Q(client_id__company_reg_number__icontains               = search_text) |\
             Q(client_id__client_file_number__icontains    = search_text) |\
             Q(created_by__first_name__icontains           = search_text) |\
             Q(created_by__last_name__icontains            = search_text) |\
@@ -246,6 +247,7 @@ def db_search_LimitedSubmissionDeadlineTracker(search_text: str, limit=-1):
             Q(client_id__client_name__icontains               = search_text) |\
             Q(client_id__director_phone_number__icontains               = search_text) |\
             Q(client_id__director_post_code__icontains               = search_text) |\
+            Q(client_id__company_reg_number__icontains               = search_text) |\
             Q(HMRC_deadline__icontains              = search_text) |\
             Q(submission_date__icontains            = search_text) |\
             Q(remarks__icontains                    = search_text) |\
@@ -281,6 +283,7 @@ def db_all_LimitedSubmissionDeadlineTracker(limit=-1):
 def db_search_LimitedVATTracker(search_text: str, limit=-1):
     Query = Q(client_id__client_name__icontains               = search_text) |\
             Q(client_id__director_phone_number__icontains               = search_text) |\
+            Q(client_id__company_reg_number__icontains               = search_text) |\
             Q(client_id__director_post_code__icontains               = search_text) |\
             Q(period_start__icontains              = search_text) |\
             Q(period_end__icontains              = search_text) |\
@@ -319,6 +322,7 @@ def db_search_LimitedConfirmationStatementTracker(search_text: str, limit=-1):
     Query = Q(client_id__client_name__icontains               = search_text) |\
             Q(client_id__director_phone_number__icontains               = search_text) |\
             Q(client_id__director_post_code__icontains               = search_text) |\
+            Q(client_id__company_reg_number__icontains               = search_text) |\
             Q(HMRC_deadline__icontains              = search_text) |\
             Q(submission_date__icontains            = search_text) |\
             Q(remarks__icontains                    = search_text) |\

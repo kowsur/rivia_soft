@@ -515,7 +515,7 @@ class Limited(models.Model):
         null=True)
 
     def __str__(self) -> str:
-        return f'🏢{self.client_name} 📂{self.client_file_number} ☎{self.director_phone_number} 📭{self.director_post_code}'
+        return f'🏢{self.client_name} 📂{self.client_file_number} ☎{self.director_phone_number} 📭{self.director_post_code} ⓇⓃ{self.company_reg_number}'
     
     def __repr__(self) -> str:
         return str(self)

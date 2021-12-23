@@ -16,7 +16,10 @@ def get_header_name_from_field_name(django_model, field_name):
   try:
     return django_model._meta.get_field(field_name).verbose_name
   except:
-    return 'Incomplete Tasks'
+    try:
+      return django_model._meta.get_field(field_name).name
+    except:
+      return 'Incomplete Tasks'
 
 def is_includeable(field, include_fields=[], exclude_fields=[], keep_include_fields=True, show_others=False):
   # skip if exclude_fields contains the field and keep_include_fields is False

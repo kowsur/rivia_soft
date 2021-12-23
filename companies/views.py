@@ -264,9 +264,9 @@ def export_selfassesment(request):
     headers={'Content-Disposition': f'attachment; filename="selfassesment_{timezone.localtime()}.csv"'},
   )
   include_fields = ['is_active', 'client_file_number', 'client_name', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent']
-  exclude_fields = ['client_id',]
+  exclude_fields = []
   keep_include_fields = True
-  show_others = False
+  show_others = True
   export_to_csv(
     django_model = Selfassesment,
     write_to = response,
@@ -513,9 +513,9 @@ def export_selfassesment_account_submission(request):
   include_fields = []
   exclude_fields = ['submission_id']
   fk_fields = {
-    'client_id': SELFASSESMENT_FK_FIELDS_FOR_EXPORT
+    'client_id': 'all'
   }
-  keep_include_fields = False
+  keep_include_fields = True
   show_others = True
   export_to_csv(
     django_model = SelfassesmentAccountSubmission,

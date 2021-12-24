@@ -359,6 +359,29 @@ class SelfassesmentTracker(models.Model):
             return f"{self.job_description}"
         return f"Deadline: {self.deadline} | Created By: {self.created_by}"
 
+class AutoCreatedSelfassesmentTracker(models.Model):
+    class Meta:
+        verbose_name = _("Auto Created Selfassesment Tracker")
+        verbose_name_plural = _("Auto Created Selfassesment Trackers")
+        constraints = [
+                models.UniqueConstraint(
+                    name = "Unique issue",
+                    fields = ("selfassesment", "reference")
+                    )
+            ]
+    selfassesment = models.ForeignKey(to='companies.Selfassesment', on_delete=models.CASCADE, to_field='client_id')
+    selfassesment_tracker = models.ForeignKey(to='companies.SelfassesmentTracker', on_delete=models.CASCADE, to_field='tracker_id')
+    
+    class CreatedForField(models.TextChoices):
+        NINO = "nino", _("NINO")
+        UTR = "utr", _("UTR")
+        HMRC_AGENT = "hmrc_agent", _("HMRC_AGENT")
+
+    reference = models.CharField(max_length=15, choices=CreatedForField.choices)
+
+    def __str__(self) -> str:
+        return f"{self.selfassesment} - {self.reference}"
+
 
 
 class Issue(models.Model):

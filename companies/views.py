@@ -28,6 +28,7 @@ from .forms import LimitedConfirmationStatementTrackerCreationForm, LimitedConfi
 #models
 from .models import  Selfassesment, SelfassesmentTracker, SelfassesmentAccountSubmission, SelfassesmentAccountSubmissionTaxYear
 from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
+from .models import AutoCreatedSelfassesmentTracker
 
 #export
 from .export_models import export_to_csv
@@ -135,6 +136,7 @@ def create_selfassesment(request):
       job_description = 'Issues\n'
 
       if not assesment.UTR:
+        # Create Tracker
         tracker = SelfassesmentTracker()
         tracker.client_id = assesment
         tracker.deadline = timezone.now()+timedelta(2)
@@ -144,7 +146,15 @@ def create_selfassesment(request):
         tracker.save()
         messages.success(request, f"New Selfassesment Tracker has been created for {assesment} because it doesn't have UTR!")
 
+        # Save reference
+        reference = AutoCreatedSelfassesmentTracker(
+          selfassesment = assesment,
+          selfassesment_tracker = tracker,
+          reference = AutoCreatedSelfassesmentTracker.CreatedForField.UTR)
+        reference.save()
+
       if not assesment.NINO:
+        # Create Tracker
         tracker = SelfassesmentTracker()
         tracker.client_id = assesment
         tracker.deadline = timezone.now()+timedelta(2)
@@ -154,7 +164,15 @@ def create_selfassesment(request):
         tracker.save()
         messages.success(request, f"New Selfassesment Tracker has been created for {assesment} because it doesn't have NINO!")
 
+        # Save reference
+        reference = AutoCreatedSelfassesmentTracker(
+          selfassesment = assesment,
+          selfassesment_tracker = tracker,
+          reference = AutoCreatedSelfassesmentTracker.CreatedForField.NINO)
+        reference.save()
+
       if not assesment.HMRC_agent:
+        # Create Tracker
         tracker = SelfassesmentTracker()
         tracker.client_id = assesment
         tracker.deadline = timezone.now()+timedelta(2)
@@ -163,6 +181,13 @@ def create_selfassesment(request):
         tracker.job_description = job_description + '    - Apply for agent\n'
         tracker.save()
         messages.success(request, f"New Selfassesment Tracker has been created for {assesment} because HMRC agent is inactive!")
+        
+        # Save reference
+        reference = AutoCreatedSelfassesmentTracker(
+          selfassesment = assesment,
+          selfassesment_tracker = tracker,
+          reference = AutoCreatedSelfassesmentTracker.CreatedForField.HMRC_AGENT)
+        reference.save()
 
       context['form'] = SelfassesmentCreationForm(initial={'client_file_number': Selfassesment.get_next_file_number()})
   return render(request, template_name='companies/create.html', context=context)
@@ -174,6 +199,11 @@ def get_details_selfassesment(request, client_id=None):
     response = SelfassesmentSerializer(instance=record).data
     return HttpResponse(json.dumps(response))
   raise Http404
+
+def mark_tracker_complete(tracker:SelfassesmentTracker)->None:
+  tracker.is_completed = True
+  tracker.has_issue = False
+  tracker.save()
 
 @login_required
 def update_selfassesment(request, client_id:int):
@@ -200,6 +230,37 @@ def update_selfassesment(request, client_id:int):
     context['form'] = form
     if form.is_valid():
       assesment = form.save()
+      # Update auto created trackers as compeleted
+      if assesment.UTR:
+        reference = AutoCreatedSelfassesmentTracker.objects.filter(
+          selfassesment = assesment,
+          reference = AutoCreatedSelfassesmentTracker.CreatedForField.UTR
+          ).first()
+        if reference:
+          tracker = reference.selfassesment_tracker
+          mark_tracker_complete(tracker)
+          reference.delete()
+
+      if assesment.NINO:
+        reference = AutoCreatedSelfassesmentTracker.objects.filter(
+          selfassesment = assesment,
+          reference = AutoCreatedSelfassesmentTracker.CreatedForField.NINO
+          ).first()
+        if reference:
+          tracker = reference.selfassesment_tracker
+          mark_tracker_complete(tracker)
+          reference.delete()
+
+      if assesment.HMRC_agent:
+        reference = AutoCreatedSelfassesmentTracker.objects.filter(
+          selfassesment = assesment,
+          reference = AutoCreatedSelfassesmentTracker.CreatedForField.HMRC_AGENT
+          ).first()
+        if reference:
+          tracker = reference.selfassesment_tracker
+          mark_tracker_complete(tracker)
+          reference.delete()
+      
       messages.success(request, f'Selfassesment has been updated having id {client_id}!')
     else:
       messages.error(request, f'Updating Selfassesment {client_id} failed due to invalid data!')

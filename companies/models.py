@@ -72,7 +72,7 @@ class Selfassesment(models.Model):
     is_active = models.BooleanField(verbose_name='Active Status', blank=False, null=False, default=True)
     remarks = models.TextField(_("Remarks"), blank=True, null=True)
     
-    client_file_number = models.IntegerField(verbose_name='File Number', unique=True, blank=False, null=True, editable=True)
+    client_file_number = models.DecimalField(verbose_name='File Number', max_digits=19, decimal_places=3, unique=True, blank=False, null=True, editable=True)
     client_name = models.CharField(verbose_name='Full Name / Business Name', max_length=100, blank=False, null=False, db_index=True)
     
     # Personal Info

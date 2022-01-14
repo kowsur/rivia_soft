@@ -16,4 +16,4 @@ class HTML_Generator:
   Selfassemsent_tax_year_repr_format = r"📆 {tax_year}"
   Selfassesment_client_id_repr_format = r"👥{client_name} 📁{client_file_number} 📞{personal_phone_number} 📭{personal_post_code}"
   
-  Limited_client_id_repr_format = r"🏢{client_name} 📂{client_file_number} ☎{director_phone_number} 📭{director_post_code} ⓇⓃ{company_reg_number}"
+  Limited_client_id_repr_format = r"🏢{client_name} 📂{client_file_number}"

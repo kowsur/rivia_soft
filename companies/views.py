@@ -1353,7 +1353,9 @@ def get_limited_submissions_where_deadline_missed():
 @login_required
 def home_limited_submission_deadline_tracker(request):
   pk_field = 'submission_id'
-  keep_include_fields = True
+  exclude_fields = []
+  field_ordering = ['client_id', 'period', 'remarks',]
+  keep_include_fields = False
   fk_fields = {
       'updated_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
@@ -1372,8 +1374,8 @@ def home_limited_submission_deadline_tracker(request):
     'submission_deadline_not_set': get_limited_submissions_where_deadline_not_set().count(),
     'submission_deadline_missed': get_limited_submissions_where_deadline_missed().count(),
 
-    'template_tag': generate_template_tag_for_model(LimitedSubmissionDeadlineTracker, pk_field=pk_field, show_id=True, fk_fields=fk_fields),
-    'data_container': generate_data_container_table(LimitedSubmissionDeadlineTracker, pk_field=pk_field, show_id=True),
+    'template_tag': generate_template_tag_for_model(LimitedSubmissionDeadlineTracker, show_id=False, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, ordering=field_ordering, fk_fields=fk_fields),
+    'data_container': generate_data_container_table(LimitedSubmissionDeadlineTracker, show_id=False, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, ordering=field_ordering),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_viewall_url,

@@ -1566,6 +1566,8 @@ def get_limited_vats_where_period_difference_more_than_3months():
 @login_required
 def home_limited_vat_tracker(request):
   pk_field = 'vat_id'
+  exclude_fields = []
+  field_ordering = ['client_id', 'period_start', 'period_end', 'HMRC_deadline', 'remarks',]
   keep_include_fields = True
   fk_fields = {
       'updated_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
@@ -1586,8 +1588,8 @@ def home_limited_vat_tracker(request):
     'submission_deadline_missed': get_limited_vats_where_deadline_missed().count(),
     'period_diff_gt_3months': get_limited_vats_where_period_difference_more_than_3months().count(),
 
-    'template_tag': generate_template_tag_for_model(LimitedVATTracker, pk_field=pk_field, show_id=True, fk_fields=fk_fields),
-    'data_container': generate_data_container_table(LimitedVATTracker, pk_field=pk_field, show_id=True),
+    'template_tag': generate_template_tag_for_model(LimitedVATTracker, pk_field=pk_field, show_id=False, ordering=field_ordering, fk_fields=fk_fields),
+    'data_container': generate_data_container_table(LimitedVATTracker, pk_field=pk_field, show_id=False, ordering=field_ordering),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_VAT_Tracker_viewall_url,

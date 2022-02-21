@@ -1,4 +1,6 @@
+from cProfile import label
 from datetime import date, datetime
+from dateutil.relativedelta import relativedelta
 from itertools import chain
 from django.utils.translation import ugettext_lazy as _
 from django import forms
@@ -840,22 +842,43 @@ class LimitedSubmissionDeadlineTrackerCreationForm(forms.ModelForm):
         empty_label=None,
         disabled=False
         )
-    our_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
-    HMRC_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    submission_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    # submitted_by = SearchableModelField(
+    #     queryset=CustomUser.objects.all(),
+    #     search_url = search_users_url_path,
+    #     all_url = all_users_url_path,
+    #     repr_format = Forms.CustomUser_repr_format,
+    #     model = CustomUser,
+    #     choices = CustomUser.objects.all().only('user_id', 'first_name'),
+    #     fk_field = 'user_id',
+    #     disabled = False,
+    #     required = False,
+    #     empty_label = None # remove default option '------' from select menu
+    #     )
+    # our_deadline = forms.DateField(label="HMRC deadline", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    HMRC_deadline = forms.DateField(label="CompanyHouse Deadline", widget=forms.DateInput(attrs={'type': 'date'}))
+    # submission_date_hmrc = forms.DateField(label="Submission Date(CH)", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    # submission_date = forms.DateField(label="Submission Date(CH)", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    period_start_date = forms.DateField(label="Period Start", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    period = forms.DateField(label="Period End", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
     
     class Meta:
         model = LimitedSubmissionDeadlineTracker
         fields = (
             # "submission_id",
             "client_id",
+            "period_start_date",
             "period",
-            "our_deadline",
+            
+            # "our_deadline",
+            # "is_submitted_hmrc",
+            # "submitted_by_hmrc",
+            # "submission_date_hmrc",
+
             "HMRC_deadline",
-            "is_submitted",
-            "submitted_by",
-            "submission_date",
-            "is_documents_uploaded",
+            # "is_submitted",
+            # "submitted_by",
+            # "submission_date",
+            # "is_documents_uploaded",
             "remarks",
             # "updated_by",
             # "last_updated_on",
@@ -866,6 +889,26 @@ class LimitedSubmissionDeadlineTrackerCreationForm(forms.ModelForm):
         if is_submitted == True and not type(submission_date)==type(date(2021, 6, 28)):
             raise ValidationError('Is Submitted is True therefore Submission Date is required.')
         return submission_date
+    
+    def clean(self):
+        date_type = type(date(1,1,1))
+
+        super().clean()
+        period_start_date = self.cleaned_data.get("period_start_date", None)
+        period = self.cleaned_data.get("period", None) # period_end_date
+
+        if (type(period_start_date) is date_type and type(period) is not date_type) or (type(period) is date_type and type(period_start_date) is not date_type):
+            message = "Period start and period end sholud be empty or both of them should be provided."
+            self.add_error("period_start_date", message)
+            self.add_error("period", message)
+        elif type(period) is date_type and type(period_start_date) is date_type:
+            print(period_start_date, period)
+            date_diff = relativedelta(period, period_start_date)
+            print(type(period), type(period_start_date), date_diff.years)
+            if not date_diff.years>=1:
+                message = "Difference between period start and period and should be 1 year or more."
+                self.add_error("period_start_date", message)
+                self.add_error("period", message)
 
 # Limited Submission Deadline Tracker
 class LimitedSubmissionDeadlineTrackerChangeForm(forms.ModelForm):
@@ -881,21 +924,32 @@ class LimitedSubmissionDeadlineTrackerChangeForm(forms.ModelForm):
         empty_label=None,
         disabled=False
         )
-    our_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
-    HMRC_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    submission_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    period_start_date = forms.DateField(label="Period Start", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    period = forms.DateField(label="Period End", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+
+    our_deadline = forms.DateField(label="HMRC Deadline", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    HMRC_deadline = forms.DateField(label="CompanyHouse Deadline", widget=forms.DateInput(attrs={'type': 'date'}))
+    submission_date = forms.DateField(label="Submission Date(CH)", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    submission_date_hmrc = forms.DateField(label="Submission Date(HM)", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
     
     class Meta:
         model = LimitedSubmissionDeadlineTracker
         fields = (
             # "submission_id",
             "client_id",
+            "period_start_date",
             "period",
-            "our_deadline",
+
             "HMRC_deadline",
             "is_submitted",
-            "submitted_by",
             "submission_date",
+            # "submitted_by",
+
+            "our_deadline",
+            "is_submitted_hmrc",
+            # "submitted_by_hmrc",
+            "submission_date_hmrc",
+
             "is_documents_uploaded",
             "remarks",
             # "updated_by",
@@ -907,6 +961,33 @@ class LimitedSubmissionDeadlineTrackerChangeForm(forms.ModelForm):
         if is_submitted == True and not type(submission_date)==type(date(2021, 6, 28)):
             raise ValidationError('Is Submitted is True therefore Submission Date is required.')
         return submission_date
+    
+    def clean_submission_date_hmrc(self):
+        is_submitted = self.cleaned_data.get('is_submitted_hmrc')
+        submission_date = self.cleaned_data.get('submission_date_hmrc')
+        if is_submitted == True and not type(submission_date)==type(date(2021, 6, 28)):
+            raise ValidationError('Is Submitted is True therefore Submission Date is required.')
+        return submission_date
+    
+    def clean(self):
+        date_type = type(date(1,1,1))
+
+        super().clean()
+        period_start_date = self.cleaned_data.get("period_start_date", None)
+        period = self.cleaned_data.get("period", None) # period_end_date
+
+        if (type(period_start_date) is date_type and type(period) is not date_type) or (type(period) is date_type and type(period_start_date) is not date_type):
+            message = "Period start and period end sholud be empty or both of them should be provided."
+            self.add_error("period_start_date", message)
+            self.add_error("period", message)
+        elif type(period) is date_type and type(period_start_date) is date_type:
+            print(period_start_date, period)
+            date_diff = relativedelta(period, period_start_date)
+            print(type(period), type(period_start_date), date_diff.years)
+            if not date_diff.years>=1:
+                message = "Difference between period start and period and should be 1 year or more."
+                self.add_error("period_start_date", message)
+                self.add_error("period", message)
 
 class LimitedSubmissionDeadlineTrackerDeleteForm(forms.ModelForm):
     agree = forms.BooleanField(label='I want to proceed.', required=True)

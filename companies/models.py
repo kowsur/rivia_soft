@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -650,19 +651,37 @@ class LimitedSubmissionDeadlineTracker(models.Model):
         related_name='limited_account_submission_client_id',
         blank=False,
         null=True)
-    period = models.CharField(
-        verbose_name='Period',
-        max_length=63,
+    period_start_date = models.DateField(verbose_name='Period Start', blank=True, null=True)
+    period = models.DateField(
+        verbose_name='Period End',
         blank=True,
         null=True,
-        default='',
         db_index=False
     )
-    our_deadline = models.DateField(verbose_name='Our Deadline', blank=True, null=True)
-    HMRC_deadline = models.DateField(verbose_name='HMRC Deadline', blank=False, null=True)
-    is_submitted = models.BooleanField(verbose_name='Is Submitted', default=False, null=False)
-    submitted_by = models.TextField(verbose_name='Submitted By', blank=True, default='', null=True)
-    submission_date = models.DateField(verbose_name='Submission Date', blank=True, null=True)
+    
+    our_deadline = models.DateField(verbose_name='HMRC Deadline', blank=True, null=True)
+    is_submitted_hmrc = models.BooleanField(verbose_name='Is Submitted(HM)', default=False, null=False)
+    submitted_by_hmrc = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Submitted By(HM)',
+        related_name='limited_submission_submitted_by_hmrc',
+        to_field='user_id',
+        blank=True,
+        null=True)
+    submission_date_hmrc = models.DateField(verbose_name='Submission Date(HM)', blank=True, null=True)
+
+    HMRC_deadline = models.DateField(verbose_name='CompanyHouse Deadline', blank=False, null=True)
+    is_submitted = models.BooleanField(verbose_name='Is Submitted(CH)', default=False, null=False)
+    submitted_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Submitted By(CH)',
+        related_name='limited_submission_submitted_by',
+        to_field='user_id',
+        blank=True,
+        null=True)
+    submission_date = models.DateField(verbose_name='Submission Date(CH)', blank=True, null=True)
     is_documents_uploaded = models.BooleanField(verbose_name='Is Documents Uploaded', default=False, null=False)
     remarks = models.TextField(verbose_name='Remarks', blank=True, null=True)
     updated_by = models.ForeignKey(
@@ -687,7 +706,7 @@ class LimitedSubmissionDeadlineTracker(models.Model):
             raise ValueError("HMRC_deadline should be an instance of datetime.date")
         
         # set self.our_deadline 30 days before the self.HMRC_deadline
-        self.our_deadline = self.HMRC_deadline - timedelta(30)
+        self.our_deadline = self.HMRC_deadline + timedelta(45)
         self.save()
 
 # Limited VAT Tracker

@@ -1,4 +1,5 @@
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 import json
 from django.http.response import Http404, HttpResponse
@@ -1354,11 +1355,12 @@ def get_limited_submissions_where_deadline_missed():
 def home_limited_submission_deadline_tracker(request):
   pk_field = 'submission_id'
   exclude_fields = []
-  field_ordering = ['client_id', 'period', 'remarks',]
+  field_ordering = ['client_id', 'period_start_date', 'period', 'remarks', 'HMRC_deadline', 'is_submitted', 'submitted_by', 'submission_date', 'our_deadline', 'is_submitted_hmrc', 'submitted_by_hmrc', 'submission_date_hmrc', 'is_documents_uploaded', ]
   keep_include_fields = False
   fk_fields = {
       'updated_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
+      'submitted_by_hmrc': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': HTML_Generator.Limited_client_id_repr_format, 'href-url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url,},
       }
   context = {
@@ -1430,12 +1432,12 @@ def update_limited_submission_deadline_tracker(request, submission_id:int):
 
   try:
     record =  LimitedSubmissionDeadlineTracker.objects.get(submission_id=submission_id)
-    if record.is_submitted:
+    if record.is_submitted and record.is_submitted_hmrc:
       messages.error(request, message=f"Limited Submission Deadline Tracker {submission_id} is submitted therefore can't be updated!")
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)
     context['form'] = LimitedSubmissionDeadlineTrackerChangeForm(instance=record)
   except LimitedSubmissionDeadlineTracker.DoesNotExist:
-    messages.error(request, f'Limited Submission Deadline Tracker having id {submission_id} does not exists!')
+    messages.error(request, f'Limited Submission Deadline Tracker having id {submission_id} does not exist!')
     return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)
     raise Http404
 
@@ -1448,10 +1450,27 @@ def update_limited_submission_deadline_tracker(request, submission_id:int):
       assesment.save()
       context['form'] = LimitedSubmissionDeadlineTrackerChangeForm(instance=assesment)
       messages.success(request, f'Limited Submission Deadline Tracker has been updated having id {submission_id}!')
-      if assesment.is_submitted:
+
+      if assesment.is_submitted and not assesment.submitted_by:
+        assesment.submitted_by = request.user
+        assesment.save()
+      else:
+        assesment.submitted_by = None
+        assesment.save()
+
+      if assesment.is_submitted_hmrc and not assesment.submitted_by_hmrc:
+        assesment.submitted_by_hmrc = request.user
+        assesment.save()
+      else:
+        assesment.submitted_by_hmrc = None
+        assesment.save()
+
+      if assesment.is_submitted and assesment.is_submitted_hmrc:
         new_assesment = LimitedSubmissionDeadlineTracker()
         new_assesment.client_id = assesment.client_id
         new_assesment.updated_by = request.user
+        new_assesment.HMRC_deadline = assesment.HMRC_deadline # Compnay House deadline
+        new_assesment.our_deadline = assesment.our_deadline # HMRC Deadline
         new_assesment.save()
         messages.success(request, f'New Limited Submission Deadline Tracker has been created {new_assesment}')
         return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)

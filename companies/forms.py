@@ -902,9 +902,8 @@ class LimitedSubmissionDeadlineTrackerCreationForm(forms.ModelForm):
             self.add_error("period_start_date", message)
             self.add_error("period", message)
         elif type(period) is date_type and type(period_start_date) is date_type:
-            print(period_start_date, period)
-            date_diff = relativedelta(period, period_start_date)
-            print(type(period), type(period_start_date), date_diff.years)
+            date_diff = relativedelta(period+relativedelta(days=1), period_start_date)
+
             if not date_diff.years>=1:
                 message = "Difference between period start and period and should be 1 year or more."
                 self.add_error("period_start_date", message)
@@ -981,9 +980,8 @@ class LimitedSubmissionDeadlineTrackerChangeForm(forms.ModelForm):
             self.add_error("period_start_date", message)
             self.add_error("period", message)
         elif type(period) is date_type and type(period_start_date) is date_type:
-            print(period_start_date, period)
-            date_diff = relativedelta(period, period_start_date)
-            print(type(period), type(period_start_date), date_diff.years)
+            date_diff = relativedelta(period+relativedelta(days=1), period_start_date)
+            
             if not date_diff.years>=1:
                 message = "Difference between period start and period and should be 1 year or more."
                 self.add_error("period_start_date", message)

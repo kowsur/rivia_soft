@@ -75,8 +75,8 @@ user_details_url_without_argument = '/u/details/'
 from pprint import pp
 
 
-SELFASSESMENT_FK_FIELDS_FOR_EXPORT = ['client_name', 'client_file_number', 'HMRC_referance', 'personal_post_code']
-LIMITED_FK_FIELDS_FOR_EXPORT = ['client_name', 'client_file_number', 'director_phone_number', 'director_post_code']
+SELFASSESMENT_FK_FIELDS_FOR_EXPORT = 'all' #['client_name', 'client_file_number', 'HMRC_referance', 'personal_post_code']
+LIMITED_FK_FIELDS_FOR_EXPORT = 'all' #['client_name', 'client_file_number', 'director_phone_number', 'director_post_code']
 # =============================================================================================================
 # =============================================================================================================
 # Selfassesment

@@ -2,6 +2,8 @@
 
 **/data/
 
+companies/migrations/
+
 *env*/
 todo.txt
 db.sqlite3*

@@ -199,7 +199,6 @@ class SelfassesmentAccountSubmission(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields = ('client_id', 'tax_year',),
-                condition = models.Q(status="SUBMITTED"),
                 name = "unique_client_id__tax_year__status_SUBMITTED",
                 )
         ]
@@ -692,7 +691,7 @@ class LimitedSubmissionDeadlineTracker(models.Model):
         to_field='user_id',
         blank=False,
         null=True)
-    last_updated_on = models.DateTimeField(verbose_name='Last Updated On', default=timezone.now, null=True)
+    last_updated_on = models.DateTimeField(verbose_name='Last Updated On', null=True, auto_now=True)
 
 
     def __str__(self) -> str:

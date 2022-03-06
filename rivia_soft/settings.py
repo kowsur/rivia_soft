@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'users',
     # "user_logs",
     'companies',
+    'accounts',
 ]
 
 MIDDLEWARE = [

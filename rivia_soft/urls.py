@@ -24,6 +24,7 @@ from companies.views import home_merged_tracker
 urlpatterns = [
     path('', home_merged_tracker),
     path('companies/', include('companies.urls'), name='companies'),
+    path('accounts/', include('accounts.urls'), name='accounts'),
     path('u/', include('users.urls')),
     path('only-admins-can-access-this/', admin.site.urls, name='admin'),
     path('opensearch.xml', lambda request: FileResponse(open('I:/Projects/rs/static/osd.xml','rb')), name='opensearch'),

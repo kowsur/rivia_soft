@@ -1,5 +1,10 @@
 from django.shortcuts import render
 
 
+from companies.views import URLS
+
+
 def index(request):
-    return render(request, "accounts/index.html")
+    context = {**URLS}
+    return render(request, "accounts/index.html", context)
+

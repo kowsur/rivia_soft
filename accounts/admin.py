@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import IncomeSources, ExpenseSources, Months, IncomesPerTaxYear, ExpensesPerTaxYear
+
+
+admin.site.register([IncomeSources, ExpenseSources, Months, IncomesPerTaxYear, ExpensesPerTaxYear])

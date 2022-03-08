@@ -2,7 +2,7 @@ from cProfile import label
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from itertools import chain
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone

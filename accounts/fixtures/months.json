@@ -3,84 +3,96 @@
     "model": "accounts.Months",
     "pk": 4,
     "fields": {
-      "month_name": "April"
+      "month_name": "April",
+      "month_index": 1
     }
   },
   {
     "model": "accounts.Months",
     "pk": 5,
     "fields": {
-      "month_name": "May"
+      "month_name": "May",
+      "month_index": 2
     }
   },
   {
     "model": "accounts.Months",
     "pk": 6,
     "fields": {
-      "month_name": "June"
+      "month_name": "June",
+      "month_index": 3
     }
   },
   {
     "model": "accounts.Months",
     "pk": 7,
     "fields": {
-      "month_name": "July"
+      "month_name": "July",
+      "month_index": 4
     }
   },
   {
     "model": "accounts.Months",
     "pk": 8,
     "fields": {
-      "month_name": "August"
+      "month_name": "August",
+      "month_index": 5
     }
   },
   {
     "model": "accounts.Months",
     "pk": 9,
     "fields": {
-      "month_name": "September"
+      "month_name": "September",
+      "month_index": 6
     }
   },
   {
     "model": "accounts.Months",
     "pk": 10,
     "fields": {
-      "month_name": "October"
+      "month_name": "October",
+      "month_index": 7
     }
   },
   {
     "model": "accounts.Months",
     "pk": 11,
     "fields": {
-      "month_name": "November"
+      "month_name": "November",
+      "month_index": 8
     }
   },
   {
     "model": "accounts.Months",
     "pk": 12,
     "fields": {
-      "month_name": "December"
+      "month_name": "December",
+      "month_index": 9
     }
   },
   {
     "model": "accounts.Months",
     "pk": 1,
     "fields": {
-      "month_name": "January"
+      "month_name": "January",
+      "month_index": 10
     }
   },
   {
     "model": "accounts.Months",
     "pk": 2,
     "fields": {
-      "month_name": "February"
+      "month_name": "February",
+      "month_index": 11
     }
   },
   {
     "model": "accounts.Months",
     "pk": 3,
     "fields": {
-      "month_name": "March"
+      "month_name": "March",
+      "month_index": 12
     }
   }
 ]

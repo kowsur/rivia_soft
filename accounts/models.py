@@ -31,8 +31,10 @@ class Months(models.Model):
     class Meta:
         verbose_name = "Month"
         verbose_name_plural = "Months"
+        ordering = ['month_index']
     
     month_name = models.CharField(_("Name"), max_length=10)
+    month_index = models.IntegerField(_("Index"), default=0)
 
     def __str__(self)->str:
         return self.month_name

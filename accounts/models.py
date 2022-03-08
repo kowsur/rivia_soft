@@ -2,7 +2,7 @@ from email.policy import default
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from companies.models import SelfassesmentAccountSubmissionTaxYear, Selfassesment
+from companies.models import SelfassesmentAccountSubmission
 
 
 class IncomeSources(models.Model):
@@ -46,8 +46,7 @@ class IncomesPerTaxYear(models.Model):
         verbose_name_plural = "Incomes Per Tax Year"
 
     income_source = models.ForeignKey(IncomeSources, on_delete=models.RESTRICT)
-    client = models.ForeignKey(Selfassesment, on_delete=models.RESTRICT)
-    tax_year = models.ForeignKey(SelfassesmentAccountSubmissionTaxYear, on_delete=models.RESTRICT)
+    client = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)
     month = models.ForeignKey(Months, on_delete=models.RESTRICT)
     amount = models.IntegerField(default=0)
     comission = models.IntegerField(default=0)
@@ -62,8 +61,7 @@ class ExpensesPerTaxYear(models.Model):
         verbose_name_plural = "Expenses Per Tax Year"
 
     expense_source = models.ForeignKey(IncomeSources, on_delete=models.RESTRICT)
-    client = models.ForeignKey(Selfassesment, on_delete=models.RESTRICT)
-    tax_year = models.ForeignKey(SelfassesmentAccountSubmissionTaxYear, on_delete=models.RESTRICT)
+    client = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)
     month = models.ForeignKey(Months, on_delete=models.RESTRICT)
     amount = models.IntegerField(default=0)
 

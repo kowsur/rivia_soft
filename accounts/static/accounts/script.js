@@ -25,29 +25,3 @@ tabNavList.addEventListener("click", (e)=>{
     currentActiveTab.classList.remove("active")
     newActiveTab.classList.add("active")
 })
-
-
-let searchOpitonsList = document.querySelectorAll(".search-options")
-
-
-searchOpitonsList.forEach(searchOptions=>{
-    searchOptions.addEventListener("click", e=>{
-        let selectedOption = searchOptions.querySelector(".search-option.selected")
-        let newSelectedOption = e.target
-        if (selectedOption && newSelectedOption) selectedOption.classList.remove("selected")
-        if (newSelectedOption) newSelectedOption.classList.add("selected")
-    })
-})
-
-let clientSearchInput = document.querySelector("#client")
-let taxYearSearchInput = document.querySelector("#tax-year")
-
-clientSearchInput.addEventListener("input", (e)=>{
-    console.log(e.target.value)
-})
-
-taxYearSearchInput.addEventListener("input", (e)=>{
-    console.log(e.target.value)
-})
-
-

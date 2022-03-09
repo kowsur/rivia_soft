@@ -10,10 +10,16 @@ let template = document.querySelector(template_querySelector);
 // Prepare row for data table
 export async function get_tr_for_table(data, template=template, model_fields=DATA.model_fields, update_url=DATA.update_url, delete_url=DATA.delete_url) {
   // prepare table row for table using template and data
+  let seflassesmentAccountSubmission_home_pathname = '/companies/SAS/home/'
   let instance = template.content.cloneNode(true)
   let serial_num = instance.getElementById('pk')
-  if (serial_num) serial_num.textContent = data.pk
-
+  if (serial_num) {
+    if (location.pathname==seflassesmentAccountSubmission_home_pathname) {
+      serial_num.innerHTML = `<a href="/accounts/?pk=${data.pk}">${data.pk}</a>`
+    }
+    else serial_num.textContent = data.pk
+  }
+  
   let update_link = `${update_url}${data.pk}/`
   let delete_link = `${delete_url}${data.pk}/`
   instance.getElementById('edit').href = `${update_link}`
@@ -66,7 +72,9 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
           
           let hrefURL = td.getAttribute('data-href-url')
           if (hrefURL){
-            td.innerHTML = `<a href="${hrefURL}${field_data}">${makeSafeHTML(string)}</a>`
+            let url = `${hrefURL}${field_data}`
+
+            td.innerHTML = `<a href="${url}">${makeSafeHTML(string)}</a>`
           }
 
           if (field=='incomplete_tasks'){

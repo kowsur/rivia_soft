@@ -73,7 +73,7 @@ export async function fetch_url({url, req_method, data_object={}, headers={'Cont
         body: data_object,
         ...others
       })
-    catchErrorAndLog(hideLoadingIndicator())
+    catchErrorAndLog(hideLoadingIndicator)
     return response
   }
 }

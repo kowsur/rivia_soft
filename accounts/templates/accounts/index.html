@@ -19,9 +19,34 @@
   </ul>
 
   <div class="tabs">
-    <div class="tab active" data-tab-name="details">Details</div>
-    <div class="tab" data-tab-name="incomeAndExpnses">Income and expenses</div>
+    <!-- Details Tab -->
+    <div class="tab active" data-tab-name="details">
+      <div class="detail"><strong>Tax-Year: </strong><span id="tax-year"></span></div>
+      <div class="detail"><strong>Name: </strong><span id="client-name"></span></div>
+      <div class="detail"><strong>Personal Address: </strong><pre id="client-personal-address"></pre></div>
+      <div class="detail"><strong>Business Address: </strong><pre id="client-business-address"></pre></div>
+      <div class="detail"><strong>Date of birth: </strong><span id="client-dob"></span></div>
+      <div class="detail"><strong>UTR: </strong><span id="client-utr"></span></div>
+      <div class="detail"><strong>Account Status: </strong><span id="client-account-status"></span></div>
+    </div>
+
+    <!-- Income and Expense Tab -->
+    <div class="tab" data-tab-name="incomeAndExpnses">
+      <div>
+        <h1>Incomes</h1>
+
+      </div>
+
+      <div>
+        <h1>Expenses</h1>
+
+      </div>
+    </div>
+
+    <!-- Tax Calculation Tab -->
     <div class="tab" data-tab-name="taxCalculation">TAX calculation</div>
+
+    <!-- view Tab -->
     <div class="tab" data-tab-name="view">View</div>
   </div>
 </div>

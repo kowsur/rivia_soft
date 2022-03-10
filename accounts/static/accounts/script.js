@@ -1,3 +1,63 @@
+/*
+// update or insert income
+fetch_url({
+  // url = "/accounts/set_income/<submission_id>/<month_id>/<income_id>/"
+  url: "/accounts/set_income/46/6/4/",
+  req_method: "POST",
+  data_object: JSON.stringify({
+    // one of them must be specified
+    amount: 2000,
+    comission: 80
+  })
+})
+
+// upsert expense
+fetch_url({
+  // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"
+  url: "/accounts/set_expense/46/6/4/",
+  req_method: "POST"
+  data_object: JSON.stringify({
+    // amount must be specified
+    amount: 2000,
+  })
+})
+
+
+
+// Get all income_sources
+fetch_url({
+  url: '/accounts/income_sources/'
+})
+
+// Get all expense_sources
+fetch_url({
+  url: '/accounts/expense_sources/'
+})
+
+// Get all months
+fetch_url({
+  url: '/accounts/months/'
+})
+
+
+
+// Get all incomes for submission_id
+fetch_url({
+  // url = "/accounts/incomes/<submission_id>/"
+  url: '/accounts/incomes/45/'
+})
+
+// Get all expenses for submission_id
+fetch_url({
+  // url = "/accounts/expenses/<submission_id>/"
+  url: '/accounts/expenses/46/'
+})
+*/
+
+
+
+
+
 let tabNavList = document.querySelector(".tab-nav")
 
 tabNavList.addEventListener("click", (e)=>{
@@ -77,7 +137,7 @@ function updateViewTab(submissionDetails){
 
 // =============================================================================================================================
 // Api caller
-async function fetch_url({url, req_method, data_object={}, headers={'Content-Type': 'application/json'}, others={}}){
+async function fetch_url({url, req_method="GET", data_object={}, headers={'Content-Type': 'application/json'}, others={}}){
     req_method = req_method.toUpperCase()
     if (deepCompare(others, {})){
       others = {

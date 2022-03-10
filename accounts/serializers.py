@@ -23,9 +23,9 @@ class MonthsSerializer(serializers.ModelSerializer):
 
 
 class IncomesPerTaxYearSerializer(serializers.ModelSerializer):
-    income_source = IncomeSourcesSerializer()
-    client = SelfassesmentAccountSubmissionSerializer()
-    month = MonthsSerializer()
+    # income_source = IncomeSourcesSerializer()
+    # client = SelfassesmentAccountSubmissionSerializer()
+    # month = MonthsSerializer()
 
     class Meta:
         model = IncomesPerTaxYear
@@ -33,11 +33,11 @@ class IncomesPerTaxYearSerializer(serializers.ModelSerializer):
 
 
 class ExpensesPerTaxYearSerializer(serializers.ModelSerializer):
-    income_source = ExpenseSourcesSerializer()
-    client = SelfassesmentAccountSubmissionSerializer()
-    month = MonthsSerializer()
+    # expense_source = ExpenseSourcesSerializer()
+    # client = SelfassesmentAccountSubmissionSerializer()
+    # month = MonthsSerializer()
 
     class Meta:
-        model = IncomesPerTaxYear
+        model = ExpensesPerTaxYear
         fields = '__all__'
 

@@ -13,7 +13,7 @@ from .models import IncomeSources, ExpenseSources, Months, ExpensesPerTaxYear, I
 
 # Serializers
 from rest_framework.renderers import JSONRenderer
-from .serializers import IncomeSourcesSerializer, ExpenseSourcesSerializer, MonthsSerializer
+from .serializers import IncomesPerTaxYearSerializer, ExpensesPerTaxYearSerializer, IncomeSourcesSerializer, ExpenseSourcesSerializer, MonthsSerializer
 dump_to_json = JSONRenderer()
 
 from companies.views import URLS
@@ -39,7 +39,7 @@ def index(request):
 
 
 ##############################################################################
-## Views to return data for incomes and expenses tab
+## Views to update and insert data for incomes and expenses
 ##############################################################################
 @csrf_exempt
 @login_required
@@ -147,6 +147,22 @@ def upsert_income_for_submission(request, submission_id, month_id, income_id):
     income_for_tax_year.save()
 
     return HttpResponse(json.dumps({'success': 'Created new record'}), status=201)
+
+
+##############################################################################
+## Views to return data for incomes and expenses tab
+##############################################################################
+def get_expenses_for_submission(request: HttpRequest, submission_id):
+    submission_expenses = ExpensesPerTaxYear.objects.filter(client=submission_id)
+    serialized_data = ExpensesPerTaxYearSerializer(submission_expenses, many=True)
+    json_response = dump_to_json.render(serialized_data.data)
+    return HttpResponse(json_response, content_type='application/json')
+
+def get_incomes_for_submission(request: HttpRequest, submission_id):
+    submission_incomes = IncomesPerTaxYear.objects.filter(client=submission_id)
+    serialized_data = IncomesPerTaxYearSerializer(submission_incomes, many=True)
+    json_response = dump_to_json.render(serialized_data.data)
+    return HttpResponse(json_response, content_type='application/json')
 
 
 ##############################################################################

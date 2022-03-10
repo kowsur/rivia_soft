@@ -52,7 +52,7 @@ class IncomesPerTaxYear(models.Model):
     comission = models.IntegerField(default=0)
 
     def __str__(self) -> str:
-        return f"{self.client} - {self.income_source} - {self.tax_year} - {self.month} - {self.amount}"
+        return f"{self.client.client_id.client_name} - {self.income_source} - {self.month} - {self.amount}"
 
 
 class ExpensesPerTaxYear(models.Model):
@@ -60,10 +60,10 @@ class ExpensesPerTaxYear(models.Model):
         verbose_name = "Expense Per Tax Year"
         verbose_name_plural = "Expenses Per Tax Year"
 
-    expense_source = models.ForeignKey(IncomeSources, on_delete=models.RESTRICT)
+    expense_source = models.ForeignKey(ExpenseSources, on_delete=models.RESTRICT)
     client = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)
     month = models.ForeignKey(Months, on_delete=models.RESTRICT)
     amount = models.IntegerField(default=0)
 
     def __str__(self) -> str:
-        return f"{self.client} - {self.expense_source} - {self.tax_year} - {self.month} - {self.amount}"
+        return f"{self.client.client_id.client_name} - {self.expense_source} - {self.month} - {self.amount}"

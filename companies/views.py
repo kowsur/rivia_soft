@@ -31,6 +31,11 @@ from .models import  Selfassesment, SelfassesmentTracker, SelfassesmentAccountSu
 from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 from .models import AutoCreatedSelfassesmentTracker
 
+# Serializers
+from rest_framework.renderers import JSONRenderer
+from .serializers import SelfassesmentAccountSubmissionSerializer
+dump_model_to_json = JSONRenderer()
+
 #export
 from .export_models import export_to_csv
 
@@ -537,6 +542,24 @@ def delete_selfassesment_account_submission(request, submission_id:int):
 def search_selfassesment_account_submission(request, limit: int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
     search_text = request.GET.get('q', '')
+    submission_id = request.GET.get('pk', None)
+    
+    if submission_id:
+      error_message = {'error': 'The resource you are looking for does not exist'}
+      error_response = HttpResponse(json.dumps(error_message), content_type='application/json', status=404)
+
+      if not submission_id.isnumeric():
+        return error_response
+
+      try:
+        submission_record = SelfassesmentAccountSubmission.objects.get(pk=submission_id)
+      except SelfassesmentAccountSubmission.DoesNotExist:
+        return error_response
+      
+      serialized_record = SelfassesmentAccountSubmissionSerializer(instance=submission_record)
+      json_response = dump_model_to_json.render(serialized_record.data)
+      return HttpResponse(json_response, content_type='application/json')
+
 
     # if tasks query paramter exists then return tasks
     if request.GET.get('tasks'):

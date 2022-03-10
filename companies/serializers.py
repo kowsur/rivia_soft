@@ -8,8 +8,7 @@ from .models import Limited
 class CustomUserSerializer(serializers.ModelSerializer):
   class Meta:
     model = CustomUser
-    fields = '__all__'
-    # fields = ['user_id', 'email', 'first_name', 'last_name', '']
+    fields = ['user_id', 'email', 'first_name', 'last_name']
 
 class SelfassesmentSerializer(serializers.ModelSerializer):
   class Meta:
@@ -21,6 +20,19 @@ class SelfassesmentAccountSubmissionTaxYearSerializer(serializers.ModelSerialize
   class Meta:
     model = SelfassesmentAccountSubmissionTaxYear
     fields = '__all__'
+
+
+class SelfassesmentAccountSubmissionSerializer(serializers.ModelSerializer):
+  client_id = SelfassesmentSerializer()
+  tax_year = SelfassesmentAccountSubmissionTaxYearSerializer()
+  submitted_by = CustomUserSerializer()
+  prepared_by = CustomUserSerializer()
+  last_updated_by = CustomUserSerializer()
+
+  class Meta:
+    model = SelfassesmentAccountSubmission
+    fields = '__all__'
+
 
 class LimitedSerializer(serializers.ModelSerializer):
   class Meta:

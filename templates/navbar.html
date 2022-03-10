@@ -1,5 +1,6 @@
 {% load admin_urls %}
 
+{% if user.is_authenticated %}
 <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 <div class="w-full text-gray-700 bg-white dark:text-gray-200 dark:bg-gray-800">
   <div x-data="{ open: false }" class="flex flex-col md:items-center md:justify-between md:flex-row max-w-screen-xl px-4 md:px-6 lg:px-8 mx-auto">
@@ -189,3 +190,4 @@
     </nav>
   </div>
 </div>
+{% endif %}

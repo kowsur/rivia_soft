@@ -27,8 +27,8 @@
 {% if add_all_url %}
   <!-- add all selfassesments -->
   {% if request.user.is_superuser %}
-  <div class="mt-5 grid place-items-center">
-    <a href="{% url add_all_url %}" class="create px-4 py-2 text-md font-semibold rounded-md">
+  <div class="grid mt-5 place-items-center">
+    <a href="{% url add_all_url %}" class="px-4 py-2 font-semibold rounded-md create text-md">
       {{ add_all_text }}</a>
   </div>
   {% endif %}
@@ -39,7 +39,7 @@
 {% include "companies/searchbar.html" %}
 
 <!-- represent data -->
-<div class="relative max-w-min mx-auto">
+<div class="relative mx-auto max-w-min">
   <!-- tasks -->
   {% if counts %}  
     {% if tracker_task_counts %}    
@@ -168,7 +168,7 @@
   {% autoescape off %}
     {{ data_container }}
   {% endautoescape %}
-  <span class="absolute top-0 right-0 bg-indigo-600 text-white px-2 py-1 text-xs font-normal sm:text-sm sm:font-normal md:text-base md:font-medium" id="loading-indicator">Loading Data</span>
+  <span class="absolute top-0 right-0 px-2 py-1 text-xs font-normal text-white bg-indigo-600 sm:text-sm sm:font-normal md:text-base md:font-medium" id="loading-indicator">Loading Data</span>
 </div>
 
 <!-- data template -->

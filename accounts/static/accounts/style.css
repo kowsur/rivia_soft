@@ -1,3 +1,68 @@
+/* Select search */
+#add_income{
+    z-index: 2;
+}
+#add_expense{
+    z-index: 1;
+}
+
+.select{
+    position: relative;
+}
+
+.select-options{
+    position: absolute;
+    top: 100%;
+    display: none;
+    background-color: #f3f4f6;
+    width: 100%;
+    padding: .5em;
+    border-radius: .5em;
+    max-height: 200px;
+    overflow-y: scroll;
+}
+.select-options div{
+    padding: .5em .3em;
+    border-radius: .5em;
+    z-index: inherit;
+}
+.select-options div:hover{
+    background-color: #9ca3af;
+}
+
+.select-options:hover,
+.select-input:active + .select-options,
+.select-input:focus + .select-options{
+    display: block;
+}
+
+
+/* Detais tab */
+.detail{
+    margin: 1rem 0rem;
+}
+
+/* Incomes and Expenses tab */
+.tab[data-tab-name="incomesAndExpnses"]{
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+}
+
+.title{
+    font-size: large;
+    font-weight: 600;
+}
+
+.incomes, .expenses{
+    margin-top: 1em;
+}
+
+.month{
+    margin-left: 1em;
+}
+
+
 :root{
     /* nav tab item styles */
     --nav-tab-margin-top: 1em;
@@ -54,15 +119,9 @@
 }
 
 
-.tab{
+.tabs .tab{
     display: none;
 }
-.tab.active{
+.tabs .tab.active{
     display: block;
-}
-
-
-/* Detais tab */
-.detail{
-    margin: 1rem 0rem;
 }

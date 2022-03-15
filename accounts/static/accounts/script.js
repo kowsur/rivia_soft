@@ -194,45 +194,29 @@ function handleIncomeSelect(e){
 function handleIncomeUpdate(e){
   let inputField = e.target
   let {submissionId, monthId, incomeId, updateType} = inputField.dataset
+  let data_object = {} // amount or comission or both must be specified
 
-  if(updateType==="amount"){
-    fetch_url({
-      // url = "/accounts/set_income/<submission_id>/<month_id>/<income_id>/"
-      url: `/accounts/set_income/${submissionId}/${monthId}/${incomeId}/`,
-      req_method: "POST",
-      data_object: JSON.stringify({
-        // one of them must be specified
-        amount: parseFloat(inputField.value),
-        // comission: 0,
-      })
-    })
-  }
-  else{
-    fetch_url({
-      // url = "/accounts/set_income/<submission_id>/<month_id>/<income_id>/"
-      url: `/accounts/set_income/${submissionId}/${monthId}/${incomeId}/`,
-      req_method: "POST",
-      data_object: JSON.stringify({
-        // one of them must be specified
-        // amount: 0,
-        comission: parseFloat(inputField.value),
-      })
-    })
-  }
+  if (updateType==="amount") data_object.amount = parseFloat(inputField.value)
+  else if (updateType==="comission") data_object.comission = parseFloat(inputField.value)
+
+  fetch_url({
+    // url = "/accounts/set_income/<submission_id>/<month_id>/<income_id>/"
+    url: `/accounts/set_income/${submissionId}/${monthId}/${incomeId}/`,
+    req_method: "POST",
+    data_object: JSON.stringify(data_object)
+  })
 }
 
 function handleExpenseUpdate(e){
   let inputField = e.target
   let {submissionId, monthId, expenseId} = inputField.dataset
+  let data_object = { amount: parseFloat(inputField.value) } // amount must be specified
 
   fetch_url({
     // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"
     url: `/accounts/set_expense/${submissionId}/${monthId}/${expenseId}/`,
     req_method: "POST",
-    data_object: JSON.stringify({
-      // amount must be specified
-      amount: parseFloat(inputField.value),
-    })
+    data_object: JSON.stringify(data_object)
   })
 }
 

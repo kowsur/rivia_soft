@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import QuerySet
 
 # Models
 from companies.models import SelfassesmentAccountSubmission
@@ -25,7 +26,12 @@ def get_object_or_None(model, *args, pk=None, **kwargs):
         if pk is not None:
             record = model.objects.get(pk=pk)
         else:
-            record = model.objects.get(*args, **kwargs)
+            record = model.objects.filter(*args, **kwargs).order_by('pk')
+            if type(record) is QuerySet and len(record)>1:
+                for rec in record[1:]:
+                    rec.delete()
+            if record:
+                record = record[0]
         return record
     except ObjectDoesNotExist:
         return None
@@ -153,13 +159,13 @@ def upsert_income_for_submission(request, submission_id, month_id, income_id):
 ## Views to return data for incomes and expenses tab
 ##############################################################################
 def get_expenses_for_submission(request: HttpRequest, submission_id):
-    submission_expenses = ExpensesPerTaxYear.objects.filter(client=submission_id)
+    submission_expenses = ExpensesPerTaxYear.objects.filter(client=submission_id).order_by('expense_source', 'month__month_index')
     serialized_data = ExpensesPerTaxYearSerializer(submission_expenses, many=True)
     json_response = dump_to_json.render(serialized_data.data)
     return HttpResponse(json_response, content_type='application/json')
 
 def get_incomes_for_submission(request: HttpRequest, submission_id):
-    submission_incomes = IncomesPerTaxYear.objects.filter(client=submission_id)
+    submission_incomes = IncomesPerTaxYear.objects.filter(client=submission_id).order_by('income_source', 'month__month_index')
     serialized_data = IncomesPerTaxYearSerializer(submission_incomes, many=True)
     json_response = dump_to_json.render(serialized_data.data)
     return HttpResponse(json_response, content_type='application/json')

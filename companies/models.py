@@ -220,6 +220,7 @@ class SelfassesmentAccountSubmission(models.Model):
         ("PROCESSING", "PROCESSING",),
         ("BOOK APPOINTMENT", "BOOK APPOINTMENT", ),
         ("READY FOR SUBMIT", "READY FOR SUBMIT", ),
+        ("WAITING FOR INFORMATION", "WAITING FOR INFORMATION",),
         ("WAITING FOR CONFIRMATION", "WAITING FOR CONFIRMATION",),
         ("SUBMITTED", "SUBMITTED",)
     )

@@ -183,6 +183,9 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   Object.entries(groupedAllIncomesForSubmissionMapBySourceId).forEach(([incomeSourceId, incomes]) => {
     displayIncomeSource(incomeSourceId, incomes, submissionDetails)
   });
+  Object.entries(groupedAllExpensesForSubmissionMapBySourceId).forEach(([expenseSourceId, expenses]) => {
+    displayExpenseSource(expenseSourceId, expenses, submissionDetails)
+  });
 
   displayIncomeOptions()
 }
@@ -198,18 +201,20 @@ function displayIncomeSource(incomeSourceId, incomes, submission){
       <h2 class="income-source">${incomeSource.name}</h2>
       <img src='/static/accounts/expand.svg'/>
     </div>
-    <div class="months hidden">
+    <div class="months invisible">
     </div>
   </div>`)
   let monthContainer = incomeContainer.querySelector('.months')
   let toggle = incomeContainer.querySelector('.toggle')
   let toggleImg = incomeContainer.querySelector('.toggle img')
+
+  // adding event listener to show or hide details for an income source
   toggle.addEventListener('click', (e)=>{
-    if (monthContainer.classList.contains('hidden')) {
-      monthContainer.classList.remove('hidden')
+    if (monthContainer.classList.contains('invisible')) {
+      monthContainer.classList.remove('invisible')
       toggleImg.src = '/static/accounts/collapse.svg'
     }else{
-      monthContainer.classList.add('hidden')
+      monthContainer.classList.add('invisible')
       toggleImg.src = '/static/accounts/expand.svg'
     }
   })
@@ -220,6 +225,78 @@ function displayIncomeSource(incomeSourceId, incomes, submission){
       "amount": 0,
       "comission": 0,
       "income_source": incomeSourceId,
+      "client": submissionId,
+      "month": month.id
+    }
+    let inputAmountId = `income_amount_${month.id}_${submission.submission_id}_${income.income_source}`
+    let inputComissionId = `income_comission_${month.id}_${submission.submission_id}_${income.income_source}`
+
+
+    // Prepare markup for a single month
+    let incomeMarkup = `
+        <div class='month'>
+          <h3 class='month-name'>${month.month_name} - ${submission.tax_year.tax_year}</h3>
+          <div>
+            <label for="${inputAmountId}">Amount</label>
+            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${income?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-income-id="${income.income_source}" data-update-type="amount">
+          </div>
+  
+          <div>
+            <label for=${inputComissionId}>Comission</label>
+            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputComissionId} value="${income?.comission}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-income-id="${income.income_source}" data-update-type="comission">
+          </div>
+        </div>
+        `
+    let node = createNodeFromMarkup(incomeMarkup)
+    let inputAmount = node.querySelector(`#${inputAmountId}`)
+    let inputComission = node.querySelector(`#${inputComissionId}`)
+
+    inputAmount.addEventListener('input', validateMaxValue)
+    inputAmount.addEventListener('input', handleIncomeUpdate)
+    inputComission.addEventListener('input', validateMaxValue)
+    inputComission.addEventListener('input', handleIncomeUpdate)
+
+    monthContainer.appendChild(node)
+  })
+
+  // add the newly prepared income source to incomes
+  incomesContainer.appendChild(incomeContainer)
+}
+function displayExpenseSource(expenseSourceId, expenses, submission){
+  // add current incomeSourceId to displayingIncomeIds set to filter them out while searching
+  displayingIncomeIds.add(parseInt(expenseSourceId))
+  let incomeSource = incomeSourcesMapById[expenseSourceId]
+  
+  let incomeContainer = createNodeFromMarkup(`
+  <div class="expense">
+    <div class="toggle">
+      <h2 class="income-source">${incomeSource.name}</h2>
+      <img src='/static/accounts/expand.svg'/>
+    </div>
+    <div class="months invisible">
+    </div>
+  </div>`)
+  let monthContainer = incomeContainer.querySelector('.months')
+  let toggle = incomeContainer.querySelector('.toggle')
+  let toggleImg = incomeContainer.querySelector('.toggle img')
+
+  // adding event listener to show or hide details for an expense source
+  toggle.addEventListener('click', (e)=>{
+    if (monthContainer.classList.contains('invisible')) {
+      monthContainer.classList.remove('invisible')
+      toggleImg.src = '/static/accounts/collapse.svg'
+    }else{
+      monthContainer.classList.add('invisible')
+      toggleImg.src = '/static/accounts/expand.svg'
+    }
+  })
+
+  allMonths.forEach(month=>{
+    // Get the existing/default income object
+    let income = expenses.find(income=>income.month===month.id) || {
+      "amount": 0,
+      "comission": 0,
+      "income_source": expenseSourceId,
       "client": submissionId,
       "month": month.id
     }

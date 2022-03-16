@@ -166,6 +166,9 @@ h3{
     display: none;
 }
 .tabs .tab.active{
+    display: block;
+}
+.tabs .tab.active[data-tab-name="incomesAndExpnses"]{
     display: flex;
 }
 

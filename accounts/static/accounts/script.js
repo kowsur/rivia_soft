@@ -1,30 +1,4 @@
-/*
-// update or insert income
-fetch_url({
-  // url = "/accounts/set_income/<submission_id>/<month_id>/<income_id>/"
-  url: "/accounts/set_income/46/6/4/",
-  req_method: "POST",
-  data_object: JSON.stringify({
-    // one of them must be specified
-    amount: 2000,
-    comission: 80
-  })
-})
-
-// upsert expense
-fetch_url({
-  // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"
-  url: "/accounts/set_expense/46/6/4/",
-  req_method: "POST",
-  data_object: JSON.stringify({
-    // amount must be specified
-    amount: 2000,
-  })
-})
-*/
-
-
-
+const DB_MAX_INT_VALUE = 2147483647
 
 let tabNavList = document.querySelector(".tab-nav")
 
@@ -48,15 +22,41 @@ tabNavList.addEventListener("click", (e)=>{
     newActiveTab.classList.add("active")
 })
 
+// =============================================================================================================================
+// 
+let incomeSearchInput = document.querySelector('#add_income_input')
+let incomeSearchOptions = document.querySelector('#add_income_options')
+let incomesContainer = document.querySelector(".incomes")
+incomeSearchInput.addEventListener('input', handleIncomeSearch)
+incomeSearchOptions.addEventListener('click', handleIncomeSelect)
 
+let expenseSearchInput = document.querySelector('#add_expense_input')
+let expenseSearchOptions = document.querySelector('#add_expense_options')
+let expensesContainer = document.querySelector(".expenses")
+
+
+// =============================================================================================================================
+// Fetch data from backend
 let urlParams = getAllUrlParams(location.href)
 let submissionId = urlParams.pk
+
+const displayingIncomeIds = new Set()
+const displayingExpenseIds = new Set()
+
 let submissionDetails = null
-let incomeSources = null
-let expenseSources = null
-let months = null
+let allIncomeSources = null
+let allExpenseSources = null
+let allMonths = null
 let allIncomesForSubmission = null
 let allExpensesForSubmission = null
+
+// Maps to speed up the lookup
+const monthsMapById = {}
+const incomeSourcesMapById = {}
+const expenseSourcesMapById = {}
+const groupedAllIncomesForSubmissionMapBySourceId = {}
+const groupedAllExpensesForSubmissionMapBySourceId = {}
+
 
 // get data
 getSubmissionDetails(updateDetailsTab, updateIncomeAndExpenseTab, updateTaxCalculationTab, updateDetailsTab)
@@ -81,43 +81,47 @@ async function getSubmissionDetails(...callbacks){
   return submissionDetails
 }
 async function getIncomeSources(...callbacks){
-  if (incomeSources!==null) return incomeSources
+  if (allIncomeSources!==null) return allIncomeSources
 
   let records = await fetch_url({url: '/accounts/income_sources/'})
-  incomeSources = await records.json()
+  allIncomeSources = await records.json()
+  mapRecordsByAttribute(allIncomeSources, 'id', incomeSourcesMapById)
   
   if (Array.isArray(callbacks)) callbacks.forEach(callback => {
-    callback(incomeSources)
+    callback(allIncomeSources)
   });
 
-  return incomeSources
+  return allIncomeSources
 }
 async function getExpneseSources(...callbacks){
-  if (expenseSources!==null) return expenseSources
+  if (allExpenseSources!==null) return allExpenseSources
   let records = await fetch_url({url: '/accounts/expense_sources/'})
-  expenseSources = await records.json()
+  allExpenseSources = await records.json()
+  mapRecordsByAttribute(allExpenseSources, 'id', expenseSourcesMapById)
   
   if (Array.isArray(callbacks)) callbacks.forEach(callback => {
-    callback(expenseSources)
+    callback(allExpenseSources)
   });
 
-  return expenseSources
+  return allExpenseSources
 }
 async function getMonths(...callbacks){
-  if (months!==null) return months
+  if (allMonths!==null) return allMonths
   let records = await fetch_url({url: '/accounts/months/'})
-  months = await records.json()
+  allMonths = await records.json()
+  mapRecordsByAttribute(allMonths, 'id', monthsMapById)
   
   if (Array.isArray(callbacks)) callbacks.forEach(callback => {
-    callback(months)
+    callback(allMonths)
   });
-  return months
+  return allMonths
 }
 async function getAllIncomesForSubmission(...callbacks){
   if (allIncomesForSubmission!==null) return allIncomesForSubmission
 
   let records = await fetch_url({url: `/accounts/incomes/${submissionId}/`})
   allIncomesForSubmission = await records.json()
+  groupRecordsByAttribute(allIncomesForSubmission, 'income_source', groupedAllIncomesForSubmissionMapBySourceId)
   
   if (Array.isArray(callbacks)) callbacks.forEach(callback => {
     callback(allIncomesForSubmission)
@@ -130,6 +134,7 @@ async function getAllExpensesForSubmission(...callbacks){
 
   let records = await fetch_url({url: `/accounts/expenses/${submissionId}/`})
   allExpensesForSubmission = await records.json()
+  groupRecordsByAttribute(allExpensesForSubmission, 'expense_source', groupedAllExpensesForSubmissionMapBySourceId)
   
   if (Array.isArray(callbacks)) callbacks.forEach(callback => {
     callback(allExpensesForSubmission)
@@ -138,7 +143,15 @@ async function getAllExpensesForSubmission(...callbacks){
   return allExpensesForSubmission
 }
 
+function mapRecordsByAttribute(records, attributeName, map=null){
+  if (map === null) map = {}
+  records.forEach(record=>{
+    map[record[attributeName]] = record
+  })
+  return map
+}
 
+// =============================================================================================================================
 // Update info in Details tab
 function updateDetailsTab(submissionDetails){
     let taxYear = document.querySelector('#tax-year')
@@ -160,7 +173,123 @@ function updateDetailsTab(submissionDetails){
 
 // Update info in Income and Expense tab
 async function updateIncomeAndExpenseTab(submissionDetails){
-  let incomeSources = {}
+  // These are required to load data incase data is not loaded
+  let incomeSources = await getIncomeSources()
+  let expenseSources = await getExpneseSources()
+  let months = await getMonths()
+  let allIncomesForSubmission = await getAllIncomesForSubmission()
+  let allExpensesForSubmission = await getAllExpensesForSubmission()
+
+  Object.entries(groupedAllIncomesForSubmissionMapBySourceId).forEach(([incomeSourceId, incomes]) => {
+    displayIncomeSource(incomeSourceId, incomes, submissionDetails)
+  });
+
+  displayIncomeOptions()
+}
+
+function displayIncomeSource(incomeSourceId, incomes, submission){
+  // add current incomeSourceId to displayingIncomeIds set to filter them out while searching
+  displayingIncomeIds.add(parseInt(incomeSourceId))
+  let incomeSource = incomeSourcesMapById[incomeSourceId]
+  
+  let incomeContainer = createNodeFromMarkup(`
+  <div class="income">
+    <div class="toggle">
+      <h2 class="income-source">${incomeSource.name}</h2>
+      <img src='/static/accounts/expand.svg'/>
+    </div>
+    <div class="months hidden">
+    </div>
+  </div>`)
+  let monthContainer = incomeContainer.querySelector('.months')
+  let toggle = incomeContainer.querySelector('.toggle')
+  let toggleImg = incomeContainer.querySelector('.toggle img')
+  toggle.addEventListener('click', (e)=>{
+    if (monthContainer.classList.contains('hidden')) {
+      monthContainer.classList.remove('hidden')
+      toggleImg.src = '/static/accounts/collapse.svg'
+    }else{
+      monthContainer.classList.add('hidden')
+      toggleImg.src = '/static/accounts/expand.svg'
+    }
+  })
+
+  allMonths.forEach(month=>{
+    // Get the existing/default income object
+    let income = incomes.find(income=>income.month===month.id) || {
+      "amount": 0,
+      "comission": 0,
+      "income_source": incomeSourceId,
+      "client": submissionId,
+      "month": month.id
+    }
+    let inputAmountId = `income_amount_${month.id}_${submission.submission_id}_${income.income_source}`
+    let inputComissionId = `income_comission_${month.id}_${submission.submission_id}_${income.income_source}`
+
+
+    // Prepare markup for a single month
+    let incomeMarkup = `
+        <div class='month'>
+          <h3 class='month-name'>${month.month_name} - ${submission.tax_year.tax_year}</h3>
+          <div>
+            <label for="${inputAmountId}">Amount</label>
+            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${income?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-income-id="${income.income_source}" data-update-type="amount">
+          </div>
+  
+          <div>
+            <label for=${inputComissionId}>Comission</label>
+            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputComissionId} value="${income?.comission}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-income-id="${income.income_source}" data-update-type="comission">
+          </div>
+        <div>
+        `
+    let node = createNodeFromMarkup(incomeMarkup)
+    let inputAmount = node.querySelector(`#${inputAmountId}`)
+    let inputComission = node.querySelector(`#${inputComissionId}`)
+
+    inputAmount.addEventListener('input', validateMaxValue)
+    inputAmount.addEventListener('input', handleIncomeUpdate)
+    inputComission.addEventListener('input', validateMaxValue)
+    inputComission.addEventListener('input', handleIncomeUpdate)
+
+    monthContainer.appendChild(node)
+  })
+
+  // add the newly prepared income source to incomes
+  incomesContainer.appendChild(incomeContainer)
+}
+
+function validateMaxValue(e){
+  let input = e.target
+  let value = parseFloat(e.target.value)
+  if (value>DB_MAX_INT_VALUE){
+    input.setCustomValidity(`Your input is grater than ${DB_MAX_INT_VALUE}!`);
+    input.reportValidity();
+  }else{
+    input.setCustomValidity("");
+  }
+}
+
+function createNodeFromMarkup(html){
+  return document.createRange().createContextualFragment(html)
+}
+
+function createHtmlElement(tag='div', attributes={}){
+  let element = document.createElement(tag)
+  Object.entries(attributes).forEach(([key, value])=>{
+    element.setAttribute(key, value)
+  })
+  return element
+}
+
+function groupRecordsByAttribute(records, attributeName, groupedRecords=null){
+  if (groupedRecords===null) groupedRecords = {}
+
+  records.forEach(record=>{
+    if (record[attributeName] in groupedRecords) groupedRecords[record[attributeName]].push(record)
+    else groupedRecords[record[attributeName]] = [record]
+  })
+
+  return groupedRecords
 }
 
 // Update info in Tax Calculation tab
@@ -173,21 +302,37 @@ function updateViewTab(submissionDetails){
     //
 }
 
-function handleIncomeSearch(e){
-  console.log(e.target.value)
-}
-function handleIncomeSelect(e){
-  console.log(e.target)
 
-  let newIncomeSource = `<div class="income">
-  <h2 class="title">${incomeSource}</h2>
-  <div class="month">
-    <span class="month">${month}</span>
-    <input type="number" value="0" step="0.1" data-month-id="${4}" data-submission-id="${45}" data-income-id="${3}" data-update-type="amount">
-    <span>Comission</span>
-    <input type="number" data-month-id="${4}" data-submission-id="${45}" data-income-id="${3}" data-update-type="comission">
-  </div>
-</div>`
+// =============================================================================================================================
+// Handlers
+async function handleIncomeSearch(e){
+  let searchText = e.target.value
+  let displayableIncomeSources = await getDisplayableIncomeSources(searchText)
+
+  displayIncomeOptions(displayableIncomeSources)
+}
+async function getDisplayableIncomeSources(searchText=''){
+  let incomeSources = await getIncomeSources()
+  let displayableIncomeSources = incomeSources.filter(incomeSource=>!displayingIncomeIds.has(incomeSource.id) && incomeSource.name.toLowerCase().includes(searchText.trim()))
+  return displayableIncomeSources
+}
+async function displayIncomeOptions(displayableIncomeSources=null){
+  if (displayableIncomeSources==null) displayableIncomeSources = await getDisplayableIncomeSources()
+  incomeSearchOptions.innerHTML = ''
+    displayableIncomeSources.forEach(incomeSource=>{
+      let option = createHtmlElement('div', {'data-income-id': incomeSource.id})
+      option.textContent = incomeSource.name
+      incomeSearchOptions.appendChild(option)
+    })
+}
+
+async function handleIncomeSelect(e){
+  let {incomeId} = e.target.dataset
+  if (incomeId && parseInt(incomeId)){
+    incomeId = parseInt(incomeId)
+    displayIncomeSource(incomeId, [], await getSubmissionDetails())
+    displayIncomeOptions()
+  }
 }
 
 

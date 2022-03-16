@@ -55,6 +55,16 @@ h3{
     display: block;
 }
 
+@media(prefers-color-scheme: dark) {
+    .select-options{
+        background-color: #263346;
+        color: #9ca3af;
+    }
+    .select-options div:hover{
+        background-color: #1c2432;
+    }
+}
+
 
 /* Detais tab */
 .detail{
@@ -157,4 +167,21 @@ h3{
 }
 .tabs .tab.active{
     display: block;
+}
+
+/* Toggle */
+.toggle{
+    user-select: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: auto;
+}
+.toggle:hover{
+    cursor: pointer;
+}
+
+.hidden{
+    display: none;
 }

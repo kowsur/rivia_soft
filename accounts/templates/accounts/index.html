@@ -4,6 +4,10 @@
 
 {% block head %}
     <link rel="stylesheet" href="{% static 'accounts/style.css' %}">
+    <link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+/>
 {% endblock head %}
 
 
@@ -32,29 +36,14 @@
     <!-- Income and Expense Tab -->
     <div class="tab active" data-tab-name="incomesAndExpnses">
       <div>
-        <h1 class="mt-5 text-2xl">Incomes</h1>
+        <h1 class="title">Incomes</h1>
         <div class="select" id="add_income">
           <input class="select-input" id="add_income_input" type="text" placeholder="Search and select to add income source">
           <div class="select-options" id="add_income_options">
-            <div data-income-id="1">Uber</div>
-            <div data-income-id="1">Uber</div>
-            <div data-income-id="1">Uber</div>
-            <div data-income-id="1">Uber</div>
-            <div data-income-id="1">Uber</div>
-            <div data-income-id="1">Uber</div>
           </div>
         </div>
 
         <div class="incomes">
-          <div class="income">
-            <h2 class="title">Food delivery</h2>
-            <div class="month">
-              <span class="month">April</span>
-              <input type="number" value="0" data-month-id="4" data-submission-id="45" data-income-id="3" data-update-type="amount">
-              <span>Comission</span>
-              <input type="number" data-month-id="4" data-submission-id="45" data-income-id="3" data-update-type="comission">
-            </div>
-          </div>
         </div>
       </div>
 
@@ -63,12 +52,6 @@
         <div class="select" id="add_expense">
           <input class="select-input" id="add_expense_input" type="text" placeholder="Search and select to add expense source">
           <div class="select-options" id="add_expense_options">
-            <div data-income-id="1">Fuel</div>
-            <div data-income-id="1">Fuel</div>
-            <div data-income-id="1">Fuel</div>
-            <div data-income-id="1">Fuel</div>
-            <div data-income-id="1">Fuel</div>
-            <div data-income-id="1">Fuel</div>
           </div>
         </div>
 
@@ -92,5 +75,5 @@
   </div>
 </div>
 
-<script src="{% static 'accounts/script.js' %}"></script>
+<script type="module" src="{% static 'accounts/script.js' %}"></script>
 {% endblock %}

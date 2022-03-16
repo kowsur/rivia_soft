@@ -81,7 +81,7 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
 
     # Try to retrive ExpensesPerTaxYear if does not exist create it
     expense_for_tax_year = get_object_or_None(ExpensesPerTaxYear, client=client, month=month, expense_source=expense)
-    print(client, month, expense, expense_for_tax_year)
+
     # Update existing record 
     if expense_for_tax_year is not None:
         expense_for_tax_year.amount = amount

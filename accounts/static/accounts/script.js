@@ -240,7 +240,7 @@ function displayIncomeSource(incomeSourceId, incomes, submission){
             <label for=${inputComissionId}>Comission</label>
             <input type="number" max=${DB_MAX_INT_VALUE} id=${inputComissionId} value="${income?.comission}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-income-id="${income.income_source}" data-update-type="comission">
           </div>
-        <div>
+        </div>
         `
     let node = createNodeFromMarkup(incomeMarkup)
     let inputAmount = node.querySelector(`#${inputAmountId}`)

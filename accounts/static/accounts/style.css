@@ -75,7 +75,7 @@ h3{
 .tab[data-tab-name="incomesAndExpnses"]{
     display: flex;
     flex-direction: column;
-    gap: 1.5em;
+    gap: 2em;
 }
 
 .title{
@@ -166,7 +166,7 @@ h3{
     display: none;
 }
 .tabs .tab.active{
-    display: block;
+    display: flex;
 }
 
 /* Toggle */

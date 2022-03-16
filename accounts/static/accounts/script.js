@@ -33,7 +33,8 @@ incomeSearchOptions.addEventListener('click', handleIncomeSelect)
 let expenseSearchInput = document.querySelector('#add_expense_input')
 let expenseSearchOptions = document.querySelector('#add_expense_options')
 let expensesContainer = document.querySelector(".expenses")
-
+expenseSearchInput.addEventListener('input', handleExpenseSearch)
+expenseSearchOptions.addEventListener('click', handleExpenseSelect)
 
 // =============================================================================================================================
 // Fetch data from backend
@@ -169,6 +170,7 @@ function updateDetailsTab(submissionDetails){
     clientDob.textContent = submissionDetails.client_id.date_of_birth
     clientUtr.textContent = submissionDetails.client_id.UTR
     clientAccountStatus.textContent = submissionDetails.status
+    clientAccountStatus.href = `/companies/SAS/update/${submissionId}/`
 }
 
 // Update info in Income and Expense tab
@@ -188,6 +190,7 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   });
 
   displayIncomeOptions()
+  displayExpenseOptions()
 }
 
 function displayIncomeSource(incomeSourceId, incomes, submission){
@@ -235,7 +238,7 @@ function displayIncomeSource(incomeSourceId, incomes, submission){
     // Prepare markup for a single month
     let incomeMarkup = `
         <div class='month'>
-          <h3 class='month-name'>${month.month_name} - ${submission.tax_year.tax_year}</h3>
+          <h3 class='month-name'>${month.month_name}</h3>
           <div>
             <label for="${inputAmountId}">Amount</label>
             <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${income?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-income-id="${income.income_source}" data-update-type="amount">
@@ -264,21 +267,21 @@ function displayIncomeSource(incomeSourceId, incomes, submission){
 }
 function displayExpenseSource(expenseSourceId, expenses, submission){
   // add current incomeSourceId to displayingIncomeIds set to filter them out while searching
-  displayingIncomeIds.add(parseInt(expenseSourceId))
-  let incomeSource = incomeSourcesMapById[expenseSourceId]
+  displayingExpenseIds.add(parseInt(expenseSourceId))
+  let expenseSource = expenseSourcesMapById[expenseSourceId]
   
-  let incomeContainer = createNodeFromMarkup(`
+  let expenseContainer = createNodeFromMarkup(`
   <div class="expense">
     <div class="toggle">
-      <h2 class="income-source">${incomeSource.name}</h2>
+      <h2 class="income-source">${expenseSource.name}</h2>
       <img src='/static/accounts/expand.svg'/>
     </div>
     <div class="months invisible">
     </div>
   </div>`)
-  let monthContainer = incomeContainer.querySelector('.months')
-  let toggle = incomeContainer.querySelector('.toggle')
-  let toggleImg = incomeContainer.querySelector('.toggle img')
+  let monthContainer = expenseContainer.querySelector('.months')
+  let toggle = expenseContainer.querySelector('.toggle')
+  let toggleImg = expenseContainer.querySelector('.toggle img')
 
   // adding event listener to show or hide details for an expense source
   toggle.addEventListener('click', (e)=>{
@@ -292,47 +295,36 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
   })
 
   allMonths.forEach(month=>{
-    // Get the existing/default income object
-    let income = expenses.find(income=>income.month===month.id) || {
+    // Get the existing/default expense object
+    let expense = expenses.find(expense=>expense.month===month.id) || {
       "amount": 0,
-      "comission": 0,
-      "income_source": expenseSourceId,
+      "expense_source": expenseSourceId,
       "client": submissionId,
       "month": month.id
     }
-    let inputAmountId = `income_amount_${month.id}_${submission.submission_id}_${income.income_source}`
-    let inputComissionId = `income_comission_${month.id}_${submission.submission_id}_${income.income_source}`
-
+    let inputAmountId = `expense_amount_${month.id}_${submission.submission_id}_${expense.expense_source}`
 
     // Prepare markup for a single month
-    let incomeMarkup = `
+    let expenseMarkup = `
         <div class='month'>
-          <h3 class='month-name'>${month.month_name} - ${submission.tax_year.tax_year}</h3>
+          <h3 class='month-name'>${month.month_name}</h3>
           <div>
             <label for="${inputAmountId}">Amount</label>
-            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${income?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-income-id="${income.income_source}" data-update-type="amount">
-          </div>
-  
-          <div>
-            <label for=${inputComissionId}>Comission</label>
-            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputComissionId} value="${income?.comission}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-income-id="${income.income_source}" data-update-type="comission">
+            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" data-update-type="amount">
           </div>
         </div>
         `
-    let node = createNodeFromMarkup(incomeMarkup)
+    let node = createNodeFromMarkup(expenseMarkup)
     let inputAmount = node.querySelector(`#${inputAmountId}`)
-    let inputComission = node.querySelector(`#${inputComissionId}`)
 
     inputAmount.addEventListener('input', validateMaxValue)
-    inputAmount.addEventListener('input', handleIncomeUpdate)
-    inputComission.addEventListener('input', validateMaxValue)
-    inputComission.addEventListener('input', handleIncomeUpdate)
+    inputAmount.addEventListener('input', handleExpenseUpdate)
 
     monthContainer.appendChild(node)
   })
 
   // add the newly prepared income source to incomes
-  incomesContainer.appendChild(incomeContainer)
+  expensesContainer.appendChild(expenseContainer)
 }
 
 function validateMaxValue(e){
@@ -383,23 +375,41 @@ function updateViewTab(submissionDetails){
 // =============================================================================================================================
 // Handlers
 async function handleIncomeSearch(e){
-  let searchText = e.target.value
-  let displayableIncomeSources = await getDisplayableIncomeSources(searchText)
+  let searchText = e.target.value || ''
+  let incomeSources = await getIncomeSources()
+  let displayableIncomeSources = await getDisplayableSources(incomeSources, displayingIncomeIds, searchText)
 
   displayIncomeOptions(displayableIncomeSources)
 }
-async function getDisplayableIncomeSources(searchText=''){
-  let incomeSources = await getIncomeSources()
-  let displayableIncomeSources = incomeSources.filter(incomeSource=>!displayingIncomeIds.has(incomeSource.id) && incomeSource.name.toLowerCase().includes(searchText.trim()))
+async function handleExpenseSearch(e){
+  let searchText = e.target.value || ''
+  let expenseSources = await getExpneseSources()
+  let displayableExpenseSources = await getDisplayableSources(expenseSources, displayingExpenseIds, searchText)
+
+  displayExpenseOptions(displayableExpenseSources)
+}
+async function getDisplayableSources(allSources, displayingSourceIds, searchText=''){
+  let displayableIncomeSources = allSources.filter(source=>!displayingSourceIds.has(source.id) && source.name.toLowerCase().includes(searchText.trim().toLowerCase()))
   return displayableIncomeSources
 }
 async function displayIncomeOptions(displayableIncomeSources=null){
-  if (displayableIncomeSources==null) displayableIncomeSources = await getDisplayableIncomeSources()
+  let incomeSources = await getIncomeSources()
+  if (displayableIncomeSources==null) displayableIncomeSources = await getDisplayableSources(incomeSources, displayingIncomeIds)
   incomeSearchOptions.innerHTML = ''
     displayableIncomeSources.forEach(incomeSource=>{
       let option = createHtmlElement('div', {'data-income-id': incomeSource.id})
       option.textContent = incomeSource.name
       incomeSearchOptions.appendChild(option)
+    })
+}
+async function displayExpenseOptions(displayableExpenseSources=null){
+  let expenseSources = await getExpneseSources()
+  if (displayableExpenseSources==null) displayableExpenseSources = await getDisplayableSources(expenseSources, displayingExpenseIds)
+  expenseSearchOptions.innerHTML = ''
+  displayableExpenseSources.forEach(expenseSource=>{
+      let option = createHtmlElement('div', {'data-income-id': expenseSource.id})
+      option.textContent = expenseSource.name
+      expenseSearchOptions.appendChild(option)
     })
 }
 
@@ -409,6 +419,14 @@ async function handleIncomeSelect(e){
     incomeId = parseInt(incomeId)
     displayIncomeSource(incomeId, [], await getSubmissionDetails())
     displayIncomeOptions()
+  }
+}
+async function handleExpenseSelect(e){
+  let {incomeId: expenseId} = e.target.dataset
+  if (expenseId && parseInt(expenseId)){
+    expenseId = parseInt(expenseId)
+    displayExpenseSource(expenseId, [], await getSubmissionDetails())
+    displayExpenseOptions()
   }
 }
 

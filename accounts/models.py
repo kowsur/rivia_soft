@@ -44,6 +44,9 @@ class IncomesPerTaxYear(models.Model):
     class Meta:
         verbose_name = "Income Per Tax Year"
         verbose_name_plural = "Incomes Per Tax Year"
+        constraints = [
+            models.UniqueConstraint(fields=['client', 'month', 'income_source'], name="unique record")
+        ]
 
     income_source = models.ForeignKey(IncomeSources, on_delete=models.RESTRICT)
     client = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)

@@ -62,6 +62,9 @@ class ExpensesPerTaxYear(models.Model):
     class Meta:
         verbose_name = "Expense Per Tax Year"
         verbose_name_plural = "Expenses Per Tax Year"
+        constraints = [
+            models.UniqueConstraint(fields=['client', 'month', 'expense_source'], name="unique expense record")
+        ]
 
     expense_source = models.ForeignKey(ExpenseSources, on_delete=models.RESTRICT)
     client = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)

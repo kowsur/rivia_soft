@@ -1374,6 +1374,13 @@ def get_limited_submissions_where_deadline_not_set():
 def get_limited_submissions_where_deadline_missed():
   return LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False)
 
+def get_limited_submission_where_period_end(limit=-1):
+    records = LimitedSubmissionDeadlineTracker.objects.filter(period__lt = timezone.now(), is_submitted=False).order_by()
+    records = records.order_by('HMRC_deadline')
+    if limit<=-1:
+        return records
+    return records[:limit]
+
 @login_required
 def home_limited_submission_deadline_tracker(request):
   pk_field = 'submission_id'
@@ -1398,6 +1405,7 @@ def home_limited_submission_deadline_tracker(request):
     'limited_submission_counts': True,
     'submission_deadline_not_set': get_limited_submissions_where_deadline_not_set().count(),
     'submission_deadline_missed': get_limited_submissions_where_deadline_missed().count(),
+    'submission_periodend': get_limited_submission_where_period_end().count(),
 
     'template_tag': generate_template_tag_for_model(LimitedSubmissionDeadlineTracker, show_id=False, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, ordering=field_ordering, fk_fields=fk_fields),
     'data_container': generate_data_container_table(LimitedSubmissionDeadlineTracker, show_id=False, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, ordering=field_ordering),
@@ -1492,8 +1500,8 @@ def update_limited_submission_deadline_tracker(request, submission_id:int):
         new_assesment = LimitedSubmissionDeadlineTracker()
         new_assesment.client_id = assesment.client_id
         new_assesment.updated_by = request.user
-        new_assesment.HMRC_deadline = assesment.HMRC_deadline # Compnay House deadline
-        new_assesment.our_deadline = assesment.our_deadline # HMRC Deadline
+        new_assesment.HMRC_deadline = assesment.HMRC_deadline + relativedelta(years=1) # Compnay House deadline
+        new_assesment.our_deadline = assesment.our_deadline + relativedelta(years=1) # HMRC Deadline
         new_assesment.save()
         messages.success(request, f'New Limited Submission Deadline Tracker has been created {new_assesment}')
         return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)
@@ -1544,7 +1552,8 @@ def search_limited_submission_deadline_tracker(request, limit: int=-1):
     if tasks_key:
       tasks = {
         'submission_deadline_not_set': get_limited_submissions_where_deadline_not_set(),
-        'submission_deadline_missed': get_limited_submissions_where_deadline_missed()
+        'submission_deadline_missed': get_limited_submissions_where_deadline_missed(),
+        'submission_periodend': get_limited_submission_where_period_end(),
       }
       records = tasks.get(tasks_key, [])
       data = serialize(queryset=records, format='json')

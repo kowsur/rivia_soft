@@ -38,6 +38,7 @@ expenseSearchOptions.addEventListener('click', handleExpenseSelect)
 
 let totalIncomeContainers = document.querySelectorAll('[data-total-income-container]')
 let totalExpenseContainers = document.querySelectorAll('[data-total-expense-container]')
+let netProfitContainers = document.querySelectorAll('[data-net-profit-container]')
 
 async function getTotalIncome(){
   let inputFields = document.querySelectorAll('.incomes input')
@@ -53,12 +54,6 @@ async function getTotalIncome(){
   return totalIncome
 }
 
-async function updateTotalIncome(){
-  let totalIncome = await getTotalIncome()
-
-  totalIncomeContainers.forEach((totalIncomeContainer)=>totalIncomeContainer.textContent = totalIncome)
-}
-
 async function getTotalExpense(){
   let inputFields = document.querySelectorAll('.expenses input')
   let totalExpense = 0
@@ -70,12 +65,33 @@ async function getTotalExpense(){
   return totalExpense
 }
 
+async function getNetProfit(){
+  let totalIncome = await getTotalIncome()
+  let totalExpense = await getTotalExpense()
+  return totalIncome - totalExpense
+}
+
+async function updateTotalIncome(){
+  let totalIncome = await getTotalIncome()
+
+  totalIncomeContainers.forEach((totalIncomeContainer)=>totalIncomeContainer.textContent = totalIncome)
+}
+
 async function updateTotalExpense(){
   let totalExpense = await getTotalExpense()
 
   totalExpenseContainers.forEach((totalExpenseContainer)=>totalExpenseContainer.textContent = totalExpense)
   return totalExpense
 }
+
+async function updateNetProfit(){
+  let netProfit = await getNetProfit()
+
+  netProfitContainers.forEach((netProfitcontainer)=>netProfitcontainer.textContent = netProfit)
+  return netProfit
+}
+
+
 // =============================================================================================================================
 // Fetch data from backend
 let urlParams = getAllUrlParams(location.href)
@@ -238,6 +254,8 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   });
   displayExpenseOptions()
   updateTotalExpense()
+
+  updateNetProfit()
 }
 
 function displayIncomeSource(incomeSourceId, incomes, submission){
@@ -304,9 +322,12 @@ function displayIncomeSource(incomeSourceId, incomes, submission){
     inputAmount.addEventListener('input', validateMaxValue)
     inputAmount.addEventListener('input', handleIncomeUpdate)
     inputAmount.addEventListener('input', updateTotalIncome)
+    inputAmount.addEventListener('input', updateNetProfit)
+
     inputComission.addEventListener('input', validateMaxValue)
     inputComission.addEventListener('input', handleIncomeUpdate)
     inputComission.addEventListener('input', updateTotalIncome)
+    inputComission.addEventListener('input', updateNetProfit)
 
     monthContainer.appendChild(node)
   })
@@ -369,6 +390,7 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
     inputAmount.addEventListener('input', validateMaxValue)
     inputAmount.addEventListener('input', handleExpenseUpdate)
     inputAmount.addEventListener('input', updateTotalExpense)
+    inputAmount.addEventListener('input', updateNetProfit)
 
     monthContainer.appendChild(node)
   })

@@ -36,6 +36,46 @@ let expensesContainer = document.querySelector(".expenses")
 expenseSearchInput.addEventListener('input', handleExpenseSearch)
 expenseSearchOptions.addEventListener('click', handleExpenseSelect)
 
+let totalIncomeContainers = document.querySelectorAll('[data-total-income-container]')
+let totalExpenseContainers = document.querySelectorAll('[data-total-expense-container]')
+
+async function getTotalIncome(){
+  let inputFields = document.querySelectorAll('.incomes input')
+  let totalIncome = 0
+
+  inputFields.forEach(inputField=>{
+    let amount = parseFloat(inputField.value)
+    if (isNaN(amount)) amount = 0
+  
+    if (inputField.dataset.updateType=='amount') totalIncome+=amount
+    else if (inputField.dataset.updateType=='comission') totalIncome-=amount
+  })
+  return totalIncome
+}
+
+async function updateTotalIncome(){
+  let totalIncome = await getTotalIncome()
+
+  totalIncomeContainers.forEach((totalIncomeContainer)=>totalIncomeContainer.textContent = totalIncome)
+}
+
+async function getTotalExpense(){
+  let inputFields = document.querySelectorAll('.expenses input')
+  let totalExpense = 0
+  inputFields.forEach(inputField=>{
+    let amount = parseFloat(inputField.value)
+    if (isNaN(amount)) amount = 0
+    totalExpense+=amount
+  })
+  return totalExpense
+}
+
+async function updateTotalExpense(){
+  let totalExpense = await getTotalExpense()
+
+  totalExpenseContainers.forEach((totalExpenseContainer)=>totalExpenseContainer.textContent = totalExpense)
+  return totalExpense
+}
 // =============================================================================================================================
 // Fetch data from backend
 let urlParams = getAllUrlParams(location.href)
@@ -175,6 +215,11 @@ function updateDetailsTab(submissionDetails){
 
 // Update info in Income and Expense tab
 async function updateIncomeAndExpenseTab(submissionDetails){
+  let clientName = document.querySelector('#ie-client-name')
+  clientName.textContent = submissionDetails.client_id.client_name
+  let taxYear = document.querySelector('#ie-client-tax-year')
+  taxYear.textContent = submissionDetails.tax_year.tax_year
+
   // These are required to load data incase data is not loaded
   let incomeSources = await getIncomeSources()
   let expenseSources = await getExpneseSources()
@@ -185,12 +230,14 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   Object.entries(groupedAllIncomesForSubmissionMapBySourceId).forEach(([incomeSourceId, incomes]) => {
     displayIncomeSource(incomeSourceId, incomes, submissionDetails)
   });
+  displayIncomeOptions()
+  updateTotalIncome()
+
   Object.entries(groupedAllExpensesForSubmissionMapBySourceId).forEach(([expenseSourceId, expenses]) => {
     displayExpenseSource(expenseSourceId, expenses, submissionDetails)
   });
-
-  displayIncomeOptions()
   displayExpenseOptions()
+  updateTotalExpense()
 }
 
 function displayIncomeSource(incomeSourceId, incomes, submission){
@@ -256,8 +303,10 @@ function displayIncomeSource(incomeSourceId, incomes, submission){
 
     inputAmount.addEventListener('input', validateMaxValue)
     inputAmount.addEventListener('input', handleIncomeUpdate)
+    inputAmount.addEventListener('input', updateTotalIncome)
     inputComission.addEventListener('input', validateMaxValue)
     inputComission.addEventListener('input', handleIncomeUpdate)
+    inputComission.addEventListener('input', updateTotalIncome)
 
     monthContainer.appendChild(node)
   })
@@ -319,6 +368,7 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
 
     inputAmount.addEventListener('input', validateMaxValue)
     inputAmount.addEventListener('input', handleExpenseUpdate)
+    inputAmount.addEventListener('input', updateTotalExpense)
 
     monthContainer.appendChild(node)
   })

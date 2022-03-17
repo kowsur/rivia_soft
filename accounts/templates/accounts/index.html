@@ -36,7 +36,10 @@
     <!-- Income and Expense Tab -->
     <div class="tab active" data-tab-name="incomesAndExpnses">
       <div>
-        <h1 class="title">Incomes</h1>
+        <h1 class="title">Account for <span id="ie-client-name"></span> Tax-year <span id="ie-client-tax-year"></span>.</h1>
+      </div>
+      <div>
+        <h1 class="title">Incomes Total: <span data-total-income-container></span></h1>
         <div class="select" id="add_income">
           <input class="select-input" id="add_income_input" type="text" placeholder="Search and select to add income source">
           <div class="select-options" id="add_income_options">
@@ -48,7 +51,7 @@
       </div>
 
       <div>
-        <h1 class="title">Expenses</h1>
+        <h1 class="title">Expenses Total: <span data-total-expense-container></span></h1>
         <div class="select" id="add_expense">
           <input class="select-input" id="add_expense_input" type="text" placeholder="Search and select to add expense source">
           <div class="select-options" id="add_expense_options">

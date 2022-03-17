@@ -2,3 +2,8 @@ nav img.icon{
     height: 35px;
     width: 35px;
 }
+
+.absolute-centerX{
+    left: 50%;
+    transform: translateX(-50%);
+}

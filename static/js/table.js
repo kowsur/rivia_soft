@@ -24,6 +24,10 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
   let delete_link = `${delete_url}${data.pk}/`
   instance.getElementById('edit').href = `${update_link}`
   instance.getElementById('delete').href = `${delete_link}`
+  if (['/', '/companies/', '/companies/MTrc/home/'].includes(location.pathname)){
+    instance.getElementById('edit').target = `blank`
+    instance.getElementById('delete').target = `blank`
+  }
 
   // fill the template
   for (let field of model_fields){

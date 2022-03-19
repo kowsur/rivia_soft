@@ -160,12 +160,14 @@ def upsert_income_for_submission(request, submission_id, month_id, income_id):
 ##############################################################################
 ## Views to return data for incomes and expenses tab
 ##############################################################################
+@login_required
 def get_expenses_for_submission(request: HttpRequest, submission_id):
     submission_expenses = ExpensesPerTaxYear.objects.filter(client=submission_id).order_by('expense_source', 'month__month_index')
     serialized_data = ExpensesPerTaxYearSerializer(submission_expenses, many=True)
     json_response = dump_to_json.render(serialized_data.data)
     return HttpResponse(json_response, content_type='application/json')
 
+@login_required
 def get_incomes_for_submission(request: HttpRequest, submission_id):
     submission_incomes = IncomesPerTaxYear.objects.filter(client=submission_id).order_by('income_source', 'month__month_index')
     serialized_data = IncomesPerTaxYearSerializer(submission_incomes, many=True)

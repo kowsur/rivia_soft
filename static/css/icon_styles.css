@@ -1,4 +1,4 @@
-nav img.icon{
+img.icon{
     height: 35px;
     width: 35px;
 }
@@ -7,3 +7,53 @@ nav img.icon{
     left: 50%;
     transform: translateX(-50%);
 }
+
+.nav-container{
+    display: flex;
+    flex-direction: column;
+}
+.nav-shortcuts{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.tooltip-container{
+    position: relative;
+}
+.tooltip-container:hover .tooltip-message{
+    display: block;
+}
+.tooltip-container a{
+    position: relative;
+}
+
+.tooltip-message{
+    display: none;
+    position: absolute;
+    top: 115%;
+    padding: 5px 10px;
+    background-color: rgba(75, 85, 99);
+    color: #f3f4f6;
+    border-radius: .5em;
+    min-width: max-content;
+
+    left: 50%;
+    transform: translateX(-50%);
+}
+.tooltip-message::before{
+    content: " ";
+    position: absolute;
+    top: -.5em;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 0; 
+    height: 0; 
+    border-left: .5em solid transparent;
+    border-right: .5em solid transparent;
+    border-bottom: .5em solid rgba(75, 85, 99);
+}
+
+

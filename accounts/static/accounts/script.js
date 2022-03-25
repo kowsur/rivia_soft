@@ -219,6 +219,7 @@ function updateDetailsTab(submissionDetails){
     let clientBusinessAddress = document.querySelector('#client-business-address')
     let clientDob = document.querySelector('#client-dob')
     let clientUtr = document.querySelector('#client-utr')
+    let clientNino = document.querySelector('#client-nino')
     let clientAccountStatus = document.querySelector('#client-account-status')
 
     taxYear.textContent = submissionDetails.tax_year.tax_year
@@ -227,6 +228,7 @@ function updateDetailsTab(submissionDetails){
     clientBusinessAddress.textContent = submissionDetails.client_id.business_address
     clientDob.textContent = submissionDetails.client_id.date_of_birth
     clientUtr.textContent = submissionDetails.client_id.UTR
+    clientNino.textContent = submissionDetails.client_id.NINO
     clientAccountStatus.textContent = submissionDetails.status
     clientAccountStatus.href = `/companies/SAS/update/${submissionId}/`
 }

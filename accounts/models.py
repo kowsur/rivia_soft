@@ -51,8 +51,8 @@ class IncomesPerTaxYear(models.Model):
     income_source = models.ForeignKey(IncomeSources, on_delete=models.RESTRICT)
     client = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)
     month = models.ForeignKey(Months, on_delete=models.RESTRICT)
-    amount = models.IntegerField(default=0)
-    comission = models.IntegerField(default=0)
+    amount = models.FloatField(default=0)
+    comission = models.FloatField(default=0)
 
     def __str__(self) -> str:
         return f"{self.client.client_id.client_name} - {self.income_source} - {self.month} - {self.amount}"
@@ -69,7 +69,7 @@ class ExpensesPerTaxYear(models.Model):
     expense_source = models.ForeignKey(ExpenseSources, on_delete=models.RESTRICT)
     client = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)
     month = models.ForeignKey(Months, on_delete=models.RESTRICT)
-    amount = models.IntegerField(default=0)
+    amount = models.FloatField(default=0)
 
     def __str__(self) -> str:
         return f"{self.client.client_id.client_name} - {self.expense_source} - {self.month} - {self.amount}"

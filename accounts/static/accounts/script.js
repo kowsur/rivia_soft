@@ -39,6 +39,7 @@ expenseSearchOptions.addEventListener('click', handleExpenseSelect)
 let totalIncomeContainers = document.querySelectorAll('[data-total-income-container]')
 let totalExpenseContainers = document.querySelectorAll('[data-total-expense-container]')
 let netProfitContainers = document.querySelectorAll('[data-net-profit-container]')
+let showUptoDecimalDigits = 2
 
 async function getTotalIncome(){
   let inputFields = document.querySelectorAll('.incomes input')
@@ -73,22 +74,23 @@ async function getNetProfit(){
 
 async function updateTotalIncome(){
   let totalIncome = await getTotalIncome()
+  totalIncome = parseFloat(totalIncome).toFixed(showUptoDecimalDigits)
 
   totalIncomeContainers.forEach((totalIncomeContainer)=>totalIncomeContainer.textContent = totalIncome)
 }
 
 async function updateTotalExpense(){
   let totalExpense = await getTotalExpense()
+  totalExpense = parseFloat(totalExpense).toFixed(showUptoDecimalDigits)
 
   totalExpenseContainers.forEach((totalExpenseContainer)=>totalExpenseContainer.textContent = totalExpense)
-  return totalExpense
 }
 
 async function updateNetProfit(){
   let netProfit = await getNetProfit()
+  netProfit = parseFloat(netProfit).toFixed(showUptoDecimalDigits)
 
   netProfitContainers.forEach((netProfitcontainer)=>netProfitcontainer.textContent = netProfit)
-  return netProfit
 }
 
 

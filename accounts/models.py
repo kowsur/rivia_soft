@@ -101,3 +101,6 @@ class SelfemploymentDeductionsPerTaxYear(models.Model):
     amount = models.FloatField(default=0)
     allowance_percentage = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     personal_usage_percentage = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+
+    def __str__(self) -> str:
+        return f"{self.client} - {self.deduction_source} - {self.amount}"

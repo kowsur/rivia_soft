@@ -10,7 +10,7 @@ urlpatterns = [
     # update or set data
     path("set_income/<int:submission_id>/<int:month_id>/<int:income_id>/", upsert_income_for_submission),
     path("set_expense/<int:submission_id>/<int:month_id>/<int:expense_id>/", upsert_expese_for_submission),
-    path("set_deduction/<int:submission_id>/<int:deduction_id>", upsert_deduction_for_submission),
+    path("set_deduction/<int:submission_id>/<int:deduction_id>/", upsert_deduction_for_submission),
 
     # get data
     path("income_sources/", get_all_income_sources),

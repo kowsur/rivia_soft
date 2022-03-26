@@ -368,36 +368,95 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
     }
   })
 
-  allMonths.forEach(month=>{
-    // Get the existing/default expense object
-    let expense = expenses.find(expense=>expense.month===month.id) || {
-      "amount": 0,
-      "expense_source": expenseSourceId,
-      "client": submissionId,
-      "month": month.id
-    }
-    let inputAmountId = `expense_amount_${month.id}_${submission.submission_id}_${expense.expense_source}`
+  // =====================================================================================================================
+  // Start Show a single month
+  let month = allMonths[0]
 
-    // Prepare markup for a single month
-    let expenseMarkup = `
-        <div class='month'>
-          <h3 class='month-name'>${month.month_name}</h3>
-          <div>
-            <label for="${inputAmountId}">Amount</label>
-            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" data-update-type="amount">
+  // Get the existing/default expense object
+  let expense = expenses.find(expense=>expense.month===month.id) || {
+    "amount": 0,
+    "personal_usage": 0,
+    "expense_source": expenseSourceId,
+    "client": submissionId,
+    "month": month.id
+  }
+  let inputAmountId = `expense_amount_${month.id}_${submission.submission_id}_${expense.expense_source}`
+  let inputPersonalUsageId = `expense_personalUsage_${month.id}_${submission.submission_id}_${expense.expense_source}`
+
+  // Prepare markup for a single month
+  let expenseMarkup = `
+      <div class='month'>
+        <div>
+          <label for="${inputAmountId}">Amount</label>
+          <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" data-update-type="amount">
           </div>
+          <div>
+          <label for="${inputPersonalUsageId}">Personal Usage(%)</label>
+          <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="personal_usage">
         </div>
-        `
-    let node = createNodeFromMarkup(expenseMarkup)
-    let inputAmount = node.querySelector(`#${inputAmountId}`)
+      </div>
+      `
+  let node = createNodeFromMarkup(expenseMarkup)
+  let inputAmount = node.querySelector(`#${inputAmountId}`)
+  
+  inputAmount.addEventListener('input', validateMaxValue)
+  inputAmount.addEventListener('input', handleExpenseUpdate)
+  inputAmount.addEventListener('input', updateTotalExpense)
+  inputAmount.addEventListener('input', updateNetProfit)
+  
+  let inputPersonalUsage = node.querySelector(`#${inputPersonalUsageId}`)
+  inputPersonalUsage.addEventListener('input', validatePercentageValue)
+  inputPersonalUsage.addEventListener('input', handleExpenseUpdate)
+  inputPersonalUsage.addEventListener('input', updateTotalExpense)
+  inputPersonalUsage.addEventListener('input', updateNetProfit)
 
-    inputAmount.addEventListener('input', validateMaxValue)
-    inputAmount.addEventListener('input', handleExpenseUpdate)
-    inputAmount.addEventListener('input', updateTotalExpense)
-    inputAmount.addEventListener('input', updateNetProfit)
+  monthContainer.appendChild(node)
+  // End Show a single month
+  // =====================================================================================================================
 
-    monthContainer.appendChild(node)
-  })
+  // // Show all months
+  // allMonths.forEach(month=>{
+  //   // Get the existing/default expense object
+  //   let expense = expenses.find(expense=>expense.month===month.id) || {
+  //     "amount": 0,
+  //     "personal_usage": 0,
+  //     "expense_source": expenseSourceId,
+  //     "client": submissionId,
+  //     "month": month.id
+  //   }
+  //   let inputAmountId = `expense_amount_${month.id}_${submission.submission_id}_${expense.expense_source}`
+  //   let inputPersonalUsageId = `expense_personalUsage_${month.id}_${submission.submission_id}_${expense.expense_source}`
+
+  //   // Prepare markup for a single month
+  //   let expenseMarkup = `
+  //       <div class='month'>
+  //         <h3 class='month-name'>${month.month_name}</h3>
+  //         <div>
+  //           <label for="${inputAmountId}">Amount</label>
+  //           <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" data-update-type="amount">
+  //           </div>
+  //           <div>
+  //           <label for="${inputPersonalUsageId}">Personal Usage(%)</label>
+  //           <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="personal_usage">
+  //         </div>
+  //       </div>
+  //       `
+  //   let node = createNodeFromMarkup(expenseMarkup)
+  //   let inputAmount = node.querySelector(`#${inputAmountId}`)
+    
+  //   inputAmount.addEventListener('input', validateMaxValue)
+  //   inputAmount.addEventListener('input', handleExpenseUpdate)
+  //   inputAmount.addEventListener('input', updateTotalExpense)
+  //   inputAmount.addEventListener('input', updateNetProfit)
+    
+  //   let inputPersonalUsage = node.querySelector(`#${inputPersonalUsageId}`)
+  //   inputPersonalUsage.addEventListener('input', validatePercentageValue)
+  //   inputPersonalUsage.addEventListener('input', handleExpenseUpdate)
+  //   inputPersonalUsage.addEventListener('input', updateTotalExpense)
+  //   inputPersonalUsage.addEventListener('input', updateNetProfit)
+
+  //   monthContainer.appendChild(node)
+  // })
 
   // add the newly prepared income source to incomes
   expensesContainer.appendChild(expenseContainer)
@@ -413,6 +472,18 @@ function validateMaxValue(e){
     input.setCustomValidity("");
   }
 }
+
+function validatePercentageValue(e){
+  let input = e.target
+  let value = parseFloat(e.target.value)
+  if (!(value>=0 && value<=100)){
+    input.setCustomValidity(`Your input should be between 0 and 100!`);
+    input.reportValidity();
+  }else{
+    input.setCustomValidity("");
+  }
+}
+
 
 function createNodeFromMarkup(html){
   return document.createRange().createContextualFragment(html)
@@ -525,8 +596,11 @@ function handleIncomeUpdate(e){
 
 function handleExpenseUpdate(e){
   let inputField = e.target
-  let {submissionId, monthId, expenseId} = inputField.dataset
-  let data_object = { amount: parseFloat(inputField.value) } // amount must be specified
+  let {submissionId, monthId, expenseId, updateType} = inputField.dataset
+  let data_object = { } // amount or personal_usage must be specified
+
+  if (updateType==="amount") data_object.amount = parseFloat(inputField.value)
+  else if (updateType==="personal_usage") data_object.personal_usage = parseFloat(inputField.value)
 
   fetch_url({
     // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import SelfemploymentIncomeSources, SelfemploymentExpenseSources, Months, SelfemploymentIncomesPerTaxYear, SelfemploymentExpensesPerTaxYear
+from .models import SelfemploymentIncomeSources, SelfemploymentExpenseSources, SelfemploymentDeductionSources, Months, SelfemploymentIncomesPerTaxYear, SelfemploymentExpensesPerTaxYear, SelfemploymentDeductionsPerTaxYear
 
 
-admin.site.register([SelfemploymentIncomeSources, SelfemploymentExpenseSources, Months, SelfemploymentIncomesPerTaxYear, SelfemploymentExpensesPerTaxYear])
+admin.site.register([SelfemploymentIncomeSources, SelfemploymentExpenseSources, SelfemploymentDeductionSources, Months, SelfemploymentIncomesPerTaxYear, SelfemploymentExpensesPerTaxYear, SelfemploymentDeductionsPerTaxYear])

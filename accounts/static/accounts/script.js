@@ -42,27 +42,41 @@ let netProfitContainers = document.querySelectorAll('[data-net-profit-container]
 let showUptoDecimalDigits = 2
 
 async function getTotalIncome(){
-  let inputFields = document.querySelectorAll('.incomes input')
+  let inputAmountFields = document.querySelectorAll('.incomes input[data-update-type="amount"]')
+  let inputComissionFields = document.querySelectorAll('.incomes input[data-update-type="comission"]')
   let totalIncome = 0
 
-  inputFields.forEach(inputField=>{
-    let amount = parseFloat(inputField.value)
-    if (isNaN(amount)) amount = 0
-  
-    if (inputField.dataset.updateType=='amount') totalIncome+=amount
-    else if (inputField.dataset.updateType=='comission') totalIncome-=amount
-  })
+  for (let i=0; i<inputAmountFields.length; i++){
+    let amount = parseFloat(inputAmountFields[i].value) || 0
+    let comission = parseFloat(inputComissionFields[i].value) || 0
+
+    let actualIncome = amount-comission
+    if (actualIncome<0) actualIncome=0
+
+    totalIncome+=actualIncome
+  }
+
   return totalIncome
 }
 
 async function getTotalExpense(){
-  let inputFields = document.querySelectorAll('.expenses input')
+  let inputAmountFields = document.querySelectorAll('.expenses input[data-update-type="amount"]')
+  let inputPersonalUsagePercentageFields = document.querySelectorAll('.expenses input[data-update-type="personal_usage"]')
   let totalExpense = 0
-  inputFields.forEach(inputField=>{
-    let amount = parseFloat(inputField.value)
-    if (isNaN(amount)) amount = 0
-    totalExpense+=amount
-  })
+
+  for (let i=0; i<inputAmountFields.length; i++){
+      let amount = parseFloat(inputAmountFields[i].value) || 0
+      let personal_usage_percentage = parseFloat(inputPersonalUsagePercentageFields[i].value) || 0
+
+      // Calculate actual personal usage
+      let personal_usage = amount*(personal_usage_percentage/100)
+
+      let actualExpense = amount-personal_usage
+      if (actualExpense<0) actualExpense = 0
+
+      totalExpense+=actualExpense
+  }
+
   return totalExpense
 }
 
@@ -74,21 +88,21 @@ async function getNetProfit(){
 
 async function updateTotalIncome(){
   let totalIncome = await getTotalIncome()
-  totalIncome = parseFloat(totalIncome).toFixed(showUptoDecimalDigits)
+  totalIncome = parseFloat(totalIncome).toFixed(showUptoDecimalDigits) || 0
 
   totalIncomeContainers.forEach((totalIncomeContainer)=>totalIncomeContainer.textContent = totalIncome)
 }
 
 async function updateTotalExpense(){
   let totalExpense = await getTotalExpense()
-  totalExpense = parseFloat(totalExpense).toFixed(showUptoDecimalDigits)
+  totalExpense = parseFloat(totalExpense).toFixed(showUptoDecimalDigits) || 0
 
   totalExpenseContainers.forEach((totalExpenseContainer)=>totalExpenseContainer.textContent = totalExpense)
 }
 
 async function updateNetProfit(){
   let netProfit = await getNetProfit()
-  netProfit = parseFloat(netProfit).toFixed(showUptoDecimalDigits)
+  netProfit = parseFloat(netProfit).toFixed(showUptoDecimalDigits) || 0
 
   netProfitContainers.forEach((netProfitcontainer)=>netProfitcontainer.textContent = netProfit)
 }
@@ -464,7 +478,7 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
 
 function validateMaxValue(e){
   let input = e.target
-  let value = parseFloat(e.target.value)
+  let value = parseFloat(e.target.value) || 0
   if (value>DB_MAX_INT_VALUE){
     input.setCustomValidity(`Your input is grater than ${DB_MAX_INT_VALUE}!`);
     input.reportValidity();
@@ -475,7 +489,7 @@ function validateMaxValue(e){
 
 function validatePercentageValue(e){
   let input = e.target
-  let value = parseFloat(e.target.value)
+  let value = parseFloat(e.target.value) || 0
   if (!(value>=0 && value<=100)){
     input.setCustomValidity(`Your input should be between 0 and 100!`);
     input.reportValidity();
@@ -583,8 +597,8 @@ function handleIncomeUpdate(e){
   let {submissionId, monthId, incomeId, updateType} = inputField.dataset
   let data_object = {} // amount or comission or both must be specified
 
-  if (updateType==="amount") data_object.amount = parseFloat(inputField.value)
-  else if (updateType==="comission") data_object.comission = parseFloat(inputField.value)
+  if (updateType==="amount") data_object.amount = parseFloat(inputField.value) || 0
+  else if (updateType==="comission") data_object.comission = parseFloat(inputField.value) || 0
 
   fetch_url({
     // url = "/accounts/set_income/<submission_id>/<month_id>/<income_id>/"
@@ -599,8 +613,8 @@ function handleExpenseUpdate(e){
   let {submissionId, monthId, expenseId, updateType} = inputField.dataset
   let data_object = { } // amount or personal_usage must be specified
 
-  if (updateType==="amount") data_object.amount = parseFloat(inputField.value)
-  else if (updateType==="personal_usage") data_object.personal_usage = parseFloat(inputField.value)
+  if (updateType==="amount") data_object.amount = parseFloat(inputField.value) || 0
+  else if (updateType==="personal_usage") data_object.personal_usage = parseFloat(inputField.value) || 0
 
   fetch_url({
     // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"

@@ -29,7 +29,7 @@ class MonthsSerializer(serializers.ModelSerializer):
 
 
 class SelfemploymentIncomesPerTaxYearSerializer(serializers.ModelSerializer):
-    # income_source = IncomeSourcesSerializer()
+    # income_source = SelfemploymentIncomeSourcesSerializer()
     # client = SelfassesmentAccountSubmissionSerializer()
     # month = MonthsSerializer()
 
@@ -39,7 +39,7 @@ class SelfemploymentIncomesPerTaxYearSerializer(serializers.ModelSerializer):
 
 
 class SelfemploymentExpensesPerTaxYearSerializer(serializers.ModelSerializer):
-    # expense_source = ExpenseSourcesSerializer()
+    # expense_source = SelfemploymentExpenseSourcesSerializer()
     # client = SelfassesmentAccountSubmissionSerializer()
     # month = MonthsSerializer()
 
@@ -49,11 +49,9 @@ class SelfemploymentExpensesPerTaxYearSerializer(serializers.ModelSerializer):
 
 
 class SelfemploymentDeductionsPerTaxYearSerializer(serializers.ModelSerializer):
-    # expense_source = ExpenseSourcesSerializer()
+    # deduction_source = SelfemploymentDeductionSourcesSerializer()
     # client = SelfassesmentAccountSubmissionSerializer()
-    # month = MonthsSerializer()
 
     class Meta:
         model = SelfemploymentDeductionsPerTaxYear
         fields = '__all__'
-

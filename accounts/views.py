@@ -10,14 +10,14 @@ from django.db.models import QuerySet
 
 # Models
 from companies.models import SelfassesmentAccountSubmission
-from .models import SelfemploymentIncomeSources, SelfemploymentExpenseSources, Months, SelfemploymentExpensesPerTaxYear, SelfemploymentIncomesPerTaxYear
+from .models import SelfemploymentIncomeSources, SelfemploymentExpenseSources, SelfemploymentDeductionSources, Months, SelfemploymentExpensesPerTaxYear, SelfemploymentIncomesPerTaxYear, SelfemploymentDeductionsPerTaxYear
 
 # Serializers
 from rest_framework.renderers import JSONRenderer
-from .serializers import SelfemploymentIncomesPerTaxYearSerializer, SelfemploymentExpensesPerTaxYearSerializer, SelfemploymentIncomeSourcesSerializer, SelfemploymentExpenseSourcesSerializer, MonthsSerializer
+from .serializers import SelfemploymentIncomeSourcesSerializer, SelfemploymentExpenseSourcesSerializer, SelfemploymentDeductionSourcesSerializer, MonthsSerializer, SelfemploymentIncomesPerTaxYearSerializer, SelfemploymentExpensesPerTaxYearSerializer, SelfemploymentDeductionsPerTaxYearSerializer
 dump_to_json = JSONRenderer()
 
-from companies.views import URLS
+from companies.views import URLS, serialized
 from companies.decorators import allowed_for_staff, allowed_for_superuser
 
 
@@ -61,12 +61,12 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
         return HttpResponse(json.dumps({'error': f'only json data is allowed'}), status=400)
 
     amount = loaded_data.get("amount", None)
-    personal_usage = loaded_data.get("personal_usage", None)
+    personal_usage_percentage = loaded_data.get("personal_usage_percentage", None)
     
-    if amount is None and personal_usage is None:
+    if amount is None and personal_usage_percentage is None:
         return HttpResponse(json.dumps({'error': f'amount or personal_usage is required'}), status=400)
     
-    if personal_usage is not None and not 0<=personal_usage<=100:
+    if personal_usage_percentage is not None and not 0<=personal_usage_percentage<=100:
         return HttpResponse(json.dumps({'error': f'personal_usage value should be between 0 and 100!'}), status=400)
 
     # retrive selfassemsent account submission record
@@ -91,8 +91,8 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
     if expense_for_tax_year is not None:
         if amount is not None:
             expense_for_tax_year.amount = amount
-        if personal_usage is not None:
-            expense_for_tax_year.personal_usage = personal_usage
+        if personal_usage_percentage is not None:
+            expense_for_tax_year.personal_usage_percentage = personal_usage_percentage
         expense_for_tax_year.save()
         return HttpResponse(json.dumps({'success': 'Updated existing record'}))
     
@@ -101,9 +101,11 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
         expense_source=expense,
         client=client,
         month=month,
-        amount = amount or 0,
-        personal_usage = personal_usage or 0
         )
+    if amount is not None:
+        expense_for_tax_year.amount = amount
+    if personal_usage_percentage is not None:
+        expense_for_tax_year.personal_usage_percentage = personal_usage_percentage
     expense_for_tax_year.save()
     return HttpResponse(json.dumps({'success': 'Updated existing record'}), status=201)
 
@@ -166,6 +168,64 @@ def upsert_income_for_submission(request, submission_id, month_id, income_id):
     return HttpResponse(json.dumps({'success': 'Created new record'}), status=201)
 
 
+@csrf_exempt
+@login_required
+def upsert_deduction_for_submission(request, submission_id, deduction_id):
+    if not request.method == "POST":
+        raise Http404()
+    
+    try:
+        loaded_data = json.loads(request.body.decode())
+    except json.decoder.JSONDecodeError:
+        return HttpResponse(json.dumps({'error': f'only json data is allowed'}), status=400)
+    
+    amount = loaded_data.get("amount", None)
+    allowance_percentage = loaded_data.get("allowance_percentage", None)
+    personal_usage_percentage = loaded_data.get("personal_usage_percentage", None)
+
+    if amount is None and allowance_percentage and personal_usage_percentage is None:
+        return HttpResponse(json.dumps({'error': f'amount or allowance_percentage or personal_usage_percentage must be specified'}), status=400)
+
+    # retrive selfassemsent account submission record
+    client = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+    if client is None:
+        return HttpResponse(json.dumps({'error': f'SelfassesmentAccountSubmission with pk={submission_id} does not exist'}), status=404)
+    
+    # retrive deduction source
+    income = get_object_or_None(SelfemploymentDeductionSources, pk=deduction_id)
+    if income is None:
+        return HttpResponse(json.dumps({'error': f'DeductionSource with pk={deduction_id} does not exist'}), status=404)
+    
+    # Try to retrive IncomesPerTaxYear if does not exist create it
+    deduction_for_tax_year = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=client, deduction_source=deduction_id)
+    
+    # Update existing record 
+    if deduction_for_tax_year:
+        if amount is not None:
+            deduction_for_tax_year.amount = amount
+        if allowance_percentage is not None:
+            deduction_for_tax_year.allowance_percentage = allowance_percentage
+        if allowance_percentage is not None:
+            deduction_for_tax_year.personal_usage_percentage = personal_usage_percentage
+        deduction_for_tax_year.save()
+        return HttpResponse(json.dumps({'success': 'Updated existing record'}))
+    
+    # Save new record
+    deduction_for_tax_year = SelfemploymentDeductionsPerTaxYear(
+        client=submission_id,
+        deduction_source=deduction_id
+    )
+    if amount is not None:
+        deduction_for_tax_year.amount = amount
+    if allowance_percentage is not None:
+        deduction_for_tax_year.allowance_percentage = allowance_percentage
+    if personal_usage_percentage is not None:
+        deduction_for_tax_year.personal_usage_percentage = personal_usage_percentage
+    deduction_for_tax_year.save()
+
+    return HttpResponse(json.dumps({'success': 'Created new record'}), status=201)
+
+
 ##############################################################################
 ## Views to return data for incomes and expenses tab
 ##############################################################################
@@ -180,6 +240,13 @@ def get_expenses_for_submission(request: HttpRequest, submission_id):
 def get_incomes_for_submission(request: HttpRequest, submission_id):
     submission_incomes = SelfemploymentIncomesPerTaxYear.objects.filter(client=submission_id).order_by('income_source', 'month__month_index')
     serialized_data = SelfemploymentIncomesPerTaxYearSerializer(submission_incomes, many=True)
+    json_response = dump_to_json.render(serialized_data.data)
+    return HttpResponse(json_response, content_type='application/json')
+
+@login_required
+def get_deductions_for_submission(request: HttpRequest, submission_id):
+    submission_deductions = SelfemploymentDeductionsPerTaxYear.objects.filter(client=submission_id).order_by('deduction_source')
+    serialized_data = SelfemploymentDeductionsPerTaxYearSerializer(submission_deductions, many=True)
     json_response = dump_to_json.render(serialized_data.data)
     return HttpResponse(json_response, content_type='application/json')
 
@@ -208,3 +275,9 @@ def get_all_months(request):
     json_response = dump_to_json.render(serialized.data)
     return HttpResponse(json_response, content_type='application/json')
 
+@login_required
+def get_all_deduction_sources(request):
+    deduction_sources = SelfemploymentDeductionSources.objects.all()
+    serialized = SelfemploymentDeductionSourcesSerializer(deduction_sources, many=True)
+    json_response = dump_to_json.render(serialized.data)
+    return HttpResponse(json_response, content_type='application/json')

@@ -13,9 +13,12 @@ h3{
 
 /* Select search */
 #add_income{
-    z-index: 2;
+    z-index: 3;
 }
 #add_expense{
+    z-index: 2;
+}
+#add_deduction_and_allowance{
     z-index: 1;
 }
 
@@ -155,7 +158,9 @@ h3{
     cursor: default;
 }
 
-
+.tabs{
+    padding-bottom: 5em;
+}
 .tabs .tab{
     display: none;
 }

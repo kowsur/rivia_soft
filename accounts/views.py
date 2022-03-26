@@ -183,8 +183,13 @@ def upsert_deduction_for_submission(request, submission_id, deduction_id):
     allowance_percentage = loaded_data.get("allowance_percentage", None)
     personal_usage_percentage = loaded_data.get("personal_usage_percentage", None)
 
-    if amount is None and allowance_percentage and personal_usage_percentage is None:
+    if amount is None and allowance_percentage is None and personal_usage_percentage is None:
         return HttpResponse(json.dumps({'error': f'amount or allowance_percentage or personal_usage_percentage must be specified'}), status=400)
+    
+    if allowance_percentage and not 0<=allowance_percentage<=100:
+        return HttpResponse(json.dumps({'error': f'allowance_percentage must be between 0 and 100!'}), status=400)
+    if personal_usage_percentage and not 0<=personal_usage_percentage<=100:
+        return HttpResponse(json.dumps({'error': f'personal_usage_percentage must be between 0 and 100!'}), status=400)
 
     # retrive selfassemsent account submission record
     client = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
@@ -192,12 +197,12 @@ def upsert_deduction_for_submission(request, submission_id, deduction_id):
         return HttpResponse(json.dumps({'error': f'SelfassesmentAccountSubmission with pk={submission_id} does not exist'}), status=404)
     
     # retrive deduction source
-    income = get_object_or_None(SelfemploymentDeductionSources, pk=deduction_id)
-    if income is None:
+    deduction_source = get_object_or_None(SelfemploymentDeductionSources, pk=deduction_id)
+    if deduction_source is None:
         return HttpResponse(json.dumps({'error': f'DeductionSource with pk={deduction_id} does not exist'}), status=404)
     
     # Try to retrive IncomesPerTaxYear if does not exist create it
-    deduction_for_tax_year = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=client, deduction_source=deduction_id)
+    deduction_for_tax_year = get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=client, deduction_source=deduction_id)
     
     # Update existing record 
     if deduction_for_tax_year:
@@ -205,15 +210,15 @@ def upsert_deduction_for_submission(request, submission_id, deduction_id):
             deduction_for_tax_year.amount = amount
         if allowance_percentage is not None:
             deduction_for_tax_year.allowance_percentage = allowance_percentage
-        if allowance_percentage is not None:
+        if personal_usage_percentage is not None:
             deduction_for_tax_year.personal_usage_percentage = personal_usage_percentage
         deduction_for_tax_year.save()
         return HttpResponse(json.dumps({'success': 'Updated existing record'}))
     
     # Save new record
     deduction_for_tax_year = SelfemploymentDeductionsPerTaxYear(
-        client=submission_id,
-        deduction_source=deduction_id
+        client=client,
+        deduction_source=deduction_source
     )
     if amount is not None:
         deduction_for_tax_year.amount = amount

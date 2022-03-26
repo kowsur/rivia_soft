@@ -36,8 +36,15 @@ let expensesContainer = document.querySelector(".expenses")
 expenseSearchInput.addEventListener('input', handleExpenseSearch)
 expenseSearchOptions.addEventListener('click', handleExpenseSelect)
 
+let deductionSearchInput = document.querySelector('#add_deduction_and_allowance_input')
+let deductionSearchOptions = document.querySelector('#add_deduction_and_allowance_options')
+let deductionsContainer = document.querySelector(".deductions_and_allowances")
+deductionSearchInput.addEventListener('input', handleDeductionSearch)
+deductionSearchOptions.addEventListener('click', handleDeductionSelect)
+
 let totalIncomeContainers = document.querySelectorAll('[data-total-income-container]')
 let totalExpenseContainers = document.querySelectorAll('[data-total-expense-container]')
+let totalDeductionContainers = document.querySelectorAll('[data-total-deduction-and-allownce-container]')
 let netProfitContainers = document.querySelectorAll('[data-net-profit-container]')
 let showUptoDecimalDigits = 2
 
@@ -79,11 +86,38 @@ async function getTotalExpense(){
 
   return totalExpense
 }
+// update the function
+async function getTotalDeduction(){
+  let inputAmountFields = document.querySelectorAll('.deductions_and_allowances input[data-update-type="amount"]')
+  let inputAllowancePercentageFields = document.querySelectorAll('.deductions_and_allowances input[data-update-type="allowance_percentage"]')
+  let inputPersonalUsagePercentageFields = document.querySelectorAll('.deductions_and_allowances input[data-update-type="personal_usage_percentage"]')
+  let totalDeduction = 0
+
+  for (let i=0; i<inputAmountFields.length; i++){
+      let amount = parseFloat(inputAmountFields[i].value) || 0
+      let allowance_percentage = parseFloat(inputAllowancePercentageFields[i].value) || 0
+      let personal_usage_percentage = parseFloat(inputPersonalUsagePercentageFields[i].value) || 0
+
+      // Calculate actual allowance
+      let allowance = amount*(allowance_percentage/100)
+
+      // Calculate actual personal usage
+      let personal_usage = allowance*(personal_usage_percentage/100)
+
+      let actualDeduction = (allowance-personal_usage)
+      if (actualDeduction<0) actualDeduction = 0
+
+      totalDeduction+=actualDeduction
+  }
+
+  return totalDeduction
+}
 
 async function getNetProfit(){
   let totalIncome = await getTotalIncome()
   let totalExpense = await getTotalExpense()
-  return totalIncome - totalExpense
+  let totalDeduction = await getTotalDeduction()
+  return totalIncome - (totalExpense + totalDeduction)
 }
 
 async function updateTotalIncome(){
@@ -98,6 +132,13 @@ async function updateTotalExpense(){
   totalExpense = parseFloat(totalExpense).toFixed(showUptoDecimalDigits) || 0
 
   totalExpenseContainers.forEach((totalExpenseContainer)=>totalExpenseContainer.textContent = totalExpense)
+}
+
+async function updateTotalDeduction(){
+  let totalDeduction = await getTotalDeduction()
+  totalDeduction = parseFloat(totalDeduction).toFixed(showUptoDecimalDigits) || 0
+
+  totalDeductionContainers.forEach((totalDeductionContainer)=>totalDeductionContainer.textContent = totalDeduction)
 }
 
 async function updateNetProfit(){
@@ -115,29 +156,36 @@ let submissionId = urlParams.pk
 
 const displayingIncomeIds = new Set()
 const displayingExpenseIds = new Set()
+const displayingDeductionIds = new Set()
 
 let submissionDetails = null
 let allIncomeSources = null
 let allExpenseSources = null
+let allDeductionSources = null
 let allMonths = null
 let allIncomesForSubmission = null
 let allExpensesForSubmission = null
+let allDeductionsForSubmission = null
 
 // Maps to speed up the lookup
 const monthsMapById = {}
 const incomeSourcesMapById = {}
 const expenseSourcesMapById = {}
+const deductionSourcesMapById = {}
 const groupedAllIncomesForSubmissionMapBySourceId = {}
 const groupedAllExpensesForSubmissionMapBySourceId = {}
+const groupedAllDeductionsForSubmissionMapBySourceId = {}
 
 
 // get data
 getSubmissionDetails(updateDetailsTab, updateIncomeAndExpenseTab, updateTaxCalculationTab, updateDetailsTab)
 getIncomeSources()
 getExpneseSources()
+getDeductionSources()
 getMonths()
 getAllIncomesForSubmission()
 getAllExpensesForSubmission()
+getAllDeductionsForSubmission()
 
 
 async function getSubmissionDetails(...callbacks){
@@ -178,6 +226,18 @@ async function getExpneseSources(...callbacks){
 
   return allExpenseSources
 }
+async function getDeductionSources(...callbacks){
+  if (allDeductionSources!==null) return allDeductionSources
+  let records = await fetch_url({url: '/accounts/deduction_sources/'})
+  allDeductionSources = await records.json()
+  mapRecordsByAttribute(allDeductionSources, 'id', deductionSourcesMapById)
+  
+  if (Array.isArray(callbacks)) callbacks.forEach(callback => {
+    callback(allDeductionSources)
+  });
+
+  return allDeductionSources
+}
 async function getMonths(...callbacks){
   if (allMonths!==null) return allMonths
   let records = await fetch_url({url: '/accounts/months/'})
@@ -214,6 +274,19 @@ async function getAllExpensesForSubmission(...callbacks){
   });
 
   return allExpensesForSubmission
+}
+async function getAllDeductionsForSubmission(...callbacks){
+  if (allDeductionsForSubmission!==null) return allDeductionsForSubmission
+
+  let records = await fetch_url({url: `/accounts/deductions/${submissionId}/`})
+  allDeductionsForSubmission = await records.json()
+  groupRecordsByAttribute(allDeductionsForSubmission, 'deduction_source', groupedAllDeductionsForSubmissionMapBySourceId)
+  
+  if (Array.isArray(callbacks)) callbacks.forEach(callback => {
+    callback(allDeductionsForSubmission)
+  });
+
+  return allDeductionsForSubmission
 }
 
 function mapRecordsByAttribute(records, attributeName, map=null){
@@ -257,9 +330,11 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   // These are required to load data incase data is not loaded
   let incomeSources = await getIncomeSources()
   let expenseSources = await getExpneseSources()
+  let deductionSources = await getDeductionSources()
   let months = await getMonths()
   let allIncomesForSubmission = await getAllIncomesForSubmission()
   let allExpensesForSubmission = await getAllExpensesForSubmission()
+  let allDeductionsForSubmission = await getAllDeductionsForSubmission()
 
   Object.entries(groupedAllIncomesForSubmissionMapBySourceId).forEach(([incomeSourceId, incomes]) => {
     displayIncomeSource(incomeSourceId, incomes, submissionDetails)
@@ -272,6 +347,12 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   });
   displayExpenseOptions()
   updateTotalExpense()
+  
+  Object.entries(groupedAllDeductionsForSubmissionMapBySourceId).forEach(([deductionSourceId, deductions]) => {
+    displayDeductionSource(deductionSourceId, deductions, submissionDetails)
+  });
+  displayDeductionOptions()
+  updateTotalDeduction()
 
   updateNetProfit()
 }
@@ -475,6 +556,90 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
   // add the newly prepared income source to incomes
   expensesContainer.appendChild(expenseContainer)
 }
+function displayDeductionSource(deductionSourceId, deductions, submission){
+  deductionSourceId = parseInt(deductionSourceId)
+  // add current incomeSourceId to displayingIncomeIds set to filter them out while searching
+  displayingDeductionIds.add(parseInt(deductionSourceId))
+  let deductionSource = deductionSourcesMapById[deductionSourceId]
+  
+
+  let deductionContainer = createNodeFromMarkup(`
+  <div class="deduction">
+    <div class="toggle">
+      <h2 class="income-source">${deductionSource.name}</h2>
+      <img src='/static/accounts/expand.svg'/>
+    </div>
+    <div class="months invisible">
+    </div>
+  </div>`)
+  let monthContainer = deductionContainer.querySelector('.months')
+  let toggle = deductionContainer.querySelector('.toggle')
+  let toggleImg = deductionContainer.querySelector('.toggle img')
+
+  // adding event listener to show or hide details for an expense source
+  toggle.addEventListener('click', (e)=>{
+    if (monthContainer.classList.contains('invisible')) {
+      monthContainer.classList.remove('invisible')
+      toggleImg.src = '/static/accounts/collapse.svg'
+    }else{
+      monthContainer.classList.add('invisible')
+      toggleImg.src = '/static/accounts/expand.svg'
+    }
+  })
+
+  // Get the existing/default deduction object
+  let deduction = deductions.find(deduction=>deduction.deduction_source===deductionSourceId) || {
+    "amount": 0,
+    "allowance_percentage": 0,
+    "personal_usage_percentage": 0,
+    "deduction_source": deductionSourceId,
+    "client": submissionId,
+  }
+  let inputAmountId = `deduction_amount_${submission.submission_id}_${deduction.deduction_source}`
+  let inputAllowancePercentageId = `deduction_allowance_percentage_${submission.submission_id}_${deduction.deduction_source}`
+  let inputPersonalUsagePercentageId = `deduction_personalUsage_percentage_${submission.submission_id}_${deduction.deduction_source}`
+
+  // Prepare markup for a single month
+  let deductionMarkup = `
+      <div class='month'>
+        <div>
+          <label for="${inputAmountId}">Amount</label>
+          <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${deduction?.amount}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="amount">
+        </div>
+        <div>
+          <label for="${inputAllowancePercentageId}">Allowance(%)</label>
+          <input type="number" min="0" max='100' id=${inputAllowancePercentageId} value="${deduction?.allowance_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="allowance_percentage">
+        </div>
+        <div>
+          <label for="${inputPersonalUsagePercentageId}">Personal Usage(%)</label>
+          <input type="number" min="0" max='100' id=${inputPersonalUsagePercentageId} value="${deduction?.personal_usage_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="personal_usage_percentage">
+        </div>
+      </div>
+      `
+  let node = createNodeFromMarkup(deductionMarkup)
+  let inputAmount = node.querySelector(`#${inputAmountId}`)
+  
+  inputAmount.addEventListener('input', validateMaxValue)
+  inputAmount.addEventListener('input', handleDeductionUpdate)
+  inputAmount.addEventListener('input', updateTotalDeduction)
+  inputAmount.addEventListener('input', updateNetProfit)
+  
+  let inputAllowancePercentage = node.querySelector(`#${inputAllowancePercentageId}`)
+  inputAllowancePercentage.addEventListener('input', validatePercentageValue)
+  inputAllowancePercentage.addEventListener('input', handleDeductionUpdate)
+  inputAllowancePercentage.addEventListener('input', updateTotalDeduction)
+  inputAllowancePercentage.addEventListener('input', updateNetProfit)
+  
+  let inputPersonalUsage = node.querySelector(`#${inputPersonalUsagePercentageId}`)
+  inputPersonalUsage.addEventListener('input', validatePercentageValue)
+  inputPersonalUsage.addEventListener('input', handleDeductionUpdate)
+  inputPersonalUsage.addEventListener('input', updateTotalDeduction)
+  inputPersonalUsage.addEventListener('input', updateNetProfit)
+
+  monthContainer.appendChild(node)
+
+  deductionsContainer.appendChild(deductionContainer)
+}
 
 function validateMaxValue(e){
   let input = e.target
@@ -549,6 +714,13 @@ async function handleExpenseSearch(e){
 
   displayExpenseOptions(displayableExpenseSources)
 }
+async function handleDeductionSearch(e){
+  let searchText = e.target.value || ''
+  let deductionSources = await getDeductionSources()
+  let displayableDeductionSources = await getDisplayableSources(deductionSources, displayingDeductionIds, searchText)
+  
+  displayDeductionOptions(displayableDeductionSources)
+}
 async function getDisplayableSources(allSources, displayingSourceIds, searchText=''){
   let displayableIncomeSources = allSources.filter(source=>!displayingSourceIds.has(source.id) && source.name.toLowerCase().includes(searchText.trim().toLowerCase()))
   return displayableIncomeSources
@@ -568,9 +740,19 @@ async function displayExpenseOptions(displayableExpenseSources=null){
   if (displayableExpenseSources==null) displayableExpenseSources = await getDisplayableSources(expenseSources, displayingExpenseIds)
   expenseSearchOptions.innerHTML = ''
   displayableExpenseSources.forEach(expenseSource=>{
-      let option = createHtmlElement('div', {'data-income-id': expenseSource.id})
+      let option = createHtmlElement('div', {'data-deduction-id': expenseSource.id})
       option.textContent = expenseSource.name
       expenseSearchOptions.appendChild(option)
+    })
+}
+async function displayDeductionOptions(displayableDeductionSources=null){
+  let deductionSources = await getDeductionSources()
+  if (displayableDeductionSources==null) displayableDeductionSources = await getDisplayableSources(deductionSources, displayingDeductionIds)
+  deductionSearchOptions.innerHTML = ''
+  displayableDeductionSources.forEach(deductionSource=>{
+      let option = createHtmlElement('div', {'data-deduction-id': deductionSource.id})
+      option.textContent = deductionSource.name
+      deductionSearchOptions.appendChild(option)
     })
 }
 
@@ -583,11 +765,19 @@ async function handleIncomeSelect(e){
   }
 }
 async function handleExpenseSelect(e){
-  let {incomeId: expenseId} = e.target.dataset
+  let {expenseId} = e.target.dataset
   if (expenseId && parseInt(expenseId)){
     expenseId = parseInt(expenseId)
     displayExpenseSource(expenseId, [], await getSubmissionDetails())
     displayExpenseOptions()
+  }
+}
+async function handleDeductionSelect(e){
+  let {deductionId} = e.target.dataset
+  if (deductionId && parseInt(deductionId)){
+    deductionId = parseInt(deductionId)
+    displayDeductionSource(deductionId, [], await getSubmissionDetails())
+    displayDeductionOptions()
   }
 }
 
@@ -619,6 +809,23 @@ function handleExpenseUpdate(e){
   fetch_url({
     // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"
     url: `/accounts/set_expense/${submissionId}/${monthId}/${expenseId}/`,
+    req_method: "POST",
+    data_object: JSON.stringify(data_object)
+  })
+}
+
+function handleDeductionUpdate(e){
+  let inputField = e.target
+  let {submissionId, deductionId, updateType} = inputField.dataset
+  let data_object = { } // amount or personal_usage_percentage or allowance_percentage must be specified
+
+  if (updateType==="amount") data_object.amount = parseFloat(inputField.value) || 0
+  else if (updateType==="allowance_percentage") data_object.allowance_percentage = parseFloat(inputField.value) || 0
+  else if (updateType==="personal_usage_percentage") data_object.personal_usage_percentage = parseFloat(inputField.value) || 0
+
+  fetch_url({
+    // url = "/accounts/set_deduction/<submission_id>/<deduction_id>/"
+    url: `/accounts/set_deduction/${submissionId}/${deductionId}/`,
     req_method: "POST",
     data_object: JSON.stringify(data_object)
   })

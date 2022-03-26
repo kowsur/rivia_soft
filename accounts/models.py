@@ -1,11 +1,12 @@
 from email.policy import default
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from companies.models import SelfassesmentAccountSubmission
 
 
-class IncomeSources(models.Model):
+class SelfemploymentIncomeSources(models.Model):
     class Meta:
         verbose_name = "Income Source"
         verbose_name_plural = "Income Sources"
@@ -16,7 +17,7 @@ class IncomeSources(models.Model):
         return self.name
 
 
-class ExpenseSources(models.Model):
+class SelfemploymentExpenseSources(models.Model):
     class Meta:
         verbose_name = "Expense Source"
         verbose_name_plural = "Expense Sources"
@@ -40,7 +41,7 @@ class Months(models.Model):
         return self.month_name
 
 
-class IncomesPerTaxYear(models.Model):
+class SelfemploymentIncomesPerTaxYear(models.Model):
     class Meta:
         verbose_name = "Income Per Tax Year"
         verbose_name_plural = "Incomes Per Tax Year"
@@ -48,7 +49,7 @@ class IncomesPerTaxYear(models.Model):
             models.UniqueConstraint(fields=['client', 'month', 'income_source'], name="unique record")
         ]
 
-    income_source = models.ForeignKey(IncomeSources, on_delete=models.RESTRICT)
+    income_source = models.ForeignKey(SelfemploymentIncomeSources, on_delete=models.RESTRICT)
     client = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)
     month = models.ForeignKey(Months, on_delete=models.RESTRICT)
     amount = models.FloatField(default=0)
@@ -58,7 +59,7 @@ class IncomesPerTaxYear(models.Model):
         return f"{self.client.client_id.client_name} - {self.income_source} - {self.month} - {self.amount}"
 
 
-class ExpensesPerTaxYear(models.Model):
+class SelfemploymentExpensesPerTaxYear(models.Model):
     class Meta:
         verbose_name = "Expense Per Tax Year"
         verbose_name_plural = "Expenses Per Tax Year"
@@ -66,10 +67,11 @@ class ExpensesPerTaxYear(models.Model):
             models.UniqueConstraint(fields=['client', 'month', 'expense_source'], name="unique expense record")
         ]
 
-    expense_source = models.ForeignKey(ExpenseSources, on_delete=models.RESTRICT)
+    expense_source = models.ForeignKey(SelfemploymentExpenseSources, on_delete=models.RESTRICT)
     client = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)
     month = models.ForeignKey(Months, on_delete=models.RESTRICT)
     amount = models.FloatField(default=0)
+    personal_usage = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
 
     def __str__(self) -> str:
         return f"{self.client.client_id.client_name} - {self.expense_source} - {self.month} - {self.amount}"

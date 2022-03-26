@@ -1,18 +1,18 @@
 from rest_framework import serializers
 
 from companies.serializers import SelfassesmentAccountSubmissionSerializer
-from .models import IncomeSources, ExpenseSources, Months, IncomesPerTaxYear, ExpensesPerTaxYear
+from .models import SelfemploymentIncomeSources, SelfemploymentExpenseSources, Months, SelfemploymentIncomesPerTaxYear, SelfemploymentExpensesPerTaxYear
 
 
-class IncomeSourcesSerializer(serializers.ModelSerializer):
+class SelfemploymentIncomeSourcesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = IncomeSources
+        model = SelfemploymentIncomeSources
         fields = '__all__'
 
 
-class ExpenseSourcesSerializer(serializers.ModelSerializer):
+class SelfemploymentExpenseSourcesSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ExpenseSources
+        model = SelfemploymentExpenseSources
         fields = '__all__'
 
 
@@ -22,22 +22,22 @@ class MonthsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class IncomesPerTaxYearSerializer(serializers.ModelSerializer):
+class SelfemploymentIncomesPerTaxYearSerializer(serializers.ModelSerializer):
     # income_source = IncomeSourcesSerializer()
     # client = SelfassesmentAccountSubmissionSerializer()
     # month = MonthsSerializer()
 
     class Meta:
-        model = IncomesPerTaxYear
+        model = SelfemploymentIncomesPerTaxYear
         fields = '__all__'
 
 
-class ExpensesPerTaxYearSerializer(serializers.ModelSerializer):
+class SelfemploymentExpensesPerTaxYearSerializer(serializers.ModelSerializer):
     # expense_source = ExpenseSourcesSerializer()
     # client = SelfassesmentAccountSubmissionSerializer()
     # month = MonthsSerializer()
 
     class Meta:
-        model = ExpensesPerTaxYear
+        model = SelfemploymentExpensesPerTaxYear
         fields = '__all__'
 

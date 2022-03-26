@@ -10,11 +10,11 @@ from django.db.models import QuerySet
 
 # Models
 from companies.models import SelfassesmentAccountSubmission
-from .models import IncomeSources, ExpenseSources, Months, ExpensesPerTaxYear, IncomesPerTaxYear
+from .models import SelfemploymentIncomeSources, SelfemploymentExpenseSources, Months, SelfemploymentExpensesPerTaxYear, SelfemploymentIncomesPerTaxYear
 
 # Serializers
 from rest_framework.renderers import JSONRenderer
-from .serializers import IncomesPerTaxYearSerializer, ExpensesPerTaxYearSerializer, IncomeSourcesSerializer, ExpenseSourcesSerializer, MonthsSerializer
+from .serializers import SelfemploymentIncomesPerTaxYearSerializer, SelfemploymentExpensesPerTaxYearSerializer, SelfemploymentIncomeSourcesSerializer, SelfemploymentExpenseSourcesSerializer, MonthsSerializer
 dump_to_json = JSONRenderer()
 
 from companies.views import URLS
@@ -61,8 +61,13 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
         return HttpResponse(json.dumps({'error': f'only json data is allowed'}), status=400)
 
     amount = loaded_data.get("amount", None)
-    if amount is None:
-        return HttpResponse(json.dumps({'error': f'amount is required'}), status=400)
+    personal_usage = loaded_data.get("personal_usage", None)
+    
+    if amount is None and personal_usage is None:
+        return HttpResponse(json.dumps({'error': f'amount or personal_usage is required'}), status=400)
+    
+    if personal_usage is not None and not 0<=personal_usage<=100:
+        return HttpResponse(json.dumps({'error': f'personal_usage value should be between 0 and 100!'}), status=400)
 
     # retrive selfassemsent account submission record
     client = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
@@ -75,25 +80,29 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
         return HttpResponse(json.dumps({'error': f'Month with pk={month_id} does not exist'}), status=404)
     
     # retrive expense source
-    expense = get_object_or_None(ExpenseSources, pk=expense_id)
+    expense = get_object_or_None(SelfemploymentExpenseSources, pk=expense_id)
     if expense is None:
         return HttpResponse(json.dumps({'error': f'Expense with pk={expense_id} does not exist'}), status=404)
 
     # Try to retrive ExpensesPerTaxYear if does not exist create it
-    expense_for_tax_year = get_object_or_None(ExpensesPerTaxYear, client=client, month=month, expense_source=expense)
+    expense_for_tax_year = get_object_or_None(SelfemploymentExpensesPerTaxYear, client=client, month=month, expense_source=expense)
 
     # Update existing record 
     if expense_for_tax_year is not None:
-        expense_for_tax_year.amount = amount
+        if amount is not None:
+            expense_for_tax_year.amount = amount
+        if personal_usage is not None:
+            expense_for_tax_year.personal_usage = personal_usage
         expense_for_tax_year.save()
         return HttpResponse(json.dumps({'success': 'Updated existing record'}))
     
     # Save new record
-    expense_for_tax_year = ExpensesPerTaxYear(
+    expense_for_tax_year = SelfemploymentExpensesPerTaxYear(
         expense_source=expense,
         client=client,
         month=month,
-        amount = amount,
+        amount = amount or 0,
+        personal_usage = personal_usage or 0
         )
     expense_for_tax_year.save()
     return HttpResponse(json.dumps({'success': 'Updated existing record'}), status=201)
@@ -126,12 +135,12 @@ def upsert_income_for_submission(request, submission_id, month_id, income_id):
         return HttpResponse(json.dumps({'error': f'Month with pk={month_id} does not exist'}), status=404)
     
     # retrive income source
-    income = get_object_or_None(IncomeSources, pk=income_id)
+    income = get_object_or_None(SelfemploymentIncomeSources, pk=income_id)
     if income is None:
         return HttpResponse(json.dumps({'error': f'IncomeSource with pk={income_id} does not exist'}), status=404)
     
     # Try to retrive IncomesPerTaxYear if does not exist create it
-    income_for_tax_year = get_object_or_None(IncomesPerTaxYear, client=client, month=month, income_source=income)
+    income_for_tax_year = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=client, month=month, income_source=income)
     
     # Update existing record 
     if income_for_tax_year:
@@ -143,7 +152,7 @@ def upsert_income_for_submission(request, submission_id, month_id, income_id):
         return HttpResponse(json.dumps({'success': 'Updated existing record'}))
     
     # Save new record
-    income_for_tax_year = IncomesPerTaxYear(
+    income_for_tax_year = SelfemploymentIncomesPerTaxYear(
         income_source=income,
         client=client,
         month=month,
@@ -162,15 +171,15 @@ def upsert_income_for_submission(request, submission_id, month_id, income_id):
 ##############################################################################
 @login_required
 def get_expenses_for_submission(request: HttpRequest, submission_id):
-    submission_expenses = ExpensesPerTaxYear.objects.filter(client=submission_id).order_by('expense_source', 'month__month_index')
-    serialized_data = ExpensesPerTaxYearSerializer(submission_expenses, many=True)
+    submission_expenses = SelfemploymentExpensesPerTaxYear.objects.filter(client=submission_id).order_by('expense_source', 'month__month_index')
+    serialized_data = SelfemploymentExpensesPerTaxYearSerializer(submission_expenses, many=True)
     json_response = dump_to_json.render(serialized_data.data)
     return HttpResponse(json_response, content_type='application/json')
 
 @login_required
 def get_incomes_for_submission(request: HttpRequest, submission_id):
-    submission_incomes = IncomesPerTaxYear.objects.filter(client=submission_id).order_by('income_source', 'month__month_index')
-    serialized_data = IncomesPerTaxYearSerializer(submission_incomes, many=True)
+    submission_incomes = SelfemploymentIncomesPerTaxYear.objects.filter(client=submission_id).order_by('income_source', 'month__month_index')
+    serialized_data = SelfemploymentIncomesPerTaxYearSerializer(submission_incomes, many=True)
     json_response = dump_to_json.render(serialized_data.data)
     return HttpResponse(json_response, content_type='application/json')
 
@@ -180,15 +189,15 @@ def get_incomes_for_submission(request: HttpRequest, submission_id):
 ##############################################################################
 @login_required
 def get_all_expense_sources(request):
-    expese_sources = ExpenseSources.objects.all()
-    serialized = ExpenseSourcesSerializer(expese_sources, many=True)
+    expese_sources = SelfemploymentExpenseSources.objects.all()
+    serialized = SelfemploymentExpenseSourcesSerializer(expese_sources, many=True)
     json_response = dump_to_json.render(serialized.data)
     return HttpResponse(json_response, content_type='application/json')
 
 @login_required
 def get_all_income_sources(request):
-    income_sources = IncomeSources.objects.all()
-    serialized = IncomeSourcesSerializer(income_sources, many=True)
+    income_sources = SelfemploymentIncomeSources.objects.all()
+    serialized = SelfemploymentIncomeSourcesSerializer(income_sources, many=True)
     json_response = dump_to_json.render(serialized.data)
     return HttpResponse(json_response, content_type='application/json')
 

@@ -61,7 +61,7 @@ async function getTotalIncome(){
 
 async function getTotalExpense(){
   let inputAmountFields = document.querySelectorAll('.expenses input[data-update-type="amount"]')
-  let inputPersonalUsagePercentageFields = document.querySelectorAll('.expenses input[data-update-type="personal_usage"]')
+  let inputPersonalUsagePercentageFields = document.querySelectorAll('.expenses input[data-update-type="personal_usage_percentage"]')
   let totalExpense = 0
 
   for (let i=0; i<inputAmountFields.length; i++){
@@ -389,7 +389,7 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
   // Get the existing/default expense object
   let expense = expenses.find(expense=>expense.month===month.id) || {
     "amount": 0,
-    "personal_usage": 0,
+    "personal_usage_percentage": 0,
     "expense_source": expenseSourceId,
     "client": submissionId,
     "month": month.id
@@ -406,7 +406,7 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
           </div>
           <div>
           <label for="${inputPersonalUsageId}">Personal Usage(%)</label>
-          <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="personal_usage">
+          <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="personal_usage_percentage">
         </div>
       </div>
       `
@@ -433,7 +433,7 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
   //   // Get the existing/default expense object
   //   let expense = expenses.find(expense=>expense.month===month.id) || {
   //     "amount": 0,
-  //     "personal_usage": 0,
+  //     "personal_usage_percentage": 0,
   //     "expense_source": expenseSourceId,
   //     "client": submissionId,
   //     "month": month.id
@@ -451,7 +451,7 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
   //           </div>
   //           <div>
   //           <label for="${inputPersonalUsageId}">Personal Usage(%)</label>
-  //           <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="personal_usage">
+  //           <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="personal_usage_percentage">
   //         </div>
   //       </div>
   //       `
@@ -611,10 +611,10 @@ function handleIncomeUpdate(e){
 function handleExpenseUpdate(e){
   let inputField = e.target
   let {submissionId, monthId, expenseId, updateType} = inputField.dataset
-  let data_object = { } // amount or personal_usage must be specified
+  let data_object = { } // amount or personal_usage_percentage must be specified
 
   if (updateType==="amount") data_object.amount = parseFloat(inputField.value) || 0
-  else if (updateType==="personal_usage") data_object.personal_usage = parseFloat(inputField.value) || 0
+  else if (updateType==="personal_usage_percentage") data_object.personal_usage_percentage = parseFloat(inputField.value) || 0
 
   fetch_url({
     // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"

@@ -740,7 +740,7 @@ async function displayExpenseOptions(displayableExpenseSources=null){
   if (displayableExpenseSources==null) displayableExpenseSources = await getDisplayableSources(expenseSources, displayingExpenseIds)
   expenseSearchOptions.innerHTML = ''
   displayableExpenseSources.forEach(expenseSource=>{
-      let option = createHtmlElement('div', {'data-deduction-id': expenseSource.id})
+      let option = createHtmlElement('div', {'data-expense-id': expenseSource.id})
       option.textContent = expenseSource.name
       expenseSearchOptions.appendChild(option)
     })

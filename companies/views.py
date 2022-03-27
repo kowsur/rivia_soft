@@ -385,6 +385,15 @@ def all_selfassesment_account_submission_tax_year(request, limit=-1):
 # =============================================================================================================
 # =============================================================================================================
 # SelfassesmentAccountSubmission
+def get_selfassesment_account_submissions_where_status_PAID():
+  return SelfassesmentAccountSubmission.objects.filter(payment_status="PAID")
+
+def get_selfassesment_account_submissions_where_status_NOT_PAID():
+  return SelfassesmentAccountSubmission.objects.filter(payment_status="NOT PAID")
+
+def get_selfassesment_account_submissions_where_status_REQUEST():
+  return SelfassesmentAccountSubmission.objects.filter(status="REQUEST")
+
 def get_selfassesment_account_submissions_where_status_PROCESSING():
   return SelfassesmentAccountSubmission.objects.filter(status="PROCESSING")
 
@@ -399,6 +408,9 @@ def get_selfassesment_account_submissions_where_status_WAITING_FOR_CONFIRMATION(
 
 def get_selfassesment_account_submissions_where_status_SUBMITTED():
   return SelfassesmentAccountSubmission.objects.filter(status="SUBMITTED")
+
+def get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(user):
+  return SelfassesmentAccountSubmission.objects.filter(assigned_to=user)
 
 
 @login_required
@@ -422,11 +434,15 @@ def home_selfassesment_account_submission(request):
 
     "counts": True,
     "selfassesment_account_submission_counts": True,
+    "selfassesment_account_submission_status_PAID": get_selfassesment_account_submissions_where_status_PAID().count(),
+    "selfassesment_account_submission_status_NOT_PAID": get_selfassesment_account_submissions_where_status_NOT_PAID().count(),
+    "selfassesment_account_submission_status_REQUEST": get_selfassesment_account_submissions_where_status_REQUEST().count(),
     "selfassesment_account_submission_status_PROCESSING": get_selfassesment_account_submissions_where_status_PROCESSING().count(),
     "selfassesment_account_submission_status_BOOK_APPOINTMENT": get_selfassesment_account_submissions_where_status_BOOK_APPOINTMENT().count(),
     "selfassesment_account_submission_status_READY_FOR_SUBMIT": get_selfassesment_account_submissions_where_status_READY_FOR_SUBMIT().count(),
     "selfassesment_account_submission_status_WAITING_FOR_CONFIRMATION": get_selfassesment_account_submissions_where_status_WAITING_FOR_CONFIRMATION().count(),
     "selfassesment_account_submission_status_SUBMITTED": get_selfassesment_account_submissions_where_status_SUBMITTED().count(),
+    "selfassesment_account_submission_status_ASSIGEND_TO_ME": get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(request.user).count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_viewall_url,
@@ -564,11 +580,15 @@ def search_selfassesment_account_submission(request, limit: int=-1):
     # if tasks query paramter exists then return tasks
     if request.GET.get('tasks'):
       tasks = {
+            "selfassesment_account_submission_status_PAID": get_selfassesment_account_submissions_where_status_PAID(),
+            "selfassesment_account_submission_status_NOT_PAID": get_selfassesment_account_submissions_where_status_NOT_PAID(),
+            "selfassesment_account_submission_status_REQUEST": get_selfassesment_account_submissions_where_status_REQUEST(),
             "selfassesment_account_submission_status_PROCESSING": get_selfassesment_account_submissions_where_status_PROCESSING(),
             "selfassesment_account_submission_status_BOOK_APPOINTMENT": get_selfassesment_account_submissions_where_status_BOOK_APPOINTMENT(),
             "selfassesment_account_submission_status_READY_FOR_SUBMIT": get_selfassesment_account_submissions_where_status_READY_FOR_SUBMIT(),
             "selfassesment_account_submission_status_WAITING_FOR_CONFIRMATION": get_selfassesment_account_submissions_where_status_WAITING_FOR_CONFIRMATION(),
             "selfassesment_account_submission_status_SUBMITTED": get_selfassesment_account_submissions_where_status_SUBMITTED(),
+            "selfassesment_account_submission_status_ASSIGEND_TO_ME": get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(request.user),
       }
       records = tasks.get(request.GET.get('tasks'), [])
       data = serialize(queryset=records, format='json')
@@ -1019,7 +1039,6 @@ def update_limited(request, client_id:int):
       
       if not had_vat and assesment.vat:
         # Create record in Limited VAT Tracker
-        print('Create VAT')
         for i in range(3):
           vat = LimitedVATTracker()
           vat.client_id = record

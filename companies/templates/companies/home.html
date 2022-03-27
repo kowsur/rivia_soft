@@ -67,6 +67,10 @@
       </div>
     {% elif selfassesment_account_submission_counts %}
       <div class="task-container">
+        <span class="task task-own" data-tasks='selfassesment_account_submission_status_REQUEST'>
+          <span id="task-count">{{ selfassesment_account_submission_status_REQUEST }}</span>
+          <span class="task-tooltip">Status - REQUEST.</span>
+        </span>
         <span class="task task-previous" data-tasks='selfassesment_account_submission_status_PROCESSING'>
           <span id="task-count">{{ selfassesment_account_submission_status_PROCESSING }}</span>
           <span class="task-tooltip">Status - PROCESSING.</span>
@@ -86,6 +90,18 @@
         <span class="task task-done" data-tasks='selfassesment_account_submission_status_SUBMITTED'>
           <span id="task-count">{{ selfassesment_account_submission_status_SUBMITTED }}</span>
           <span class="task-tooltip">Status - SUBMITTED.</span>
+        </span>
+        <span class="task task-done" data-tasks='selfassesment_account_submission_status_PAID'>
+          <span id="task-count">{{ selfassesment_account_submission_status_PAID }}</span>
+          <span class="task-tooltip">Payment Status - PAID.</span>
+        </span>
+        <span class="task task-previous" data-tasks='selfassesment_account_submission_status_NOT_PAID'>
+          <span id="task-count">{{ selfassesment_account_submission_status_NOT_PAID }}</span>
+          <span class="task-tooltip">Payment Status - NOT PAID.</span>
+        </span>
+        <span class="task task-previous" data-tasks='selfassesment_account_submission_status_ASSIGEND_TO_ME'>
+          <span id="task-count">{{ selfassesment_account_submission_status_ASSIGEND_TO_ME }}</span>
+          <span class="task-tooltip">Assigned to me.</span>
         </span>
       </div>
     {% elif limited_submission_counts %}

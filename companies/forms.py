@@ -186,6 +186,18 @@ class SelfassesmentDeleteForm(forms.ModelForm):
 
 
 class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
+    assigned_to = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = Forms.CustomUser_repr_format,
+        model = CustomUser,
+        choices = CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field = 'user_id',
+        disabled = False,
+        required = False,
+        empty_label = None # remove default option '------' from select menu
+        )
     client_id = SearchableModelField(
         queryset=Selfassesment.objects.all(),
         label = 'Client Name',
@@ -215,6 +227,7 @@ class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
         model = SelfassesmentAccountSubmission
         fields = (
             # "submission_id",
+            'assigned_to',
             "client_id",
             "status",
             "appointment_date",
@@ -251,6 +264,18 @@ class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
 
 
 class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
+    assigned_to = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = Forms.CustomUser_repr_format,
+        model = CustomUser,
+        choices = CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field = 'user_id',
+        disabled = False,
+        required = False,
+        empty_label = None # remove default option '------' from select menu
+        )
     client_id = SearchableModelField(
         queryset=Selfassesment.objects.all(),
         label = 'Client Name',
@@ -293,6 +318,7 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         model = SelfassesmentAccountSubmission
         fields = (
             # "submission_id",
+            'assigned_to',
             "client_id",
             "status",
             "appointment_date",

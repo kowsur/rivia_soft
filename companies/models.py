@@ -2,6 +2,8 @@ from email.policy import default
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+from users.models import CustomUser
 from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR
 
 from datetime import timedelta, date
@@ -205,7 +207,14 @@ class SelfassesmentAccountSubmission(models.Model):
         # unique_together = (
         #         ('client_id', 'tax_year',),
         #     )
-
+    assigned_to = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Assigned to',
+        related_name='selfassesment_account_submission_assigned_to',
+        to_field='user_id',
+        blank=True,
+        null=True)
     submission_id = models.AutoField(verbose_name='Submission ID', primary_key=True, null=False, db_index=True, editable=False)
     client_id = models.ForeignKey(
         to='companies.Selfassesment',
@@ -217,6 +226,7 @@ class SelfassesmentAccountSubmission(models.Model):
         null=True)
     request_date = models.DateField("Request Date", blank=False, null=True, default=timezone.now)
     status_choices = (
+        ("REQUEST", "REQUEST",),
         ("PROCESSING", "PROCESSING",),
         ("BOOK APPOINTMENT", "BOOK APPOINTMENT", ),
         ("READY FOR SUBMIT", "READY FOR SUBMIT", ),
@@ -224,7 +234,7 @@ class SelfassesmentAccountSubmission(models.Model):
         ("WAITING FOR CONFIRMATION", "WAITING FOR CONFIRMATION",),
         ("SUBMITTED", "SUBMITTED",)
     )
-    status = models.CharField("Status", blank=False, max_length=55, choices=status_choices, default="PROCESSING")
+    status = models.CharField("Status", blank=False, max_length=55, choices=status_choices, default="REQUEST")
     appointment_date = models.DateField(verbose_name='Appointment Date', blank=True, null=True, default=timezone.now)
     tax_year = models.ForeignKey(
         default=SelfassesmentAccountSubmissionTaxYear.get_max_year,

@@ -16,9 +16,9 @@ class TaxPolicy:
         if self.flat_tax is None and self.tax_percentage is None:
             raise ValueError(f"{self.__class__.__name__}.tax_percentage or {self.__class__.__name__}.flat_tax must be specified")
         
-        # # Don't allow flat_tax and tax_percentage at the same time
-        # if self.flat_tax is not None and self.tax_percentage is not None:
-        #     raise ValueError(f"You should specify one of {self.__class__.__name__}.tax_percentage or {self.__class__.__name__}.flat_tax")
+        # Don't allow flat_tax and tax_percentage at the same time
+        if self.flat_tax is not None and self.tax_percentage is not None:
+            raise ValueError(f"You should specify one of {self.__class__.__name__}.tax_percentage or {self.__class__.__name__}.flat_tax")
 
         if self.tax_percentage is not None and not 0<=self.tax_percentage<=100:
             raise ValueError(f"{self.__class__.__name__}.tax_percentage must be an int or a float and the value must be between 0 and 100")

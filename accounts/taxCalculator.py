@@ -107,16 +107,16 @@ class ProgressiveTaxPolicy:
             
             
             if income>bracket_start:
-                additive_tax = 0
+                additive_tax = policy.flat_tax
                 
                 # Calulate applicable tax for current tax TaxPolicy\bracket
                 if income>=bracket_end:
-                    additive_tax = (bracket_end-bracket_start) * policy.tax_percentage/100
+                    additive_tax += (bracket_end-bracket_start) * policy.tax_percentage/100
                 else:
                     taxable_income_for_bracket = income-bracket_start
                     if taxable_income_for_bracket<1:
                         continue
-                    additive_tax = taxable_income_for_bracket*policy.tax_percentage/100
+                    additive_tax += taxable_income_for_bracket*policy.tax_percentage/100
                 
                 total_tax+=additive_tax
 

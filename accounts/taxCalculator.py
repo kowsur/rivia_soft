@@ -39,6 +39,9 @@ class TaxPolicy:
         if self.start<=income<=self.end:
             total_tax += self.flat_tax
             total_tax += (income-self.start)*self.tax_percentage/100
+        if income>self.end:
+            total_tax += self.flat_tax
+            total_tax += (self.end-self.start)*self.tax_percentage/100
         return total_tax
 
 

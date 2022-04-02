@@ -1,9 +1,9 @@
-from email.policy import default
 from django.db import models
+from django.db.models.constraints import UniqueConstraint
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from companies.models import SelfassesmentAccountSubmission
+from companies.models import SelfassesmentAccountSubmission, SelfassesmentAccountSubmissionTaxYear
 
 
 class SelfemploymentIncomeSources(models.Model):
@@ -104,3 +104,58 @@ class SelfemploymentDeductionsPerTaxYear(models.Model):
 
     def __str__(self) -> str:
         return f"{self.client} - {self.deduction_source} - {self.amount}"
+
+
+class SelfemploymentUkTaxConfigForTaxYear:
+    class Meta:
+        verbose_name = 'Selfemployment UK Tax Config For TaxYear'
+        verbose_name_plural = 'Selfemployment UK Tax Configs For TaxYears'
+        constraints = [UniqueConstraint(name='unique_tax_year__uk_tax', fields=['tax_year'])]
+    
+    tax_year = models.ForeignKey(SelfassesmentAccountSubmissionTaxYear, on_delete=models.RESTRICT)
+    # Allowance reduction configs
+    personal_allowance_limit = models.FloatField(default=100000, blank=False, null=True)
+    one_pound_reduction_from_PA_earned_over_PAL = models.FloatField(default=2, blank=False, null=True)
+    
+    # Tax brackets
+    personal_allowance = models.FloatField(default=12570, blank=False, null=False)
+    basic_rate_max = models.FloatField(default=37700, blank=False, null=False)
+    higher_rate_max = models.FloatField(default=150000, blank=False, null=False)
+    
+    # Applied tax on each brackets
+    basic_rate_tax_percentage = models.FloatField(default=20, blank=False, null=True)
+    higher_rate_tax_percentage = models.FloatField(default=40, blank=False, null=True)
+    additional_rate_tax_percentage = models.FloatField(default=45, blank=False, null=True)
+
+    def __str__(self) -> str:
+        return f"{self.tax_year} - {self.personal_allowance}, {self.basic_rate_max}, {self.higher_rate_max}"
+
+
+class SelfemploymentClass4TaxConfigForTaxYear:
+    class Meta:
+        verbose_name = 'Selfemployment Class 4 Tax Config For TaxYear'
+        verbose_name_plural = 'Selfemployment Class 4 Tax Configs For TaxYears'
+        constraints = [UniqueConstraint(name='unique_tax_year__class_4_tax', fields=['tax_year'])]
+    
+    tax_year = models.ForeignKey(SelfassesmentAccountSubmissionTaxYear, on_delete=models.RESTRICT)
+    basic_rate_min = models.FloatField(default=9500, blank=False)
+    basic_rate_max = models.FloatField(default=50000, blank=False)
+    basic_rate_tax_percentage = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    higher_rate_tax_percentage = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+
+    def __str__(self) -> str:
+        return f"{self.tax_year} - {self.tax_applied_for_income_above} - {self.flat_tax_amount}"
+
+
+class SelfemploymentClass2TaxConfigForTaxYear:
+    class Meta:
+        verbose_name = 'Selfemployment Class 2 Tax Config For TaxYear'
+        verbose_name_plural = 'Selfemployment Class 2 Tax Configs For TaxYears'
+        constraints = [UniqueConstraint(name='unique_tax_year__class2_tax', fields=['tax_year'])]
+    
+    tax_year = models.ForeignKey(SelfassesmentAccountSubmissionTaxYear, on_delete=models.RESTRICT)
+    tax_applied_for_income_above = models.FloatField(default=6470, blank=False)
+    flat_tax_amount = models.FloatField(default=158, blank=False)
+
+    def __str__(self) -> str:
+        return f"{self.tax_year} - {self.tax_applied_for_income_above} - {self.flat_tax_amount}"

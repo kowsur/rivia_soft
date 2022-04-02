@@ -1,5 +1,5 @@
 from django.db.models import Q
-from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker, SelfassesmentAccountSubmissionTaxYear
+from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker, SelfassesmentAccountSubmissionTaxYear, SelfemploymentIncomeAndExpensesDataCollection
 from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 from datetime import date, datetime
 from django.utils import timezone
@@ -50,6 +50,54 @@ def db_all_Selfassesment(limit=-1):
     if limit<=-1:
         return Selfassesment.objects.all()
     return Selfassesment.objects.all()[:limit]
+
+
+# SelfemploymentIncomeAndExpensesDataCollection
+def db_search_SelfemploymentIncomeAndExpensesDataCollection(search_text: str, limit=-1):
+    Query = Q(selfassesment__selfassesment_type__type_name__icontains = search_text) |\
+            Q(selfassesment__date_of_registration__icontains          = search_text) |\
+            Q(selfassesment__remarks__icontains                       = search_text) |\
+            Q(selfassesment__client_name__icontains                   = search_text) |\
+            Q(selfassesment__date_of_birth__icontains                 = search_text) |\
+            Q(selfassesment__PAYE_number__icontains                   = search_text) |\
+            Q(selfassesment__personal_phone_number__icontains         = search_text) |\
+            Q(selfassesment__personal_email__icontains                = search_text) |\
+            Q(selfassesment__personal_address__icontains              = search_text) |\
+            Q(selfassesment__personal_post_code__icontains            = search_text) |\
+            Q(selfassesment__AOR_number__icontains                    = search_text) |\
+            Q(selfassesment__business_phone_number__icontains         = search_text) |\
+            Q(selfassesment__business_email__icontains                = search_text) |\
+            Q(selfassesment__business_address__icontains              = search_text) |\
+            Q(selfassesment__business_post_code__icontains            = search_text) |\
+            Q(selfassesment__HMRC_agent__icontains                    = search_text) |\
+            Q(selfassesment__HMRC_referance__icontains                = search_text) |\
+            Q(selfassesment__UTR__icontains                           = search_text) |\
+            Q(selfassesment__NINO__icontains                          = search_text) |\
+            Q(selfassesment__gateway_id__icontains                    = search_text) |\
+            Q(selfassesment__gateway_password__icontains              = search_text) |\
+            Q(selfassesment__bank_name__icontains                     = search_text) |\
+            Q(selfassesment__bank_account_number__icontains           = search_text) |\
+            Q(selfassesment__bank_sort_code__icontains                = search_text) |\
+            Q(selfassesment__bank_account_holder_name__icontains      = search_text)
+
+    Query |= Q(tax_year__tax_year__icontains = search_text)
+
+    try:
+        num = int(search_text)
+        Query |= Q(client_id          = num) |\
+                 Q(client_file_number = num)
+    except Exception:
+        pass
+    
+    if limit==-1:
+        return SelfemploymentIncomeAndExpensesDataCollection.objects.filter(Query)
+    return SelfemploymentIncomeAndExpensesDataCollection.objects.filter(Query)[:limit]
+
+def db_all_SelfemploymentIncomeAndExpensesDataCollection(limit=-1):
+    if limit<=-1:
+        return SelfemploymentIncomeAndExpensesDataCollection.objects.all()
+    return SelfemploymentIncomeAndExpensesDataCollection.objects.all()[:limit]
+
 
 # SelfassesmentAccountSubmissionTaxYear
 def db_search_SelfassesmentAccountSubmissionTaxYear(search_text:str, limit=-1):

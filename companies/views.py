@@ -41,6 +41,7 @@ from .export_models import export_to_csv
 
 #queries
 from .queries import db_search_Selfassesment, db_all_Selfassesment
+from .queries import db_search_SelfemploymentIncomeAndExpensesDataCollection, db_all_SelfemploymentIncomeAndExpensesDataCollection
 from .queries import db_search_SelfassesmentAccountSubmissionTaxYear, db_all_SelfassesmentAccountSubmissionTaxYear
 from .queries import db_search_SelfassesmentAccountSubmission, db_all_SelfassesmentAccountSubmission
 from .queries import db_search_SelfassesmentTracker, db_all_SelfassesmentTracker
@@ -418,16 +419,51 @@ def create_selfassesment_data_collection(request):
   return HttpResponse('create_selfassesment_data_collection')
 
 @login_required
-def search_selfassesment_data_collection(request):
-  return HttpResponse('search_selfassesment_data_collection')
+def search_selfassesment_data_collection(request, limit:int=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    search_text = request.GET.get('q', '')
+    if search_text.strip()=='':
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_viewall_name)
+    records = db_search_SelfemploymentIncomeAndExpensesDataCollection(search_text, limit)
+    records = records.order_by("-created_at")
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
 
 @login_required
-def all_selfassesment_data_collection(request):
-  return HttpResponse('all_selfassesment_data_collection')
+def all_selfassesment_data_collection(request, limit:int=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    records = db_all_SelfemploymentIncomeAndExpensesDataCollection(limit)
+    records = records.order_by("-created_at")
+    data = serialize(queryset=records, format='json')
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
 
 @login_required
 def export_selfassesment_data_collection(request):
-  return HttpResponse('export_selfassesment_data_collection')
+  response = HttpResponse(
+    content_type='text/csv',
+    headers={'Content-Disposition': f'attachment; filename="selfassesment_{timezone.localtime()}.csv"'},
+  )
+  include_fields = []
+  exclude_fields = []
+  fk_fields = {
+    'selfassesment': 'all',
+    'tax_year': ['tax_year']
+  }
+  keep_include_fields = True
+  show_others = True
+  export_to_csv(
+    django_model = SelfemploymentIncomeAndExpensesDataCollection,
+    write_to = response,
+    include_fields = include_fields,
+    exclude_fields = exclude_fields,
+    keep_include_fields = keep_include_fields,
+    show_others = show_others,
+    fk_fields=fk_fields
+    )
+  return response
+
 
 
 # =============================================================================================================

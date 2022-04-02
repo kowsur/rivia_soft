@@ -27,7 +27,7 @@ from .forms import LimitedVATTrackerCreationForm, LimitedVATTrackerChangeForm, L
 from .forms import LimitedConfirmationStatementTrackerCreationForm, LimitedConfirmationStatementTrackerChangeForm, LimitedConfirmationStatementTrackerDeleteForm
 
 #models
-from .models import  Selfassesment, SelfassesmentTracker, SelfassesmentAccountSubmission, SelfassesmentAccountSubmissionTaxYear
+from .models import  Selfassesment, SelfassesmentTracker, SelfassesmentAccountSubmission, SelfassesmentAccountSubmissionTaxYear, SelfemploymentIncomeAndExpensesDataCollection
 from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 from .models import AutoCreatedSelfassesmentTracker
 
@@ -381,6 +381,54 @@ def all_selfassesment_account_submission_tax_year(request, limit=-1):
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
   raise Http404
+
+
+# =============================================================================================================
+# =============================================================================================================
+# SelfemploymentIncomeAndExpensesDataCollection
+@login_required
+def home_selfassesment_data_collection(request):
+  pk_field = 'id'
+  exclude_fields = []
+  include_fields = []
+  keep_include_fields = True
+  show_others = True
+  model_fields = get_field_names_from_model(SelfemploymentIncomeAndExpensesDataCollection)
+  context = {
+    **URLS,
+    'caption': 'View Selfassesment Data Collection',
+    'page_title': 'View Selfassesment Data Collection',
+    
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_create_name,
+    'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_export_name,
+
+    'template_tag': generate_template_tag_for_model(SelfemploymentIncomeAndExpensesDataCollection, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+    'data_container': generate_data_container_table(SelfemploymentIncomeAndExpensesDataCollection, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+
+    'frontend_data':{
+      'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Data_Collection_viewall_url,
+      'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Data_Collection_search_url,
+      'model_fields': model_fields
+    },
+  }
+  return render(request=request, template_name='companies/home.html', context=context)
+
+
+def create_selfassesment_data_collection(request):
+  return HttpResponse('create_selfassesment_data_collection')
+
+@login_required
+def search_selfassesment_data_collection(request):
+  return HttpResponse('search_selfassesment_data_collection')
+
+@login_required
+def all_selfassesment_data_collection(request):
+  return HttpResponse('all_selfassesment_data_collection')
+
+@login_required
+def export_selfassesment_data_collection(request):
+  return HttpResponse('export_selfassesment_data_collection')
+
 
 # =============================================================================================================
 # =============================================================================================================

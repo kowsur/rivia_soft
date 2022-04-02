@@ -6,6 +6,10 @@ from .views import home_selfassesment, create_selfassesment, update_selfassesmen
     delete_selfassesment, search_selfassesment, all_selfassesment, get_details_selfassesment, \
     export_selfassesment
 
+# selfassesment data collection view functions
+from .views import home_selfassesment_data_collection, create_selfassesment_data_collection,\
+    all_selfassesment_data_collection, search_selfassesment_data_collection, export_selfassesment_data_collection
+
 # selfassesment account submission tax year
 from .views import search_selfassesment_account_submission_tax_year, all_selfassesment_account_submission_tax_year, \
     get_details_selfassesment_account_submission_tax_year
@@ -177,6 +181,28 @@ urlpatterns = [
         name = URL_NAMES.Selfassesment_Tracker_export_name
     ),
 
+
+    # =============================================================================================================
+    # Selfassesment Data collection
+    path(route = URL_PATHS.Selfassesment_Data_Collection_home_url,
+        view = home_selfassesment_data_collection,
+        name = URL_NAMES.Selfassesment_Data_Collection_home_name),
+    
+    path(route = URL_PATHS.Selfassesment_Data_Collection_create_url,
+        view = create_selfassesment_data_collection,
+        name = URL_NAMES.Selfassesment_Data_Collection_create_name),
+    
+    path(route = URL_PATHS.Selfassesment_Data_Collection_search_url,
+        view = search_selfassesment_data_collection,
+        name = URL_NAMES.Selfassesment_Data_Collection_search_name),
+
+    path(route = URL_PATHS.Selfassesment_Data_Collection_viewall_url,
+        view = all_selfassesment_data_collection,
+        name = URL_NAMES.Selfassesment_Data_Collection_viewall_name),
+
+    path(route = URL_PATHS.Selfassesment_Data_Collection_export_url,
+        view = export_selfassesment_data_collection,
+        name = URL_NAMES.Selfassesment_Data_Collection_export_name),
 
     # =============================================================================================================
     # =============================================================================================================

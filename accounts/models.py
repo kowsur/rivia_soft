@@ -106,7 +106,7 @@ class SelfemploymentDeductionsPerTaxYear(models.Model):
         return f"{self.client} - {self.deduction_source} - {self.amount}"
 
 
-class SelfemploymentUkTaxConfigForTaxYear:
+class SelfemploymentUkTaxConfigForTaxYear(models.Model):
     class Meta:
         verbose_name = 'Selfemployment UK Tax Config For TaxYear'
         verbose_name_plural = 'Selfemployment UK Tax Configs For TaxYears'
@@ -131,7 +131,7 @@ class SelfemploymentUkTaxConfigForTaxYear:
         return f"{self.tax_year} - {self.personal_allowance}, {self.basic_rate_max}, {self.higher_rate_max}"
 
 
-class SelfemploymentClass4TaxConfigForTaxYear:
+class SelfemploymentClass4TaxConfigForTaxYear(models.Model):
     class Meta:
         verbose_name = 'Selfemployment Class 4 Tax Config For TaxYear'
         verbose_name_plural = 'Selfemployment Class 4 Tax Configs For TaxYears'
@@ -147,7 +147,7 @@ class SelfemploymentClass4TaxConfigForTaxYear:
         return f"{self.tax_year} - {self.tax_applied_for_income_above} - {self.flat_tax_amount}"
 
 
-class SelfemploymentClass2TaxConfigForTaxYear:
+class SelfemploymentClass2TaxConfigForTaxYear(models.Model):
     class Meta:
         verbose_name = 'Selfemployment Class 2 Tax Config For TaxYear'
         verbose_name_plural = 'Selfemployment Class 2 Tax Configs For TaxYears'

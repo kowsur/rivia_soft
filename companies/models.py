@@ -1,7 +1,7 @@
-from email.policy import default
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import MinValueValidator
 
 from users.models import CustomUser
 from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR
@@ -817,23 +817,23 @@ class SelfemploymentIncomeAndExpensesDataCollection(models.Model):
     note = models.TextField('Note')
 
     # incomes
-    uber_income = models.FloatField(_('TOTAL INCOME FROM UBER (APRIL 2021-MAR 22)'), default=0)
-    bolt_income = models.FloatField(_('TOTAL INCOME FROM BOLT (APRIL 2021-MAR 22)'), default=0)
-    free_now_income = models.FloatField(_('TOTAL INCOME FROM FREE NOW (APRIL 2021-MAR 22)'), default=0)
-    other_income = models.FloatField(_('TOTAL INCOME FROM OTHER (APRIL 2021-MAR 22)'), default=0)
-    last_two_grant_income = models.FloatField(_('Last Two Grant'), default=0)
-    employment_income = models.FloatField(_('Employment Income'), default=0)
+    uber_income = models.FloatField(_('TOTAL INCOME FROM UBER'), default=0, validators=[MinValueValidator(0)])
+    bolt_income = models.FloatField(_('TOTAL INCOME FROM BOLT'), default=0, validators=[MinValueValidator(0)])
+    free_now_income = models.FloatField(_('TOTAL INCOME FROM FREE NOW'), default=0, validators=[MinValueValidator(0)])
+    other_income = models.FloatField(_('TOTAL INCOME FROM OTHERS'), default=0, validators=[MinValueValidator(0)])
+    last_two_grant_income = models.FloatField(_('Last Two Grant'), default=0, validators=[MinValueValidator(0)])
+    employment_income = models.FloatField(_('Employment Income'), default=0, validators=[MinValueValidator(0)])
 
     # expenses
-    telephone_expense = models.FloatField(_('Telephone for the year'), default=0)
-    congestion_expense = models.FloatField(_('Congestion Charge'), default=0)
-    insurance_expense = models.FloatField(_('Insurance'), default=0)
-    MOT_expense = models.FloatField(_('MOT'), default=0)
-    licence_expense = models.FloatField(_('Licence Renew'), default=0)
-    repair_expense = models.FloatField(_('Repair'), default=0)
-    road_tax_expense = models.FloatField(_('Road Tax'), default=0)
-    breakdown_expense = models.FloatField(_('Breakdown'), default=0)
-    car_value_expense = models.FloatField(_('Car Value'), default=0)
+    telephone_expense = models.FloatField(_('Telephone'), default=0, validators=[MinValueValidator(0)])
+    congestion_expense = models.FloatField(_('Congestion Charge'), default=0, validators=[MinValueValidator(0)])
+    insurance_expense = models.FloatField(_('Insurance'), default=0, validators=[MinValueValidator(0)])
+    MOT_expense = models.FloatField(_('MOT'), default=0, validators=[MinValueValidator(0)])
+    licence_expense = models.FloatField(_('Licence Renew'), default=0, validators=[MinValueValidator(0)])
+    repair_expense = models.FloatField(_('Repair'), default=0, validators=[MinValueValidator(0)])
+    road_tax_expense = models.FloatField(_('Road Tax'), default=0, validators=[MinValueValidator(0)])
+    breakdown_expense = models.FloatField(_('Breakdown'), default=0, validators=[MinValueValidator(0)])
+    car_value_expense = models.FloatField(_('Car Value'), default=0, validators=[MinValueValidator(0)])
 
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 

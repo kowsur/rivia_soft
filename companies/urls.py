@@ -2,12 +2,13 @@ from django.urls import path
 from django.urls.conf import include, re_path
 
 # selfassesment view functions
-from .views import home_selfassesment, create_selfassesment, update_selfassesment, \
+from .views import delete_selfassesment_data_collection, home_selfassesment, create_selfassesment, update_selfassesment, \
     delete_selfassesment, search_selfassesment, all_selfassesment, get_details_selfassesment, \
     export_selfassesment
 
 # selfassesment data collection view functions
 from .views import home_selfassesment_data_collection, create_selfassesment_data_collection,\
+    update_selfassesment_data_collection, delete_selfassesment_data_collection, \
     all_selfassesment_data_collection, search_selfassesment_data_collection, export_selfassesment_data_collection
 
 # selfassesment account submission tax year
@@ -191,6 +192,14 @@ urlpatterns = [
     path(route = URL_PATHS.Selfassesment_Data_Collection_create_url,
         view = create_selfassesment_data_collection,
         name = URL_NAMES.Selfassesment_Data_Collection_create_name),
+    
+    path(route = URL_PATHS.Selfassesment_Data_Collection_update_url,
+        view = update_selfassesment_data_collection,
+        name = URL_NAMES.Selfassesment_Data_Collection_update_name),
+    
+    path(route = URL_PATHS.Selfassesment_Data_Collection_delete_url,
+        view = delete_selfassesment_data_collection,
+        name = URL_NAMES.Selfassesment_Data_Collection_delete_name),
     
     path(route = URL_PATHS.Selfassesment_Data_Collection_search_url,
         view = search_selfassesment_data_collection,

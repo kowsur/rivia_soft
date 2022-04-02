@@ -76,6 +76,8 @@ class URL_PATHS(Dict_Duck_type):
   # Selfassement Data Collection
   Selfassesment_Data_Collection_home_url = f'{Selfassesment_path}/{data_collection}/'
   Selfassesment_Data_Collection_create_url = f'{Selfassesment_path}/{data_collection}/{create_suffix}/'
+  Selfassesment_Data_Collection_update_url = f'{Selfassesment_path}/{data_collection}/{update_suffix}/<int:data_id>/'
+  Selfassesment_Data_Collection_delete_url = f'{Selfassesment_path}/{data_collection}/{delete_suffix}/<int:data_id>/'
   Selfassesment_Data_Collection_search_url = f'{Selfassesment_path}/{data_collection}/{search_suffix}/' # fetch only
   Selfassesment_Data_Collection_viewall_url = f'{Selfassesment_path}/{data_collection}/{viewall_suffix}/' # fetch only
   Selfassesment_Data_Collection_export_url = f'{Selfassesment_path}/{data_collection}/{export_suffix}/'
@@ -172,6 +174,8 @@ class URL_NAMES(Dict_Duck_type):
   # Selfassement Data Collections
   Selfassesment_Data_Collection_home_name = f'{Selfassesment_path}_{data_collection}'
   Selfassesment_Data_Collection_create_name = f'{Selfassesment_path}_{data_collection}_{create_suffix}'
+  Selfassesment_Data_Collection_update_name = f'{Selfassesment_path}_{data_collection}_{update_suffix}'
+  Selfassesment_Data_Collection_delete_name = f'{Selfassesment_path}_{data_collection}_{delete_suffix}'
   Selfassesment_Data_Collection_search_name = f'{Selfassesment_path}_{data_collection}_{search_suffix}' # fetch only
   Selfassesment_Data_Collection_viewall_name = f'{Selfassesment_path}_{data_collection}_{viewall_suffix}' # fetch only
   Selfassesment_Data_Collection_export_name = f'{Selfassesment_path}_{data_collection}_{export_suffix}'
@@ -269,6 +273,8 @@ class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
   # Selfassement Data Collection
   Selfassesment_Data_Collection_home_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{data_collection}/'
   Selfassesment_Data_Collection_create_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{data_collection}/{create_suffix}/'
+  Selfassesment_Data_Collection_update_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{data_collection}/{update_suffix}/'
+  Selfassesment_Data_Collection_delete_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{data_collection}/{delete_suffix}/'
   Selfassesment_Data_Collection_search_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{data_collection}/{search_suffix}/' # fetch only
   Selfassesment_Data_Collection_viewall_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{data_collection}/{viewall_suffix}/' # fetch only
   Selfassesment_Data_Collection_export_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{data_collection}/{export_suffix}/'
@@ -366,6 +372,8 @@ class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
   # Selfassement Data Collections
   Selfassesment_Data_Collection_home_name = f'{APPLICATION_NAME}:{Selfassesment_path}_{data_collection}'
   Selfassesment_Data_Collection_create_name = f'{APPLICATION_NAME}:{Selfassesment_path}_{data_collection}_{create_suffix}'
+  Selfassesment_Data_Collection_update_name = f'{APPLICATION_NAME}:{Selfassesment_path}_{data_collection}_{update_suffix}'
+  Selfassesment_Data_Collection_delete_name = f'{APPLICATION_NAME}:{Selfassesment_path}_{data_collection}_{delete_suffix}'
   Selfassesment_Data_Collection_search_name = f'{APPLICATION_NAME}:{Selfassesment_path}_{data_collection}_{search_suffix}' # fetch only
   Selfassesment_Data_Collection_viewall_name = f'{APPLICATION_NAME}:{Selfassesment_path}_{data_collection}_{viewall_suffix}' # fetch only
   Selfassesment_Data_Collection_export_name = f'{APPLICATION_NAME}:{Selfassesment_path}_{data_collection}_{export_suffix}'

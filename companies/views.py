@@ -453,7 +453,34 @@ def create_selfassesment_data_collection(request):
 
 @login_required
 def update_selfassesment_data_collection(request, data_id):
-  return 
+  context = {
+    **URLS,
+    'page_title': f'Update Collected Data',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_home_name,
+    'id': data_id,
+    'update_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_update_name,
+    'form_title': 'Update Collected Data Form',
+    'form': SelfemploymentIncomeAndExpensesDataCollectionUpdateForm()
+  }
+
+  try:
+    record =  SelfemploymentIncomeAndExpensesDataCollection.objects.get(id=data_id)
+    context['form'] = SelfemploymentIncomeAndExpensesDataCollectionUpdateForm(instance=record)
+  except SelfemploymentIncomeAndExpensesDataCollection.DoesNotExist:
+    messages.error(request, f'Collected Data having id {data_id} does not exists!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_home_name)
+    raise Http404
+
+  if request.method == 'POST':
+    form = SelfemploymentIncomeAndExpensesDataCollectionUpdateForm(request.POST, instance=record)
+    context['form'] = form
+    if form.is_valid():
+      collected_data = form.save()
+      collected_data.save()
+      messages.success(request, f'Collected Data has been updated having id {data_id}!')
+    else:
+      messages.error(request, f'Updating Collected Data having id {data_id} failed due to invalid data!')
+  return render(request, template_name='companies/update.html', context=context)
 
 @login_required
 @allowed_for_superuser(

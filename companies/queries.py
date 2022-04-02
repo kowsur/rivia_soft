@@ -84,8 +84,8 @@ def db_search_SelfemploymentIncomeAndExpensesDataCollection(search_text: str, li
 
     try:
         num = int(search_text)
-        Query |= Q(client_id          = num) |\
-                 Q(client_file_number = num)
+        Query |= Q(selfassesment__client_id          = num) |\
+                 Q(selfassesment__client_file_number = num)
     except Exception:
         pass
     

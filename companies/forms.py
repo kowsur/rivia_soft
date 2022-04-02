@@ -9,7 +9,7 @@ from django.utils import timezone
 from .fields import SearchableModelField, Select, Fieldset
 from .url_variables import Full_URL_PATHS_WITHOUT_ARGUMENTS
 
-from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker, SelfassesmentAccountSubmissionTaxYear
+from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker, SelfassesmentAccountSubmissionTaxYear, SelfemploymentIncomeAndExpensesDataCollection
 from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 
 # from .queries import db_all_Limited, db_all_LimitedConfirmationStatementTracker, db_all_LimitedSubmissionDeadlineTracker, \
@@ -182,6 +182,273 @@ class SelfassesmentDeleteForm(forms.ModelForm):
     agree = forms.BooleanField(label='I want to proceed.', required=True)
     class Meta:
         model = Selfassesment
+        fields = ()
+
+
+class SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(forms.ModelForm):
+    selfassesment = SearchableModelField(
+        queryset=Selfassesment.objects.all(),
+        label = 'Client Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
+        repr_format = Forms.Selfassesment_client_id_repr_format,
+        model=Selfassesment,
+        choices=Selfassesment.objects.all().only('client_id', 'client_name'),
+        fk_field='client_id',
+        empty_label=None,
+        disabled=True
+        )
+    tax_year = SearchableModelField(
+        queryset=SelfassesmentAccountSubmissionTaxYear.objects.all(),
+        label = 'Tax Year',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_Tax_Year_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_Tax_Year_viewall_url,
+        repr_format = Forms.Selfassemsent_tax_year_repr_format,
+        model=SelfassesmentAccountSubmissionTaxYear,
+        choices=SelfassesmentAccountSubmissionTaxYear.objects.all(),
+        fk_field='id',
+        empty_label=None,
+        disabled=True
+    )
+
+    class Meta:
+        model = SelfemploymentIncomeAndExpensesDataCollection
+        fields = (
+            "selfassesment",
+            "tax_year",
+
+            # incomes
+            "uber_income",
+            "bolt_income",
+            "free_now_income",
+            "other_income",
+            "total_grant_income",
+            "employment_income",
+            "income_note",
+
+            # expenses
+            "telephone_expense",
+            "congestion_expense",
+            "insurance_expense",
+            "MOT_expense",
+            "licence_expense",
+            "repair_expense",
+            "road_tax_expense",
+            "breakdown_expense",
+            "car_value_expense",
+            )
+        fieldsets = (
+            Fieldset(
+                title = 'Info',
+                fields = (
+                    'selfassesment',
+                    'tax_year'
+                    )
+                ),
+            Fieldset(
+                title = 'Incomes',
+                fields = (
+                    "uber_income",
+                    "bolt_income",
+                    "free_now_income",
+                    "other_income",
+                    "total_grant_income",
+                    "employment_income",
+                    "income_note",
+                    )
+                ),
+            Fieldset(
+                title = 'Expenses',
+                fields = (
+                    "telephone_expense",
+                    "congestion_expense",
+                    "insurance_expense",
+                    "MOT_expense",
+                    "licence_expense",
+                    "repair_expense",
+                    "road_tax_expense",
+                    "breakdown_expense",
+                    "car_value_expense",
+                    )
+                ),
+        )
+
+class SelfemploymentIncomeAndExpensesDataCollectionCreationForm(forms.ModelForm):
+    selfassesment = SearchableModelField(
+        queryset=Selfassesment.objects.all(),
+        label = 'Client Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
+        repr_format = Forms.Selfassesment_client_id_repr_format,
+        model=Selfassesment,
+        choices=Selfassesment.objects.all().only('client_id', 'client_name'),
+        fk_field='client_id',
+        empty_label=None
+        )
+    tax_year = SearchableModelField(
+        queryset=SelfassesmentAccountSubmissionTaxYear.objects.all(),
+        label = 'Tax Year',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_Tax_Year_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_Tax_Year_viewall_url,
+        repr_format = Forms.Selfassemsent_tax_year_repr_format,
+        model=SelfassesmentAccountSubmissionTaxYear,
+        choices=SelfassesmentAccountSubmissionTaxYear.objects.all(),
+        fk_field='id',
+        empty_label=None,
+    )
+
+    class Meta:
+        model = SelfemploymentIncomeAndExpensesDataCollection
+        fields = (
+            "selfassesment",
+            "tax_year",
+
+            # incomes
+            "uber_income",
+            "bolt_income",
+            "free_now_income",
+            "other_income",
+            "total_grant_income",
+            "employment_income",
+            "income_note",
+
+            # expenses
+            "telephone_expense",
+            "congestion_expense",
+            "insurance_expense",
+            "MOT_expense",
+            "licence_expense",
+            "repair_expense",
+            "road_tax_expense",
+            "breakdown_expense",
+            "car_value_expense",
+            )
+        fieldsets = (
+            Fieldset(
+                title = 'Info',
+                fields = (
+                    'selfassesment',
+                    'tax_year'
+                    )
+                ),
+            Fieldset(
+                title = 'Incomes',
+                fields = (
+                    "uber_income",
+                    "bolt_income",
+                    "free_now_income",
+                    "other_income",
+                    "total_grant_income",
+                    "employment_income",
+                    "income_note",
+                    )
+                ),
+            Fieldset(
+                title = 'Expenses',
+                fields = (
+                    "telephone_expense",
+                    "congestion_expense",
+                    "insurance_expense",
+                    "MOT_expense",
+                    "licence_expense",
+                    "repair_expense",
+                    "road_tax_expense",
+                    "breakdown_expense",
+                    "car_value_expense",
+                    )
+                ),
+        )
+
+class SelfemploymentIncomeAndExpensesDataCollectionUpdateForm(forms.ModelForm):
+    selfassesment = SearchableModelField(
+        queryset=Selfassesment.objects.all(),
+        label = 'Client Name',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
+        repr_format = Forms.Selfassesment_client_id_repr_format,
+        model=Selfassesment,
+        choices=Selfassesment.objects.all().only('client_id', 'client_name'),
+        fk_field='client_id',
+        empty_label=None,
+        )
+    tax_year = SearchableModelField(
+        queryset=SelfassesmentAccountSubmissionTaxYear.objects.all(),
+        label = 'Tax Year',
+        search_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_Tax_Year_search_url,
+        all_url = Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_Tax_Year_viewall_url,
+        repr_format = Forms.Selfassemsent_tax_year_repr_format,
+        model=SelfassesmentAccountSubmissionTaxYear,
+        choices=SelfassesmentAccountSubmissionTaxYear.objects.all(),
+        fk_field='id',
+        empty_label=None,
+    )
+
+    class Meta:
+        model = SelfemploymentIncomeAndExpensesDataCollection
+        fields = (
+            "selfassesment",
+            "tax_year",
+
+            # incomes
+            "uber_income",
+            "bolt_income",
+            "free_now_income",
+            "other_income",
+            "total_grant_income",
+            "employment_income",
+            "income_note",
+
+            # expenses
+            "telephone_expense",
+            "congestion_expense",
+            "insurance_expense",
+            "MOT_expense",
+            "licence_expense",
+            "repair_expense",
+            "road_tax_expense",
+            "breakdown_expense",
+            "car_value_expense",
+            )
+        fieldsets = (
+            Fieldset(
+                title = 'Info',
+                fields = (
+                    'selfassesment',
+                    'tax_year'
+                    )
+                ),
+            Fieldset(
+                title = 'Incomes',
+                fields = (
+                    "uber_income",
+                    "bolt_income",
+                    "free_now_income",
+                    "other_income",
+                    "total_grant_income",
+                    "employment_income",
+                    "income_note",
+                    )
+                ),
+            Fieldset(
+                title = 'Expenses',
+                fields = (
+                    "telephone_expense",
+                    "congestion_expense",
+                    "insurance_expense",
+                    "MOT_expense",
+                    "licence_expense",
+                    "repair_expense",
+                    "road_tax_expense",
+                    "breakdown_expense",
+                    "car_value_expense",
+                    )
+                ),
+        )
+
+class SelfemploymentIncomeAndExpensesDataCollectionDeleteForm(forms.ModelForm):
+    agree = forms.BooleanField(label='I want to proceed.', required=True)
+    class Meta:
+        model = SelfemploymentIncomeAndExpensesDataCollection
         fields = ()
 
 

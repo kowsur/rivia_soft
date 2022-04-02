@@ -805,3 +805,39 @@ class LimitedConfirmationStatementTracker(models.Model):
         self.updated_by = request.user
         self.last_updated_on = timezone.now()
         self.save()
+
+
+class SelfemploymentIncomeAndExpensesDataCollection(models.Model):
+    class Model:
+        verbose_name = 'Selfemployment Class 2 Tax Config For TaxYear'
+        verbose_name_plural = 'Selfemployment Class 2 Tax Configs For TaxYears'
+
+    selfassesment = models.ForeignKey(Selfassesment, on_delete=models.CASCADE)
+    tax_year = models.ForeignKey(SelfassesmentAccountSubmissionTaxYear, on_delete=models.RESTRICT, default=SelfassesmentAccountSubmissionTaxYear.get_max_year)
+    note = models.TextField('Note')
+
+    # incomes
+    uber_income = models.FloatField(_('TOTAL INCOME FROM UBER (APRIL 2021-MAR 22)'), default=0)
+    bolt_income = models.FloatField(_('TOTAL INCOME FROM BOLT (APRIL 2021-MAR 22)'), default=0)
+    free_now_income = models.FloatField(_('TOTAL INCOME FROM FREE NOW (APRIL 2021-MAR 22)'), default=0)
+    other_income = models.FloatField(_('TOTAL INCOME FROM OTHER (APRIL 2021-MAR 22)'), default=0)
+    last_two_grant_income = models.FloatField(_('Last Two Grant'), default=0)
+    employment_income = models.FloatField(_('Employment Income'), default=0)
+
+    # expenses
+    telephone_expense = models.FloatField(_('Telephone for the year'), default=0)
+    congestion_expense = models.FloatField(_('Congestion Charge'), default=0)
+    insurance_expense = models.FloatField(_('Insurance'), default=0)
+    MOT_expense = models.FloatField(_('MOT'), default=0)
+    licence_expense = models.FloatField(_('Licence Renew'), default=0)
+    repair_expense = models.FloatField(_('Repair'), default=0)
+    road_tax_expense = models.FloatField(_('Road Tax'), default=0)
+    breakdown_expense = models.FloatField(_('Breakdown'), default=0)
+    car_value_expense = models.FloatField(_('Car Value'), default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+
+
+    def __str__(self):
+        return f"{self.tax_year} - {self.selfassesment}"
+    

@@ -15,6 +15,8 @@ from django.contrib.auth import get_user_model
 
 #forms
 from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm
+from .forms import SelfemploymentIncomeAndExpensesDataCollectionCreationForm, SelfemploymentIncomeAndExpensesDataCollectionUpdateForm, \
+  SelfemploymentIncomeAndExpensesDataCollectionDeleteForm, SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients
 from .forms import SelfassesmentAccountSubmissionCreationForm, SelfassesmentAccountSubmissionChangeForm, SelfassesmentAccountSubmissionDeleteForm
 from .forms import Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form
 from .forms import SelfassesmentTrackerCreationForm, SelfassesmentTrackerChangeForm, SelfassesmentTrackerDeleteForm
@@ -409,14 +411,80 @@ def home_selfassesment_data_collection(request):
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Data_Collection_viewall_url,
       'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Data_Collection_search_url,
+      'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Data_Collection_update_url,
+      'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Data_Collection_delete_url,
       'model_fields': model_fields
     },
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
 
+@login_required
 def create_selfassesment_data_collection(request):
-  return HttpResponse('create_selfassesment_data_collection')
+  context = {
+    **URLS,
+
+    'page_title': 'Create Selfassesment Income and Expense data',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_home_name,
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_create_name,
+    'form_title': 'Selfassesment Income And Expense Data Collection',
+    'form': SelfemploymentIncomeAndExpensesDataCollectionCreationForm(initial={
+      'selfassesment': Selfassesment.objects.first(),
+      'tax_year': SelfassesmentAccountSubmissionTaxYear.get_max_year()}
+      )
+  }
+
+  if request.method == 'POST':
+    form = SelfemploymentIncomeAndExpensesDataCollectionCreationForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      try:
+        assesment = form.save()
+        assesment.save()
+        context['form'] = SelfemploymentIncomeAndExpensesDataCollectionCreationForm(initial={
+          'selfassesment': Selfassesment.objects.first(),
+          'tax_year': SelfassesmentAccountSubmissionTaxYear.get_max_year()}
+        )
+      except IntegrityError:
+        messages.error(request, f"Selfassesment Account Submission can't be updated because Client Name, Tax Year and Status is SUBMITTED is not unique!")
+    else:
+      messages.error(request, f'Action failed due to invalid data!')
+  return render(request, template_name='companies/create.html', context=context)
+
+@login_required
+def update_selfassesment_data_collection(request, data_id):
+  return 
+
+@login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to delete this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_update_name)
+def delete_selfassesment_data_collection(request, data_id:int):
+  context = {
+    **URLS,
+    'page_title': 'Selfassesment Income And Expense Data Collection Deletion',
+    'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_viewall_name,
+    'id': data_id,
+    'delete_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_delete_name,
+    'form_title': "Selfassesment Income And Expense Data Delete Form",
+    'form': SelfemploymentIncomeAndExpensesDataCollectionDeleteForm()
+  }
+  try:
+    record =  SelfemploymentIncomeAndExpensesDataCollection.objects.get(id=data_id)
+  except SelfemploymentIncomeAndExpensesDataCollection.DoesNotExist:
+    messages.error(request, f'Selfassesment Collected Data record with id {data_id}, you are looking for does not exist!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_home_name)
+
+  if request.method == 'POST':
+    form = SelfemploymentIncomeAndExpensesDataCollectionDeleteForm(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      record.delete()
+      messages.success(request, f'Selfassesment Collected Data has been deleted having id {data_id}!')
+    else:
+      messages.error(request, f'Selfassesment Collected Data deletion of id {data_id} failed!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_home_name)
+  return render(request, template_name='companies/delete.html', context=context)
 
 @login_required
 def search_selfassesment_data_collection(request, limit:int=-1):

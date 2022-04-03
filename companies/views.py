@@ -394,7 +394,7 @@ def all_selfassesment_account_submission_tax_year(request, limit=-1):
 def home_selfassesment_data_collection(request):
   pk_field = 'id'
   exclude_fields = []
-  include_fields = []
+  include_fields = ['selfassesment', 'tax_year', 'is_submitted']
   keep_include_fields = True
   show_others = True
   model_fields = get_field_names_from_model(SelfemploymentIncomeAndExpensesDataCollection)

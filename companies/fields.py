@@ -1,6 +1,8 @@
+from email.policy import default
 from django import forms
 from django.forms import widgets
 from typing import *
+from dataclasses import dataclass, field
 from collections import namedtuple
 from django.db.models.query import QuerySet
 
@@ -8,8 +10,11 @@ from django.db.models.query import QuerySet
 # uncomment next line before migrating
 # from .dummy_class import *
 
-
-Fieldset = namedtuple('Fieldset', ['title', 'fields'])
+@dataclass
+class Fieldset:
+    title: str = 'Fieldset Title'
+    fieldset_message:str = ''
+    fields: list[str] = field(default_factory=lambda:[])
 
 class Select(widgets.ChoiceWidget):
     template_name = 'companies/widgets/select.html'

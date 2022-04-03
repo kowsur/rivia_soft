@@ -60,6 +60,11 @@
                 <div class="text-red-500">
                     {{ field.errors }}
                 </div>
+                {% with 'Meta.message_for_fields.'|addstr:field_name as nest_field %}
+                        {% if form|get_attr:nest_field %}
+                        <p style='margin-top: 1em; font-weight: 300;'>{{form|get_attr:nest_field}}</p>
+                        {% endif %}
+                    {% endwith %}
               </div>
             </div>
             {% endwith %}
@@ -85,6 +90,11 @@
           <div class="text-red-500">
               {{ field.errors }}
           </div>
+          {% with 'Meta.message_for_fields.'|addstr:field.name as nest_field %}
+                {% if form|get_attr:nest_field %}
+                <p style='margin-top: 1em; font-weight: 300;'>{{form|get_attr:nest_field}}</p>
+                {% endif %}
+            {% endwith %}
         </div>
       </div>
       {% endfor %}

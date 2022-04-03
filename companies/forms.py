@@ -244,6 +244,8 @@ class SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(forms.
             "road_tax_expense",
             "breakdown_expense",
             "car_value_expense",
+
+            'is_submitted'
             )
         fieldsets = (
             Fieldset(
@@ -254,7 +256,8 @@ class SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(forms.
                     )
                 ),
             Fieldset(
-                title = 'Incomes',
+                title = 'Total income for the year',
+                fieldset_message = 'Please make sure you sent the proof of income(Bank statements/other documents) to our Email(info@rivia-solutions.com) or WhatsApp.',
                 fields = (
                     "uber_income",
                     "bolt_income",
@@ -279,7 +282,15 @@ class SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(forms.
                     "car_value_expense",
                     )
                 ),
+            Fieldset(
+                title='Agreement',
+                fieldset_message='I hereby declare that the information provided is true and correct.',
+                fields=['is_submitted']
+            )
         )
+        message_for_fields={
+            'is_submitted': 'After submitting with Is submitted marked you can not edit but only view. If you need to change after submitting with Is submitted marked please contact us.'
+        }
 
 class SelfemploymentIncomeAndExpensesDataCollectionCreationForm(forms.ModelForm):
     selfassesment = SearchableModelField(
@@ -330,6 +341,8 @@ class SelfemploymentIncomeAndExpensesDataCollectionCreationForm(forms.ModelForm)
             "road_tax_expense",
             "breakdown_expense",
             "car_value_expense",
+
+            'is_submitted'
             )
         fieldsets = (
             Fieldset(
@@ -363,6 +376,12 @@ class SelfemploymentIncomeAndExpensesDataCollectionCreationForm(forms.ModelForm)
                     "road_tax_expense",
                     "breakdown_expense",
                     "car_value_expense",
+                    )
+                ),
+            Fieldset(
+                title = 'Agreement',
+                fields = (
+                    'is_submitted',
                     )
                 ),
         )
@@ -416,6 +435,8 @@ class SelfemploymentIncomeAndExpensesDataCollectionUpdateForm(forms.ModelForm):
             "road_tax_expense",
             "breakdown_expense",
             "car_value_expense",
+
+            'is_submitted'
             )
         fieldsets = (
             Fieldset(
@@ -449,6 +470,12 @@ class SelfemploymentIncomeAndExpensesDataCollectionUpdateForm(forms.ModelForm):
                     "road_tax_expense",
                     "breakdown_expense",
                     "car_value_expense",
+                    )
+                ),
+            Fieldset(
+                title = 'Agreement',
+                fields = (
+                    'is_submitted',
                     )
                 ),
         )
@@ -520,6 +547,8 @@ class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
         labels = {
             'client_id': _('Client Name'),
         }
+        message_for_fields = {}
+
     def clean_appointment_date(self):
         status = self.cleaned_data.get('status')
         appointment_date = self.cleaned_data.get('appointment_date')

@@ -14,6 +14,7 @@
 
 {% block content_body %}
 <body>
+    <div class="max-w-screen-2xl px-4 md:px-6 lg:px-8 mx-auto">
     <div class="max-w-6xl mx-auto mt-5">
     <!-- messages -->
     {% if messages %}
@@ -42,6 +43,8 @@
         {% for fieldset in form.Meta.fieldsets %}
             <fieldset class="fieldset">
             <h1 class="fieldset title">{{ fieldset.title }}</h1>
+            {% if fieldset.fieldset_message %}<p style="margin-top: .5em; font-weight:500; font-size:1.08rem;">{{fieldset.fieldset_message}}</p>{% endif %}
+            
 
             {% for field_name in fieldset.fields %}
                 {% with field=form|get_field:field_name  %}
@@ -60,6 +63,12 @@
                     <div class="text-red-500">
                         {{ field.errors }}
                     </div>
+
+                    {% with 'Meta.message_for_fields.'|addstr:field_name as nest_field %}
+                        {% if form|get_attr:nest_field %}
+                        <p style='margin-top: 1em; font-weight: 300;'>{{form|get_attr:nest_field}}</p>
+                        {% endif %}
+                    {% endwith %}
                 </div>
                 </div>
                 {% endwith %}
@@ -71,6 +80,7 @@
 
         {% for field in form %}
         <div class="flex flex-col align-middle items-start w-full">
+            
             <!-- input container -->
             <div class="w-full mt-3.5">
             <!-- input label -->
@@ -85,12 +95,18 @@
             <div class="text-red-500">
                 {{ field.errors }}
             </div>
+            {% with 'Meta.message_for_fields.'|addstr:field.name as nest_field %}
+                {% if form|get_attr:nest_field %}
+                <p style='margin-top: 1em; font-weight: 300;'>{{form|get_attr:nest_field}}</p>
+                {% endif %}
+            {% endwith %}
             </div>
         </div>
         {% endfor %}
         {% endif %}
-        <button type="submit" class="create">Create</button>
+        <button type="submit" class="create">Submit</button>
     </form>
     </div>
+</div>
 </body>
 {% endblock content_body %}

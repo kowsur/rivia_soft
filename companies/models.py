@@ -811,18 +811,24 @@ class SelfemploymentIncomeAndExpensesDataCollection(models.Model):
     class Model:
         verbose_name = 'Selfemployment Class 2 Tax Config For TaxYear'
         verbose_name_plural = 'Selfemployment Class 2 Tax Configs For TaxYears'
+        constraints = [
+            models.UniqueConstraint(
+                fields = ('selfassesment', 'tax_year',),
+                name = "SelfemploymentIncomeAndExpensesDataCollection__selfassesment__tax_year",
+                )
+        ]
 
     selfassesment = models.ForeignKey(Selfassesment, on_delete=models.CASCADE)
     tax_year = models.ForeignKey(SelfassesmentAccountSubmissionTaxYear, on_delete=models.RESTRICT, default=SelfassesmentAccountSubmissionTaxYear.get_max_year)
 
     # incomes
-    uber_income = models.FloatField(_('TOTAL INCOME FROM UBER'), default=0, validators=[MinValueValidator(0)])
-    bolt_income = models.FloatField(_('TOTAL INCOME FROM BOLT'), default=0, validators=[MinValueValidator(0)])
-    free_now_income = models.FloatField(_('TOTAL INCOME FROM FREE NOW'), default=0, validators=[MinValueValidator(0)])
-    other_income = models.FloatField(_('TOTAL INCOME FROM OTHERS'), default=0, validators=[MinValueValidator(0)])
+    uber_income = models.FloatField(_('Uber'), default=0, validators=[MinValueValidator(0)])
+    bolt_income = models.FloatField(_('Bolt'), default=0, validators=[MinValueValidator(0)])
+    free_now_income = models.FloatField(_('Free now'), default=0, validators=[MinValueValidator(0)])
+    other_income = models.FloatField(_('Others'), default=0, validators=[MinValueValidator(0)])
     total_grant_income = models.FloatField(_('Total grant(last two) received'), default=0, validators=[MinValueValidator(0)])
     employment_income = models.FloatField(_('Employment Income(Please send P60 or P45)'), default=0, validators=[MinValueValidator(0)])
-    income_note = models.TextField(_("Note: (Please write below where did you send documents? Email/WhatsApp)"), default='Email')
+    income_note = models.TextField(_("Note: (Please write below where did you send documents? Email/WhatsApp)"))
 
     # expenses
     telephone_expense = models.FloatField(_('Telephone'), default=0, validators=[MinValueValidator(0)])
@@ -834,6 +840,8 @@ class SelfemploymentIncomeAndExpensesDataCollection(models.Model):
     road_tax_expense = models.FloatField(_('Road Tax'), default=0, validators=[MinValueValidator(0)])
     breakdown_expense = models.FloatField(_('Breakdown'), default=0, validators=[MinValueValidator(0)])
     car_value_expense = models.FloatField(_('Car Value'), default=0, validators=[MinValueValidator(0)])
+
+    is_submitted = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 

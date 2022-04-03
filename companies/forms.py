@@ -185,6 +185,12 @@ class SelfassesmentDeleteForm(forms.ModelForm):
         fields = ()
 
 
+class SelfemploymentIncomeAndExpensesDataCollectionAuthFormForClients(forms.Form):
+    utr = forms.CharField(label="Enter your UTR", max_length=10, required=True)
+
+    class Meta:
+        fields = ('utr',)
+
 class SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(forms.ModelForm):
     selfassesment = SearchableModelField(
         queryset=Selfassesment.objects.all(),
@@ -196,7 +202,8 @@ class SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(forms.
         choices=Selfassesment.objects.all().only('client_id', 'client_name'),
         fk_field='client_id',
         empty_label=None,
-        disabled=True
+        disabled=True,
+        required=False
         )
     tax_year = SearchableModelField(
         queryset=SelfassesmentAccountSubmissionTaxYear.objects.all(),
@@ -208,7 +215,8 @@ class SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(forms.
         choices=SelfassesmentAccountSubmissionTaxYear.objects.all(),
         fk_field='id',
         empty_label=None,
-        disabled=True
+        disabled=True,
+        required=False
     )
 
     class Meta:

@@ -13,7 +13,7 @@
 
 
 {% block content_body %}
-<body>
+<body class="font-normal text-gray-700 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 min-w-full min-h-screen">
     <div class="max-w-screen-2xl px-4 md:px-6 lg:px-8 mx-auto">
     <div class="max-w-6xl mx-auto mt-5">
     <!-- messages -->
@@ -105,8 +105,8 @@
         {% endfor %}
         {% endif %}
         
-        {% if not hide_submit_btn %}
-            <button type="submit" class="create">Submit</button>
+        {% if not hide_submit_button %}
+            <button type="submit" class="create"> {% if submit_button_text %}{{submit_button_text}} {% elif not submit_button_text %}Create{% endif %}</button>
         {% endif %}
     </form>
     </div>

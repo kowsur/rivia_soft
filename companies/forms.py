@@ -291,7 +291,7 @@ class SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(forms.
             )
         )
         message_for_fields={
-            'is_submitted': 'After submitting with Is submitted marked you can not edit but only view. If you need to update data after submitting with "Is submitted" marked please contact us.'
+            'is_submitted': 'After submitting with Ready to Submit marked you can not edit but only view. If you need to update data after submitting with "Ready to Submit" marked please contact us.'
         }
 
 class SelfemploymentIncomeAndExpensesDataCollectionCreationForm(forms.ModelForm):

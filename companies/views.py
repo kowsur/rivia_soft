@@ -440,16 +440,17 @@ def create_selfassesment_data_collection_for_client(request, utr=None):
       'selfassesment': selfassesment,
       'tax_year': tax_year
       }),
-    'hide_submit_btn': True
+    'submit_button_text': 'Save',
+    'hide_submit_button': True,
     }
 
   try:
     existing_record = SelfemploymentIncomeAndExpensesDataCollection.objects.get(selfassesment=selfassesment, tax_year=tax_year)
     context['form'] = SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(instance=existing_record)
     if existing_record.is_submitted:
-      context['hide_submit_btn'] = True
+      context['hide_submit_button'] = True
     else:
-      context['hide_submit_btn'] = False
+      context['hide_submit_button'] = False
 
     if request.method == 'POST':
       form = SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(request.POST, instance=existing_record)
@@ -458,13 +459,13 @@ def create_selfassesment_data_collection_for_client(request, utr=None):
         context['form'] = form
         updated_data = form.save(commit=True)
         if updated_data.is_submitted:
-          context['hide_submit_btn'] = True
+          context['hide_submit_button'] = True
         messages.success(request, f'Your data is updated successfully at {timezone.now().strftime("%Y-%m-%d %H:%M:%S")}.')
       else:
-        messages.error(request, 'You have previously provided data with Is submitted marked true so you can not update data to update data please contact us.')
+        messages.error(request, 'You have previously provided data with Ready to Submit marked true so you can not update data to update data please contact us.')
         # return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
   except SelfemploymentIncomeAndExpensesDataCollection.DoesNotExist:
-    context['hide_submit_btn'] = False
+    context['hide_submit_button'] = False
     if request.method == 'POST':
       form = SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(request.POST)
       context['form'] = form
@@ -489,11 +490,14 @@ def create_selfassesment_data_collection_for_client(request, utr=None):
 def auth_selfassesment_data_collection_for_client(request):
   context = {
     'page_title': 'Auth Income and Expense Data collection',
+    'form_title': 'Auth Income And Expense Data Collection',
+
     'has_url_args': False,
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client,
     'create_url_arg': None,
-    'form_title': 'Auth Income And Expense Data Collection',
-    'form': SelfemploymentIncomeAndExpensesDataCollectionAuthFormForClients()
+
+    'form': SelfemploymentIncomeAndExpensesDataCollectionAuthFormForClients(),
+    'submit_button_text': 'Login',
   }
   if request.method=="POST":
     form = SelfemploymentIncomeAndExpensesDataCollectionAuthFormForClients(request.POST)

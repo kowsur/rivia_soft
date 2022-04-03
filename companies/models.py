@@ -841,7 +841,7 @@ class SelfemploymentIncomeAndExpensesDataCollection(models.Model):
     breakdown_expense = models.FloatField(_('Breakdown'), default=0, validators=[MinValueValidator(0)])
     car_value_expense = models.FloatField(_('Car Value'), default=0, validators=[MinValueValidator(0)])
 
-    is_submitted = models.BooleanField(default=False)
+    is_submitted = models.BooleanField(_("Ready to Submit"), default=False)
 
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 

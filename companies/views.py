@@ -464,6 +464,7 @@ def create_selfassesment_data_collection_for_client(request, utr=None):
         messages.error(request, 'You have previously provided data with Is submitted marked true so you can not update data to update data please contact us.')
         # return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
   except SelfemploymentIncomeAndExpensesDataCollection.DoesNotExist:
+    context['hide_submit_btn'] = False
     if request.method == 'POST':
       form = SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(request.POST)
       context['form'] = form

@@ -83,7 +83,7 @@ class URL_PATHS(Dict_Duck_type):
   Selfassesment_Data_Collection_viewall_url = f'{Selfassesment_path}/{data_collection}/{viewall_suffix}/' # fetch only
   Selfassesment_Data_Collection_export_url = f'{Selfassesment_path}/{data_collection}/{export_suffix}/'
   Selfassesment_Data_Collection_auth_url_for_client = f'{Selfassesment_path}/{data_collection}/{auth_suffix}_for_client/'
-  Selfassesment_Data_Collection_create_url_for_client = f'{Selfassesment_path}/{data_collection}/{create_suffix}_for_client/'
+  Selfassesment_Data_Collection_create_url_for_client = f'{Selfassesment_path}/{data_collection}/{create_suffix}_for_client/<str:utr>/'
 
   # Selfassesment Account Submission Tax Year
   Selfassesment_Account_Submission_Tax_Year_details_url = f'{Selfassesment_Account_Submission_Tax_Year_path}/{details_suffix}/<int:id>/'

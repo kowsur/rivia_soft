@@ -420,51 +420,77 @@ def home_selfassesment_data_collection(request):
   return render(request=request, template_name='companies/home.html', context=context)
 
 
-def create_selfassesment_data_collection_for_client(request, selfassesment=None):
-  if not selfassesment and request.method!='POST':
-    raise Http404
+def create_selfassesment_data_collection_for_client(request, utr=None):
+  tax_year = SelfassesmentAccountSubmissionTaxYear.get_max_year()
+  try:
+      selfassesment = Selfassesment.objects.get(UTR=utr)
+  except Selfassesment.DoesNotExist:
+    messages.error(request, 'Invalid UTR or we do not have your info.')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
   
   context = {
     'page_title': 'Submit Income and Expense Data',
-    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_create_name_for_client,
     'form_title': 'Submit Income And Expense Data',
+    
+    'has_url_args': True,
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_create_name_for_client,
+    'client_url_arg': utr,
+    
     'form': SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(initial={
       'selfassesment': selfassesment,
-      'tax_year': SelfassesmentAccountSubmissionTaxYear.get_max_year()
-    })
-  }
+      'tax_year': tax_year
+      }),
+    'hide_submit_btn': True
+    }
 
-  if request.method == 'POST':
-    form = SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(request.POST)
-    context['form'] = form
-
-    try:
-      tax_year = form.data.get('tax_year', None)
-      tax_year = SelfassesmentAccountSubmissionTaxYear.objects.get(pk=tax_year)
-    except SelfassesmentAccountSubmissionTaxYear.DoesNotExist:
-      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
-    
-    try:
-      selfassesment = form.data.get('selfassesment', None)
-      selfassesment = Selfassesment.objects.get(pk=selfassesment)
-    except Selfassesment.DoesNotExist:
-      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
-    
-    if form.is_valid() and tax_year and selfassesment:
-      assesment = form.save(commit=False)
-      assesment.tax_year = tax_year
-      assesment.selfassesment = selfassesment
-      assesment.save()
-      messages.add_message(request, messages.SUCCESS, 'We recieved your data!')
-      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
+  try:
+    existing_record = SelfemploymentIncomeAndExpensesDataCollection.objects.get(selfassesment=selfassesment, tax_year=tax_year)
+    context['form'] = SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(instance=existing_record)
+    if existing_record.is_submitted:
+      context['hide_submit_btn'] = True
     else:
-      messages.error(request, f'Action failed due to invalid data!')
+      context['hide_submit_btn'] = False
+
+    if request.method == 'POST':
+      form = SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(request.POST, instance=existing_record)
+
+      if not existing_record.is_submitted and form.is_valid():
+        context['form'] = form
+        updated_data = form.save(commit=True)
+        if updated_data.is_submitted:
+          context['hide_submit_btn'] = True
+        messages.success(request, f'Your data is updated successfully at {timezone.now().strftime("%Y-%m-%d %H:%M:%S")}.')
+      else:
+        messages.error(request, 'You have previously provided data with Is submitted marked true so you can not update data to update data please contact us.')
+        # return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
+  except SelfemploymentIncomeAndExpensesDataCollection.DoesNotExist:
+    if request.method == 'POST':
+      form = SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(request.POST)
+      context['form'] = form
+      
+      try:
+        selfassesment = Selfassesment.objects.get(UTR=utr)
+      except Selfassesment.DoesNotExist:
+        messages.error(request, 'Invalid UTR or we do not have your info.')
+        return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
+      
+      if form.is_valid():
+        assesment = form.save(commit=False)
+        assesment.tax_year = tax_year
+        assesment.selfassesment = selfassesment
+        assesment.save()
+        messages.add_message(request, messages.SUCCESS, 'We recieved your data!')
+        return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
+      else:
+        messages.error(request, f'Action failed due to invalid data!')
   return render(request, template_name='companies/create_without_auth.html', context=context)
 
 def auth_selfassesment_data_collection_for_client(request):
   context = {
     'page_title': 'Auth Income and Expense Data collection',
+    'has_url_args': False,
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client,
+    'create_url_arg': None,
     'form_title': 'Auth Income And Expense Data Collection',
     'form': SelfemploymentIncomeAndExpensesDataCollectionAuthFormForClients()
   }
@@ -475,17 +501,7 @@ def auth_selfassesment_data_collection_for_client(request):
       utr = form.cleaned_data.get('utr')
       try:
         selfassesment = Selfassesment.objects.get(UTR=utr)
-        context = {
-          'page_title': 'Submit Income and Expense Data',
-          'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_create_name_for_client,
-          'form_title': 'Submit Income And Expense Data',
-          'form': SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(initial={
-            'selfassesment': selfassesment,
-            'tax_year': SelfassesmentAccountSubmissionTaxYear.get_max_year()
-          })
-        }
-        # return redirect(to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_create_name_for_client, selfassesment=selfassesment)
-        return render(request, template_name='companies/create_without_auth.html', context=context)
+        return redirect(to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_create_name_for_client, utr=utr)
       except Selfassesment.DoesNotExist:
         form.add_error('utr', 'Invalid UTR')
   return render(request, template_name='companies/create_without_auth.html', context=context)

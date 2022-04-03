@@ -27,7 +27,7 @@
     {% endif %}
 
     <!-- form -->
-    <form action="{% url create_url %}" method="POST" class="my-10">
+    <form action="{% if has_url_args %}{% url create_url client_url_arg %}{% elif not has_url_args %}{% url create_url %}{% endif %}" method="POST" class="my-10">
         {% csrf_token %}
         <h1 class="py-3 text-lg font-bold text-center rounded shadow-lg create select-none">{{ form_title }}</h1>
         
@@ -104,7 +104,10 @@
         </div>
         {% endfor %}
         {% endif %}
-        <button type="submit" class="create">Submit</button>
+        
+        {% if not hide_submit_btn %}
+            <button type="submit" class="create">Submit</button>
+        {% endif %}
     </form>
     </div>
 </div>

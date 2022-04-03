@@ -16,7 +16,8 @@ from django.contrib.auth import get_user_model
 #forms
 from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm
 from .forms import SelfemploymentIncomeAndExpensesDataCollectionCreationForm, SelfemploymentIncomeAndExpensesDataCollectionUpdateForm, \
-  SelfemploymentIncomeAndExpensesDataCollectionDeleteForm, SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients
+  SelfemploymentIncomeAndExpensesDataCollectionDeleteForm, SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients, \
+  SelfemploymentIncomeAndExpensesDataCollectionAuthFormForClients
 from .forms import SelfassesmentAccountSubmissionCreationForm, SelfassesmentAccountSubmissionChangeForm, SelfassesmentAccountSubmissionDeleteForm
 from .forms import Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form
 from .forms import SelfassesmentTrackerCreationForm, SelfassesmentTrackerChangeForm, SelfassesmentTrackerDeleteForm
@@ -419,6 +420,76 @@ def home_selfassesment_data_collection(request):
   return render(request=request, template_name='companies/home.html', context=context)
 
 
+def create_selfassesment_data_collection_for_client(request, selfassesment=None):
+  if not selfassesment and request.method!='POST':
+    raise Http404
+  
+  context = {
+    'page_title': 'Submit Income and Expense Data',
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_create_name_for_client,
+    'form_title': 'Submit Income And Expense Data',
+    'form': SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(initial={
+      'selfassesment': selfassesment,
+      'tax_year': SelfassesmentAccountSubmissionTaxYear.get_max_year()
+    })
+  }
+
+  if request.method == 'POST':
+    form = SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(request.POST)
+    context['form'] = form
+
+    try:
+      tax_year = form.data.get('tax_year', None)
+      tax_year = SelfassesmentAccountSubmissionTaxYear.objects.get(pk=tax_year)
+    except SelfassesmentAccountSubmissionTaxYear.DoesNotExist:
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
+    
+    try:
+      selfassesment = form.data.get('selfassesment', None)
+      selfassesment = Selfassesment.objects.get(pk=selfassesment)
+    except Selfassesment.DoesNotExist:
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
+    
+    if form.is_valid() and tax_year and selfassesment:
+      assesment = form.save(commit=False)
+      assesment.tax_year = tax_year
+      assesment.selfassesment = selfassesment
+      assesment.save()
+      messages.add_message(request, messages.SUCCESS, 'We recieved your data!')
+      return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
+    else:
+      messages.error(request, f'Action failed due to invalid data!')
+  return render(request, template_name='companies/create_without_auth.html', context=context)
+
+def auth_selfassesment_data_collection_for_client(request):
+  context = {
+    'page_title': 'Auth Income and Expense Data collection',
+    'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client,
+    'form_title': 'Auth Income And Expense Data Collection',
+    'form': SelfemploymentIncomeAndExpensesDataCollectionAuthFormForClients()
+  }
+  if request.method=="POST":
+    form = SelfemploymentIncomeAndExpensesDataCollectionAuthFormForClients(request.POST)
+    context['form'] = form
+    if form.is_valid():
+      utr = form.cleaned_data.get('utr')
+      try:
+        selfassesment = Selfassesment.objects.get(UTR=utr)
+        context = {
+          'page_title': 'Submit Income and Expense Data',
+          'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_create_name_for_client,
+          'form_title': 'Submit Income And Expense Data',
+          'form': SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(initial={
+            'selfassesment': selfassesment,
+            'tax_year': SelfassesmentAccountSubmissionTaxYear.get_max_year()
+          })
+        }
+        # return redirect(to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_create_name_for_client, selfassesment=selfassesment)
+        return render(request, template_name='companies/create_without_auth.html', context=context)
+      except Selfassesment.DoesNotExist:
+        form.add_error('utr', 'Invalid UTR')
+  return render(request, template_name='companies/create_without_auth.html', context=context)
+
 @login_required
 def create_selfassesment_data_collection(request):
   context = {
@@ -429,7 +500,7 @@ def create_selfassesment_data_collection(request):
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_create_name,
     'form_title': 'Selfassesment Income And Expense Data Collection',
     'form': SelfemploymentIncomeAndExpensesDataCollectionCreationForm(initial={
-      'selfassesment': Selfassesment.objects.first(),
+      'selfassesment': None,
       'tax_year': SelfassesmentAccountSubmissionTaxYear.get_max_year()}
       )
   }
@@ -438,15 +509,8 @@ def create_selfassesment_data_collection(request):
     form = SelfemploymentIncomeAndExpensesDataCollectionCreationForm(request.POST)
     context['form'] = form
     if form.is_valid():
-      try:
-        assesment = form.save()
-        assesment.save()
-        context['form'] = SelfemploymentIncomeAndExpensesDataCollectionCreationForm(initial={
-          'selfassesment': Selfassesment.objects.first(),
-          'tax_year': SelfassesmentAccountSubmissionTaxYear.get_max_year()}
-        )
-      except IntegrityError:
-        messages.error(request, f"Selfassesment Account Submission can't be updated because Client Name, Tax Year and Status is SUBMITTED is not unique!")
+      assesment = form.save()
+      assesment.save()
     else:
       messages.error(request, f'Action failed due to invalid data!')
   return render(request, template_name='companies/create.html', context=context)

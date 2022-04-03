@@ -9,6 +9,7 @@ search_suffix = 'search'
 details_suffix = 'details'
 export_suffix = 'export'
 viewall_suffix = 'all'
+auth_suffix = 'auth'
 
 data_collection = 'data_collection'
 
@@ -81,6 +82,8 @@ class URL_PATHS(Dict_Duck_type):
   Selfassesment_Data_Collection_search_url = f'{Selfassesment_path}/{data_collection}/{search_suffix}/' # fetch only
   Selfassesment_Data_Collection_viewall_url = f'{Selfassesment_path}/{data_collection}/{viewall_suffix}/' # fetch only
   Selfassesment_Data_Collection_export_url = f'{Selfassesment_path}/{data_collection}/{export_suffix}/'
+  Selfassesment_Data_Collection_auth_url_for_client = f'{Selfassesment_path}/{data_collection}/{auth_suffix}_for_client/'
+  Selfassesment_Data_Collection_create_url_for_client = f'{Selfassesment_path}/{data_collection}/{create_suffix}_for_client/'
 
   # Selfassesment Account Submission Tax Year
   Selfassesment_Account_Submission_Tax_Year_details_url = f'{Selfassesment_Account_Submission_Tax_Year_path}/{details_suffix}/<int:id>/'
@@ -179,6 +182,8 @@ class URL_NAMES(Dict_Duck_type):
   Selfassesment_Data_Collection_search_name = f'{Selfassesment_path}_{data_collection}_{search_suffix}' # fetch only
   Selfassesment_Data_Collection_viewall_name = f'{Selfassesment_path}_{data_collection}_{viewall_suffix}' # fetch only
   Selfassesment_Data_Collection_export_name = f'{Selfassesment_path}_{data_collection}_{export_suffix}'
+  Selfassesment_Data_Collection_auth_name_for_client = f'{Selfassesment_path}_{data_collection}_{auth_suffix}_for_client'
+  Selfassesment_Data_Collection_create_name_for_client = f'{Selfassesment_path}_{data_collection}_{create_suffix}_for_client'
 
   # Selfassesment Account Submission Tax 
   Selfassesment_Account_Submission_Tax_Year_details_name = f'{Selfassesment_Account_Submission_Tax_Year_path}_{details_suffix}'
@@ -278,6 +283,8 @@ class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
   Selfassesment_Data_Collection_search_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{data_collection}/{search_suffix}/' # fetch only
   Selfassesment_Data_Collection_viewall_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{data_collection}/{viewall_suffix}/' # fetch only
   Selfassesment_Data_Collection_export_url = f'/{APPLICATION_NAME}/{Selfassesment_path}/{data_collection}/{export_suffix}/'
+  Selfassesment_Data_Collection_auth_url_for_client = f'/{APPLICATION_NAME}/{Selfassesment_path}/{data_collection}/{auth_suffix}_for_client/'
+  Selfassesment_Data_Collection_create_url_for_client = f'/{APPLICATION_NAME}/{Selfassesment_path}/{data_collection}/{create_suffix}_for_client/'
 
   # Selfassesment Account Submission Tax Year
   Selfassesment_Account_Submission_Tax_Year_details_url = f'/{APPLICATION_NAME}/{Selfassesment_Account_Submission_Tax_Year_path}/{details_suffix}/'
@@ -377,6 +384,8 @@ class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
   Selfassesment_Data_Collection_search_name = f'{APPLICATION_NAME}:{Selfassesment_path}_{data_collection}_{search_suffix}' # fetch only
   Selfassesment_Data_Collection_viewall_name = f'{APPLICATION_NAME}:{Selfassesment_path}_{data_collection}_{viewall_suffix}' # fetch only
   Selfassesment_Data_Collection_export_name = f'{APPLICATION_NAME}:{Selfassesment_path}_{data_collection}_{export_suffix}'
+  Selfassesment_Data_Collection_auth_name_for_client = f'{APPLICATION_NAME}:{Selfassesment_path}_{data_collection}_{auth_suffix}_for_client'
+  Selfassesment_Data_Collection_create_name_for_client = f'{APPLICATION_NAME}:{Selfassesment_path}_{data_collection}_{create_suffix}_for_client'
 
   # Selfassesment Account Submission Tax Year
   Selfassesment_Account_Submission_Tax_Year_details_name = f'{APPLICATION_NAME}:{Selfassesment_Account_Submission_Tax_Year_path}_{details_suffix}'

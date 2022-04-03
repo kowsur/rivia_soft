@@ -9,7 +9,8 @@ from .views import delete_selfassesment_data_collection, home_selfassesment, cre
 # selfassesment data collection view functions
 from .views import home_selfassesment_data_collection, create_selfassesment_data_collection,\
     update_selfassesment_data_collection, delete_selfassesment_data_collection, \
-    all_selfassesment_data_collection, search_selfassesment_data_collection, export_selfassesment_data_collection
+    all_selfassesment_data_collection, search_selfassesment_data_collection, export_selfassesment_data_collection, \
+    auth_selfassesment_data_collection_for_client, create_selfassesment_data_collection_for_client
 
 # selfassesment account submission tax year
 from .views import search_selfassesment_account_submission_tax_year, all_selfassesment_account_submission_tax_year, \
@@ -212,6 +213,14 @@ urlpatterns = [
     path(route = URL_PATHS.Selfassesment_Data_Collection_export_url,
         view = export_selfassesment_data_collection,
         name = URL_NAMES.Selfassesment_Data_Collection_export_name),
+    
+    path(route = URL_PATHS.Selfassesment_Data_Collection_auth_url_for_client,
+        view = auth_selfassesment_data_collection_for_client,
+        name = URL_NAMES.Selfassesment_Data_Collection_auth_name_for_client),
+    
+    path(route = URL_PATHS.Selfassesment_Data_Collection_create_url_for_client,
+        view = create_selfassesment_data_collection_for_client,
+        name = URL_NAMES.Selfassesment_Data_Collection_create_name_for_client),
 
     # =============================================================================================================
     # =============================================================================================================

@@ -203,7 +203,8 @@ class SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(forms.
         fk_field='client_id',
         empty_label=None,
         disabled=True,
-        required=False
+        required=False,
+        render_options=False
         )
     tax_year = SearchableModelField(
         queryset=SelfassesmentAccountSubmissionTaxYear.objects.all(),
@@ -216,7 +217,8 @@ class SelfemploymentIncomeAndExpensesDataCollectionCreationFormForClients(forms.
         fk_field='id',
         empty_label=None,
         disabled=True,
-        required=False
+        required=False,
+        render_options=False
     )
 
     class Meta:

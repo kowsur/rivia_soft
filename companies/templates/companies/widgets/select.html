@@ -7,6 +7,7 @@
   <input value="{{ all_url }}" name="all_url" type="text"  aria-hidden="true" hidden>
   <input type="text" class="search" {% if widget.attrs.disabled %} disabled aria-disabled="true" {% endif %} {% if widget.attrs.required %} required required="true" aria-required="true" {% endif %} name="search" autocomplete="off" value="{{ value }}" placeholder="Please select an option">
 
+  {% if render_options %}
   <div class="select" name="{{ widget.name }}" id="{{ 'id_'|addstr:widget.name }}" {% include "companies/widgets/attrs.html" %}>
     {% if value %}
       <span class="option selected" value="{{ value.pk }}" data-value="{{ value.pk }}">{{ value }}</span>
@@ -17,6 +18,7 @@
     </optgroup>
     {% endif %}{% endfor %}
   </div>
+  {% endif %}
 
   <!-- actual input -->
   <select class="hidden" name="{{ widget.name }}" id="{{ 'id_'|addstr:widget.name }}" {% include "companies/widgets/attrs.html" %}>

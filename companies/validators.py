@@ -36,3 +36,12 @@ BANK_ACCOUNT_NUMBER_VALIDATOR = RegexValidator(
     message='Enter 8 digit Bank Account Number',
     code='Invalid Bank Account'
 )
+
+# company_auth_code
+AUTH_CODE_REGEX = r'^[A-Za-z0-9]{6}$'
+COMPILED_AUTH_CODE_REGEX = re.compile(AUTH_CODE_REGEX)
+# Validator
+AUTH_CODE_VALIDATOR = RegexValidator(
+    regex=COMPILED_AUTH_CODE_REGEX,
+    message='Enter 6 digit alphanumeric code',
+    code='Invalid company authentication code')

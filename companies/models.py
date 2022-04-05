@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 
 from users.models import CustomUser
-from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR
+from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR, AUTH_CODE_VALIDATOR
 
 from datetime import timedelta, date
 
@@ -482,7 +482,7 @@ class Limited(models.Model):
     client_file_number = models.DecimalField(verbose_name='File Number', max_digits=19, decimal_places=3, unique=True, blank=False, null=True, editable=True)
     client_name = models.CharField(verbose_name='Business Name', max_length=100, blank=False, null=False, db_index=True)
     company_reg_number = models.CharField(verbose_name='Company Registration Number', max_length=100, blank=False, null=True, unique=True, db_index=True)
-    company_auth_code = models.CharField(verbose_name='Company Authentication Code', max_length=100, blank=False, null=True, db_index=True)
+    company_auth_code = models.CharField(verbose_name='Company Authentication Code', max_length=100, blank=True, null=True, db_index=True, validators=[AUTH_CODE_VALIDATOR])
     
     # Director Info
     date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=True)

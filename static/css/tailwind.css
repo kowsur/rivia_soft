@@ -173,7 +173,7 @@
 
 /* table */
 .container{
-  @apply mx-auto;
+  @apply mx-auto max-w-max;
 }
 .data-wrapper{
   @apply relative mt-8 overflow-auto sm:mt-10 md:mt-12;

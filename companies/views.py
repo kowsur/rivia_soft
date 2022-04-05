@@ -89,6 +89,13 @@ LIMITED_FK_FIELDS_FOR_EXPORT = 'all' #['client_name', 'client_file_number', 'dir
 # =============================================================================================================
 # =============================================================================================================
 # Selfassesment
+def get_selfassesment_where_UTR_NOT_SET():
+  return Selfassesment.objects.filter(UTR=None)
+
+def get_selfassesment_where_AGENT_NOT_ACTIVE():
+  return Selfassesment.objects.filter(HMRC_agent=False)
+
+
 @login_required
 def home_selfassesment(request):
   pk_field = 'client_id'
@@ -108,6 +115,11 @@ def home_selfassesment(request):
 
     'template_tag': generate_template_tag_for_model(Selfassesment, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
     'data_container': generate_data_container_table(Selfassesment, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+
+    "counts": True,
+    "selfassesment_counts": True,
+    "selfassesment_UTR_NOT_SET": get_selfassesment_where_UTR_NOT_SET().count(),
+    "selfassesment_AGENT_NOT_ACTIVE": get_selfassesment_where_AGENT_NOT_ACTIVE().count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
@@ -311,6 +323,17 @@ def delete_selfassesment(request, client_id:int):
 def search_selfassesment(request, limit: int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
     search_text = request.GET.get('q', '')
+
+    # if tasks query paramter exists then return tasks
+    if request.GET.get('tasks'):
+      tasks = {
+        "selfassesment_UTR_NOT_SET": get_selfassesment_where_UTR_NOT_SET(),
+        "selfassesment_AGENT_NOT_ACTIVE": get_selfassesment_where_AGENT_NOT_ACTIVE(),
+      }
+      records = tasks.get(request.GET.get('tasks'), [])
+      data = serialize(queryset=records, format='json')
+      return HttpResponse(data, content_type='application/json')
+
     if search_text.strip()=='':
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_viewall_name)
     records = db_search_Selfassesment(search_text, limit)
@@ -676,6 +699,9 @@ def get_selfassesment_account_submissions_where_status_SUBMITTED():
 def get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(user):
   return SelfassesmentAccountSubmission.objects.filter(assigned_to=user)
 
+def get_selfassesment_account_submissions_where_status_NOT_ASSIGNED():
+  return SelfassesmentAccountSubmission.objects.filter(assigned_to=None)
+
 
 @login_required
 def home_selfassesment_account_submission(request):
@@ -707,6 +733,7 @@ def home_selfassesment_account_submission(request):
     "selfassesment_account_submission_status_WAITING_FOR_CONFIRMATION": get_selfassesment_account_submissions_where_status_WAITING_FOR_CONFIRMATION().count(),
     "selfassesment_account_submission_status_SUBMITTED": get_selfassesment_account_submissions_where_status_SUBMITTED().count(),
     "selfassesment_account_submission_status_ASSIGEND_TO_ME": get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(request.user).count(),
+    "selfassesment_account_submission_status_NOT_ASSIGEND": get_selfassesment_account_submissions_where_status_NOT_ASSIGNED().count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_viewall_url,
@@ -844,15 +871,16 @@ def search_selfassesment_account_submission(request, limit: int=-1):
     # if tasks query paramter exists then return tasks
     if request.GET.get('tasks'):
       tasks = {
-            "selfassesment_account_submission_status_PAID": get_selfassesment_account_submissions_where_status_PAID(),
-            "selfassesment_account_submission_status_NOT_PAID": get_selfassesment_account_submissions_where_status_NOT_PAID(),
-            "selfassesment_account_submission_status_REQUEST": get_selfassesment_account_submissions_where_status_REQUEST(),
-            "selfassesment_account_submission_status_PROCESSING": get_selfassesment_account_submissions_where_status_PROCESSING(),
-            "selfassesment_account_submission_status_BOOK_APPOINTMENT": get_selfassesment_account_submissions_where_status_BOOK_APPOINTMENT(),
-            "selfassesment_account_submission_status_READY_FOR_SUBMIT": get_selfassesment_account_submissions_where_status_READY_FOR_SUBMIT(),
-            "selfassesment_account_submission_status_WAITING_FOR_CONFIRMATION": get_selfassesment_account_submissions_where_status_WAITING_FOR_CONFIRMATION(),
-            "selfassesment_account_submission_status_SUBMITTED": get_selfassesment_account_submissions_where_status_SUBMITTED(),
-            "selfassesment_account_submission_status_ASSIGEND_TO_ME": get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(request.user),
+        "selfassesment_account_submission_status_PAID": get_selfassesment_account_submissions_where_status_PAID(),
+        "selfassesment_account_submission_status_NOT_PAID": get_selfassesment_account_submissions_where_status_NOT_PAID(),
+        "selfassesment_account_submission_status_REQUEST": get_selfassesment_account_submissions_where_status_REQUEST(),
+        "selfassesment_account_submission_status_PROCESSING": get_selfassesment_account_submissions_where_status_PROCESSING(),
+        "selfassesment_account_submission_status_BOOK_APPOINTMENT": get_selfassesment_account_submissions_where_status_BOOK_APPOINTMENT(),
+        "selfassesment_account_submission_status_READY_FOR_SUBMIT": get_selfassesment_account_submissions_where_status_READY_FOR_SUBMIT(),
+        "selfassesment_account_submission_status_WAITING_FOR_CONFIRMATION": get_selfassesment_account_submissions_where_status_WAITING_FOR_CONFIRMATION(),
+        "selfassesment_account_submission_status_SUBMITTED": get_selfassesment_account_submissions_where_status_SUBMITTED(),
+        "selfassesment_account_submission_status_ASSIGEND_TO_ME": get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(request.user),
+        "selfassesment_account_submission_status_NOT_ASSIGEND": get_selfassesment_account_submissions_where_status_NOT_ASSIGNED(),
       }
       records = tasks.get(request.GET.get('tasks'), [])
       data = serialize(queryset=records, format='json')
@@ -1186,6 +1214,16 @@ def export_selfassesment_tracker(request):
 # =============================================================================================================
 # =============================================================================================================
 # Limited
+
+def get_limited_where_UTR_NOT_SET():
+  return Limited.objects.filter(UTR=None)
+
+def get_limited_where_COMPANY_AUTH_CODE_NOT_SET():
+  return Limited.objects.filter(company_auth_code=None)
+
+def get_limited_where_AGENT_NOT_ACTIVE():
+  return Limited.objects.filter(HMRC_agent=False)
+
 @login_required
 def home_limited(request):
   pk_field = 'client_id'
@@ -1205,6 +1243,12 @@ def home_limited(request):
 
     'template_tag': generate_template_tag_for_model(Limited, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
     'data_container': generate_data_container_table(Limited, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+
+    "counts": True,
+    "limited_counts": True,
+    "limited_UTR_NOT_SET": get_limited_where_UTR_NOT_SET().count(),
+    "limited_COMPANY_AUTH_CODE_NOT_SET": get_limited_where_COMPANY_AUTH_CODE_NOT_SET().count(),
+    "limited_AGENT_NOT_ACTIVE": get_limited_where_AGENT_NOT_ACTIVE().count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
@@ -1348,6 +1392,18 @@ def delete_limited(request, client_id:int):
 def search_limited(request, limit: int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
     search_text = request.GET.get('q', '')
+
+    # if tasks query paramter exists then return tasks
+    if request.GET.get('tasks'):
+      tasks = {
+        "limited_UTR_NOT_SET": get_limited_where_UTR_NOT_SET(),
+        "limited_COMPANY_AUTH_CODE_NOT_SET": get_limited_where_COMPANY_AUTH_CODE_NOT_SET(),
+        "limited_AGENT_NOT_ACTIVE": get_limited_where_AGENT_NOT_ACTIVE(),
+      }
+      records = tasks.get(request.GET.get('tasks'), [])
+      data = serialize(queryset=records, format='json')
+      return HttpResponse(data, content_type='application/json')
+
     if search_text.strip()=='':
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_viewall_name)
     records = db_search_Limited(search_text, limit)

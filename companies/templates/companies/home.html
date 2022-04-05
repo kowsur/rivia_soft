@@ -65,13 +65,24 @@
           <span class="task-tooltip">New Customers.</span>
         </span>
       </div>
+    {% elif selfassesment_counts %}
+      <div class="task-container">
+        <span class="task task-previous" data-tasks='selfassesment_UTR_NOT_SET'>
+          <span id="task-count">{{ selfassesment_UTR_NOT_SET }}</span>
+          <span class="task-tooltip">UTR not set.</span>
+        </span>
+        <span class="task task-today" data-tasks='selfassesment_AGENT_NOT_ACTIVE'>
+          <span id="task-count">{{ selfassesment_AGENT_NOT_ACTIVE }}</span>
+          <span class="task-tooltip">Agent Inactive.</span>
+        </span>
+      </div>
     {% elif selfassesment_account_submission_counts %}
       <div class="task-container">
-        <span class="task task-own" data-tasks='selfassesment_account_submission_status_REQUEST'>
+        <span class="task task-previous" data-tasks='selfassesment_account_submission_status_REQUEST'>
           <span id="task-count">{{ selfassesment_account_submission_status_REQUEST }}</span>
           <span class="task-tooltip">Status - REQUEST.</span>
         </span>
-        <span class="task task-previous" data-tasks='selfassesment_account_submission_status_PROCESSING'>
+        <span class="task task-today" data-tasks='selfassesment_account_submission_status_PROCESSING'>
           <span id="task-count">{{ selfassesment_account_submission_status_PROCESSING }}</span>
           <span class="task-tooltip">Status - PROCESSING.</span>
         </span>
@@ -79,7 +90,7 @@
           <span id="task-count">{{ selfassesment_account_submission_status_BOOK_APPOINTMENT }}</span>
           <span class="task-tooltip">Status - BOOK APPOINTMENT.</span>
         </span>
-        <span class="task task-today" data-tasks='selfassesment_account_submission_status_READY_FOR_SUBMIT'>
+        <span class="task task-own" data-tasks='selfassesment_account_submission_status_READY_FOR_SUBMIT'>
           <span id="task-count">{{ selfassesment_account_submission_status_READY_FOR_SUBMIT }}</span>
           <span class="task-tooltip">Status - READY FOR SUBMIT.</span>
         </span>
@@ -91,17 +102,36 @@
           <span id="task-count">{{ selfassesment_account_submission_status_SUBMITTED }}</span>
           <span class="task-tooltip">Status - SUBMITTED.</span>
         </span>
-        <span class="task task-done" data-tasks='selfassesment_account_submission_status_PAID'>
-          <span id="task-count">{{ selfassesment_account_submission_status_PAID }}</span>
-          <span class="task-tooltip">Payment Status - PAID.</span>
-        </span>
         <span class="task task-previous" data-tasks='selfassesment_account_submission_status_NOT_PAID'>
           <span id="task-count">{{ selfassesment_account_submission_status_NOT_PAID }}</span>
           <span class="task-tooltip">Payment Status - NOT PAID.</span>
         </span>
-        <span class="task task-previous" data-tasks='selfassesment_account_submission_status_ASSIGEND_TO_ME'>
+        <span class="task task-done" data-tasks='selfassesment_account_submission_status_PAID'>
+          <span id="task-count">{{ selfassesment_account_submission_status_PAID }}</span>
+          <span class="task-tooltip">Payment Status - PAID.</span>
+        </span>
+        <span class="task task-own" data-tasks='selfassesment_account_submission_status_ASSIGEND_TO_ME'>
           <span id="task-count">{{ selfassesment_account_submission_status_ASSIGEND_TO_ME }}</span>
           <span class="task-tooltip">Assigned to me.</span>
+        </span>
+        <span class="task task-previous" data-tasks='selfassesment_account_submission_status_NOT_ASSIGEND'>
+          <span id="task-count">{{ selfassesment_account_submission_status_NOT_ASSIGEND }}</span>
+          <span class="task-tooltip">Not Assigned.</span>
+        </span>
+      </div>
+    {% elif limited_counts %}
+      <div class="task-container">
+        <span class="task task-previous" data-tasks='limited_UTR_NOT_SET'>
+          <span id="task-count">{{ limited_UTR_NOT_SET }}</span>
+          <span class="task-tooltip">UTR not set.</span>
+        </span>
+        <span class="task task-today" data-tasks='limited_AGENT_NOT_ACTIVE'>
+          <span id="task-count">{{ limited_AGENT_NOT_ACTIVE }}</span>
+          <span class="task-tooltip">Agent Inactive.</span>
+        </span>
+        <span class="task task-own" data-tasks='limited_COMPANY_AUTH_CODE_NOT_SET'>
+          <span id="task-count">{{ limited_COMPANY_AUTH_CODE_NOT_SET }}</span>
+          <span class="task-tooltip">Authentication Code not set.</span>
         </span>
       </div>
     {% elif limited_submission_counts %}

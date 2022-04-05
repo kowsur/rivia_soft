@@ -49,8 +49,8 @@ class TaxPolicy:
 class ProgressiveTaxPolicy:
     policies: List[TaxPolicy]
     
-    # for uk personal_allowance_limit is 100,000£ but for those who doesn't have any limit the personal_allowance_limit
-    # could be passed as math.inf, the limit is applied if the polici
+    # for uk personal_allowance_limit is 100,000£ but for those who do not have any limit the personal_allowance_limit
+    # could be passed as math.inf, the limit is applied if the policy
     personal_allowance_limit: int|float = 100000 # math.inf for no limit
     
     # when personal_allowance_limit exceeds 1£ is redued from personal_allowance per 2£ earned over personal_allowance_limit

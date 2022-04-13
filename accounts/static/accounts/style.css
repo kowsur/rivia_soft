@@ -62,47 +62,6 @@ h3{
     }
 }
 
-
-/* Detais tab */
-.detail{
-    margin: 1rem 0rem;
-}
-
-/* Incomes and Expenses tab */
-.tab[data-tab-name="incomesAndExpnses"]{
-    display: flex;
-    flex-direction: column;
-    gap: 2em;
-}
-
-.title{
-    font-size: large;
-    font-weight: 600;
-}
-
-.incomes, .expenses{
-    margin-top: 1em;
-}
-
-.months{
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.month{
-    margin: 1em 1em;
-    display: flex;
-    flex-direction: column;
-    gap: .5em;
-}
-.month div{
-    margin-left: 1em;
-}
-.month input{
-    width: 18ch;
-}
-
-
 :root{
     /* nav tab item styles */
     --nav-tab-margin-top: 1em;
@@ -167,9 +126,9 @@ h3{
 .tabs .tab.active{
     display: block;
 }
-.tabs .tab.active[data-tab-name="incomesAndExpnses"]{
+/* .tabs .tab[data-tab-name="incomesAndExpenses"]{
     display: flex;
-}
+} */
 
 /* Toggle */
 .toggle{
@@ -185,6 +144,44 @@ h3{
 }
 
 
+/* Detais tab */
+.detail{
+    margin: 1rem 0rem;
+}
+
+/* Incomes and Expenses tab */
+.tabs .tab[data-tab-name="incomesAndExpenses"]{
+    display: flex;
+    flex-direction: column;
+    gap: 1.55em;
+}
+
+.title{
+    font-size: large;
+    font-weight: 600;
+}
+
+.incomes, .expenses{
+    margin-top: 1em;
+}
+
+.months{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.month{
+    margin: 1em 1em;
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+}
+.month div{
+    margin-left: 1em;
+}
+.month input{
+    width: 18ch;
+}
 
 #client-account-status{
     color: red;

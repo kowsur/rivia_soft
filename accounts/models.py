@@ -65,6 +65,7 @@ class SelfemploymentIncomesPerTaxYear(models.Model):
     month = models.ForeignKey(Months, on_delete=models.RESTRICT)
     amount = models.FloatField(default=0)
     comission = models.FloatField(default=0)
+    note = models.TextField(default='')
 
     def __str__(self) -> str:
         return f"{self.client.client_id.client_name} - {self.income_source} - {self.month} - {self.amount}"
@@ -83,6 +84,7 @@ class SelfemploymentExpensesPerTaxYear(models.Model):
     month = models.ForeignKey(Months, on_delete=models.RESTRICT)
     amount = models.FloatField(default=0)
     personal_usage_percentage = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    note = models.TextField(default='')
 
     def __str__(self) -> str:
         return f"{self.client.client_id.client_name} - {self.expense_source} - {self.month} - {self.amount}"
@@ -101,10 +103,47 @@ class SelfemploymentDeductionsPerTaxYear(models.Model):
     amount = models.FloatField(default=0)
     allowance_percentage = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     personal_usage_percentage = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    note = models.TextField(default='')
 
     def __str__(self) -> str:
         return f"{self.client} - {self.deduction_source} - {self.amount}"
 
+# class EmploymentIncomeForTaxYear(models.Model):
+#     class Meta:
+#         verbose_name = "Employment Income For Tax Year"
+#         verbose_name_plural = "Employment Incomes For Tax Years"
+    
+#     submission = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)
+#     income_amount = models.FloatField(default=0)
+#     paid_tax_amount = models.FloatField(default=0)
+
+#     def __str__(self) -> str:
+#         return f"{self.submission} -  {self.income_amount} - {self.paid_tax_amount}"
+
+class TaxableIncomeSources(models.Model):
+    class Meta:
+        verbose_name = "Taxable Income Source"
+        verbose_name_plural = "Taxable Income Sources"
+    name = models.CharField(default="New Taxable Income Source", max_length=255)
+    apply_uk_tax = models.BooleanField()
+    apply_class2_tax = models.BooleanField()
+    apply_class4_tax = models.BooleanField()
+
+    def __str__(self) -> str:
+        return f"{self.name} - uk tax {self.apply_uk_tax} - class 2 {self.apply_class2_tax} - class 4 tax {self.apply_class4_tax}"
+
+class TaxableIncomeSourceForSubmission(models.Model):
+    class Meta:
+        verbose_name = "Taxable Income Source For Submission"
+        verbose_name_plural = "Taxable Income Sources For Submissions"
+    
+    submission = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)
+    taxable_income_source = models.ForeignKey(TaxableIncomeSources, on_delete=models.RESTRICT)
+    income_amount = models.FloatField(default=0)
+    paid_income_tax_amount = models.FloatField(default=0)
+
+    def __str__(self) -> str:
+        return f"{self.submission} - income: {self.income_amount} - paid tax: {self.paid_income_tax_amount} - income source: {self.taxable_income_source.name}"
 
 class SelfemploymentUkTaxConfigForTaxYear(models.Model):
     class Meta:

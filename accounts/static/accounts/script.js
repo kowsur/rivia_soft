@@ -342,9 +342,19 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   displayIncomeOptions()
   updateTotalIncome()
 
+  // Show expenses with data from backend
   Object.entries(groupedAllExpensesForSubmissionMapBySourceId).forEach(([expenseSourceId, expenses]) => {
     displayExpenseSource(expenseSourceId, expenses, submissionDetails)
   });
+
+  // Show other expenses that doesn't have data
+  // console.log(allExpenseSources, allExpensesForSubmission, submissionDetails)
+  allExpenseSources.forEach(expenseSource=>{
+    if (!displayingExpenseIds.has(expenseSource.id)){
+      displayExpenseSource(expenseSource.id, [], submissionDetails)
+    }
+  })
+
   displayExpenseOptions()
   updateTotalExpense()
   
@@ -369,8 +379,23 @@ function displayIncomeSource(incomeSourceId, incomes, submission){
       <img src='/static/accounts/expand.svg'/>
     </div>
     <div class="months invisible">
+      <div class="table income-display-table" data-display-table-name="income">
+        <div class="thead">
+          <div class="row">
+            <span>Month</span>
+            <span>Amount</span>
+            <span>Comission</span>
+            <span>Note</span>
+          </div>
+        </div>
+        <div class="body">
+          <div class="row"></div>
+        </div>
+      </div>
     </div>
   </div>`)
+
+  let displayTable = incomeContainer.querySelector('[data-display-table-name="income"] div.body')
   let monthContainer = incomeContainer.querySelector('.months')
   let toggle = incomeContainer.querySelector('.toggle')
   let toggleImg = incomeContainer.querySelector('.toggle img')
@@ -386,55 +411,69 @@ function displayIncomeSource(incomeSourceId, incomes, submission){
     }
   })
 
+  let innerTableBody = ''
+
   allMonths.forEach(month=>{
     // Get the existing/default income object
     let income = incomes.find(income=>income.month===month.id) || {
       "amount": 0,
       "comission": 0,
+      "note": '',
       "income_source": incomeSourceId,
       "client": submissionId,
       "month": month.id
     }
     let inputAmountId = `income_amount_${month.id}_${submission.submission_id}_${income.income_source}`
     let inputComissionId = `income_comission_${month.id}_${submission.submission_id}_${income.income_source}`
-
+    let inputNoteId = `income_note_${month.id}_${submission.submission_id}_${income.income_source}`
 
     // Prepare markup for a single month
     let incomeMarkup = `
-        <div class='month'>
-          <h3 class='month-name'>${month.month_name}</h3>
-          <div>
-            <label for="${inputAmountId}">Amount</label>
-            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${income?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-income-id="${income.income_source}" data-update-type="amount">
-          </div>
+      <div class="row">
+        <span>${month.month_name}</span>
+        <span><input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${income?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-income-id="${income.income_source}" data-update-type="amount"></span>
+        <span><input type="number" max=${DB_MAX_INT_VALUE} id=${inputComissionId} value="${income?.comission}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-income-id="${income.income_source}" data-update-type="comission"></span>
+        <span>
+          <textarea id=${inputNoteId} data-update-type="note" data-month-id="${month.id}" data-submission-id="${submissionId}" data-income-id="${income.income_source}">${income?.note}</textarea>
+        </span>
+      </div>
+      `
+    innerTableBody += incomeMarkup
+    })
+
+  displayTable.innerHTML = innerTableBody
+  let inputAmountElements = displayTable.querySelectorAll('input[data-update-type="amount"]')
+  let inputComissionElements = displayTable.querySelectorAll('input[data-update-type="comission"]')
+  let inputNoteElements = displayTable.querySelectorAll('textarea[data-update-type="note"]')
+  addEventListenersToElements(Array.from(inputAmountElements), 'input', [validateMaxValue, handleIncomeUpdate, updateTotalIncome, updateNetProfit])
+  addEventListenersToElements(Array.from(inputComissionElements), 'input', [validateMaxValue, handleIncomeUpdate, updateTotalIncome, updateNetProfit])
+  addEventListenersToElements(Array.from(inputNoteElements), 'input', [handleIncomeUpdate])
   
-          <div>
-            <label for=${inputComissionId}>Comission</label>
-            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputComissionId} value="${income?.comission}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-income-id="${income.income_source}" data-update-type="comission">
-          </div>
-        </div>
-        `
-    let node = createNodeFromMarkup(incomeMarkup)
-    let inputAmount = node.querySelector(`#${inputAmountId}`)
-    let inputComission = node.querySelector(`#${inputComissionId}`)
-
-    inputAmount.addEventListener('input', validateMaxValue)
-    inputAmount.addEventListener('input', handleIncomeUpdate)
-    inputAmount.addEventListener('input', updateTotalIncome)
-    inputAmount.addEventListener('input', updateNetProfit)
-
-    inputComission.addEventListener('input', validateMaxValue)
-    inputComission.addEventListener('input', handleIncomeUpdate)
-    inputComission.addEventListener('input', updateTotalIncome)
-    inputComission.addEventListener('input', updateNetProfit)
-
-    monthContainer.appendChild(node)
-  })
-
   // add the newly prepared income source to incomes
   incomesContainer.appendChild(incomeContainer)
 }
+
+function addEventListenersToElements(element_or_elements, eventName, eventFunction_or_Functions){
+  if (Array.isArray(element_or_elements)){
+    element_or_elements.forEach(element=>{
+      if (Array.isArray(eventFunction_or_Functions)){
+        eventFunction_or_Functions.forEach(eventFunction=>element.addEventListener(eventName, eventFunction))
+      }else{
+        element.addEventListener(eventName, eventFunction_or_Functions)
+      }
+    })
+  }else{
+    if (Array.isArray(eventFunction_or_Functions)){
+      eventFunction_or_Functions.forEach(eventFunction=>element_or_elements.addEventListener(eventName, eventFunction))
+    }else{
+      element_or_elements.addEventListener(eventName, eventFunction_or_Functions)
+    }
+  }
+}
+
+
 function displayExpenseSource(expenseSourceId, expenses, submission){
+  console.log(expenseSourceId, expenses, submission)
   // add current incomeSourceId to displayingIncomeIds set to filter them out while searching
   displayingExpenseIds.add(parseInt(expenseSourceId))
   let expenseSource = expenseSourcesMapById[expenseSourceId]
@@ -471,12 +510,14 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
   let expense = expenses.find(expense=>expense.month===month.id) || {
     "amount": 0,
     "personal_usage_percentage": 0,
+    'note': '',
     "expense_source": expenseSourceId,
     "client": submissionId,
     "month": month.id
   }
   let inputAmountId = `expense_amount_${month.id}_${submission.submission_id}_${expense.expense_source}`
   let inputPersonalUsageId = `expense_personalUsage_${month.id}_${submission.submission_id}_${expense.expense_source}`
+  let inputNoteId = `expense_note_${month.id}_${submission.submission_id}_${expense.expense_source}`
 
   // Prepare markup for a single month
   let expenseMarkup = `
@@ -484,76 +525,27 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
         <div>
           <label for="${inputAmountId}">Amount</label>
           <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" data-update-type="amount">
-          </div>
-          <div>
+        </div>
+        <div>
           <label for="${inputPersonalUsageId}">Personal Usage(%)</label>
           <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="personal_usage_percentage">
+        </div>
+        <div>
+          <label for="${inputNoteId}">Note</label>
+          <textarea id=${inputNoteId} data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="note">${expense?.note}</textarea>
         </div>
       </div>
       `
   let node = createNodeFromMarkup(expenseMarkup)
   let inputAmount = node.querySelector(`#${inputAmountId}`)
-  
-  inputAmount.addEventListener('input', validateMaxValue)
-  inputAmount.addEventListener('input', handleExpenseUpdate)
-  inputAmount.addEventListener('input', updateTotalExpense)
-  inputAmount.addEventListener('input', updateNetProfit)
-  
   let inputPersonalUsage = node.querySelector(`#${inputPersonalUsageId}`)
-  inputPersonalUsage.addEventListener('input', validatePercentageValue)
-  inputPersonalUsage.addEventListener('input', handleExpenseUpdate)
-  inputPersonalUsage.addEventListener('input', updateTotalExpense)
-  inputPersonalUsage.addEventListener('input', updateNetProfit)
+  let inputNote = node.querySelector(`#${inputNoteId}`)
+  
+  addEventListenersToElements(inputAmount, 'input', [validateMaxValue, handleExpenseUpdate, updateTotalExpense, updateNetProfit])
+  addEventListenersToElements(inputPersonalUsage, 'input', [validatePercentageValue, handleExpenseUpdate, updateTotalExpense, updateNetProfit])
+  addEventListenersToElements(inputNote, 'input', [handleExpenseUpdate])
 
   monthContainer.appendChild(node)
-  // End Show a single month
-  // =====================================================================================================================
-
-  // // Show all months
-  // allMonths.forEach(month=>{
-  //   // Get the existing/default expense object
-  //   let expense = expenses.find(expense=>expense.month===month.id) || {
-  //     "amount": 0,
-  //     "personal_usage_percentage": 0,
-  //     "expense_source": expenseSourceId,
-  //     "client": submissionId,
-  //     "month": month.id
-  //   }
-  //   let inputAmountId = `expense_amount_${month.id}_${submission.submission_id}_${expense.expense_source}`
-  //   let inputPersonalUsageId = `expense_personalUsage_${month.id}_${submission.submission_id}_${expense.expense_source}`
-
-  //   // Prepare markup for a single month
-  //   let expenseMarkup = `
-  //       <div class='month'>
-  //         <h3 class='month-name'>${month.month_name}</h3>
-  //         <div>
-  //           <label for="${inputAmountId}">Amount</label>
-  //           <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" data-update-type="amount">
-  //           </div>
-  //           <div>
-  //           <label for="${inputPersonalUsageId}">Personal Usage(%)</label>
-  //           <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="personal_usage_percentage">
-  //         </div>
-  //       </div>
-  //       `
-  //   let node = createNodeFromMarkup(expenseMarkup)
-  //   let inputAmount = node.querySelector(`#${inputAmountId}`)
-    
-  //   inputAmount.addEventListener('input', validateMaxValue)
-  //   inputAmount.addEventListener('input', handleExpenseUpdate)
-  //   inputAmount.addEventListener('input', updateTotalExpense)
-  //   inputAmount.addEventListener('input', updateNetProfit)
-    
-  //   let inputPersonalUsage = node.querySelector(`#${inputPersonalUsageId}`)
-  //   inputPersonalUsage.addEventListener('input', validatePercentageValue)
-  //   inputPersonalUsage.addEventListener('input', handleExpenseUpdate)
-  //   inputPersonalUsage.addEventListener('input', updateTotalExpense)
-  //   inputPersonalUsage.addEventListener('input', updateNetProfit)
-
-  //   monthContainer.appendChild(node)
-  // })
-
-  // add the newly prepared income source to incomes
   expensesContainer.appendChild(expenseContainer)
 }
 function displayDeductionSource(deductionSourceId, deductions, submission){
@@ -592,12 +584,14 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
     "amount": 0,
     "allowance_percentage": 0,
     "personal_usage_percentage": 0,
+    "note": '',
     "deduction_source": deductionSourceId,
     "client": submissionId,
   }
   let inputAmountId = `deduction_amount_${submission.submission_id}_${deduction.deduction_source}`
   let inputAllowancePercentageId = `deduction_allowance_percentage_${submission.submission_id}_${deduction.deduction_source}`
   let inputPersonalUsagePercentageId = `deduction_personalUsage_percentage_${submission.submission_id}_${deduction.deduction_source}`
+  let inputNoteId = `deduction_note_${submission.submission_id}_${deduction.deduction_source}`
 
   // Prepare markup for a single month
   let deductionMarkup = `
@@ -614,27 +608,22 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
           <label for="${inputPersonalUsagePercentageId}">Personal Usage(%)</label>
           <input type="number" min="0" max='100' id=${inputPersonalUsagePercentageId} value="${deduction?.personal_usage_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="personal_usage_percentage">
         </div>
+        <div>
+          <label for="${inputNoteId}">Note</label>
+          <textarea id=${inputNoteId} data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="note">${deduction?.note}</textarea>
+        </div>
       </div>
       `
   let node = createNodeFromMarkup(deductionMarkup)
   let inputAmount = node.querySelector(`#${inputAmountId}`)
-  
-  inputAmount.addEventListener('input', validateMaxValue)
-  inputAmount.addEventListener('input', handleDeductionUpdate)
-  inputAmount.addEventListener('input', updateTotalDeduction)
-  inputAmount.addEventListener('input', updateNetProfit)
-  
   let inputAllowancePercentage = node.querySelector(`#${inputAllowancePercentageId}`)
-  inputAllowancePercentage.addEventListener('input', validatePercentageValue)
-  inputAllowancePercentage.addEventListener('input', handleDeductionUpdate)
-  inputAllowancePercentage.addEventListener('input', updateTotalDeduction)
-  inputAllowancePercentage.addEventListener('input', updateNetProfit)
-  
   let inputPersonalUsage = node.querySelector(`#${inputPersonalUsagePercentageId}`)
-  inputPersonalUsage.addEventListener('input', validatePercentageValue)
-  inputPersonalUsage.addEventListener('input', handleDeductionUpdate)
-  inputPersonalUsage.addEventListener('input', updateTotalDeduction)
-  inputPersonalUsage.addEventListener('input', updateNetProfit)
+  let inputNote = node.querySelector(`#${inputNoteId}`)
+
+  addEventListenersToElements(inputAmount, 'input', validateMaxValue)
+  addEventListenersToElements([inputAmount, inputAllowancePercentage, inputPersonalUsage, inputNote], 'input', handleDeductionUpdate)
+  addEventListenersToElements([inputAmount, inputAllowancePercentage, inputPersonalUsage], 'input', [updateTotalDeduction, updateNetProfit])
+  addEventListenersToElements([inputAllowancePercentage, inputPersonalUsage], 'input', validatePercentageValue)
 
   monthContainer.appendChild(node)
 
@@ -789,6 +778,7 @@ function handleIncomeUpdate(e){
 
   if (updateType==="amount") data_object.amount = parseFloat(inputField.value) || 0
   else if (updateType==="comission") data_object.comission = parseFloat(inputField.value) || 0
+  else if (updateType==="note") data_object.note = inputField.value
 
   fetch_url({
     // url = "/accounts/set_income/<submission_id>/<month_id>/<income_id>/"
@@ -805,6 +795,7 @@ function handleExpenseUpdate(e){
 
   if (updateType==="amount") data_object.amount = parseFloat(inputField.value) || 0
   else if (updateType==="personal_usage_percentage") data_object.personal_usage_percentage = parseFloat(inputField.value) || 0
+  else if (updateType==="note") data_object.note = inputField.value
 
   fetch_url({
     // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"
@@ -822,6 +813,7 @@ function handleDeductionUpdate(e){
   if (updateType==="amount") data_object.amount = parseFloat(inputField.value) || 0
   else if (updateType==="allowance_percentage") data_object.allowance_percentage = parseFloat(inputField.value) || 0
   else if (updateType==="personal_usage_percentage") data_object.personal_usage_percentage = parseFloat(inputField.value) || 0
+  else if (updateType==="note") data_object.note = inputField.value
 
   fetch_url({
     // url = "/accounts/set_deduction/<submission_id>/<deduction_id>/"

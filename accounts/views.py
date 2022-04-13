@@ -62,9 +62,10 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
 
     amount = loaded_data.get("amount", None)
     personal_usage_percentage = loaded_data.get("personal_usage_percentage", None)
+    note = loaded_data.get("note", None)
     
-    if amount is None and personal_usage_percentage is None:
-        return HttpResponse(json.dumps({'error': f'amount or personal_usage is required'}), status=400)
+    if amount is None and personal_usage_percentage is None and note is None:
+        return HttpResponse(json.dumps({'error': f'amount or personal_usage or note is required'}), status=400)
     
     if personal_usage_percentage is not None and not 0<=personal_usage_percentage<=100:
         return HttpResponse(json.dumps({'error': f'personal_usage value should be between 0 and 100!'}), status=400)
@@ -93,6 +94,8 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
             expense_for_tax_year.amount = amount
         if personal_usage_percentage is not None:
             expense_for_tax_year.personal_usage_percentage = personal_usage_percentage
+        if note is not None:
+            expense_for_tax_year.note = note
         expense_for_tax_year.save()
         return HttpResponse(json.dumps({'success': 'Updated existing record'}))
     
@@ -106,6 +109,8 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
         expense_for_tax_year.amount = amount
     if personal_usage_percentage is not None:
         expense_for_tax_year.personal_usage_percentage = personal_usage_percentage
+    if note is not None:
+        expense_for_tax_year.note = note
     expense_for_tax_year.save()
     return HttpResponse(json.dumps({'success': 'Updated existing record'}), status=201)
 
@@ -122,9 +127,10 @@ def upsert_income_for_submission(request, submission_id, month_id, income_id):
     
     amount = loaded_data.get("amount", None)
     comission = loaded_data.get("comission", None)
+    note = loaded_data.get("note", None)
 
-    if amount is None and comission is None:
-        return HttpResponse(json.dumps({'error': f'amount or comission must be specified'}), status=400)
+    if amount is None and comission is None and note is None:
+        return HttpResponse(json.dumps({'error': f'amount or comission or note must be specified'}), status=400)
 
     # retrive selfassemsent account submission record
     client = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
@@ -150,6 +156,8 @@ def upsert_income_for_submission(request, submission_id, month_id, income_id):
             income_for_tax_year.amount = amount
         if comission is not None:
             income_for_tax_year.comission = comission
+        if note is not None:
+            income_for_tax_year.note = note
         income_for_tax_year.save()
         return HttpResponse(json.dumps({'success': 'Updated existing record'}))
     
@@ -163,6 +171,8 @@ def upsert_income_for_submission(request, submission_id, month_id, income_id):
         income_for_tax_year.amount = amount
     if comission is not None:
         income_for_tax_year.comission = comission
+    if note is not None:
+        income_for_tax_year.note = note
     income_for_tax_year.save()
 
     return HttpResponse(json.dumps({'success': 'Created new record'}), status=201)
@@ -182,9 +192,10 @@ def upsert_deduction_for_submission(request, submission_id, deduction_id):
     amount = loaded_data.get("amount", None)
     allowance_percentage = loaded_data.get("allowance_percentage", None)
     personal_usage_percentage = loaded_data.get("personal_usage_percentage", None)
+    note = loaded_data.get("note", None)
 
-    if amount is None and allowance_percentage is None and personal_usage_percentage is None:
-        return HttpResponse(json.dumps({'error': f'amount or allowance_percentage or personal_usage_percentage must be specified'}), status=400)
+    if amount is None and allowance_percentage is None and personal_usage_percentage is None and note is None:
+        return HttpResponse(json.dumps({'error': f'amount or allowance_percentage or personal_usage_percentage or note must be specified'}), status=400)
     
     if allowance_percentage and not 0<=allowance_percentage<=100:
         return HttpResponse(json.dumps({'error': f'allowance_percentage must be between 0 and 100!'}), status=400)
@@ -212,6 +223,8 @@ def upsert_deduction_for_submission(request, submission_id, deduction_id):
             deduction_for_tax_year.allowance_percentage = allowance_percentage
         if personal_usage_percentage is not None:
             deduction_for_tax_year.personal_usage_percentage = personal_usage_percentage
+        if note is not None:
+            deduction_for_tax_year.note = note
         deduction_for_tax_year.save()
         return HttpResponse(json.dumps({'success': 'Updated existing record'}))
     
@@ -226,6 +239,8 @@ def upsert_deduction_for_submission(request, submission_id, deduction_id):
         deduction_for_tax_year.allowance_percentage = allowance_percentage
     if personal_usage_percentage is not None:
         deduction_for_tax_year.personal_usage_percentage = personal_usage_percentage
+    if note is not None:
+        deduction_for_tax_year.note = note
     deduction_for_tax_year.save()
 
     return HttpResponse(json.dumps({'success': 'Created new record'}), status=201)

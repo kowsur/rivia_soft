@@ -46,10 +46,11 @@ h3{
     background-color: #9ca3af;
 }
 
-.select-input, .select-options{
-    /* margin-left: 1em; */
+/* .select, .toggle{ */
+/* .select{
     max-width: 60em;
-}
+} */
+
 .select-options:hover,
 .select-input:active + .select-options,
 .select-input:focus + .select-options{

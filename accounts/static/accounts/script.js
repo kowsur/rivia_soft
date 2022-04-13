@@ -48,6 +48,27 @@ let totalDeductionContainers = document.querySelectorAll('[data-total-deduction-
 let netProfitContainers = document.querySelectorAll('[data-net-profit-container]')
 let showUptoDecimalDigits = 2
 
+function calculateIncome(incomeAmount, comission){
+  let actualIncome = incomeAmount-comission
+  if (actualIncome<0) actualIncome=0
+  return actualIncome
+}
+
+async function getTotalIncomeForIncomeSection(incomeSectionContainer){
+  let inputAmountFields = incomeSectionContainer.querySelectorAll('.incomes input[data-update-type="amount"]')
+  let inputComissionFields = incomeSectionContainer.querySelectorAll('.incomes input[data-update-type="comission"]')
+  let totalIncome = 0
+
+  for (let i=0; i<inputAmountFields.length; i++){
+    let amount = parseFloat(inputAmountFields[i].value) || 0
+    let comission = parseFloat(inputComissionFields[i].value) || 0
+
+    totalIncome+=calculateIncome(amount, comission)
+  }
+
+  return totalIncome
+}
+
 async function getTotalIncome(){
   let inputAmountFields = document.querySelectorAll('.incomes input[data-update-type="amount"]')
   let inputComissionFields = document.querySelectorAll('.incomes input[data-update-type="comission"]')
@@ -57,10 +78,7 @@ async function getTotalIncome(){
     let amount = parseFloat(inputAmountFields[i].value) || 0
     let comission = parseFloat(inputComissionFields[i].value) || 0
 
-    let actualIncome = amount-comission
-    if (actualIncome<0) actualIncome=0
-
-    totalIncome+=actualIncome
+    totalIncome+=calculateIncome(amount, comission)
   }
 
   return totalIncome
@@ -118,6 +136,13 @@ async function getNetProfit(){
   let totalExpense = await getTotalExpense()
   let totalDeduction = await getTotalDeduction()
   return totalIncome - (totalExpense + totalDeduction)
+}
+
+async function updateTotalIncomeForIncomeSection(incomeSectionContainer, totalIncomeContainerForSection){
+  let totalIncome = await getTotalIncomeForIncomeSection(incomeSectionContainer)
+  totalIncome = parseFloat(totalIncome).toFixed(showUptoDecimalDigits) || 0
+
+  totalIncomeContainerForSection.textContent = totalIncome
 }
 
 async function updateTotalIncome(){
@@ -348,7 +373,6 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   });
 
   // Show other expenses that doesn't have data
-  // console.log(allExpenseSources, allExpensesForSubmission, submissionDetails)
   allExpenseSources.forEach(expenseSource=>{
     if (!displayingExpenseIds.has(expenseSource.id)){
       displayExpenseSource(expenseSource.id, [], submissionDetails)
@@ -373,9 +397,9 @@ function displayIncomeSource(incomeSourceId, incomes, submission){
   let incomeSource = incomeSourcesMapById[incomeSourceId]
   
   let incomeContainer = createNodeFromMarkup(`
-  <div class="income">
+  <div class="income" data-income-section="${incomeSource.id}">
     <div class="toggle">
-      <h2 class="income-source">${incomeSource.name}</h2>
+      <h2 class="income-source">${incomeSource.name} Total: <span data-total-container-for-income-source>0</span></h2>
       <img src='/static/accounts/expand.svg'/>
     </div>
     <div class="months invisible">
@@ -451,6 +475,14 @@ function displayIncomeSource(incomeSourceId, incomes, submission){
   
   // add the newly prepared income source to incomes
   incomesContainer.appendChild(incomeContainer)
+  
+  let incomeSectionContainer = document.querySelector(`.income[data-income-section="${incomeSource.id}"]`)
+  let totalIncomeContainerForSection = incomeSectionContainer.querySelector('span[data-total-container-for-income-source]')
+  
+  let handleTotalIncomeUpdateForSection = updateTotalIncomeForIncomeSection.bind(undefined, incomeSectionContainer, totalIncomeContainerForSection)
+  addEventListenersToElements([...Array.from(inputAmountElements), ...Array.from(inputComissionElements)], 'input', handleTotalIncomeUpdateForSection)
+  // Initially Call to update the seciton total
+  handleTotalIncomeUpdateForSection()
 }
 
 function addEventListenersToElements(element_or_elements, eventName, eventFunction_or_Functions){
@@ -473,7 +505,6 @@ function addEventListenersToElements(element_or_elements, eventName, eventFuncti
 
 
 function displayExpenseSource(expenseSourceId, expenses, submission){
-  console.log(expenseSourceId, expenses, submission)
   // add current incomeSourceId to displayingIncomeIds set to filter them out while searching
   displayingExpenseIds.add(parseInt(expenseSourceId))
   let expenseSource = expenseSourcesMapById[expenseSourceId]

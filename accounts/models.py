@@ -23,6 +23,7 @@ class SelfemploymentExpenseSources(models.Model):
         verbose_name_plural = "Expense Sources"
     
     name = models.CharField(_("Name"), max_length=255)
+    default_personal_usage_percentage = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
 
     def __str__(self)->str:
         return self.name

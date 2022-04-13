@@ -509,7 +509,7 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
   // Get the existing/default expense object
   let expense = expenses.find(expense=>expense.month===month.id) || {
     "amount": 0,
-    "personal_usage_percentage": 0,
+    "personal_usage_percentage": expenseSource?.default_personal_usage_percentage||0,
     'note': '',
     "expense_source": expenseSourceId,
     "client": submissionId,
@@ -547,6 +547,10 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
 
   monthContainer.appendChild(node)
   expensesContainer.appendChild(expenseContainer)
+
+  // Dispatch input event to make sure the loaded default percentage value gets saved to backend.
+  // But, for existing records this will not change anything the value remains the same as before.
+  inputPersonalUsage.dispatchEvent(new Event('input'))
 }
 function displayDeductionSource(deductionSourceId, deductions, submission){
   deductionSourceId = parseInt(deductionSourceId)

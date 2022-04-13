@@ -792,11 +792,16 @@ def update_selfassesment_account_submission(request, submission_id:int):
 
   try:
     record =  SelfassesmentAccountSubmission.objects.get(submission_id=submission_id)
+    currently_assigned_to = record.assigned_to
     context['form'] = SelfassesmentAccountSubmissionChangeForm(instance=record)
   except SelfassesmentAccountSubmission.DoesNotExist:
     messages.error(request, f'Selfassesment Account Submission having id {submission_id} does not exists!')
     return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_home_name)
     raise Http404
+
+  if record.status=="SUBMITTED" and not request.user.is_superuser:
+    messages.error(request, f'You can not update the submission it is already submitted!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_home_name)
 
   if request.method == 'POST':
     form = SelfassesmentAccountSubmissionChangeForm(request.POST, instance=record)
@@ -805,6 +810,9 @@ def update_selfassesment_account_submission(request, submission_id:int):
       try:
         assesment = form.save(commit=False)
         assesment.set_defaults(request)
+        if not assesment.assigned_to==currently_assigned_to and not request.user.is_superuser:
+          messages.error(request, "Only admins can change Assigned to")
+          return render(request, template_name='companies/update.html', context=context)
         assesment.save()
         messages.success(request, f'Selfassesment Account Submission has been updated having id {submission_id}!')
       except IntegrityError:

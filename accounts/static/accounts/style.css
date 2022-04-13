@@ -46,6 +46,10 @@ h3{
     background-color: #9ca3af;
 }
 
+.select-input, .select-options{
+    /* margin-left: 1em; */
+    max-width: 60em;
+}
 .select-options:hover,
 .select-input:active + .select-options,
 .select-input:focus + .select-options{
@@ -120,15 +124,6 @@ h3{
 .tabs{
     padding-bottom: 5em;
 }
-.tabs .tab{
-    display: none;
-}
-.tabs .tab.active{
-    display: block;
-}
-/* .tabs .tab[data-tab-name="incomesAndExpenses"]{
-    display: flex;
-} */
 
 /* Toggle */
 .toggle{
@@ -150,7 +145,7 @@ h3{
 }
 
 /* Incomes and Expenses tab */
-.tabs .tab[data-tab-name="incomesAndExpenses"]{
+.tabs .tab.active[data-tab-name="incomesAndExpenses"]{
     display: flex;
     flex-direction: column;
     gap: 1.55em;
@@ -187,9 +182,17 @@ h3{
     color: red;
 }
 
+
 .invisible{
     display: none !important;
 }
+.tabs .tab{
+    display: none;
+}
+.tabs .tab.active{
+    display: block;
+}
+
 
 .table{
     margin: auto;

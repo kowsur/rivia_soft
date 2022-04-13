@@ -1,0 +1,221 @@
+h1, h1.title{
+    font-size: 2.2em;
+}
+h2{
+    font-size: 1.8em;
+}
+h3{
+    font-size: 1.3em;
+}
+.income-source, .month-name{
+    font-weight: 500;
+}
+
+/* Select search */
+#add_income{
+    z-index: 3;
+}
+#add_expense{
+    z-index: 2;
+}
+#add_deduction_and_allowance{
+    z-index: 1;
+}
+
+.select{
+    position: relative;
+}
+
+.select-options{
+    position: absolute;
+    top: 100%;
+    display: none;
+    background-color: #d0d3d7;
+    width: 100%;
+    padding: .5em;
+    border-radius: .5em;
+    max-height: 200px;
+    overflow-y: scroll;
+}
+.select-options div{
+    padding: .5em .3em;
+    border-radius: .5em;
+    z-index: inherit;
+}
+.select-options div:hover{
+    background-color: #9ca3af;
+}
+
+/* .select, .toggle{ */
+/* .select{
+    max-width: 60em;
+} */
+
+.select-options:hover,
+.select-input:active + .select-options,
+.select-input:focus + .select-options{
+    display: block;
+}
+
+@media(prefers-color-scheme: dark) {
+    .select-options{
+        background-color: #263346;
+        color: #9ca3af;
+    }
+    .select-options div:hover{
+        background-color: #1c2432;
+    }
+}
+
+:root{
+    /* nav tab item styles */
+    --nav-tab-margin-top: 1em;
+    --nav-tab-margin-bottom: var(--nav-tab-item-padding-top);
+    --nav-tab-margin-left: 0em;
+    --nav-tab-margin-right: var(--nav-tab-item-padding-left);
+
+    /* nav tab item styles */
+    --nav-tab-item-padding-top: .8em;
+    --nav-tab-item-padding-bottom: var(--nav-tab-item-padding-top);
+    --nav-tab-item-padding-left: 1em;
+    --nav-tab-item-padding-right: var(--nav-tab-item-padding-left);
+    --nav-tab-item-active-bg-color: rgb(6, 122, 54);
+    --nav-tab-item-hover-bg-color: rgb(11, 173, 79);
+    --nav-tab-item-active-text-color: rgb(237, 253, 244);
+
+    --nav-tab-item-border-radus: .5em;
+    --nav-tab-item-border-size: 1px;
+    --nav-tab-item-border-style: solid;
+    --nav-tab-item-border-color: rgb(9, 151, 68);
+    --nav-tab-item-margin-top: 2px;
+    --nav-tab-item-margin-bottom: var(--nav-tab-item-margin-top);
+    --nav-tab-item-margin-left: var(--nav-tab-item-margin-top);
+    --nav-tab-item-margin-right: var(--nav-tab-item-margin-left);
+}
+
+.tab-nav{
+    display: flex;
+    flex-wrap: wrap;
+    user-select: none;
+    margin: var(--nav-tab-margin-top) var(--nav-tab-margin-right) var(--nav-tab-margin-bottom) var(--nav-tab-margin-left);
+}
+
+.tab-nav-item{
+    border: var(--nav-tab-item-border-size) var(--nav-tab-item-border-style) var(--nav-tab-item-border-color);
+    padding-top: var(--nav-tab-item-padding-top);
+    padding-bottom: var(--nav-tab-item-padding-bottom);
+    padding-left: var(--nav-tab-item-padding-left);
+    padding-right: var(--nav-tab-item-padding-right);
+    border-radius: var(--nav-tab-item-border-radus);
+    margin: var(--nav-tab-item-margin-top) var(--nav-tab-item-margin-right) var(--nav-tab-item-margin-bottom) var(--nav-tab-item-margin-left);
+}
+
+.tab-nav-item:hover{
+    background-color: var(--nav-tab-item-hover-bg-color);
+    color: var(--nav-tab-item-active-text-color);
+    cursor: pointer;
+}
+
+.tab-nav-item.active{
+    background-color: var(--nav-tab-item-active-bg-color);
+    color: var(--nav-tab-item-active-text-color);
+    cursor: default;
+}
+
+.tabs{
+    padding-bottom: 5em;
+}
+
+/* Toggle */
+.toggle{
+    user-select: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: auto;
+}
+.toggle:hover{
+    cursor: pointer;
+}
+
+
+/* Detais tab */
+.detail{
+    margin: 1rem 0rem;
+}
+
+/* Incomes and Expenses tab */
+.tabs .tab.active[data-tab-name="incomesAndExpenses"]{
+    display: flex;
+    flex-direction: column;
+    gap: 1.55em;
+}
+
+.title{
+    font-size: large;
+    font-weight: 600;
+}
+
+.incomes, .expenses{
+    margin-top: 1em;
+}
+
+.months{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.month{
+    margin: 1em 1em;
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+}
+.month div{
+    margin-left: 1em;
+}
+.month input{
+    width: 18ch;
+}
+
+#client-account-status{
+    color: red;
+}
+
+
+.invisible{
+    display: none !important;
+}
+.tabs .tab{
+    display: none;
+}
+.tabs .tab.active{
+    display: block;
+}
+
+
+.table{
+    margin: auto;
+    padding: 0 1em;
+}
+.table .row {
+    display: grid;
+    grid-template-columns: 10ch 1fr 1fr 2fr;
+    grid-gap: 4px;
+    margin: 4px 0px;
+}
+
+.table .thead .row span{
+    font-weight: 900;
+}
+.table .row span{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    align-content: center;
+}
+.table .row input{
+    width: 100%;
+}

@@ -10,11 +10,11 @@ from django.db.models import QuerySet
 
 # Models
 from companies.models import SelfassesmentAccountSubmission
-from .models import SelfemploymentIncomeSources, SelfemploymentExpenseSources, SelfemploymentDeductionSources, Months, SelfemploymentExpensesPerTaxYear, SelfemploymentIncomesPerTaxYear, SelfemploymentDeductionsPerTaxYear
+from .models import SelfemploymentIncomeSources, SelfemploymentExpenseSources, SelfemploymentDeductionSources, Months, SelfemploymentExpensesPerTaxYear, SelfemploymentIncomesPerTaxYear, SelfemploymentDeductionsPerTaxYear, TaxableIncomeSources, TaxableIncomeSourceForSubmission
 
 # Serializers
 from rest_framework.renderers import JSONRenderer
-from .serializers import SelfemploymentIncomeSourcesSerializer, SelfemploymentExpenseSourcesSerializer, SelfemploymentDeductionSourcesSerializer, MonthsSerializer, SelfemploymentIncomesPerTaxYearSerializer, SelfemploymentExpensesPerTaxYearSerializer, SelfemploymentDeductionsPerTaxYearSerializer
+from .serializers import SelfemploymentIncomeSourcesSerializer, SelfemploymentExpenseSourcesSerializer, SelfemploymentDeductionSourcesSerializer, MonthsSerializer, SelfemploymentIncomesPerTaxYearSerializer, SelfemploymentExpensesPerTaxYearSerializer, SelfemploymentDeductionsPerTaxYearSerializer, TaxableIncomeSourcesSerializer, TaxableIncomeSourceForSubmissionSerializer
 dump_to_json = JSONRenderer()
 
 from companies.views import URLS, serialized
@@ -270,6 +270,13 @@ def get_deductions_for_submission(request: HttpRequest, submission_id):
     json_response = dump_to_json.render(serialized_data.data)
     return HttpResponse(json_response, content_type='application/json')
 
+@login_required
+def get_taxable_incomes_for_submission(request: HttpRequest, submission_id):
+    taxable_incomes = TaxableIncomeSourceForSubmission.objects.filter(submission=submission_id).order_by('taxable_income_source')
+    serialized_data = TaxableIncomeSourceForSubmissionSerializer(taxable_incomes, many=True)
+    json_response = dump_to_json.render(serialized_data.data)
+    return HttpResponse(json_response, content_type='application/json')
+
 
 ##############################################################################
 ## Views to return data for incomes and expenses tab
@@ -299,5 +306,12 @@ def get_all_months(request):
 def get_all_deduction_sources(request):
     deduction_sources = SelfemploymentDeductionSources.objects.all()
     serialized = SelfemploymentDeductionSourcesSerializer(deduction_sources, many=True)
+    json_response = dump_to_json.render(serialized.data)
+    return HttpResponse(json_response, content_type='application/json')
+
+@login_required
+def get_all_taxable_income_sources(request):
+    taxable_income_sources = TaxableIncomeSources.objects.all()
+    serialized = TaxableIncomeSourcesSerializer(taxable_income_sources, many=True)
     json_response = dump_to_json.render(serialized.data)
     return HttpResponse(json_response, content_type='application/json')

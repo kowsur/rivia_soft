@@ -140,8 +140,9 @@ class TaxableIncomeSourceForSubmission(models.Model):
     
     submission = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)
     taxable_income_source = models.ForeignKey(TaxableIncomeSources, on_delete=models.RESTRICT)
-    income_amount = models.FloatField(default=0)
+    amount = models.FloatField(default=0)
     paid_income_tax_amount = models.FloatField(default=0)
+    note = models.TextField(default='')
 
     def __str__(self) -> str:
         return f"{self.submission} - income: {self.income_amount} - paid tax: {self.paid_income_tax_amount} - income source: {self.taxable_income_source.name}"

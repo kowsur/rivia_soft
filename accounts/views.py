@@ -32,7 +32,7 @@ def get_object_or_None(model, *args, pk=None, **kwargs):
                     rec.delete()
             if record:
                 record = record[0]
-            if type(record) is QuerySet and len(record) is 0:
+            if type(record) is QuerySet and len(record) == 0:
                 return None
         return record
     except ObjectDoesNotExist:
@@ -242,6 +242,67 @@ def upsert_deduction_for_submission(request, submission_id, deduction_id):
     if note is not None:
         deduction_for_tax_year.note = note
     deduction_for_tax_year.save()
+
+    return HttpResponse(json.dumps({'success': 'Created new record'}), status=201)
+
+
+@csrf_exempt
+@login_required
+def upsert_taxable_income_for_submission(request, submission_id, taxable_income_id):
+    if not request.method == "POST":
+        raise Http404()
+    
+    try:
+        loaded_data = json.loads(request.body.decode())
+    except json.decoder.JSONDecodeError:
+        return HttpResponse(json.dumps({'error': f'only json data is allowed'}), status=400)
+    
+    amount = loaded_data.get("amount", None)
+    paid_income_tax_amount = loaded_data.get("paid_income_tax_amount", None)
+    note = loaded_data.get("note", None)
+
+    if amount is None and paid_income_tax_amount is None and note is None:
+        return HttpResponse(json.dumps({'error': f'amount or paid_income_tax_amount or note must be specified'}), status=400)
+    
+    if paid_income_tax_amount and not 0<=paid_income_tax_amount<=100:
+        return HttpResponse(json.dumps({'error': f'paid_income_tax_amount must be between 0 and 100!'}), status=400)
+
+    # retrive selfassemsent account submission record
+    submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+    if submission is None:
+        return HttpResponse(json.dumps({'error': f'SelfassesmentAccountSubmission with pk={submission_id} does not exist'}), status=404)
+    
+    # retrive deduction source
+    taxable_income_source = get_object_or_None(TaxableIncomeSources, pk=taxable_income_id)
+    if taxable_income_source is None:
+        return HttpResponse(json.dumps({'error': f'DeductionSource with pk={taxable_income_id} does not exist'}), status=404)
+    
+    # Try to retrive TaxableIncomeSourceForSubmission if does not exist create it
+    taxable_income_for_tax_year = get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission, taxable_income_source=taxable_income_id)
+    
+    # Update existing record 
+    if taxable_income_for_tax_year:
+        if amount is not None:
+            taxable_income_for_tax_year.amount = amount
+        if paid_income_tax_amount is not None:
+            taxable_income_for_tax_year.paid_income_tax_amount = paid_income_tax_amount
+        if note is not None:
+            taxable_income_for_tax_year.note = note
+        taxable_income_for_tax_year.save()
+        return HttpResponse(json.dumps({'success': 'Updated existing record'}))
+    
+    # Save new record
+    taxable_income_for_tax_year = TaxableIncomeSourceForSubmission(
+        submission=submission,
+        taxable_income_source=taxable_income_source
+    )
+    if amount is not None:
+        taxable_income_for_tax_year.amount = amount
+    if paid_income_tax_amount is not None:
+        taxable_income_for_tax_year.paid_income_tax_amount = paid_income_tax_amount
+    if note is not None:
+        taxable_income_for_tax_year.note = note
+    taxable_income_for_tax_year.save()
 
     return HttpResponse(json.dumps({'success': 'Created new record'}), status=201)
 

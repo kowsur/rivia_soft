@@ -13,13 +13,12 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-import django
 from django.contrib import admin
 from django.urls import path, include
-from django.conf.urls.static import static
 from django.conf import settings
 from django.http import FileResponse
 from companies.views import home_merged_tracker
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     path('', home_merged_tracker),
@@ -28,7 +27,9 @@ urlpatterns = [
     path('u/', include('users.urls')),
     path('only-admins-can-access-this/', admin.site.urls, name='admin'),
     path('opensearch.xml', lambda request: FileResponse(open('I:/Projects/rs/static/osd.xml','rb')), name='opensearch'),
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+]
+
+urlpatterns += staticfiles_urlpatterns()
 
 # Custom error handler page
 handler400 = 'error_handler.views.handle_400_error'

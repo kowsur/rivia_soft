@@ -42,7 +42,7 @@ let deductionsContainer = document.querySelector(".deductions_and_allowances")
 deductionSearchInput.addEventListener('input', handleDeductionSearch)
 deductionSearchOptions.addEventListener('click', handleDeductionSelect)
 
-let totalIncomeContainers = document.querySelectorAll('[data-total-income-container]')
+let totalIncomeContainers = document.querySelectorAll('[data-total-selfemployment-income-container]')
 let totalExpenseContainers = document.querySelectorAll('[data-total-expense-container]')
 let totalDeductionContainers = document.querySelectorAll('[data-total-deduction-and-allownce-container]')
 let netProfitContainers = document.querySelectorAll('[data-net-profit-container]')

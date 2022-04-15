@@ -7,12 +7,12 @@ h2{
 h3{
     font-size: 1.3em;
 }
-.income-source, .month-name{
+.selfemployment-income-source, .month-name{
     font-weight: 500;
 }
 
 /* Select search */
-#add_income{
+#add_taxable_income{
     z-index: 3;
 }
 #add_expense{
@@ -157,7 +157,7 @@ h3{
     font-weight: 600;
 }
 
-.incomes, .expenses{
+.selfemployment-incomes, .expenses{
     margin-top: 1em;
 }
 

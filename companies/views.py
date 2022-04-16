@@ -918,7 +918,7 @@ def export_selfassesment_account_submission(request):
   include_fields = []
   exclude_fields = ['submission_id']
   fk_fields = {
-    'client_id': 'all'
+    'client_id': ['client_name', 'client_file_number', 'personal_phone_number', 'personal_post_code']
   }
   keep_include_fields = True
   show_others = True

@@ -471,18 +471,73 @@ async function updateIncomeAndExpenseTab(submissionDetails){
 function displayTaxableIncomeSource(taxableIncomeSourceId, taxableIncomes, submission){
   // add current incomeSourceId to displayingIncomeIds set to filter them out while searching
   displayingTaxableIncomeIds.add(parseInt(taxableIncomeSourceId))
-  let incomeSource = taxableIncomeSourcesMapById[taxableIncomeSourceId]
+  let taxableIncomeSource = taxableIncomeSourcesMapById[taxableIncomeSourceId]
   
   let taxableIncomeContainer = createNodeFromMarkup(`
-  <div class="taxable-income" data-income-section="${incomeSource.id}">
+  <div class="taxable-income" data-taxable-income-section="${taxableIncomeSource.id}">
     <div class="toggle">
-      <h2 class="taxable-income-source">${incomeSource.name} Total: <span data-total-container-for-taxable-income-source>0</span></h2>
+      <h2 class="taxable-income-source">${taxableIncomeSource.name}</h2>
       <img src='/static/accounts/expand.svg'/>
     </div>
     <div class="months invisible">
     </div>
   </div>`)
 
+  let monthContainer = taxableIncomeContainer.querySelector('.months')
+  let toggle = taxableIncomeContainer.querySelector('.toggle')
+  let toggleImg = taxableIncomeContainer.querySelector('.toggle img')
+
+  // adding event listener to show or hide details for an income source
+  toggle.addEventListener('click', (e)=>{
+    if (monthContainer.classList.contains('invisible')) {
+      monthContainer.classList.remove('invisible')
+      toggleImg.src = '/static/accounts/collapse.svg'
+    }else{
+      monthContainer.classList.add('invisible')
+      toggleImg.src = '/static/accounts/expand.svg'
+    }
+  })
+
+  let taxableIncome = taxableIncomes.find(taxableIncome=>taxableIncome.taxable_income_source===taxableIncomeSource.id) || {
+    "amount": 0,
+    "paid_income_tax_amount": 0,
+    "note": "",
+    "submission": submissionId,
+    "taxable_income_source": taxableIncomeSourceId,
+  }
+
+  let inputAmountId = `taxable_income_amount_${taxableIncomeSourceId}`
+  let inputPaidIncomeTaxAmountId = `taxable_income_paid_income_tax_amount_${taxableIncomeSourceId}`
+  let inputNoteId = `taxable_income_note_${taxableIncomeSourceId}`
+
+  let taxableIncomeMarkup = `
+  <div class="month">
+    <div>
+      <label for="${inputAmountId}">Amount</label>
+      <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${taxableIncome?.amount}" data-submission-id="${submissionId}" data-taxable-income-id="${taxableIncome.taxable_income_source}" data-update-type="amount">
+    </div>
+    <div>
+      <label for="${inputPaidIncomeTaxAmountId}">Paid income tax amount</label>
+      <input type="number" max=${DB_MAX_INT_VALUE} id=${inputPaidIncomeTaxAmountId} value="${taxableIncome?.paid_income_tax_amount}" data-submission-id="${submissionId}" data-taxable-income-id="${taxableIncome.taxable_income_source}" data-update-type="paid_income_tax_amount">
+    </div>
+    <div>
+      <label for="${inputNoteId}">Note</label>
+      <textarea id=${inputNoteId} data-submission-id="${submissionId}" data-taxable-income-id="${taxableIncome.taxable_income_source}" data-update-type="note">${taxableIncome.note}</textarea>
+    </div>
+  </div>
+  `
+
+  let node = createNodeFromMarkup(taxableIncomeMarkup)
+  let inputAmount = node.querySelector(`#${inputAmountId}`)
+  let inputPaidIncomeTaxAmount = node.querySelector(`#${inputPaidIncomeTaxAmountId}`)
+  let inputNote = node.querySelector(`#${inputNoteId}`)
+
+  addEventListenersToElements(inputAmount, 'input', [validateMaxValue, handleTaxableIncomeUpdate, updateTotalTaxableIncome, updateNetProfit])
+  addEventListenersToElements(inputPaidIncomeTaxAmount, 'input', [validateMaxValue, handleTaxableIncomeUpdate, updateTotalTaxableIncome, updateNetProfit])
+  addEventListenersToElements(inputNote, 'input', handleTaxableIncomeUpdate)
+
+  monthContainer.appendChild(node)
+  taxableIncomesContainer.appendChild(taxableIncomeContainer)
 }
 
 function displaySelfemploymentIncomeSource(incomeSourceId, incomes, submission){
@@ -931,7 +986,7 @@ function handleTaxableIncomeUpdate(e){
   let data_object = {} // amount or comission or both must be specified
 
   if (updateType==="amount") data_object.amount = parseFloat(inputField.value) || 0
-  else if (updateType==="taxable_income_tax_amount") data_object.taxable_income_tax_amount = parseFloat(inputField.value) || 0
+  else if (updateType==="paid_income_tax_amount") data_object.paid_income_tax_amount = parseFloat(inputField.value) || 0
   else if (updateType==="note") data_object.note = inputField.value
 
   fetch_url({

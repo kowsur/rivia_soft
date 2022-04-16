@@ -64,7 +64,7 @@ class TaxableIncomeSourcesSerializer(serializers.ModelSerializer):
 
 
 class TaxableIncomeSourceForSubmissionSerializer(serializers.ModelSerializer):
-    taxable_income_source = TaxableIncomeSourcesSerializer()
+    # taxable_income_source = TaxableIncomeSourcesSerializer()
 
     class Meta:
         model = TaxableIncomeSourceForSubmission

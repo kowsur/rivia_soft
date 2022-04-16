@@ -145,7 +145,7 @@ class TaxableIncomeSourceForSubmission(models.Model):
     note = models.TextField(default='')
 
     def __str__(self) -> str:
-        return f"{self.submission} - income: {self.income_amount} - paid tax: {self.paid_income_tax_amount} - income source: {self.taxable_income_source.name}"
+        return f"{self.submission} - income: {self.amount} - paid tax: {self.paid_income_tax_amount} - income source: {self.taxable_income_source.name}"
 
 class SelfemploymentUkTaxConfigForTaxYear(models.Model):
     class Meta:

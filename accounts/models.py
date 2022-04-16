@@ -185,7 +185,7 @@ class SelfemploymentClass4TaxConfigForTaxYear(models.Model):
     higher_rate_tax_percentage = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(100)])
 
     def __str__(self) -> str:
-        return f"{self.tax_year} - {self.tax_applied_for_income_above} - {self.flat_tax_amount}"
+        return f"{self.tax_year} - {self.basic_rate_min} {self.basic_rate_tax_percentage}% - {self.basic_rate_max} {self.higher_rate_tax_percentage}%"
 
 
 class SelfemploymentClass2TaxConfigForTaxYear(models.Model):

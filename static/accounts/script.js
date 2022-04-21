@@ -23,12 +23,18 @@ tabNavList.addEventListener("click", (e)=>{
 })
 
 // =============================================================================================================================
-// 
-let incomeSearchInput = document.querySelector('#add_income_input')
-let incomeSearchOptions = document.querySelector('#add_income_options')
-let incomesContainer = document.querySelector(".incomes")
-incomeSearchInput.addEventListener('input', handleIncomeSearch)
-incomeSearchOptions.addEventListener('click', handleIncomeSelect)
+
+let taxableIncomeSearchInput = document.querySelector('#add_taxable_income_input')
+let taxableIncomeSearchOptions = document.querySelector('#add_taxable_income_options')
+let taxableIncomesContainer = document.querySelector(".taxable-incomes")
+taxableIncomeSearchInput.addEventListener('input', handleTaxableIncomeSearch)
+taxableIncomeSearchOptions.addEventListener('click', handleTaxableIncomeSelect)
+
+let selfemploymentIncomeSearchInput = document.querySelector('#add_selfemployment_income_input')
+let selfemploymentIncomeSearchOptions = document.querySelector('#add_selfemployment_income_options')
+let selfemploymentIncomesContainer = document.querySelector(".selfemployment-incomes")
+selfemploymentIncomeSearchInput.addEventListener('input', handleSelfemploymentIncomeSearch)
+selfemploymentIncomeSearchOptions.addEventListener('click', handleSelfemploymentIncomeSelect)
 
 let expenseSearchInput = document.querySelector('#add_expense_input')
 let expenseSearchOptions = document.querySelector('#add_expense_options')
@@ -42,43 +48,66 @@ let deductionsContainer = document.querySelector(".deductions_and_allowances")
 deductionSearchInput.addEventListener('input', handleDeductionSearch)
 deductionSearchOptions.addEventListener('click', handleDeductionSelect)
 
-let totalIncomeContainers = document.querySelectorAll('[data-total-selfemployment-income-container]')
+let totalTaxableIncomeContainers = document.querySelectorAll('[data-total-taxable-income-container]')
+let totalSelfemploymentIncomeContainers = document.querySelectorAll('[data-total-selfemployment-income-container]')
 let totalExpenseContainers = document.querySelectorAll('[data-total-expense-container]')
 let totalDeductionContainers = document.querySelectorAll('[data-total-deduction-and-allownce-container]')
 let netProfitContainers = document.querySelectorAll('[data-net-profit-container]')
 let showUptoDecimalDigits = 2
 
-function calculateIncome(incomeAmount, comission){
-  let actualIncome = incomeAmount-comission
+
+function calculateTaxableIncome(incomeAmount, paid_income_tax_amount){
+  let actualIncome = incomeAmount//-paid_income_tax_amount
   if (actualIncome<0) actualIncome=0
   return actualIncome
 }
 
-async function getTotalIncomeForIncomeSection(incomeSectionContainer){
-  let inputAmountFields = incomeSectionContainer.querySelectorAll('.incomes input[data-update-type="amount"]')
-  let inputComissionFields = incomeSectionContainer.querySelectorAll('.incomes input[data-update-type="comission"]')
+async function getTotalTaxableIncome(){
+  let inputAmountFields = document.querySelectorAll('.taxable-incomes input[data-update-type="amount"]')
+  let inputPaidTaxAmountFields = document.querySelectorAll('.taxable-incomes input[data-update-type="paid_income_tax_amount"]')
   let totalIncome = 0
 
   for (let i=0; i<inputAmountFields.length; i++){
     let amount = parseFloat(inputAmountFields[i].value) || 0
-    let comission = parseFloat(inputComissionFields[i].value) || 0
+    let paid_income_tax_amount = parseFloat(inputPaidTaxAmountFields[i].value) || 0
 
-    totalIncome+=calculateIncome(amount, comission)
+    totalIncome+=calculateTaxableIncome(amount, paid_income_tax_amount)
   }
 
   return totalIncome
 }
 
-async function getTotalIncome(){
-  let inputAmountFields = document.querySelectorAll('.incomes input[data-update-type="amount"]')
-  let inputComissionFields = document.querySelectorAll('.incomes input[data-update-type="comission"]')
-  let totalIncome = 0
+function calculateSelfemploymentIncome(incomeAmount, comission){
+  let actualIncome = incomeAmount-comission
+  if (actualIncome<0) actualIncome=0
+  return actualIncome
+}
 
+async function getTotalSelfemploymentIncomeForSelfemploymentIncomeSection(incomeSectionContainer){
+  let inputAmountFields = incomeSectionContainer.querySelectorAll('.selfemployment-incomes input[data-update-type="amount"]')
+  let inputComissionFields = incomeSectionContainer.querySelectorAll('.selfemployment-incomes input[data-update-type="comission"]')
+  let totalIncome = 0
+  
   for (let i=0; i<inputAmountFields.length; i++){
     let amount = parseFloat(inputAmountFields[i].value) || 0
     let comission = parseFloat(inputComissionFields[i].value) || 0
 
-    totalIncome+=calculateIncome(amount, comission)
+    totalIncome+=calculateSelfemploymentIncome(amount, comission)
+  }
+
+  return totalIncome
+}
+
+async function getTotalSelfemploymentIncome(){
+  let inputAmountFields = document.querySelectorAll('.selfemployment-incomes input[data-update-type="amount"]')
+  let inputComissionFields = document.querySelectorAll('.selfemployment-incomes input[data-update-type="comission"]')
+  let totalIncome = 0
+  
+  for (let i=0; i<inputAmountFields.length; i++){
+    let amount = parseFloat(inputAmountFields[i].value) || 0
+    let comission = parseFloat(inputComissionFields[i].value) || 0
+
+    totalIncome+=calculateSelfemploymentIncome(amount, comission)
   }
 
   return totalIncome
@@ -132,24 +161,31 @@ async function getTotalDeduction(){
 }
 
 async function getNetProfit(){
-  let totalIncome = await getTotalIncome()
+  let totalIncome = await getTotalSelfemploymentIncome()
   let totalExpense = await getTotalExpense()
   let totalDeduction = await getTotalDeduction()
   return totalIncome - (totalExpense + totalDeduction)
 }
 
-async function updateTotalIncomeForIncomeSection(incomeSectionContainer, totalIncomeContainerForSection){
-  let totalIncome = await getTotalIncomeForIncomeSection(incomeSectionContainer)
+async function updateTotalSelfemploymentIncomeForSelfemploymentIncomeSection(incomeSectionContainer, totalIncomeContainerForSection){
+  let totalIncome = await getTotalSelfemploymentIncomeForSelfemploymentIncomeSection(incomeSectionContainer)
   totalIncome = parseFloat(totalIncome).toFixed(showUptoDecimalDigits) || 0
 
   totalIncomeContainerForSection.textContent = totalIncome
 }
 
-async function updateTotalIncome(){
-  let totalIncome = await getTotalIncome()
+async function updateTotalTaxableIncome(){
+  let totalIncome = await getTotalTaxableIncome()
   totalIncome = parseFloat(totalIncome).toFixed(showUptoDecimalDigits) || 0
 
-  totalIncomeContainers.forEach((totalIncomeContainer)=>totalIncomeContainer.textContent = totalIncome)
+  totalTaxableIncomeContainers.forEach((totalIncomeContainer)=>totalIncomeContainer.textContent = totalIncome)
+}
+
+async function updateTotalSelfemploymentIncome(){
+  let totalIncome = await getTotalSelfemploymentIncome()
+  totalIncome = parseFloat(totalIncome).toFixed(showUptoDecimalDigits) || 0
+
+  totalSelfemploymentIncomeContainers.forEach((totalIncomeContainer)=>totalIncomeContainer.textContent = totalIncome)
 }
 
 async function updateTotalExpense(){
@@ -179,36 +215,43 @@ async function updateNetProfit(){
 let urlParams = getAllUrlParams(location.href)
 let submissionId = urlParams.pk
 
-const displayingIncomeIds = new Set()
+const displayingTaxableIncomeIds = new Set()
+const displayingSelfemploymentIncomeIds = new Set()
 const displayingExpenseIds = new Set()
 const displayingDeductionIds = new Set()
 
 let submissionDetails = null
-let allIncomeSources = null
+let allTaxableIncomeSources = null
+let allSelfemploymentIncomeSources = null
 let allExpenseSources = null
 let allDeductionSources = null
 let allMonths = null
-let allIncomesForSubmission = null
+let allTaxableIncomesForSubmission = null
+let allSelfemploymentIncomesForSubmission = null
 let allExpensesForSubmission = null
 let allDeductionsForSubmission = null
 
 // Maps to speed up the lookup
 const monthsMapById = {}
-const incomeSourcesMapById = {}
+const taxableIncomeSourcesMapById = {}
+const selfemploymentIncomeSourcesMapById = {}
 const expenseSourcesMapById = {}
 const deductionSourcesMapById = {}
-const groupedAllIncomesForSubmissionMapBySourceId = {}
+const groupedAllTaxableIncomesForSubmissionMapBySourceId = {}
+const groupedAllSelfemploymentIncomesForSubmissionMapBySourceId = {}
 const groupedAllExpensesForSubmissionMapBySourceId = {}
 const groupedAllDeductionsForSubmissionMapBySourceId = {}
 
 
 // get data
-getSubmissionDetails(updateDetailsTab, updateIncomeAndExpenseTab, updateTaxCalculationTab, updateDetailsTab)
-getIncomeSources()
+getSubmissionDetails(updateDetailsTab, updateIncomeAndExpenseTab)
+getTaxableIncomeSources()
+getSelfemploymentIncomeSources()
 getExpneseSources()
 getDeductionSources()
 getMonths()
-getAllIncomesForSubmission()
+getAllTaxableIncomesForSubmission()
+getAllSelfemploymentIncomesForSubmission()
 getAllExpensesForSubmission()
 getAllDeductionsForSubmission()
 
@@ -226,18 +269,31 @@ async function getSubmissionDetails(...callbacks){
   }
   return submissionDetails
 }
-async function getIncomeSources(...callbacks){
-  if (allIncomeSources!==null) return allIncomeSources
+async function getTaxableIncomeSources(...callbacks){
+  if (allTaxableIncomeSources!==null) return allTaxableIncomeSources
 
-  let records = await fetch_url({url: '/accounts/income_sources/'})
-  allIncomeSources = await records.json()
-  mapRecordsByAttribute(allIncomeSources, 'id', incomeSourcesMapById)
+  let records = await fetch_url({url: '/accounts/taxable_income_sources/'})
+  allTaxableIncomeSources = await records.json()
+  mapRecordsByAttribute(allTaxableIncomeSources, 'id', taxableIncomeSourcesMapById)
   
   if (Array.isArray(callbacks)) callbacks.forEach(callback => {
-    callback(allIncomeSources)
+    callback(allTaxableIncomeSources)
   });
 
-  return allIncomeSources
+  return allTaxableIncomeSources
+}
+async function getSelfemploymentIncomeSources(...callbacks){
+  if (allSelfemploymentIncomeSources!==null) return allSelfemploymentIncomeSources
+
+  let records = await fetch_url({url: '/accounts/income_sources/'})
+  allSelfemploymentIncomeSources = await records.json()
+  mapRecordsByAttribute(allSelfemploymentIncomeSources, 'id', selfemploymentIncomeSourcesMapById)
+  
+  if (Array.isArray(callbacks)) callbacks.forEach(callback => {
+    callback(allSelfemploymentIncomeSources)
+  });
+
+  return allSelfemploymentIncomeSources
 }
 async function getExpneseSources(...callbacks){
   if (allExpenseSources!==null) return allExpenseSources
@@ -274,18 +330,31 @@ async function getMonths(...callbacks){
   });
   return allMonths
 }
-async function getAllIncomesForSubmission(...callbacks){
-  if (allIncomesForSubmission!==null) return allIncomesForSubmission
+async function getAllTaxableIncomesForSubmission(...callbacks){
+  if (allTaxableIncomesForSubmission!==null) return allTaxableIncomesForSubmission
 
-  let records = await fetch_url({url: `/accounts/incomes/${submissionId}/`})
-  allIncomesForSubmission = await records.json()
-  groupRecordsByAttribute(allIncomesForSubmission, 'income_source', groupedAllIncomesForSubmissionMapBySourceId)
+  let records = await fetch_url({url: `/accounts/taxable_incomes/${submissionId}/`})
+  allTaxableIncomesForSubmission = await records.json()
+  groupRecordsByAttribute(allTaxableIncomesForSubmission, 'taxable_income_source', groupedAllTaxableIncomesForSubmissionMapBySourceId)
   
   if (Array.isArray(callbacks)) callbacks.forEach(callback => {
-    callback(allIncomesForSubmission)
+    callback(allTaxableIncomesForSubmission)
   });
 
-  return allIncomesForSubmission
+  return allTaxableIncomesForSubmission
+}
+async function getAllSelfemploymentIncomesForSubmission(...callbacks){
+  if (allSelfemploymentIncomesForSubmission!==null) return allSelfemploymentIncomesForSubmission
+
+  let records = await fetch_url({url: `/accounts/incomes/${submissionId}/`})
+  allSelfemploymentIncomesForSubmission = await records.json()
+  groupRecordsByAttribute(allSelfemploymentIncomesForSubmission, 'income_source', groupedAllSelfemploymentIncomesForSubmissionMapBySourceId)
+  
+  if (Array.isArray(callbacks)) callbacks.forEach(callback => {
+    callback(allSelfemploymentIncomesForSubmission)
+  });
+
+  return allSelfemploymentIncomesForSubmission
 }
 async function getAllExpensesForSubmission(...callbacks){
   if (allExpensesForSubmission!==null) return allExpensesForSubmission
@@ -353,19 +422,27 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   taxYear.textContent = submissionDetails.tax_year.tax_year
 
   // These are required to load data incase data is not loaded
-  let incomeSources = await getIncomeSources()
+  let taxableIncomeSources = await getTaxableIncomeSources()
+  let selfemploymentIncomeSources = await getSelfemploymentIncomeSources()
   let expenseSources = await getExpneseSources()
   let deductionSources = await getDeductionSources()
   let months = await getMonths()
-  let allIncomesForSubmission = await getAllIncomesForSubmission()
+  let allTaxableIncomesForSubmission = await getAllTaxableIncomesForSubmission()
+  let allSelfemploymentIncomesForSubmission = await getAllSelfemploymentIncomesForSubmission()
   let allExpensesForSubmission = await getAllExpensesForSubmission()
   let allDeductionsForSubmission = await getAllDeductionsForSubmission()
 
-  Object.entries(groupedAllIncomesForSubmissionMapBySourceId).forEach(([incomeSourceId, incomes]) => {
-    displayIncomeSource(incomeSourceId, incomes, submissionDetails)
+  Object.entries(groupedAllTaxableIncomesForSubmissionMapBySourceId).forEach(([taxableIncomeSourceId, taxableIncomes]) => {
+    displayTaxableIncomeSource(taxableIncomeSourceId, taxableIncomes, submissionDetails)
   });
-  displayIncomeOptions()
-  updateTotalIncome()
+  displayTaxableIncomeOptions()
+  updateTotalTaxableIncome()
+
+  Object.entries(groupedAllSelfemploymentIncomesForSubmissionMapBySourceId).forEach(([incomeSourceId, incomes]) => {
+    displaySelfemploymentIncomeSource(incomeSourceId, incomes, submissionDetails)
+  });
+  displaySelfemploymentIncomeOptions()
+  updateTotalSelfemploymentIncome()
 
   // Show expenses with data from backend
   Object.entries(groupedAllExpensesForSubmissionMapBySourceId).forEach(([expenseSourceId, expenses]) => {
@@ -391,15 +468,87 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   updateNetProfit()
 }
 
-function displayIncomeSource(incomeSourceId, incomes, submission){
+function displayTaxableIncomeSource(taxableIncomeSourceId, taxableIncomes, submission){
   // add current incomeSourceId to displayingIncomeIds set to filter them out while searching
-  displayingIncomeIds.add(parseInt(incomeSourceId))
-  let incomeSource = incomeSourcesMapById[incomeSourceId]
+  displayingTaxableIncomeIds.add(parseInt(taxableIncomeSourceId))
+  let taxableIncomeSource = taxableIncomeSourcesMapById[taxableIncomeSourceId]
+  
+  let taxableIncomeContainer = createNodeFromMarkup(`
+  <div class="taxable-income" data-taxable-income-section="${taxableIncomeSource.id}">
+    <div class="toggle">
+      <h2 class="taxable-income-source">${taxableIncomeSource.name}</h2>
+      <img src='/static/accounts/expand.svg'/>
+    </div>
+    <div class="months invisible">
+    </div>
+  </div>`)
+
+  let monthContainer = taxableIncomeContainer.querySelector('.months')
+  let toggle = taxableIncomeContainer.querySelector('.toggle')
+  let toggleImg = taxableIncomeContainer.querySelector('.toggle img')
+
+  // adding event listener to show or hide details for an income source
+  toggle.addEventListener('click', (e)=>{
+    if (monthContainer.classList.contains('invisible')) {
+      monthContainer.classList.remove('invisible')
+      toggleImg.src = '/static/accounts/collapse.svg'
+    }else{
+      monthContainer.classList.add('invisible')
+      toggleImg.src = '/static/accounts/expand.svg'
+    }
+  })
+
+  let taxableIncome = taxableIncomes.find(taxableIncome=>taxableIncome.taxable_income_source===taxableIncomeSource.id) || {
+    "amount": 0,
+    "paid_income_tax_amount": 0,
+    "note": "",
+    "submission": submissionId,
+    "taxable_income_source": taxableIncomeSourceId,
+  }
+
+  let inputAmountId = `taxable_income_amount_${taxableIncomeSourceId}`
+  let inputPaidIncomeTaxAmountId = `taxable_income_paid_income_tax_amount_${taxableIncomeSourceId}`
+  let inputNoteId = `taxable_income_note_${taxableIncomeSourceId}`
+
+  let taxableIncomeMarkup = `
+  <div class="month">
+    <div>
+      <label for="${inputAmountId}">Amount</label>
+      <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${taxableIncome?.amount}" data-submission-id="${submissionId}" data-taxable-income-id="${taxableIncome.taxable_income_source}" data-update-type="amount">
+    </div>
+    <div>
+      <label for="${inputPaidIncomeTaxAmountId}">Paid income tax amount</label>
+      <input type="number" max=${DB_MAX_INT_VALUE} id=${inputPaidIncomeTaxAmountId} value="${taxableIncome?.paid_income_tax_amount}" data-submission-id="${submissionId}" data-taxable-income-id="${taxableIncome.taxable_income_source}" data-update-type="paid_income_tax_amount">
+    </div>
+    <div>
+      <label for="${inputNoteId}">Note</label>
+      <textarea id=${inputNoteId} data-submission-id="${submissionId}" data-taxable-income-id="${taxableIncome.taxable_income_source}" data-update-type="note">${taxableIncome.note}</textarea>
+    </div>
+  </div>
+  `
+
+  let node = createNodeFromMarkup(taxableIncomeMarkup)
+  let inputAmount = node.querySelector(`#${inputAmountId}`)
+  let inputPaidIncomeTaxAmount = node.querySelector(`#${inputPaidIncomeTaxAmountId}`)
+  let inputNote = node.querySelector(`#${inputNoteId}`)
+
+  addEventListenersToElements(inputAmount, 'input', [validateMaxValue, handleTaxableIncomeUpdate, updateTotalTaxableIncome, updateNetProfit])
+  addEventListenersToElements(inputPaidIncomeTaxAmount, 'input', [validateMaxValue, handleTaxableIncomeUpdate, updateTotalTaxableIncome, updateNetProfit])
+  addEventListenersToElements(inputNote, 'input', handleTaxableIncomeUpdate)
+
+  monthContainer.appendChild(node)
+  taxableIncomesContainer.appendChild(taxableIncomeContainer)
+}
+
+function displaySelfemploymentIncomeSource(incomeSourceId, incomes, submission){
+  // add current incomeSourceId to displayingIncomeIds set to filter them out while searching
+  displayingSelfemploymentIncomeIds.add(parseInt(incomeSourceId))
+  let incomeSource = selfemploymentIncomeSourcesMapById[incomeSourceId]
   
   let incomeContainer = createNodeFromMarkup(`
-  <div class="income" data-income-section="${incomeSource.id}">
+  <div class="selfemployment-income" data-income-section="${incomeSource.id}">
     <div class="toggle">
-      <h2 class="income-source">${incomeSource.name} Total: <span data-total-container-for-income-source>0</span></h2>
+      <h2 class="selfemployment-income-source">${incomeSource.name} Total: <span data-total-container-for-selfemployment-income-source>0</span></h2>
       <img src='/static/accounts/expand.svg'/>
     </div>
     <div class="months invisible">
@@ -469,20 +618,20 @@ function displayIncomeSource(incomeSourceId, incomes, submission){
   let inputAmountElements = displayTable.querySelectorAll('input[data-update-type="amount"]')
   let inputComissionElements = displayTable.querySelectorAll('input[data-update-type="comission"]')
   let inputNoteElements = displayTable.querySelectorAll('textarea[data-update-type="note"]')
-  addEventListenersToElements(Array.from(inputAmountElements), 'input', [validateMaxValue, handleIncomeUpdate, updateTotalIncome, updateNetProfit])
-  addEventListenersToElements(Array.from(inputComissionElements), 'input', [validateMaxValue, handleIncomeUpdate, updateTotalIncome, updateNetProfit])
-  addEventListenersToElements(Array.from(inputNoteElements), 'input', [handleIncomeUpdate])
+  addEventListenersToElements(Array.from(inputAmountElements), 'input', [validateMaxValue, handleSelfemploymentIncomeUpdate, updateTotalSelfemploymentIncome, updateNetProfit])
+  addEventListenersToElements(Array.from(inputComissionElements), 'input', [validateMaxValue, handleSelfemploymentIncomeUpdate, updateTotalSelfemploymentIncome, updateNetProfit])
+  addEventListenersToElements(Array.from(inputNoteElements), 'input', [handleSelfemploymentIncomeUpdate])
   
   // add the newly prepared income source to incomes
-  incomesContainer.appendChild(incomeContainer)
+  selfemploymentIncomesContainer.appendChild(incomeContainer)
   
-  let incomeSectionContainer = document.querySelector(`.income[data-income-section="${incomeSource.id}"]`)
-  let totalIncomeContainerForSection = incomeSectionContainer.querySelector('span[data-total-container-for-income-source]')
+  let incomeSectionContainer = document.querySelector(`.selfemployment-income[data-income-section="${incomeSource.id}"]`)
+  let totalIncomeContainerForSection = incomeSectionContainer.querySelector('span[data-total-container-for-selfemployment-income-source]')
   
-  let handleTotalIncomeUpdateForSection = updateTotalIncomeForIncomeSection.bind(undefined, incomeSectionContainer, totalIncomeContainerForSection)
-  addEventListenersToElements([...Array.from(inputAmountElements), ...Array.from(inputComissionElements)], 'input', handleTotalIncomeUpdateForSection)
+  let handleTotalSelfemploymentIncomeUpdateForSection = updateTotalSelfemploymentIncomeForSelfemploymentIncomeSection.bind(undefined, incomeSectionContainer, totalIncomeContainerForSection)
+  addEventListenersToElements([...Array.from(inputAmountElements), ...Array.from(inputComissionElements)], 'input', handleTotalSelfemploymentIncomeUpdateForSection)
   // Initially Call to update the seciton total
-  handleTotalIncomeUpdateForSection()
+  handleTotalSelfemploymentIncomeUpdateForSection()
 }
 
 function addEventListenersToElements(element_or_elements, eventName, eventFunction_or_Functions){
@@ -512,7 +661,7 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
   let expenseContainer = createNodeFromMarkup(`
   <div class="expense">
     <div class="toggle">
-      <h2 class="income-source">${expenseSource.name}</h2>
+      <h2 class="selfemployment-income-source">${expenseSource.name}</h2>
       <img src='/static/accounts/expand.svg'/>
     </div>
     <div class="months invisible">
@@ -593,7 +742,7 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
   let deductionContainer = createNodeFromMarkup(`
   <div class="deduction">
     <div class="toggle">
-      <h2 class="income-source">${deductionSource.name}</h2>
+      <h2 class="selfemployment-income-source">${deductionSource.name}</h2>
       <img src='/static/accounts/expand.svg'/>
     </div>
     <div class="months invisible">
@@ -711,25 +860,36 @@ function groupRecordsByAttribute(records, attributeName, groupedRecords=null){
   return groupedRecords
 }
 
-// Update info in Tax Calculation tab
-function updateTaxCalculationTab(submissionDetails){
-    //
-}
-
-// Update info in View tab
-function updateViewTab(submissionDetails){
-    //
+let taxReportIframes = Array.from(document.querySelectorAll('iframe[data-tax-report]'))
+Array.from(taxReportIframes).forEach(iframe=>{
+  iframe.src = `/accounts/tax_report/${submissionId}/`
+})
+let taxCalculationTab = document.querySelector('li[data-tab-name="taxReport"]')
+console.log(taxCalculationTab)
+taxCalculationTab.addEventListener('click', updateTaxReport)
+// Update info in Tax Report tab
+function updateTaxReport(submissionDetails){
+  taxReportIframes.forEach(iframe=>{
+    iframe.contentWindow.location.reload()
+  })
 }
 
 
 // =============================================================================================================================
 // Handlers
-async function handleIncomeSearch(e){
+async function handleTaxableIncomeSearch(e){
   let searchText = e.target.value || ''
-  let incomeSources = await getIncomeSources()
-  let displayableIncomeSources = await getDisplayableSources(incomeSources, displayingIncomeIds, searchText)
+  let taxableIncomeSources = await getTaxableIncomeSources()
+  let displayableIncomeSources = await getDisplayableSources(taxableIncomeSources, displayingTaxableIncomeIds, searchText)
 
-  displayIncomeOptions(displayableIncomeSources)
+  displayTaxableIncomeOptions(displayableIncomeSources)
+}
+async function handleSelfemploymentIncomeSearch(e){
+  let searchText = e.target.value || ''
+  let incomeSources = await getSelfemploymentIncomeSources()
+  let displayableIncomeSources = await getDisplayableSources(incomeSources, displayingSelfemploymentIncomeIds, searchText)
+
+  displaySelfemploymentIncomeOptions(displayableIncomeSources)
 }
 async function handleExpenseSearch(e){
   let searchText = e.target.value || ''
@@ -749,14 +909,24 @@ async function getDisplayableSources(allSources, displayingSourceIds, searchText
   let displayableIncomeSources = allSources.filter(source=>!displayingSourceIds.has(source.id) && source.name.toLowerCase().includes(searchText.trim().toLowerCase()))
   return displayableIncomeSources
 }
-async function displayIncomeOptions(displayableIncomeSources=null){
-  let incomeSources = await getIncomeSources()
-  if (displayableIncomeSources==null) displayableIncomeSources = await getDisplayableSources(incomeSources, displayingIncomeIds)
-  incomeSearchOptions.innerHTML = ''
+async function displayTaxableIncomeOptions(displayableTaxableIncomeSources=null){
+  let incomeSources = await getTaxableIncomeSources()
+  if (displayableTaxableIncomeSources==null) displayableTaxableIncomeSources = await getDisplayableSources(incomeSources, displayingTaxableIncomeIds)
+  taxableIncomeSearchOptions.innerHTML = ''
+  displayableTaxableIncomeSources.forEach(incomeSource=>{
+    let option = createHtmlElement('div', {'data-taxable-income-id': incomeSource.id})
+    option.textContent = incomeSource.name
+    taxableIncomeSearchOptions.appendChild(option)
+  })
+}
+async function displaySelfemploymentIncomeOptions(displayableIncomeSources=null){
+  let incomeSources = await getSelfemploymentIncomeSources()
+  if (displayableIncomeSources==null) displayableIncomeSources = await getDisplayableSources(incomeSources, displayingSelfemploymentIncomeIds)
+  selfemploymentIncomeSearchOptions.innerHTML = ''
     displayableIncomeSources.forEach(incomeSource=>{
       let option = createHtmlElement('div', {'data-income-id': incomeSource.id})
       option.textContent = incomeSource.name
-      incomeSearchOptions.appendChild(option)
+      selfemploymentIncomeSearchOptions.appendChild(option)
     })
 }
 async function displayExpenseOptions(displayableExpenseSources=null){
@@ -780,12 +950,20 @@ async function displayDeductionOptions(displayableDeductionSources=null){
     })
 }
 
-async function handleIncomeSelect(e){
+async function handleTaxableIncomeSelect(e){
+  let {taxableIncomeId} = e.target.dataset
+  if (taxableIncomeId && parseInt(taxableIncomeId)){
+    taxableIncomeId = parseInt(taxableIncomeId)
+    displayTaxableIncomeSource(taxableIncomeId, [], await getSubmissionDetails())
+    displayTaxableIncomeOptions()
+  }
+}
+async function handleSelfemploymentIncomeSelect(e){
   let {incomeId} = e.target.dataset
   if (incomeId && parseInt(incomeId)){
     incomeId = parseInt(incomeId)
-    displayIncomeSource(incomeId, [], await getSubmissionDetails())
-    displayIncomeOptions()
+    displaySelfemploymentIncomeSource(incomeId, [], await getSubmissionDetails())
+    displaySelfemploymentIncomeOptions()
   }
 }
 async function handleExpenseSelect(e){
@@ -806,7 +984,24 @@ async function handleDeductionSelect(e){
 }
 
 
-function handleIncomeUpdate(e){
+function handleTaxableIncomeUpdate(e){
+  let inputField = e.target
+  let {submissionId, taxableIncomeId, updateType} = inputField.dataset
+  let data_object = {} // amount or comission or both must be specified
+
+  if (updateType==="amount") data_object.amount = parseFloat(inputField.value) || 0
+  else if (updateType==="paid_income_tax_amount") data_object.paid_income_tax_amount = parseFloat(inputField.value) || 0
+  else if (updateType==="note") data_object.note = inputField.value
+
+  fetch_url({
+    // url = "/accounts/set_income/<submission_id>/<month_id>/<income_id>/"
+    url: `/accounts/set_taxable_income/${submissionId}/${taxableIncomeId}/`,
+    req_method: "POST",
+    data_object: JSON.stringify(data_object)
+  })
+}
+
+function handleSelfemploymentIncomeUpdate(e){
   let inputField = e.target
   let {submissionId, monthId, incomeId, updateType} = inputField.dataset
   let data_object = {} // amount or comission or both must be specified

@@ -142,6 +142,9 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Set session cookie max age to 5 hours
 SESSION_COOKIE_AGE = 60*60*5
 
+# Allow iframe to load from same origin
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 STATIC_URL = '/static/'

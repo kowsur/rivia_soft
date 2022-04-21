@@ -1,6 +1,11 @@
 import json
+from io import BytesIO, StringIO
+
+from xhtml2pdf import pisa
+
 from django.http import Http404
 from django.http.request import HttpRequest
+from django.template.loader import get_template
 
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, HttpResponse
@@ -21,15 +26,18 @@ from companies.views import URLS, serialized
 from companies.decorators import allowed_for_staff, allowed_for_superuser
 
 
-def get_object_or_None(model, *args, pk=None, **kwargs):
+def get_object_or_None(model, *args, pk=None, delete_duplicate=True, return_all=False,**kwargs):
     try:
         if pk is not None:
             record = model.objects.get(pk=pk)
         else:
             record = model.objects.filter(*args, **kwargs).order_by('pk')
-            if type(record) is QuerySet and len(record)>1:
-                for rec in record[1:]:
-                    rec.delete()
+            if delete_duplicate:
+                if type(record) is QuerySet and len(record)>1:
+                    for rec in record[1:]:
+                        rec.delete()
+            if return_all:
+                return record
             if record:
                 record = record[0]
             if type(record) is QuerySet and len(record) == 0:
@@ -116,7 +124,7 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
 
 @csrf_exempt
 @login_required
-def upsert_income_for_submission(request, submission_id, month_id, income_id):
+def upsert_income_for_submission(request:HttpRequest, submission_id, month_id, income_id):
     if not request.method == "POST":
         raise Http404()
     
@@ -180,7 +188,7 @@ def upsert_income_for_submission(request, submission_id, month_id, income_id):
 
 @csrf_exempt
 @login_required
-def upsert_deduction_for_submission(request, submission_id, deduction_id):
+def upsert_deduction_for_submission(request:HttpRequest, submission_id, deduction_id):
     if not request.method == "POST":
         raise Http404()
     
@@ -248,7 +256,7 @@ def upsert_deduction_for_submission(request, submission_id, deduction_id):
 
 @csrf_exempt
 @login_required
-def upsert_taxable_income_for_submission(request, submission_id, taxable_income_id):
+def upsert_taxable_income_for_submission(request:HttpRequest, submission_id, taxable_income_id):
     if not request.method == "POST":
         raise Http404()
     
@@ -264,8 +272,8 @@ def upsert_taxable_income_for_submission(request, submission_id, taxable_income_
     if amount is None and paid_income_tax_amount is None and note is None:
         return HttpResponse(json.dumps({'error': f'amount or paid_income_tax_amount or note must be specified'}), status=400)
     
-    if paid_income_tax_amount and not 0<=paid_income_tax_amount<=100:
-        return HttpResponse(json.dumps({'error': f'paid_income_tax_amount must be between 0 and 100!'}), status=400)
+    # if paid_income_tax_amount and not 0<=paid_income_tax_amount<=100:
+    #     return HttpResponse(json.dumps({'error': f'paid_income_tax_amount must be between 0 and 100!'}), status=400)
 
     # retrive selfassemsent account submission record
     submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
@@ -376,3 +384,29 @@ def get_all_taxable_income_sources(request):
     serialized = TaxableIncomeSourcesSerializer(taxable_income_sources, many=True)
     json_response = dump_to_json.render(serialized.data)
     return HttpResponse(json_response, content_type='application/json')
+
+
+##############################################################################
+## Views to calculate and retun tax
+##############################################################################
+
+
+def tax_report_pdf(request:HttpRequest, submission_id):
+    template = get_template('accounts/tax_report.html')
+    context = {
+        'submission': get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id),
+        'selfemployment_incomes': get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True),
+        'selfemployment_expenses': get_object_or_None(SelfemploymentExpensesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True),
+        'taxable_incomes': get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission_id, delete_duplicate=False, return_all=True),
+        'deduction_and_allowance': get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True),
+    }
+    html = template.render(context) # Render html template to string
+    
+    # Initiate file like object
+    response = HttpResponse(content_type="application/pdf")
+    response['Content-Disposition'] = f"inline; filename='Tax Report of {context['submission'].client_id.client_name} Tax Year-{context['submission'].tax_year.tax_year}.pdf'"
+
+    pdf = pisa.CreatePDF(BytesIO(html.encode()), response)
+    if not pdf.err:
+        return response
+    return HttpResponse("Error while generating report!", status=500)

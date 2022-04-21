@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Tax report</title>
+
+    <link rel="stylesheet" href="accounts/templates/accounts/tax_report_style.css">
+</head>
+<body>
+    <div>
+        Submission
+        {% if submission %}
+            {{submission}}
+        {% else %}
+            Submission does not exist.
+        {% endif %}
+    </div>
+
+    <div>
+        selfemployment_incomes
+        {% if selfemployment_incomes %}
+            {{selfemployment_incomes}}
+        {% else %}
+            selfemployment_incomes does not exist.
+        {% endif %}
+    </div>
+
+    <div>
+        selfemployment_expenses
+        {% if selfemployment_expenses %}
+            {{selfemployment_expenses}}
+        {% else %}
+            selfemployment_expenses does not exist.
+        {% endif %}
+    </div>
+    
+    <div>
+        taxable_incomes
+        {% if taxable_incomes %}
+            {{taxable_incomes}}
+        {% else %}
+            taxable_incomes does not exist.
+        {% endif %}
+    </div>
+    
+    <div>
+        deduction_and_allowance
+        {% if deduction_and_allowance %}
+            {{deduction_and_allowance}}
+        {% else %}
+            deduction_and_allowance does not exist.
+        {% endif %}
+    </div>
+</body>
+</html>

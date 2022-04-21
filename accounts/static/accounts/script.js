@@ -244,7 +244,7 @@ const groupedAllDeductionsForSubmissionMapBySourceId = {}
 
 
 // get data
-getSubmissionDetails(updateDetailsTab, updateIncomeAndExpenseTab, updateTaxCalculationTab, updateDetailsTab)
+getSubmissionDetails(updateDetailsTab, updateIncomeAndExpenseTab)
 getTaxableIncomeSources()
 getSelfemploymentIncomeSources()
 getExpneseSources()
@@ -860,14 +860,18 @@ function groupRecordsByAttribute(records, attributeName, groupedRecords=null){
   return groupedRecords
 }
 
-// Update info in Tax Calculation tab
-function updateTaxCalculationTab(submissionDetails){
-    //
-}
-
-// Update info in View tab
-function updateViewTab(submissionDetails){
-    //
+let taxReportIframes = Array.from(document.querySelectorAll('iframe[data-tax-report]'))
+Array.from(taxReportIframes).forEach(iframe=>{
+  iframe.src = `/accounts/tax_report/${submissionId}/`
+})
+let taxCalculationTab = document.querySelector('li[data-tab-name="taxReport"]')
+console.log(taxCalculationTab)
+taxCalculationTab.addEventListener('click', updateTaxReport)
+// Update info in Tax Report tab
+function updateTaxReport(submissionDetails){
+  taxReportIframes.forEach(iframe=>{
+    iframe.contentWindow.location.reload()
+  })
 }
 
 

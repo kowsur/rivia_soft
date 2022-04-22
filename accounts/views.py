@@ -386,19 +386,33 @@ def get_all_taxable_income_sources(request):
     return HttpResponse(json_response, content_type='application/json')
 
 
+
 ##############################################################################
 ## Views to calculate and retun tax
 ##############################################################################
 
-
+@login_required
+@allowed_for_staff
 def tax_report_pdf(request:HttpRequest, submission_id):
     template = get_template('accounts/tax_report.html')
+    
+    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+    if not account_submission:
+        return Http404("Submission for the submission_id specified does not exist!")
+    selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    selfemployment_expenses = get_object_or_None(SelfemploymentExpensesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission_id, delete_duplicate=False, return_all=True)
+    deductions_and_allowances = get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+
     context = {
-        'submission': get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id),
-        'selfemployment_incomes': get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True),
-        'selfemployment_expenses': get_object_or_None(SelfemploymentExpensesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True),
-        'taxable_incomes': get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission_id, delete_duplicate=False, return_all=True),
-        'deduction_and_allowance': get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True),
+        'submission': account_submission,
+        'tax_year': account_submission.tax_year.tax_year[:4],
+        'tax_year_next': account_submission.tax_year.tax_year[5:],
+        'client_name': account_submission.client_id.client_name,
+        'selfemployment_incomes': selfemployment_incomes,
+        'selfemployment_expenses': selfemployment_expenses,
+        'taxable_incomes': taxable_incomes,
+        'deductions_and_allowances': deductions_and_allowances,
     }
     html = template.render(context) # Render html template to string
     

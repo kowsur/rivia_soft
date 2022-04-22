@@ -10,49 +10,64 @@
     <link rel="stylesheet" href="accounts/templates/accounts/tax_report_style.css">
 </head>
 <body>
-    <div>
-        Submission
-        {% if submission %}
-            {{submission}}
-        {% else %}
-            Submission does not exist.
-        {% endif %}
-    </div>
+    {% comment %} Agreement Page {% endcomment %}
+    <section>
+        <section>
+            <h1 class="text-center underline">ACCOUNTANT'S REPORT</h1>
+            <p>
+                We have prepared without carrying out an audit the attached
+                Profit and Loss accounts for the year ended <strong>05 April {{tax_year_next}}</strong>.
+                These have been prepared from the information, accounting
+                records and explanation received from <strong>{{client_name}}</strong>.
+            </p>
+        </section>
 
-    <div>
-        selfemployment_incomes
-        {% if selfemployment_incomes %}
-            {{selfemployment_incomes}}
-        {% else %}
-            selfemployment_incomes does not exist.
-        {% endif %}
-    </div>
+        <br>
+        <br>
+        <br>
 
-    <div>
-        selfemployment_expenses
-        {% if selfemployment_expenses %}
-            {{selfemployment_expenses}}
-        {% else %}
-            selfemployment_expenses does not exist.
-        {% endif %}
-    </div>
+        <section>
+            <div>
+                <h1 class="text-center inline-block">RIVIA SOLUTION LTD</h1>
+                <pre class="inline-block">    </pre>
+                <span>Date: …………………………….</span>
+            </div>
+            <pre><strong class="underline"><i>Accountants</i></strong>
+Unit-111, 2<sup>nd</sup> Floor
+Greatorex Business Centre
+8-10 Greatorex Street
+London E1 5NF
+            </pre>
+        </section>
+        
+        <br>
+        <br>
+
+        <section>
+            <h1 class="text-center underline">CLIENT'S APPROVAL</h1>
+            I have approved the attached Profit & Loss Accounts for the
+            period from <strong>06 April {{tax_year}} to 05 April {{tax_year_next}}</strong>. These have been
+            prepared from the information, records and explanation given by me.
+            <div>
+                <strong class="text-center inline-block">{{client_name}}</strong>
+                <pre class="inline-block">    </pre>
+                <span>Date: …………………………….</span>
+            </div>
+        </section>
+    </section>
+
+    <pdf:nextpage name="page_std">
+        
+    {% comment %} Profit and Loss Page {% endcomment %}
+    <section>
+        <h1 class="underline text-center fs-13">Profit and loss for account for the year 5 April {{tax_year_next}}</h1>
+    </section>
     
-    <div>
-        taxable_incomes
-        {% if taxable_incomes %}
-            {{taxable_incomes}}
-        {% else %}
-            taxable_incomes does not exist.
-        {% endif %}
-    </div>
-    
-    <div>
-        deduction_and_allowance
-        {% if deduction_and_allowance %}
-            {{deduction_and_allowance}}
-        {% else %}
-            deduction_and_allowance does not exist.
-        {% endif %}
-    </div>
+    <pdf:nextpage name="page_std">
+        
+    {% comment %} Tax Calculation Page {% endcomment %}
+    <section>
+        <h1 class="underline text-center fs-13">Tax account for the year 5 April {{tax_year_next}}</h1>
+    </section>
 </body>
 </html>

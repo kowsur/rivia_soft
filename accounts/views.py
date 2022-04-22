@@ -1,7 +1,6 @@
 import json
-from io import BytesIO, StringIO
 
-from xhtml2pdf import pisa
+from weasyprint import HTML, CSS
 
 from django.http import Http404
 from django.http.request import HttpRequest
@@ -396,6 +395,7 @@ def get_all_taxable_income_sources(request):
 def tax_report_pdf(request:HttpRequest, submission_id):
     template = get_template('accounts/tax_report.html')
     
+    # Retrive data from database
     account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
     if not account_submission:
         return Http404("Submission for the submission_id specified does not exist!")
@@ -414,13 +414,17 @@ def tax_report_pdf(request:HttpRequest, submission_id):
         'taxable_incomes': taxable_incomes,
         'deductions_and_allowances': deductions_and_allowances,
     }
-    html = template.render(context) # Render html template to string
+    html_markup = template.render(context) # Render html template to string
+    style_sheets = [
+            CSS(filename='accounts/templates/accounts/tax_report_style.css'),
+        ]
     
-    # Initiate file like object
+    # Initiate file like HttpResponse object
     response = HttpResponse(content_type="application/pdf")
-    response['Content-Disposition'] = f"inline; filename='Tax Report of {context['submission'].client_id.client_name} Tax Year-{context['submission'].tax_year.tax_year}.pdf'"
+    response['Content-Disposition'] = f"inline; filename='Account of {context['submission'].client_id.client_name} Tax Year-{context['submission'].tax_year.tax_year}.pdf'"
+    
+    # Generate and write pdf to HttpResponse
+    weasyprinted_markup = HTML(string=html_markup)
+    weasyprinted_markup.write_pdf(response, stylesheets=style_sheets)
 
-    pdf = pisa.CreatePDF(BytesIO(html.encode()), response)
-    if not pdf.err:
-        return response
-    return HttpResponse("Error while generating report!", status=500)
+    return response

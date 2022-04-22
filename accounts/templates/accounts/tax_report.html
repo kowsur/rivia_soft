@@ -5,13 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Tax report</title>
+    <title>Tax Account</title>
 
+    {% comment %}
+    <! –– the below css will be added from python using weasyprint library ––>
     <link rel="stylesheet" href="accounts/templates/accounts/tax_report_style.css">
+    {% endcomment %}
 </head>
 <body>
     {% comment %} Agreement Page {% endcomment %}
-    <section>
+    <article>
         <section>
             <h1 class="text-center underline">ACCOUNTANT'S REPORT</h1>
             <p>
@@ -48,26 +51,25 @@ London E1 5NF
             I have approved the attached Profit & Loss Accounts for the
             period from <strong>06 April {{tax_year}} to 05 April {{tax_year_next}}</strong>. These have been
             prepared from the information, records and explanation given by me.
+            <br>
+            <br>
+            <br>
             <div>
                 <strong class="text-center inline-block">{{client_name}}</strong>
                 <pre class="inline-block">    </pre>
                 <span>Date: …………………………….</span>
             </div>
         </section>
-    </section>
+    </article>
 
-    <pdf:nextpage name="page_std">
-        
     {% comment %} Profit and Loss Page {% endcomment %}
-    <section>
-        <h1 class="underline text-center fs-13">Profit and loss for account for the year ended 5 April {{tax_year_next}}</h1>
-    </section>
-    
-    <pdf:nextpage name="page_std">
-        
+    <article>
+        <h1 class="underline text-center fs-13">Profit and loss for the year ended 5 April {{tax_year_next}}</h1>
+    </article>
+
     {% comment %} Tax Calculation Page {% endcomment %}
-    <section>
+    <article>
         <h1 class="underline text-center fs-13">Tax account for the year ended 5 April {{tax_year_next}}</h1>
-    </section>
+    </article>
 </body>
 </html>

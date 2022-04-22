@@ -392,7 +392,7 @@ def get_all_taxable_income_sources(request):
 ##############################################################################
 
 @login_required
-@allowed_for_staff
+@allowed_for_staff()
 def tax_report_pdf(request:HttpRequest, submission_id):
     template = get_template('accounts/tax_report.html')
     

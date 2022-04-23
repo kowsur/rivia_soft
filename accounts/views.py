@@ -1,6 +1,7 @@
 import json
 
 from weasyprint import HTML, CSS
+from weasyprint.text.fonts import FontConfiguration
 
 from django.http import Http404
 from django.http.request import HttpRequest
@@ -390,6 +391,9 @@ def get_all_taxable_income_sources(request):
 ## Views to calculate and retun tax
 ##############################################################################
 
+
+IMAGE_CACHE = {}
+FONT_CONFIG = FontConfiguration()
 @login_required
 @allowed_for_staff()
 def tax_report_pdf(request:HttpRequest, submission_id):
@@ -414,17 +418,20 @@ def tax_report_pdf(request:HttpRequest, submission_id):
         'taxable_incomes': taxable_incomes,
         'deductions_and_allowances': deductions_and_allowances,
     }
-    html_markup = template.render(context) # Render html template to string
-    style_sheets = [
-            CSS(filename='accounts/templates/accounts/tax_report_style.css'),
-        ]
     
     # Initiate file like HttpResponse object
     response = HttpResponse(content_type="application/pdf")
     response['Content-Disposition'] = f"inline; filename='Account of {context['submission'].client_id.client_name} Tax Year-{context['submission'].tax_year.tax_year}.pdf'"
     
+    # Render html template to string
+    html_markup = template.render(context)
+
+    stylesheets = [
+            CSS(filename='accounts/templates/accounts/tax_report_style.css'),
+        ]
+
     # Generate and write pdf to HttpResponse
     weasyprinted_markup = HTML(string=html_markup)
-    weasyprinted_markup.write_pdf(response, stylesheets=style_sheets)
+    weasyprinted_markup.write_pdf(response, stylesheets=stylesheets, font_config=FONT_CONFIG, image_cache=IMAGE_CACHE)
 
     return response

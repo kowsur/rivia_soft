@@ -7,14 +7,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Tax Account</title>
 
-    {% comment %}
-    <! –– the below css will be added from python using weasyprint library ––>
-    <link rel="stylesheet" href="accounts/templates/accounts/tax_report_style.css">
+    {% comment %} 
+    <!-- the below css will be added from python using weasyprint library -->
+    <link rel="stylesheet" href="accounts/templates/accounts/tax_report_style.css"/>
     {% endcomment %}
 </head>
 <body>
     {% comment %} Agreement Page {% endcomment %}
-    <article>
+    <article page-break-before page-break-after>
         <section>
             <h1 class="text-center underline">ACCOUNTANT'S REPORT</h1>
             <p>
@@ -25,50 +25,45 @@
             </p>
         </section>
 
-        <br>
-        <br>
-        <br>
+        <div class="spacer"></div>
+        <div class="spacer"></div>
 
         <section>
-            <div>
-                <h1 class="text-center inline-block">RIVIA SOLUTION LTD</h1>
-                <pre class="inline-block">    </pre>
+            <div class="d-f items-center justify-between">
+                <h2 class="d-ib">RIVIA SOLUTION LTD</h2>
                 <span>Date: …………………………….</span>
             </div>
-            <pre><strong class="underline"><i>Accountants</i></strong>
-Unit-111, 2<sup>nd</sup> Floor
-Greatorex Business Centre
-8-10 Greatorex Street
-London E1 5NF
-            </pre>
+            <strong class="underline"><i>Accountants</i></strong>
+            <address>
+                Unit-111, 2<sup>nd</sup> Floor<br>
+                Greatorex Business Centre<br>
+                8-10 Greatorex Street<br>
+                London E1 5NF<br>
+            </address>
         </section>
-        
-        <br>
-        <br>
+
+        <div class="spacer"></div>
 
         <section>
             <h1 class="text-center underline">CLIENT'S APPROVAL</h1>
             I have approved the attached Profit & Loss Accounts for the
             period from <strong>06 April {{tax_year}} to 05 April {{tax_year_next}}</strong>. These have been
             prepared from the information, records and explanation given by me.
-            <br>
-            <br>
-            <br>
-            <div>
-                <strong class="text-center inline-block">{{client_name}}</strong>
-                <pre class="inline-block">    </pre>
+            <div class="spacer"></div>
+            <div class="d-f items-center justify-between">
+                <strong>{{client_name}}</strong>
                 <span>Date: …………………………….</span>
             </div>
         </section>
     </article>
 
     {% comment %} Profit and Loss Page {% endcomment %}
-    <article>
+    <article page-break-before page-break-after>
         <h1 class="underline text-center fs-13">Profit and loss for the year ended 5 April {{tax_year_next}}</h1>
     </article>
 
     {% comment %} Tax Calculation Page {% endcomment %}
-    <article>
+    <article page-break-before page-break-after>
         <h1 class="underline text-center fs-13">Tax account for the year ended 5 April {{tax_year_next}}</h1>
     </article>
 </body>

@@ -1,16 +1,63 @@
+*, *::after, *::before{
+    padding: 0;
+    margin: 0;
+}
+h1, h2{
+    padding: 4pt 0pt;
+}
+
+@font-face {
+    font-family: DejaVuSans;
+    src: url(accounts/templates/accounts/DejaVuSans.ttf);
+}
+@page {
+    size: A4 portrait;
+    margin: 0.75in; /* Set margin on each page */
+    @top-right{
+        content: "Page " counter(page) "/" counter(pages);
+        text-align: right;
+        vertical-align: bottom;
+    }
+}
+/* page-breaking */
+[page-break-after]{
+    page-break-after: always;
+    display: block;
+}
+[page-break-before]{
+    page-break-before: always;
+    display: block;
+}
+
 body{
     font-size: 11pt;
+    font-family: DejaVuSans, serif, sans-serif;
+    text-align: justify;
 }
 
 .text-center {
     text-align:center;
-}
-.inline-block{
-    display: inline-block;
 }
 .underline{
     text-decoration: underline;
 }
 .fs-13{
     font-size: 13pt;
+}
+
+.d-ib{
+    display: inline-block;
+}
+.d-f{
+    display: flex;
+}
+.items-center{
+    align-items: center;
+}
+.justify-between{
+    justify-content: space-between;
+}
+.spacer{
+    display: block;
+    height: 50pt;
 }

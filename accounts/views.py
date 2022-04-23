@@ -454,9 +454,16 @@ def tax_report_pdf(request:HttpRequest, submission_id):
     if not account_submission:
         return Http404("Submission for the submission_id specified does not exist!")
     selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    selfemployment_incomes = [income for income in selfemployment_incomes if income.amount>0]
+
     selfemployment_expenses = get_object_or_None(SelfemploymentExpensesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    selfemployment_expenses = [expense for expense in selfemployment_expenses if expense.amount>0]
+
     taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission_id, delete_duplicate=False, return_all=True)
+    taxable_incomes = [taxable_income for taxable_income in taxable_incomes if taxable_income.amount>0]
+    
     deductions_and_allowances = get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    deductions_and_allowances = [amount for amount in deductions_and_allowances if amount.amount>0]
 
     # selfemployment
     selfemployment_total_income = get_total_selfemployment_income(selfemployment_incomes)

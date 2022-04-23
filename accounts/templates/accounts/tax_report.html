@@ -75,6 +75,7 @@
             <br>
 
             <section>
+                {% if selfemployment_expenses %}
                 <table class="fs-8" data-expense-list>
                     <thead>
                         <tr>
@@ -104,7 +105,9 @@
                 </table>
 
                 <br>
+                {% endif %}
 
+                {% if deductions_and_allowances %}
                 <table class="fs-8" data-deduction-list>
                     <thead>
                         <tr>
@@ -136,14 +139,23 @@
                         </tr>
                     </tbody>
                 </table>
-                
+
+                {% endif %}
+
+                {% if selfemployment_expenses or deductions_and_allowances %}
                 <br/>
                 <hr/>
                 <br/>
+                {% endif %}
 
                 <h2 class="fs-9 font-normal d-f justify-between">Selfemployment Income (Including Tips) <span>{{selfemployment_total_income|floatformat:"2g"}}£</span></h2>
-                <h2 class="fs-9 font-normal d-f justify-between"><span><strong>Less:</strong> Total Allowanble Expenses </span><span>{{selfemployment_total_expense|floatformat:"2g"}}£</span></h2>
-                <h2 class="fs-9 font-normal d-f justify-between"><span><strong>Less:</strong> Capital Allownace and Deduction For This Period </span><span>{{selfemployment_total_deduction_and_allowance|floatformat:"2g"}}£</span></h2>
+                {% if selfemployment_expenses %}
+                    <h2 class="fs-9 font-normal d-f justify-between"><span><strong>Less:</strong> Total Allowanble Expenses </span><span>{{selfemployment_total_expense|floatformat:"2g"}}£</span></h2>
+                {% endif %}
+                {% if deductions_and_allowances %}
+                    <h2 class="fs-9 font-normal d-f justify-between"><span><strong>Less:</strong> Capital Allownace and Deduction For This Period </span><span>{{selfemployment_total_deduction_and_allowance|floatformat:"2g"}}£</span></h2>
+                {% endif %}
+                <hr>
                 <h2 class="fs-10 font-bold d-f justify-between">Selfemployment Net Profit <span>{{selfemployment_net_profit|floatformat:"2g"}}£</span></h2>
             </section>
         </section>

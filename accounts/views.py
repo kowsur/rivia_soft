@@ -434,7 +434,7 @@ def calculate_taxable_income(income_amount, paid_tax_amount):
 def get_total_taxable_income(taxable_incomes):
     total = 0
     for income in taxable_incomes:
-        total += calculate_taxable_income(income.amount, income.paid_tax_amount)
+        total += calculate_taxable_income(income.amount, income.paid_income_tax_amount)
     return total
 
 

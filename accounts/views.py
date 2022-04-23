@@ -25,7 +25,6 @@ dump_to_json = JSONRenderer()
 from companies.views import URLS, serialized
 from companies.decorators import allowed_for_staff, allowed_for_superuser
 
-from accounts.templatetags.accounts_tags import calculate_capital_allowance
 
 def get_object_or_None(model, *args, pk=None, delete_duplicate=True, return_all=False,**kwargs):
     try:
@@ -393,20 +392,34 @@ def get_all_taxable_income_sources(request):
 ##############################################################################
 
 
+def calculate_selfemployment_expense(expense_amount, personal_usage_percentage):
+    personal_usage = (expense_amount*personal_usage_percentage)/100
+    expense = expense_amount - personal_usage
+    return expense if expense>=0 else 0
+
 def get_total_selfemployment_expense(selfemployment_expenses):
     total = 0
     for expense in selfemployment_expenses:
-        expense_amount = expense.amount-((expense.amount*expense.personal_usage_percentage)/100)
-        total += expense_amount
+        total += calculate_selfemployment_expense(expense.amount, expense.personal_usage_percentage)
     return total
+
+
+def calculate_selfemployment_income(income_amount, comission):
+    income = income_amount - comission
+    return  income if income>=0 else 0
 
 def get_total_selfemployment_income(selfemployment_incomes):
     total = 0
     for income in selfemployment_incomes:
-        income_amount = income.amount - income.comission
-        if income_amount>=0:
-            total+=income_amount
+        total += calculate_selfemployment_income(income.amount, income.comission)
     return total
+
+
+def calculate_capital_allowance(amount, allowance_percentage, personal_usage_percentage):
+    allowance = (amount*allowance_percentage)/100
+    personal_usage = (allowance*personal_usage_percentage)/100
+    capital_allowance = allowance - personal_usage
+    return capital_allowance if capital_allowance>=0 else 0
 
 def get_total_selfemployment_deduction_and_allowance(selfemployment_deductions_and_allowances):
     total = 0
@@ -414,10 +427,14 @@ def get_total_selfemployment_deduction_and_allowance(selfemployment_deductions_a
         total += calculate_capital_allowance(deduction.amount, deduction.allowance_percentage, deduction.personal_usage_percentage)
     return total
 
+
+def calculate_taxable_income(income_amount, paid_tax_amount):
+    return income_amount if income_amount>=0 else 0
+
 def get_total_taxable_income(taxable_incomes):
     total = 0
     for income in taxable_incomes:
-        pass
+        total += calculate_taxable_income(income.amount, income.paid_tax_amount)
     return total
 
 

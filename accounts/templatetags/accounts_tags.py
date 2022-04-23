@@ -17,11 +17,3 @@ def subtract(number1, number2):
         return number1 - number2
     except (ValueError, ZeroDivisionError):
         return "Error"
-
-
-def calculate_capital_allowance(amount, allowance_percentage, personal_usage_percentage):
-    allowance = (amount*allowance_percentage)/100
-    personal_usage = (allowance*personal_usage_percentage)/100
-    return allowance - personal_usage
-
-register.filter("calculate_capital_allowance", calculate_capital_allowance)

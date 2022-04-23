@@ -86,14 +86,15 @@
                     </thead>
                     <tbody>
                         {% for expense in selfemployment_expenses %}
-                            {% with expense.amount|as_percentage_of:expense.personal_usage_percentage as personal_usage %}
                             <tr>
-                                    <td>{{expense.expense_source}}</td>
-                                    <td class="text-right">{{expense.amount|floatformat:"2g"}}</td>
-                                    <td class="text-right">{{expense.personal_usage_percentage}}</td>
+                                <td>{{expense.expense_source}}</td>
+                                <td class="text-right">{{expense.amount|floatformat:"2g"}}</td>
+                                <td class="text-right">{{expense.personal_usage_percentage}}</td>
+                                
+                                {% with expense.amount|as_percentage_of:expense.personal_usage_percentage as personal_usage %}
                                     <td class="text-right">{{expense.amount|subtract:personal_usage|floatformat:"2g"}}</td>
-                                </tr>
-                            {% endwith %}
+                                {% endwith %}
+                            </tr>
                         {% endfor %}
                         <tr>
                             <th class="text-left" colspan="3">Total Allowanble Expenses</th>

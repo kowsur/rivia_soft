@@ -17,7 +17,7 @@
 </head>
 <body>
     {% comment %} Agreement Page {% endcomment %}
-    <article hide id="agreement" page-break-before page-break-after>
+    <article id="agreement" page-break-before page-break-after>
         <section>
             <h1 class="text-center underline to-upper">Account's Report</h1>
             <p>
@@ -90,7 +90,7 @@
                                 <td>{{expense.expense_source}}</td>
                                 <td class="text-right">{{expense.amount|floatformat:"2g"}}</td>
                                 <td class="text-right">{{expense.personal_usage_percentage}}</td>
-                                
+
                                 {% with expense.amount|as_percentage_of:expense.personal_usage_percentage as personal_usage %}
                                     <td class="text-right">{{expense.amount|subtract:personal_usage|floatformat:"2g"}}</td>
                                 {% endwith %}
@@ -152,7 +152,7 @@
 
 
     {% comment %} Tax Calculation Page {% endcomment %}
-    <article hide id="tax-calculation" page-break-before page-break-after>
+    <article id="tax-calculation" page-break-before page-break-after>
 
         <h1 class="to-upper fs-11">Tax account for the year ended 5 April {{tax_year_next}}</h1>
         <aside data-client-details class="fs-8.5">

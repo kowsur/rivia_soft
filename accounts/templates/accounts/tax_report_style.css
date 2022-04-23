@@ -3,7 +3,7 @@
     margin: 0;
 }
 h1, h2{
-    padding: 4pt 0pt;
+    padding: 5pt 0pt;
 }
 
 @font-face {
@@ -17,7 +17,20 @@ h1, h2{
         content: "Page " counter(page) "/" counter(pages);
         text-align: right;
         vertical-align: bottom;
+        font-size: 8.5pt;
+        font-weight: thin;
     }
+
+    @top-left{
+        content: element(page-top-left);
+        text-align: left;
+        vertical-align: bottom;
+    }
+}
+[top-left]{
+    position: running(page-top-left);
+    margin: 0;
+    padding: 0;
 }
 /* page-breaking */
 [page-break-after]{
@@ -38,12 +51,29 @@ body{
 .text-center {
     text-align:center;
 }
+.to-upper{
+    text-transform: uppercase;
+}
 .underline{
     text-decoration: underline;
 }
-.fs-13{
-    font-size: 13pt;
-}
+.font-blod{ font-weight: bold; }
+.fs-14{ font-size: 14pt; }
+.fs-13{ font-size: 13pt; }
+.fs-12{ font-size: 12pt; }
+.fs-11{ font-size: 11pt; }
+.fs-10{ font-size: 10pt; }
+.fs-9\.5{ font-size: 9.5pt; }
+.fs-9{ font-size: 9pt; }
+.fs-8\.5{ font-size: 8.5pt; }
+.fs-8{ font-size: 8pt; }
+.fs-7\.5{ font-size: 7.5pt; }
+.fs-7{ font-size: 7pt; }
+.fs-6\.5{ font-size: 6.5pt; }
+.fs-6{ font-size: 6pt; }
+.fs-5{ font-size: 5pt; }
+.fs-4{ font-size: 4pt; }
+.fs-3{ font-size: 3pt; }
 
 .d-ib{
     display: inline-block;
@@ -60,4 +90,26 @@ body{
 .spacer{
     display: block;
     height: 50pt;
+}
+
+#agreement {
+
+}
+
+[data-client-details] * {
+    display: inline-block;
+}
+[data-client-details] {
+    margin-top: 5pt;
+    margin-bottom: 5pt;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+#profit-and-loss {}
+
+#tax-calculation{
+
 }

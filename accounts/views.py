@@ -394,6 +394,10 @@ def get_all_taxable_income_sources(request):
 
 IMAGE_CACHE = {}
 FONT_CONFIG = FontConfiguration()
+STYLESHEETS_CACHE = [
+        CSS(filename='accounts/templates/accounts/tax_report_style.css'),
+    ]
+
 @login_required
 @allowed_for_staff()
 def tax_report_pdf(request:HttpRequest, submission_id):
@@ -409,10 +413,16 @@ def tax_report_pdf(request:HttpRequest, submission_id):
     deductions_and_allowances = get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
 
     context = {
+        # submission info
         'submission': account_submission,
         'tax_year': account_submission.tax_year.tax_year[:4],
         'tax_year_next': account_submission.tax_year.tax_year[5:],
+
+        # client info
         'client_name': account_submission.client_id.client_name,
+        'client_address': account_submission.client_id.personal_address,
+
+        # client's income and expenses info
         'selfemployment_incomes': selfemployment_incomes,
         'selfemployment_expenses': selfemployment_expenses,
         'taxable_incomes': taxable_incomes,
@@ -426,12 +436,8 @@ def tax_report_pdf(request:HttpRequest, submission_id):
     # Render html template to string
     html_markup = template.render(context)
 
-    stylesheets = [
-            CSS(filename='accounts/templates/accounts/tax_report_style.css'),
-        ]
-
     # Generate and write pdf to HttpResponse
     weasyprinted_markup = HTML(string=html_markup)
-    weasyprinted_markup.write_pdf(response, stylesheets=stylesheets, font_config=FONT_CONFIG, image_cache=IMAGE_CACHE)
+    weasyprinted_markup.write_pdf(response, stylesheets=STYLESHEETS_CACHE, font_config=FONT_CONFIG, image_cache=IMAGE_CACHE)
 
     return response

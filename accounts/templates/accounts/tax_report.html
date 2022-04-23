@@ -14,9 +14,9 @@
 </head>
 <body>
     {% comment %} Agreement Page {% endcomment %}
-    <article page-break-before page-break-after>
+    <article id="agreement" page-break-before page-break-after>
         <section>
-            <h1 class="text-center underline">ACCOUNTANT'S REPORT</h1>
+            <h1 class="text-center underline to-upper">Account's Report</h1>
             <p>
                 We have prepared without carrying out an audit the attached
                 Profit and Loss accounts for the year ended <strong>05 April {{tax_year_next}}</strong>.
@@ -45,7 +45,7 @@
         <div class="spacer"></div>
 
         <section>
-            <h1 class="text-center underline">CLIENT'S APPROVAL</h1>
+            <h1 class="text-center to-upper underline">Client's Approval</h1>
             I have approved the attached Profit & Loss Accounts for the
             period from <strong>06 April {{tax_year}} to 05 April {{tax_year_next}}</strong>. These have been
             prepared from the information, records and explanation given by me.
@@ -58,13 +58,28 @@
     </article>
 
     {% comment %} Profit and Loss Page {% endcomment %}
-    <article page-break-before page-break-after>
-        <h1 class="underline text-center fs-13">Profit and loss for the year ended 5 April {{tax_year_next}}</h1>
+    <article id="profit-and-loss" page-break-before page-break-after>
+
+        <h1 class="to-upper fs-11" top-left>Profit and loss for the year ended 5 April {{tax_year_next}}</h1>
+        <section data-client-details class="fs-8.5">
+            <strong>{{client_name}}</strong>
+            <address>
+                <pre>{{client_address}}</pre>
+            </address>
+        </section>
+
     </article>
 
     {% comment %} Tax Calculation Page {% endcomment %}
-    <article page-break-before page-break-after>
-        <h1 class="underline text-center fs-13">Tax account for the year ended 5 April {{tax_year_next}}</h1>
+    <article id="tax-calculation" page-break-before page-break-after>
+        <h1 class="text-center to-upper fs-11" top-left>Tax account for the year ended 5 April {{tax_year_next}}</h1>
+        <section data-client-details class="fs-8.5">
+            <strong>{{client_name}}</strong>
+            <address>
+                <pre>{{client_address}}</pre>
+            </address>
+        </section>
+
     </article>
 </body>
 </html>

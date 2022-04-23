@@ -25,6 +25,7 @@ dump_to_json = JSONRenderer()
 from companies.views import URLS, serialized
 from companies.decorators import allowed_for_staff, allowed_for_superuser
 
+from accounts.templatetags.accounts_tags import calculate_capital_allowance
 
 def get_object_or_None(model, *args, pk=None, delete_duplicate=True, return_all=False,**kwargs):
     try:
@@ -392,12 +393,40 @@ def get_all_taxable_income_sources(request):
 ##############################################################################
 
 
+def get_total_selfemployment_expense(selfemployment_expenses):
+    total = 0
+    for expense in selfemployment_expenses:
+        expense_amount = expense.amount-((expense.amount*expense.personal_usage_percentage)/100)
+        total += expense_amount
+    return total
+
+def get_total_selfemployment_income(selfemployment_incomes):
+    total = 0
+    for income in selfemployment_incomes:
+        income_amount = income.amount - income.comission
+        if income_amount>=0:
+            total+=income_amount
+    return total
+
+def get_total_selfemployment_deduction_and_allowance(selfemployment_deductions_and_allowances):
+    total = 0
+    for deduction in selfemployment_deductions_and_allowances:
+        total += calculate_capital_allowance(deduction.amount, deduction.allowance_percentage, deduction.personal_usage_percentage)
+    return total
+
+def get_total_taxable_income(taxable_incomes):
+    total = 0
+    for income in taxable_incomes:
+        pass
+    return total
+
+
+# Cache for weasyprint
 IMAGE_CACHE = {}
 FONT_CONFIG = FontConfiguration()
 STYLESHEETS_CACHE = [
         CSS(filename='accounts/templates/accounts/tax_report_style.css'),
     ]
-
 @login_required
 @allowed_for_staff()
 def tax_report_pdf(request:HttpRequest, submission_id):
@@ -412,6 +441,12 @@ def tax_report_pdf(request:HttpRequest, submission_id):
     taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission_id, delete_duplicate=False, return_all=True)
     deductions_and_allowances = get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
 
+    # selfemployment
+    selfemployment_total_income = get_total_selfemployment_income(selfemployment_incomes)
+    selfemployment_total_expense = get_total_selfemployment_expense(selfemployment_expenses)
+    selfemployment_total_deduction_and_allowance = get_total_selfemployment_deduction_and_allowance(deductions_and_allowances)
+    selfemployment_net_profit = selfemployment_total_income - selfemployment_total_expense - selfemployment_total_deduction_and_allowance
+
     context = {
         # submission info
         'submission': account_submission,
@@ -422,11 +457,19 @@ def tax_report_pdf(request:HttpRequest, submission_id):
         'client_name': account_submission.client_id.client_name,
         'client_address': account_submission.client_id.personal_address,
 
+        # selfemployment
+        'selfemployment_total_income': get_total_selfemployment_income(selfemployment_incomes),
+        'selfemployment_total_expense': get_total_selfemployment_expense(selfemployment_expenses),
+        'selfemployment_total_deduction_and_allowance': get_total_selfemployment_deduction_and_allowance(deductions_and_allowances),
+        'selfemployment_net_profit': selfemployment_net_profit,
+
+        'total_taxable_income': get_total_taxable_income(taxable_incomes),
+
         # client's income and expenses info
         'selfemployment_incomes': selfemployment_incomes,
         'selfemployment_expenses': selfemployment_expenses,
-        'taxable_incomes': taxable_incomes,
         'deductions_and_allowances': deductions_and_allowances,
+        'taxable_incomes': taxable_incomes,
     }
     
     # Initiate file like HttpResponse object

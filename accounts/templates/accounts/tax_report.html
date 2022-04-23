@@ -1,3 +1,6 @@
+{% load static %}
+{% load accounts_tags %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,7 +17,7 @@
 </head>
 <body>
     {% comment %} Agreement Page {% endcomment %}
-    <article id="agreement" page-break-before page-break-after>
+    <article hide id="agreement" page-break-before page-break-after>
         <section>
             <h1 class="text-center underline to-upper">Account's Report</h1>
             <p>
@@ -51,7 +54,7 @@
             prepared from the information, records and explanation given by me.
             <div class="spacer"></div>
             <div class="d-f items-center justify-between">
-                <strong>{{client_name}}</strong>
+                <h2 class="fs-11">{{client_name}}</h2>
                 <span>Date: …………………………….</span>
             </div>
         </section>
@@ -60,25 +63,103 @@
     {% comment %} Profit and Loss Page {% endcomment %}
     <article id="profit-and-loss" page-break-before page-break-after>
 
-        <h1 class="to-upper fs-11" top-left>Profit and loss for the year ended 5 April {{tax_year_next}}</h1>
-        <section data-client-details class="fs-8.5">
-            <strong>{{client_name}}</strong>
-            <address>
-                <pre>{{client_address}}</pre>
-            </address>
+        <section>
+            <h1 class="to-upper fs-11">Profit and loss for the year ended 5 April {{tax_year_next}}</h1>
+            <aside data-client-details class="fs-8.5">
+                <strong>{{client_name}}</strong>
+                <address>
+                    <pre>{{client_address}}</pre>
+                </address>
+            </aside>
+
+            <br>
+
+            <section>
+                <table class="fs-8" data-expense-list>
+                    <thead>
+                        <tr>
+                            <th>Expenses</th>
+                            <th>Amount(£)</th>
+                            <th>Personal usage(%)</th>
+                            <th>Amount - Personal usage(%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in selfemployment_expenses %}
+                            {% with expense.amount|as_percentage_of:expense.personal_usage_percentage as personal_usage %}
+                            <tr>
+                                    <td>{{expense.expense_source}}</td>
+                                    <td class="text-right">{{expense.amount|floatformat:"2g"}}</td>
+                                    <td class="text-right">{{expense.personal_usage_percentage}}</td>
+                                    <td class="text-right">{{expense.amount|subtract:personal_usage|floatformat:"2g"}}</td>
+                                </tr>
+                            {% endwith %}
+                        {% endfor %}
+                        <tr>
+                            <th class="text-left" colspan="3">Total Allowanble Expenses</th>
+                            <th class="text-right">{{selfemployment_total_expense|floatformat:"2g"}}</th>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <br>
+
+                <table class="fs-8" data-deduction-list>
+                    <thead>
+                        <tr>
+                            <th>Deduction and Allownace Sources</th>
+                            <th>Value(£)</th>
+                            <th>Allownace(%)</th>
+                            <th>Personal usage(%)</th>
+                            <th>Capital Allowance(£)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for deduction in deductions_and_allowances %}
+                            <tr>
+                                <td>{{deduction.deduction_source}}</td>
+                                <td class="text-right">{{deduction.amount|floatformat:"2g"}}</td>
+                                <td class="text-right">{{deduction.allowance_percentage}}</td>
+                                <td class="text-right">{{deduction.personal_usage_percentage}}</td>
+
+                                {% with deduction.amount|as_percentage_of:deduction.allowance_percentage as allowance %}
+                                {% with allowance|as_percentage_of:deduction.personal_usage_percentage as personal_usage %}
+                                    <td class="text-right">{{allowance|subtract:personal_usage|floatformat:"2g"}}</td>
+                                {% endwith %}
+                                {% endwith %}
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <th class="text-left" colspan="4">Capital Allownace Deduction For This Period</th>
+                            <th class="text-right">{{selfemployment_total_deduction_and_allowance|floatformat:"2g"}}</th>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <br/>
+                <hr/>
+                <br/>
+
+                <h2 class="fs-9 font-normal d-f justify-between">Selfemployment Income (Including Tips) <span>{{selfemployment_total_income|floatformat:"2g"}}£</span></h2>
+                <h2 class="fs-9 font-normal d-f justify-between"><span><strong>Less:</strong> Total Allowanble Expenses </span><span>{{selfemployment_total_expense|floatformat:"2g"}}£</span></h2>
+                <h2 class="fs-9 font-normal d-f justify-between"><span><strong>Less:</strong> Capital Allownace Deduction For This Period </span><span>{{selfemployment_total_deduction_and_allowance|floatformat:"2g"}}£</span></h2>
+                <h2 class="fs-10 font-bold d-f justify-between">Selfemployment Net Profit <span>{{selfemployment_net_profit|floatformat:"2g"}}£</span></h2>
+            </section>
         </section>
 
     </article>
 
+
     {% comment %} Tax Calculation Page {% endcomment %}
-    <article id="tax-calculation" page-break-before page-break-after>
-        <h1 class="text-center to-upper fs-11" top-left>Tax account for the year ended 5 April {{tax_year_next}}</h1>
-        <section data-client-details class="fs-8.5">
+    <article hide id="tax-calculation" page-break-before page-break-after>
+
+        <h1 class="to-upper fs-11">Tax account for the year ended 5 April {{tax_year_next}}</h1>
+        <aside data-client-details class="fs-8.5">
             <strong>{{client_name}}</strong>
             <address>
                 <pre>{{client_address}}</pre>
             </address>
-        </section>
+        </aside>
 
     </article>
 </body>

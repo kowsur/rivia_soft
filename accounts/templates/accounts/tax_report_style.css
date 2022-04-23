@@ -2,9 +2,50 @@
     padding: 0;
     margin: 0;
 }
-h1, h2{
-    padding: 5pt 0pt;
+
+[hide]{
+    display: none !important;
 }
+
+h1{padding: 6pt 0pt;}
+h2{padding: 5pt 0pt;}
+h3{padding: 4pt 0pt;}
+h4{padding: 3pt 0pt;}
+h5{padding: 2pt 0pt;}
+
+h1{font-size: 18pt;}
+h2{font-size: 16pt;}
+h3{font-size: 14pt;}
+h4{font-size: 12pt;}
+h5{font-size: 10pt;}
+
+table{
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 8pt;
+}
+th{
+    font-size: 1.15em;
+    text-align: center;
+}
+th,td{
+    border: 1pt solid black;
+    padding: 3pt;
+}
+/* column widths for expenses */
+table[data-expense-list] th:nth-child(1) {width: 40%;}
+table[data-expense-list] th:nth-child(2) {width: 10%;}
+table[data-expense-list] th:nth-child(3) {width: 15%;}
+table[data-expense-list] th:nth-child(4) {width: 35%;}
+/* colmun widths for deductions */
+table[data-deduction-list] th:nth-child(1) {width: 45%;}
+table[data-deduction-list] th:nth-child(2) {width: auto;}
+table[data-deduction-list] th:nth-child(3) {width: auto;}
+table[data-deduction-list] th:nth-child(4) {width: auto}
+table[data-deduction-list] th:nth-child(5) {width: 20%;}
+
+
+strong{ font-size: inherit; }
 
 @font-face {
     font-family: DejaVuSans;
@@ -48,17 +89,29 @@ body{
     text-align: justify;
 }
 
-.text-center {
-    text-align:center;
-}
-.to-upper{
-    text-transform: uppercase;
-}
-.underline{
-    text-decoration: underline;
-}
-.font-blod{ font-weight: bold; }
-.fs-14{ font-size: 14pt; }
+.text-center {text-align:center;}
+.text-left {text-align:left;}
+.text-right {text-align:right;}
+
+.to-upper{text-transform: uppercase;}
+.to-lower{text-transform: lowercase;}
+.to-capitalize{text-transform: capitalize;}
+
+.underline{text-decoration: underline;}
+.line-through{text-decoration: line-through;}
+.line-overline{text-decoration: overline;}
+
+.font-bolder{font-weight: bolder;}
+.font-blod{font-weight: bold;}
+.font-normal{font-weight: normal;}
+.font-lighter{font-weight: lighter;}
+
+.fs-19{ font-size: 19pt; }
+.fs-18{ font-size: 18pt; }
+.fs-17{ font-size: 17pt; }
+.fs-16{ font-size: 16pt; }
+.fs-15{ font-size: 15pt; }
+.fs-14{ font-size: 45pt; }
 .fs-13{ font-size: 13pt; }
 .fs-12{ font-size: 12pt; }
 .fs-11{ font-size: 11pt; }
@@ -75,12 +128,10 @@ body{
 .fs-4{ font-size: 4pt; }
 .fs-3{ font-size: 3pt; }
 
-.d-ib{
-    display: inline-block;
-}
-.d-f{
-    display: flex;
-}
+.d-b{display: block;}
+.d-ib{display: inline-block;}
+.d-f{display: flex;}
+
 .items-center{
     align-items: center;
 }
@@ -92,10 +143,7 @@ body{
     height: 50pt;
 }
 
-#agreement {
-
-}
-
+/* client-details container styles */
 [data-client-details] * {
     display: inline-block;
 }
@@ -108,6 +156,9 @@ body{
     align-items: flex-end;
 }
 
+#agreement {
+
+}
 #profit-and-loss {}
 
 #tax-calculation{

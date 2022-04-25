@@ -126,6 +126,11 @@ h3{
     padding-bottom: 5em;
 }
 
+.tab [data-tax-report]{
+    width:100%;
+    height: 90vh;
+}
+
 /* Toggle */
 .toggle{
     user-select: none;

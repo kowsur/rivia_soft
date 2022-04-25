@@ -860,17 +860,20 @@ function groupRecordsByAttribute(records, attributeName, groupedRecords=null){
   return groupedRecords
 }
 
-let taxReportIframes = Array.from(document.querySelectorAll('iframe[data-tax-report]'))
-Array.from(taxReportIframes).forEach(iframe=>{
-  iframe.src = `/accounts/tax_report/${submissionId}/`
-})
 let taxCalculationTab = document.querySelector('li[data-tab-name="taxReport"]')
-console.log(taxCalculationTab)
+
 taxCalculationTab.addEventListener('click', updateTaxReport)
 // Update info in Tax Report tab
 function updateTaxReport(submissionDetails){
+  let taxReportIframes = Array.from(document.querySelectorAll('iframe[data-tax-report]'))
+  Array.from(taxReportIframes).forEach(iframe=>{
+    iframe.src = `/accounts/tax_report/${submissionId}/`
+  })
+
   taxReportIframes.forEach(iframe=>{
-    iframe.contentWindow.location.reload()
+    let newIFrame = createNodeFromMarkup(`<iframe src="/accounts/tax_report/${submissionId}/" data-tax-report></iframe>`)
+    iframe.parentNode.appendChild(newIFrame)
+    iframe.remove()
   })
 }
 

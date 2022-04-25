@@ -244,7 +244,7 @@ const groupedAllDeductionsForSubmissionMapBySourceId = {}
 
 
 // get data
-getSubmissionDetails(updateDetailsTab, updateIncomeAndExpenseTab)
+getSubmissionDetails(updateDetailsTab, updateIncomeAndExpenseTab, updateTaxReportTab)
 getTaxableIncomeSources()
 getSelfemploymentIncomeSources()
 getExpneseSources()
@@ -862,7 +862,10 @@ function groupRecordsByAttribute(records, attributeName, groupedRecords=null){
 
 let taxCalculationTab = document.querySelector('li[data-tab-name="taxReport"]')
 
-taxCalculationTab.addEventListener('click', updateTaxReport)
+taxCalculationTab.addEventListener('click', async (e)=>{
+  await getSubmissionDetails()
+  updateTaxReport(submissionDetails)
+})
 // Update info in Tax Report tab
 function updateTaxReport(submissionDetails){
   let taxReportIframes = Array.from(document.querySelectorAll('iframe[data-tax-report]'))
@@ -872,11 +875,12 @@ function updateTaxReport(submissionDetails){
 
   taxReportIframes.forEach(iframe=>{
     let newIFrame = createNodeFromMarkup(`<iframe src="/accounts/tax_report/${submissionId}/" data-tax-report></iframe>`)
-    iframe.parentNode.appendChild(newIFrame)
-    iframe.remove()
+    iframe.parentNode.replaceChild(newIFrame, iframe)
   })
 }
-
+function updateTaxReportTab(submissionDetails){
+  updateTaxReport(submissionDetails)
+}
 
 // =============================================================================================================================
 // Handlers

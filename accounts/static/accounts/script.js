@@ -766,6 +766,8 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
   // Get the existing/default deduction object
   let deduction = deductions.find(deduction=>deduction.deduction_source===deductionSourceId) || {
     "amount": 0,
+    "addition": 0,
+    "disposal": 0,
     "allowance_percentage": 0,
     "personal_usage_percentage": 0,
     "note": '',
@@ -773,6 +775,8 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
     "client": submissionId,
   }
   let inputAmountId = `deduction_amount_${submission.submission_id}_${deduction.deduction_source}`
+  let inputAdditionId = `deduction_addition_${submission.submission_id}_${deduction.deduction_source}`
+  let inputDisposalId = `deduction_disposal_${submission.submission_id}_${deduction.deduction_source}`
   let inputAllowancePercentageId = `deduction_allowance_percentage_${submission.submission_id}_${deduction.deduction_source}`
   let inputPersonalUsagePercentageId = `deduction_personalUsage_percentage_${submission.submission_id}_${deduction.deduction_source}`
   let inputNoteId = `deduction_note_${submission.submission_id}_${deduction.deduction_source}`
@@ -783,6 +787,14 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
         <div>
           <label for="${inputAmountId}">Amount</label>
           <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${deduction?.amount}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="amount">
+        </div>
+        <div>
+          <label for="${inputAdditionId}">Addition</label>
+          <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAdditionId} value="${deduction?.addition}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="addition">
+        </div>
+        <div>
+          <label for="${inputDisposalId}">Disposal</label>
+          <input type="number" max=${DB_MAX_INT_VALUE} id=${inputDisposalId} value="${deduction?.disposal}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="disposal">
         </div>
         <div>
           <label for="${inputAllowancePercentageId}">Allowance(%)</label>
@@ -800,12 +812,14 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
       `
   let node = createNodeFromMarkup(deductionMarkup)
   let inputAmount = node.querySelector(`#${inputAmountId}`)
+  let inputAddition = node.querySelector(`#${inputAdditionId}`)
+  let inputDisposal = node.querySelector(`#${inputDisposalId}`)
   let inputAllowancePercentage = node.querySelector(`#${inputAllowancePercentageId}`)
   let inputPersonalUsage = node.querySelector(`#${inputPersonalUsagePercentageId}`)
   let inputNote = node.querySelector(`#${inputNoteId}`)
 
   addEventListenersToElements(inputAmount, 'input', validateMaxValue)
-  addEventListenersToElements([inputAmount, inputAllowancePercentage, inputPersonalUsage, inputNote], 'input', handleDeductionUpdate)
+  addEventListenersToElements([inputAmount, inputAddition, inputDisposal, inputAllowancePercentage, inputPersonalUsage, inputNote], 'input', handleDeductionUpdate)
   addEventListenersToElements([inputAmount, inputAllowancePercentage, inputPersonalUsage], 'input', [updateTotalDeduction, updateNetProfit])
   addEventListenersToElements([inputAllowancePercentage, inputPersonalUsage], 'input', validatePercentageValue)
 
@@ -1048,6 +1062,8 @@ function handleDeductionUpdate(e){
   let data_object = { } // amount or personal_usage_percentage or allowance_percentage must be specified
 
   if (updateType==="amount") data_object.amount = parseFloat(inputField.value) || 0
+  else if (updateType==="addition") data_object.addition = parseFloat(inputField.value) || 0
+  else if (updateType==="disposal") data_object.disposal = parseFloat(inputField.value) || 0
   else if (updateType==="allowance_percentage") data_object.allowance_percentage = parseFloat(inputField.value) || 0
   else if (updateType==="personal_usage_percentage") data_object.personal_usage_percentage = parseFloat(inputField.value) || 0
   else if (updateType==="note") data_object.note = inputField.value

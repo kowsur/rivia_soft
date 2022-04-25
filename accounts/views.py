@@ -198,12 +198,14 @@ def upsert_deduction_for_submission(request:HttpRequest, submission_id, deductio
         return HttpResponse(json.dumps({'error': f'only json data is allowed'}), status=400)
     
     amount = loaded_data.get("amount", None)
+    addition = loaded_data.get("addition", None)
+    disposal = loaded_data.get("disposal", None)
     allowance_percentage = loaded_data.get("allowance_percentage", None)
     personal_usage_percentage = loaded_data.get("personal_usage_percentage", None)
     note = loaded_data.get("note", None)
 
-    if amount is None and allowance_percentage is None and personal_usage_percentage is None and note is None:
-        return HttpResponse(json.dumps({'error': f'amount or allowance_percentage or personal_usage_percentage or note must be specified'}), status=400)
+    if amount is None and addition is None and disposal is None and allowance_percentage is None and personal_usage_percentage is None and note is None:
+        return HttpResponse(json.dumps({'error': f'amount or addition or disposal or allowance_percentage or personal_usage_percentage or note must be specified'}), status=400)
     
     if allowance_percentage and not 0<=allowance_percentage<=100:
         return HttpResponse(json.dumps({'error': f'allowance_percentage must be between 0 and 100!'}), status=400)
@@ -227,6 +229,10 @@ def upsert_deduction_for_submission(request:HttpRequest, submission_id, deductio
     if deduction_for_tax_year:
         if amount is not None:
             deduction_for_tax_year.amount = amount
+        if addition is not None:
+            deduction_for_tax_year.addition = addition
+        if disposal is not None:
+            deduction_for_tax_year.disposal = disposal
         if allowance_percentage is not None:
             deduction_for_tax_year.allowance_percentage = allowance_percentage
         if personal_usage_percentage is not None:
@@ -243,6 +249,10 @@ def upsert_deduction_for_submission(request:HttpRequest, submission_id, deductio
     )
     if amount is not None:
         deduction_for_tax_year.amount = amount
+    if addition is not None:
+        deduction_for_tax_year.addition = addition
+    if disposal is not None:
+        deduction_for_tax_year.disposal = disposal
     if allowance_percentage is not None:
         deduction_for_tax_year.allowance_percentage = allowance_percentage
     if personal_usage_percentage is not None:

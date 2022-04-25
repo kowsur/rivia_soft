@@ -102,6 +102,8 @@ class SelfemploymentDeductionsPerTaxYear(models.Model):
     deduction_source = models.ForeignKey(SelfemploymentDeductionSources, on_delete=models.RESTRICT)
     client = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.CASCADE)
     amount = models.FloatField(default=0)
+    addition = models.FloatField(default=0)
+    disposal = models.FloatField(default=0)
     allowance_percentage = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     personal_usage_percentage = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
     note = models.TextField(default='')

@@ -140,7 +140,7 @@ class TaxableIncomeSourceForSubmission(models.Model):
         verbose_name = "Taxable Income Source For Submission"
         verbose_name_plural = "Taxable Income Sources For Submissions"
     
-    submission = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)
+    submission = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.CASCADE)
     taxable_income_source = models.ForeignKey(TaxableIncomeSources, on_delete=models.RESTRICT)
     amount = models.FloatField(default=0)
     paid_income_tax_amount = models.FloatField(default=0)

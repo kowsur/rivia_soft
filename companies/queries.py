@@ -95,8 +95,8 @@ def db_search_SelfemploymentIncomeAndExpensesDataCollection(search_text: str, li
 
 def db_all_SelfemploymentIncomeAndExpensesDataCollection(limit=-1):
     if limit<=-1:
-        return SelfemploymentIncomeAndExpensesDataCollection.objects.all()
-    return SelfemploymentIncomeAndExpensesDataCollection.objects.all()[:limit]
+        return SelfemploymentIncomeAndExpensesDataCollection.objects.filter(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year())
+    return SelfemploymentIncomeAndExpensesDataCollection.objects.filter(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year())[:limit]
 
 
 # SelfassesmentAccountSubmissionTaxYear

@@ -813,7 +813,7 @@ class SelfemploymentIncomeAndExpensesDataCollection(models.Model):
         verbose_name_plural = 'Selfemployment Class 2 Tax Configs For TaxYears'
         constraints = [
             models.UniqueConstraint(
-                fields = ('selfassesment', 'tax_year',),
+                fields = ('selfassesment', 'tax_year'),
                 name = "SelfemploymentIncomeAndExpensesDataCollection__selfassesment__tax_year",
                 )
         ]

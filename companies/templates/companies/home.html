@@ -118,6 +118,10 @@
           <span id="task-count">{{ selfassesment_account_submission_status_NOT_ASSIGEND }}</span>
           <span class="task-tooltip">Not Assigned.</span>
         </span>
+        <span class="task task-done" data-tasks='selfassesment_account_submission_data_collected'>
+          <span id="task-count">{{ selfassesment_account_submission_data_collected }}</span>
+          <span class="task-tooltip">Data collected.</span>
+        </span>
       </div>
     {% elif limited_counts %}
       <div class="task-container">
@@ -173,6 +177,13 @@
         <span class="task task-previous" data-tasks='statement_deadline_missed'>
           <span id="task-count">{{ statement_deadline_missed }}</span>
           <span class="task-tooltip">Missed Deadlines.</span>
+        </span>
+      </div>
+    {% elif selfassesment_data_collection_counts %}
+      <div class="task-container">
+        <span class="task task-done" data-tasks='selfassesment_data_collection_record_for_current_year'>
+          <span id="task-count">{{ selfassesment_data_collection_record_for_current_year }}</span>
+          <span class="task-tooltip">Rows for current Year</span>
         </span>
       </div>
     {% endif %}

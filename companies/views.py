@@ -30,6 +30,7 @@ from .forms import LimitedVATTrackerCreationForm, LimitedVATTrackerChangeForm, L
 from .forms import LimitedConfirmationStatementTrackerCreationForm, LimitedConfirmationStatementTrackerChangeForm, LimitedConfirmationStatementTrackerDeleteForm
 
 #models
+from django.db.models import Subquery
 from .models import  Selfassesment, SelfassesmentTracker, SelfassesmentAccountSubmission, SelfassesmentAccountSubmissionTaxYear, SelfemploymentIncomeAndExpensesDataCollection
 from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 from .models import AutoCreatedSelfassesmentTracker
@@ -82,6 +83,31 @@ URLS = {
 user_details_url_without_argument = '/u/details/'
 
 from pprint import pp
+
+
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import QuerySet
+
+def get_object_or_None(model, *args, pk=None, delete_duplicate=True, return_all=False,**kwargs):
+    try:
+        if pk is not None:
+            record = model.objects.get(pk=pk)
+        else:
+            record = model.objects.filter(*args, **kwargs).order_by('pk')
+            if delete_duplicate:
+                if type(record) is QuerySet and len(record)>1:
+                    for rec in record[1:]:
+                        rec.delete()
+            if return_all:
+                return record
+            if record:
+                record = record[0]
+            if type(record) is QuerySet and len(record) == 0:
+                return None
+        return record
+    except ObjectDoesNotExist:
+        return None
+
 
 
 SELFASSESMENT_FK_FIELDS_FOR_EXPORT = 'all' #['client_name', 'client_file_number', 'HMRC_referance', 'personal_post_code']
@@ -413,6 +439,17 @@ def all_selfassesment_account_submission_tax_year(request, limit=-1):
 # =============================================================================================================
 # =============================================================================================================
 # SelfemploymentIncomeAndExpensesDataCollection
+def slefassesment_account_submission_auto_row(request, selfassesment, tax_year, message=False):
+  try:
+    account_sumbission = SelfassesmentAccountSubmission(client_id=selfassesment, tax_year=tax_year)
+    account_sumbission.save()
+  except Exception:
+    if message:
+      messages.error(request, "Failed auto creation of Selfassesment Account Submission a row already exists.")
+
+def get_selfassesment_data_collection_records_where_for_current_year():
+  return SelfemploymentIncomeAndExpensesDataCollection.objects.filter(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year())
+
 @login_required
 def home_selfassesment_data_collection(request):
   pk_field = 'id'
@@ -431,6 +468,10 @@ def home_selfassesment_data_collection(request):
 
     'template_tag': generate_template_tag_for_model(SelfemploymentIncomeAndExpensesDataCollection, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
     'data_container': generate_data_container_table(SelfemploymentIncomeAndExpensesDataCollection, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+
+    "counts": True,
+    "selfassesment_data_collection_counts": True,
+    "selfassesment_data_collection_record_for_current_year": get_selfassesment_data_collection_records_where_for_current_year().count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Data_Collection_viewall_url,
@@ -504,6 +545,10 @@ def create_selfassesment_data_collection_for_client(request, utr=None):
         assesment.tax_year = tax_year
         assesment.selfassesment = selfassesment
         assesment.save()
+
+        # Create row in selfassesment account submission
+        slefassesment_account_submission_auto_row(request, selfassesment, tax_year)
+
         messages.add_message(request, messages.SUCCESS, 'We recieved your data!')
         return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
       else:
@@ -553,8 +598,20 @@ def create_selfassesment_data_collection(request):
     form = SelfemploymentIncomeAndExpensesDataCollectionCreationForm(request.POST)
     context['form'] = form
     if form.is_valid():
-      assesment = form.save()
-      assesment.save()
+      assesment = form.save(commit=False)
+
+      selfassesment = assesment.selfassesment
+      tax_year = assesment.tax_year
+      existing_record = get_object_or_None(SelfemploymentIncomeAndExpensesDataCollection, selfassesment=selfassesment, tax_year=tax_year, delete_duplicate=False, return_all=True)
+      if not existing_record:
+        assesment.save()
+
+        # Create row in selfassesment account submission
+        slefassesment_account_submission_auto_row(request, selfassesment, tax_year, message=True)
+
+        messages.success(request, "Record created")
+      else:
+        messages.error(request, "There is an existing Record for the selected client and the current year")
     else:
       messages.error(request, f'Action failed due to invalid data!')
   return render(request, template_name='companies/create.html', context=context)
@@ -624,6 +681,14 @@ def delete_selfassesment_data_collection(request, data_id:int):
 @login_required
 def search_selfassesment_data_collection(request, limit:int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    if request.GET.get('tasks'):
+      tasks = {
+        "selfassesment_data_collection_record_for_current_year": get_selfassesment_data_collection_records_where_for_current_year(),
+      }
+      records = tasks.get(request.GET.get('tasks'), [])
+      data = serialize(queryset=records, format='json')
+      return HttpResponse(data, content_type='application/json')
+
     search_text = request.GET.get('q', '')
     if search_text.strip()=='':
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_viewall_name)
@@ -702,6 +767,10 @@ def get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(user):
 def get_selfassesment_account_submissions_where_status_NOT_ASSIGNED():
   return SelfassesmentAccountSubmission.objects.filter(assigned_to=None)
 
+def get_selfassesment_account_submissions_where_data_collected():
+  collected_data_for_clients_for_current_year = SelfemploymentIncomeAndExpensesDataCollection.objects.filter(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year())
+  return SelfassesmentAccountSubmission.objects.filter(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year(), client_id__in=Subquery(collected_data_for_clients_for_current_year.values('selfassesment__pk')))
+
 
 @login_required
 def home_selfassesment_account_submission(request):
@@ -734,6 +803,7 @@ def home_selfassesment_account_submission(request):
     "selfassesment_account_submission_status_SUBMITTED": get_selfassesment_account_submissions_where_status_SUBMITTED().count(),
     "selfassesment_account_submission_status_ASSIGEND_TO_ME": get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(request.user).count(),
     "selfassesment_account_submission_status_NOT_ASSIGEND": get_selfassesment_account_submissions_where_status_NOT_ASSIGNED().count(),
+    "selfassesment_account_submission_data_collected": get_selfassesment_account_submissions_where_data_collected().count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_viewall_url,
@@ -889,6 +959,7 @@ def search_selfassesment_account_submission(request, limit: int=-1):
         "selfassesment_account_submission_status_SUBMITTED": get_selfassesment_account_submissions_where_status_SUBMITTED(),
         "selfassesment_account_submission_status_ASSIGEND_TO_ME": get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(request.user),
         "selfassesment_account_submission_status_NOT_ASSIGEND": get_selfassesment_account_submissions_where_status_NOT_ASSIGNED(),
+        "selfassesment_account_submission_data_collected": get_selfassesment_account_submissions_where_data_collected(),
       }
       records = tasks.get(request.GET.get('tasks'), [])
       data = serialize(queryset=records, format='json')

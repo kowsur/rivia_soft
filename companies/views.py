@@ -869,9 +869,9 @@ def update_selfassesment_account_submission(request, submission_id:int):
     return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_home_name)
     raise Http404
 
-  if record.status=="SUBMITTED" and not request.user.is_superuser:
-    messages.error(request, f'You can not update the submission it is already submitted!')
-    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_home_name)
+  # if record.status=="SUBMITTED" and not request.user.is_superuser:
+  #   messages.error(request, f'You can not update the submission it is already submitted!')
+  #   return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_home_name)
 
   if request.method == 'POST':
     form = SelfassesmentAccountSubmissionChangeForm(request.POST, instance=record)

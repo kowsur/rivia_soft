@@ -45,3 +45,13 @@ AUTH_CODE_VALIDATOR = RegexValidator(
     regex=COMPILED_AUTH_CODE_REGEX,
     message='Enter 6 digit alphanumeric code',
     code='Invalid company authentication code')
+
+
+# tax_year
+TAX_YEAR_REGEX = r'^\d{4}-\d{4}$'
+COMPILED_TAX_YEAR_REGEX = re.compile(TAX_YEAR_REGEX)
+# validator
+TAX_YEAR_VALIDATOR = RegexValidator(
+    regex=COMPILED_TAX_YEAR_REGEX,
+    message="Maintain the format(dddd-dddd) for tax years. Ex: 2020-2021"
+)

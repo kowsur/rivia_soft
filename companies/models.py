@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
 
 from users.models import CustomUser
-from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR, AUTH_CODE_VALIDATOR
+from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR, AUTH_CODE_VALIDATOR, TAX_YEAR_VALIDATOR
 
 from datetime import timedelta, date
 
@@ -180,8 +180,11 @@ class SelfassesmentAccountSubmissionTaxYear(models.Model):
     class Meta:
         verbose_name = _("Selfassesment Tax Year")
         verbose_name_plural = _("Selfassesment Tax Years")
+        constraints = [
+            models.UniqueConstraint(fields=['tax_year'], name='unique_tax_year'),
+        ]
     id = models.AutoField(verbose_name='Tax Year ID', primary_key=True, null=False, db_index=True, editable=False)
-    tax_year = models.CharField(verbose_name='Tax Year', blank=False, null=False, max_length=12)
+    tax_year = models.CharField(verbose_name='Tax Year', blank=False, null=False, max_length=12, validators=[TAX_YEAR_VALIDATOR])
 
     def __str__(self):
         return f"📆 {self.tax_year}"

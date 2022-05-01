@@ -17,9 +17,9 @@
 </head>
 <body>
     {% comment %} Agreement Page {% endcomment %}
-    <article id="agreement" page-break-before page-break-after>
+    <article hide id="agreement" page-break-before page-break-after>
         <section>
-            <h1 class="text-center underline to-upper">Account's Report</h1>
+            <h1 class="text-center underline to-upper">Accountant's Report</h1>
             <p>
                 We have prepared without carrying out an audit the attached
                 Profit and Loss accounts for the year ended <strong>05 April {{tax_year_next}}</strong>.
@@ -50,7 +50,7 @@
         <section>
             <h1 class="text-center to-upper underline">Client's Approval</h1>
             I have approved the attached Profit & Loss Accounts for the
-            period from <strong>06 April {{tax_year}} to 05 April {{tax_year_next}}</strong>. These have been
+            period from <strong>06 April {{tax_year_prev}} to 05 April {{tax_year_next}}</strong>. These have been
             prepared from the information, records and explanation given by me.
             <div class="spacer"></div>
             <div class="d-f items-center justify-between">
@@ -64,49 +64,136 @@
     <article id="profit-and-loss" page-break-before page-break-after>
 
         <section>
-            <h1 class="to-upper fs-11">Profit and loss for the year ended 5 April {{tax_year_next}}</h1>
-            <aside data-client-details class="fs-8.5">
-                <strong>{{client_name}}</strong>
-                <address>
-                    <pre>{{client_address}}</pre>
+            <aside data-client-details class="fs-12">
+                <strong class="to-upper">{{client_name}}</strong>
+                <address class="text-center to-upper">
+                    <pre class="pre-to-normal mw-45ch">{{client_address}}</pre>
+                    {% if client_post_code %}
+                        <br/>
+                        <span>{{client_post_code}}</span>
+                    {% endif %}
                 </address>
             </aside>
-
+            <h1 class="to-upper text-center fs-11">Profit and loss for the year ended 5 April {{tax_year_next}}</h1>
+            
+            <br>
+            <h2 class="fs-9 font-normal d-f justify-between">Selfemployment Income (Including Tips) <span>£{{selfemployment_total_income|floatformat:"2g"}}</span></h2>
             <br>
 
             <section>
-                {% if selfemployment_expenses %}
+                
                 <table class="fs-8" data-expense-list>
                     <thead>
                         <tr>
-                            <th>Expenses</th>
-                            <th>Amount(£)</th>
-                            <th>Personal usage(%)</th>
-                            <th>Amount - Personal usage(%)</th>
+                            <th class="bb-1">Less: Expenses</th>
+                            <th class="bb-1 text-right">Including personal usage(£)</th>
+                            <th class="bb-1 text-right">Personal usage(£)</th>
+                            <th class="bb-1 text-right">Excluding personal usage(£)</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% if selfemployment_total_income_comission != 0 %}
+                            <tr>
+                                <td>Office and Admin Charge</td>
+                                <td class="text-right">{{selfemployment_total_income_comission|floatformat:"2g"}}</td>
+                                <td class="text-right">{{0|floatformat:"2g"}}</td>
+                                <td class="text-right">{{selfemployment_total_income_comission|floatformat:"2g"}}</td>
+                            </tr>
+                        {% endif %}
                         {% for expense in selfemployment_expenses %}
                             <tr>
                                 <td>{{expense.expense_source}}</td>
                                 <td class="text-right">{{expense.amount|floatformat:"2g"}}</td>
-                                <td class="text-right">{{expense.personal_usage_percentage}}</td>
-
                                 {% with expense.amount|as_percentage_of:expense.personal_usage_percentage as personal_usage %}
+                                    <td class="text-right">{{personal_usage|floatformat:"2g"}}</td>
                                     <td class="text-right">{{expense.amount|subtract:personal_usage|floatformat:"2g"}}</td>
                                 {% endwith %}
                             </tr>
                         {% endfor %}
-                        <tr>
-                            <th class="text-left" colspan="3">Total Allowanble Expenses</th>
-                            <th class="text-right">{{selfemployment_total_expense|floatformat:"2g"}}</th>
-                        </tr>
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th class="text-right font-bolder" colspan="3">Total Allowanble Expenses</th>
+                            <th class="text-right font-bolder">{{selfemployment_total_expense|floatformat:"2g"}}</th>
+                        </tr>
+                    </tfoot>
                 </table>
 
                 <br>
-                {% endif %}
 
+
+                {% if car_value %}
+                    <table data-car-value>
+                        <thead>
+                            <tr>
+                                <th class="bb-1" colspan="7">LESS : DEDUCTIONS AND ALLOWANCES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="1"></td>
+                                <td colspan="3">Pool Written Down Value b/fwd</td>
+                                <td class="text-right" colspan="1">{{car_value.value|floatformat:"2g"}}</td>
+                                <td colspan="2"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="1"></td>
+                                <td colspan="3">Additions</td>
+                                <td class="text-right" colspan="1">{{car_value.addition|floatformat:"2g"}}</td>
+                                <td colspan="2"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="1"></td>
+                                <td colspan="3">Disposals</td>
+                                <td class="text-right" colspan="1">{{car_value.disposal|floatformat:"2g"}}</td>
+                                <td colspan="2"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"></td>
+                                <td class="bt-1" colspan="2">Total</td>
+                                <td class="text-right bt-1" colspan="1">{{car_value.total|floatformat:"2g"}}</td>
+                                <td colspan="2"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"></td>
+                                <td colspan="2">WDA @{{car_value.written_down_allowance_percentage}}%</td>
+                                <td class="text-right" colspan="1">{{car_value.written_down_allowance|floatformat:"2g"}}</td>
+                                <td colspan="2"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"></td>
+                                <td colspan="2">WDV c/fwd</td>
+                                <td class="text-right bt-1" colspan="1">{{car_value.written_down_value|floatformat:"2g"}}</td>
+                                <td colspan="2"></td>
+                            </tr>
+                            
+                            <tr>
+                                <!-- empty row -->
+                                <td class="h-5" colspan="7"></td>
+                            </tr>
+                            
+                            <tr>
+                                <td colspan="1"></td>
+                                <td colspan="5">Capital Allowance available</td>
+                                <td class="text-right" colspan="1">{{car_value.capital_allowance|floatformat:"2g"}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="1"></td>
+                                <td colspan="5">(Less):Personal Usages - {{car_value.personal_usage_percentage}}%</td>
+                                <td class="text-right" colspan="1">{{car_value.personal_usage|floatformat:"2g"}}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"></td>
+                                <td class="font-bolder bt-1" colspan="4">Capital Allownace Deduction</td>
+                                <td class="font-bolder bt-1 text-right"colspan="1">{{car_value.capital_allowance_deduction|floatformat:"2g"}}</td>
+                            </tr>                    
+                        </tbody>
+                    </table>
+                {% endif %}
+                <h2 class="fs-9 font-normal d-f justify-between">Total Expenses <span>£{{total_expenses|floatformat:"2g"}}</span></h2>
+                <h2 class="fs-9 font-bold d-f justify-between doubble-underline">Net {% if selfemployment_net_profit >= 0 %}Profit {% else %}Loss{% endif %} for the year <span>£{{selfemployment_net_profit|floatformat:"2g"}}</span></h2>
+
+                {% comment %} 
                 {% if deductions_and_allowances %}
                 <table class="fs-8" data-deduction-list>
                     <thead>
@@ -133,11 +220,13 @@
                                 {% endwith %}
                             </tr>
                         {% endfor %}
-                        <tr>
-                            <th class="text-left" colspan="4">Capital Allownace Deduction For This Period</th>
-                            <th class="text-right">{{selfemployment_total_deduction_and_allowance|floatformat:"2g"}}</th>
-                        </tr>
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <th class="text-right font-bolder" colspan="4">Capital Allownace Deduction For This Period</th>
+                            <th class="text-right font-bolder">{{selfemployment_total_deduction_and_allowance|floatformat:"2g"}}</th>
+                        </tr>
+                    </tfoot>
                 </table>
 
                 {% endif %}
@@ -148,15 +237,15 @@
                 <br/>
                 {% endif %}
 
-                <h2 class="fs-9 font-normal d-f justify-between">Selfemployment Income (Including Tips) <span>{{selfemployment_total_income|floatformat:"2g"}}£</span></h2>
                 {% if selfemployment_expenses %}
-                    <h2 class="fs-9 font-normal d-f justify-between"><span><strong>Less:</strong> Total Allowanble Expenses </span><span>{{selfemployment_total_expense|floatformat:"2g"}}£</span></h2>
+                    <h2 class="fs-9 font-normal d-f justify-between"><span><strong>Less:</strong> Total Allowable Expenses </span><span>{{selfemployment_total_expense|floatformat:"2g"}}£</span></h2>
                 {% endif %}
                 {% if deductions_and_allowances %}
                     <h2 class="fs-9 font-normal d-f justify-between"><span><strong>Less:</strong> Capital Allownace and Deduction For This Period </span><span>{{selfemployment_total_deduction_and_allowance|floatformat:"2g"}}£</span></h2>
                 {% endif %}
                 <hr>
                 <h2 class="fs-10 font-bold d-f justify-between">Selfemployment Net Profit <span>{{selfemployment_net_profit|floatformat:"2g"}}£</span></h2>
+                {% endcomment %}
             </section>
         </section>
 
@@ -164,7 +253,7 @@
 
 
     {% comment %} Tax Calculation Page {% endcomment %}
-    <article id="tax-calculation" page-break-before page-break-after>
+    <article hide id="tax-calculation" page-break-before page-break-after>
 
         <h1 class="to-upper fs-11">Tax account for the year ended 5 April {{tax_year_next}}</h1>
         <aside data-client-details class="fs-8.5">

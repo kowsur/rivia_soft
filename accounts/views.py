@@ -415,13 +415,19 @@ def get_total_selfemployment_expense(selfemployment_expenses):
 
 
 def calculate_selfemployment_income(income_amount, comission):
-    income = income_amount - comission
-    return  income if income>=0 else 0
+    income = income_amount #- comission
+    return income if income>=0 else 0
 
 def get_total_selfemployment_income(selfemployment_incomes):
     total = 0
     for income in selfemployment_incomes:
         total += calculate_selfemployment_income(income.amount, income.comission)
+    return total
+
+def get_total_selfemployment_comission(selfemployment_incomes):
+    total = 0
+    for income in selfemployment_incomes:
+        total += income.comission
     return total
 
 
@@ -457,6 +463,11 @@ STYLESHEETS_CACHE = [
 @login_required
 @allowed_for_staff()
 def tax_report_pdf(request:HttpRequest, submission_id):
+    IMAGE_CACHE = {}
+    FONT_CONFIG = FontConfiguration()
+    STYLESHEETS_CACHE = [
+            CSS(filename='accounts/templates/accounts/tax_report_style.css'),
+        ]
     template = get_template('accounts/tax_report.html')
     
     # Retrive data from database
@@ -464,7 +475,8 @@ def tax_report_pdf(request:HttpRequest, submission_id):
     if not account_submission:
         return Http404("Submission for the submission_id specified does not exist!")
     selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
-    selfemployment_incomes = [income for income in selfemployment_incomes if income.amount>0]
+    selfemployment_incomes = [income for income in selfemployment_incomes if income.amount>0 or income.comission>0]
+    selfemployment_total_comission = get_total_selfemployment_comission(selfemployment_incomes)
 
     selfemployment_expenses = get_object_or_None(SelfemploymentExpensesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
     selfemployment_expenses = [expense for expense in selfemployment_expenses if expense.amount>0]
@@ -477,25 +489,67 @@ def tax_report_pdf(request:HttpRequest, submission_id):
 
     # selfemployment
     selfemployment_total_income = get_total_selfemployment_income(selfemployment_incomes)
-    selfemployment_total_expense = get_total_selfemployment_expense(selfemployment_expenses)
+    selfemployment_total_expense = get_total_selfemployment_expense(selfemployment_expenses) + selfemployment_total_comission
     selfemployment_total_deduction_and_allowance = get_total_selfemployment_deduction_and_allowance(deductions_and_allowances)
-    selfemployment_net_profit = selfemployment_total_income - selfemployment_total_expense - selfemployment_total_deduction_and_allowance
+
+    car_value_deduction_and_allowance = get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=submission_id, deduction_source__name__icontains="Car Value", return_all=False, delete_duplicate=False)
+    allowance_car_value = {
+        'value': 0,
+        'addition': 0,
+        'disposal': 0,
+        'total': 0,
+
+        'written_down_allowance': 0,
+        'written_down_allowance_percentage': 0,
+        'written_down_value': 0,
+        
+        'capital_allowance': 0,
+        'personal_usage': 0,
+        'personal_usage_percentage': 0,
+        'capital_allowance_deduction': 0,
+    }
+    if car_value_deduction_and_allowance:
+        allowance_car_value['value'] = car_value_deduction_and_allowance.amount
+        allowance_car_value['addition'] = car_value_deduction_and_allowance.addition
+        allowance_car_value['disposal'] = car_value_deduction_and_allowance.disposal
+        total = car_value_deduction_and_allowance.amount + car_value_deduction_and_allowance.addition + car_value_deduction_and_allowance.disposal
+        allowance_car_value['total'] = total
+
+        written_down_allowance = (total*car_value_deduction_and_allowance.allowance_percentage)/100
+        allowance_car_value['written_down_allowance'] = written_down_allowance
+        allowance_car_value['written_down_allowance_percentage'] = car_value_deduction_and_allowance.allowance_percentage
+        written_down_value = total - written_down_allowance
+        allowance_car_value['written_down_value'] = written_down_value
+
+        allowance_car_value['capital_allowance'] = written_down_allowance
+        personal_usage = (written_down_allowance*car_value_deduction_and_allowance.personal_usage_percentage)/100
+        allowance_car_value['personal_usage'] = personal_usage
+        allowance_car_value['personal_usage_percentage'] = car_value_deduction_and_allowance.personal_usage_percentage
+        allowance_car_value['capital_allowance_deduction'] = written_down_allowance-personal_usage
+
+
+    total_expenses = selfemployment_total_expense + allowance_car_value['capital_allowance_deduction']
+    selfemployment_net_profit = selfemployment_total_income - total_expenses
 
     context = {
         # submission info
         'submission': account_submission,
-        'tax_year': account_submission.tax_year.tax_year[:4],
+        'tax_year': account_submission.tax_year.tax_year,
+        'tax_year_prev': account_submission.tax_year.tax_year[:4],
         'tax_year_next': account_submission.tax_year.tax_year[5:],
 
         # client info
         'client_name': account_submission.client_id.client_name,
         'client_address': account_submission.client_id.personal_address,
+        'client_post_code': account_submission.client_id.personal_post_code,
 
         # selfemployment
         'selfemployment_total_income': get_total_selfemployment_income(selfemployment_incomes),
-        'selfemployment_total_expense': get_total_selfemployment_expense(selfemployment_expenses),
+        'selfemployment_total_income_comission': selfemployment_total_comission,
+        'selfemployment_total_expense': selfemployment_total_expense,
         'selfemployment_total_deduction_and_allowance': get_total_selfemployment_deduction_and_allowance(deductions_and_allowances),
         'selfemployment_net_profit': selfemployment_net_profit,
+        'total_expenses': total_expenses,
 
         'total_taxable_income': get_total_taxable_income(taxable_incomes),
 
@@ -504,6 +558,7 @@ def tax_report_pdf(request:HttpRequest, submission_id):
         'selfemployment_expenses': selfemployment_expenses,
         'deductions_and_allowances': deductions_and_allowances,
         'taxable_incomes': taxable_incomes,
+        'car_value': allowance_car_value
     }
     
     # Initiate file like HttpResponse object

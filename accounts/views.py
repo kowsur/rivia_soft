@@ -560,47 +560,59 @@ def tax_report_pdf(request:HttpRequest, submission_id):
     total_income_from_taxable_incomes = get_total_taxable_income(taxable_incomes)
     total_income = selfemployment_net_profit + total_income_from_taxable_incomes
 
-    # Personal Allowance
-    personal_allowance = UK_tax_config.personal_allowance
-    personal_allowance_limit = UK_tax_config.personal_allowance_limit
-    one_unit_deducted_from_PA_earned_over_PAL = UK_tax_config.one_pound_reduction_from_PA_earned_over_PAL
-    
-    personal_allowance_reduction = get_personal_allowance_reduction(total_income, personal_allowance, personal_allowance_limit, one_unit_deducted_from_PA_earned_over_PAL)
-    reduced_personal_allowance = personal_allowance-personal_allowance_reduction
+    tax_calc_data={}
+    if not error_messages:
+        # Personal Allowance
+        personal_allowance = UK_tax_config.personal_allowance
+        personal_allowance_limit = UK_tax_config.personal_allowance_limit
+        one_unit_deducted_from_PA_earned_over_PAL = UK_tax_config.one_pound_reduction_from_PA_earned_over_PAL
+        
+        personal_allowance_reduction = get_personal_allowance_reduction(total_income, personal_allowance, personal_allowance_limit, one_unit_deducted_from_PA_earned_over_PAL)
+        reduced_personal_allowance = personal_allowance-personal_allowance_reduction
 
-    # Tax Calculation page data
-    taxable_income = total_income - reduced_personal_allowance
-    tax_calc__income = {
-        'total_income': total_income,
-        'personal_allowance': personal_allowance,
-        'reduced_personal_allowance': reduced_personal_allowance,
-        'taxable_income': taxable_income
-    }
-    
-    tax_calc__uk_tax = uk_tax(
-        total_income=total_income_for_uk_tax,
-        personal_allowance=personal_allowance,
-        basic_rate_max=UK_tax_config.basic_rate_max,
-        higher_rate_max=UK_tax_config.higher_rate_max,
-        basic_tax_rate=UK_tax_config.basic_rate_tax_percentage,
-        higher_tax_rate=UK_tax_config.higher_rate_tax_percentage,
-        additional_tax_rate=UK_tax_config.additional_rate_tax_percentage,
-        personal_allowance_limit=UK_tax_config.personal_allowance_limit,
-        one_pound_reduction_from_PA_earned_over_PAL=UK_tax_config.one_pound_reduction_from_PA_earned_over_PAL
+        # Tax Calculation page data
+        taxable_income = total_income - reduced_personal_allowance
+        tax_calc__income = {
+            'total_income': total_income,
+            'personal_allowance': personal_allowance,
+            'reduced_personal_allowance': reduced_personal_allowance,
+            'taxable_income': taxable_income
+        }
+        
+        tax_calc__uk_tax = uk_tax(
+            total_income=total_income_for_uk_tax,
+            personal_allowance=personal_allowance,
+            basic_rate_max=UK_tax_config.basic_rate_max,
+            higher_rate_max=UK_tax_config.higher_rate_max,
+            basic_tax_rate=UK_tax_config.basic_rate_tax_percentage,
+            higher_tax_rate=UK_tax_config.higher_rate_tax_percentage,
+            additional_tax_rate=UK_tax_config.additional_rate_tax_percentage,
+            personal_allowance_limit=UK_tax_config.personal_allowance_limit,
+            one_pound_reduction_from_PA_earned_over_PAL=UK_tax_config.one_pound_reduction_from_PA_earned_over_PAL
+            )
+        tax_calc__class_4_tax = uk_class_4_tax(
+            total_income=total_income_for_class_4_tax,
+            basic_rate_start=Class4_tax_config.basic_rate_min,
+            higher_rate_start=Class4_tax_config.basic_rate_max,
+            basic_rate_tax_percentage=Class4_tax_config.basic_rate_tax_percentage,
+            higher_rate_tax_percentage=Class4_tax_config.higher_rate_tax_percentage
         )
-    tax_calc__class_4_tax = uk_class_4_tax(
-        total_income=total_income_for_class_4_tax,
-        basic_rate_start=Class4_tax_config.basic_rate_min,
-        higher_rate_start=Class4_tax_config.basic_rate_max,
-        basic_rate_tax_percentage=Class4_tax_config.basic_rate_tax_percentage,
-        higher_rate_tax_percentage=Class4_tax_config.higher_rate_tax_percentage
-    )
-    tax_calc__class_2_tax = {
-                'earning_limit': Class2_tax_config.tax_applied_for_income_above,
-                'total': 0 if Class2_tax_config.tax_applied_for_income_above>=total_income_for_class_2_tax else Class2_tax_config.flat_tax_amount
-            }
-    tax_calc__total_tax = tax_calc__uk_tax.total + tax_calc__class_4_tax.total + tax_calc__class_2_tax['total']
-    tax_clac__total_paid_tax = reduce(lambda taxable_income_1, taxable_income_2: taxable_income_1.paid_income_tax_amount + taxable_income_2.paid_income_tax_amount, taxable_incomes)
+        tax_calc__class_2_tax = {
+                    'earning_limit': Class2_tax_config.tax_applied_for_income_above,
+                    'total': 0 if Class2_tax_config.tax_applied_for_income_above>=total_income_for_class_2_tax else Class2_tax_config.flat_tax_amount
+                }
+        tax_calc__total_tax = tax_calc__uk_tax.total + tax_calc__class_4_tax.total + tax_calc__class_2_tax['total']
+        tax_clac__total_paid_tax = reduce(lambda taxable_income_1, taxable_income_2: taxable_income_1.paid_income_tax_amount + taxable_income_2.paid_income_tax_amount, taxable_incomes)
+
+        tax_calc_data = {
+            'income': tax_calc__income,
+            'uk_tax': tax_calc__uk_tax,
+            'class_4': tax_calc__class_4_tax,
+            'class_2': tax_calc__class_2_tax,
+            'total_tax': tax_calc__total_tax,
+            'total_paid_tax': tax_clac__total_paid_tax,
+            'total_tax_due': tax_calc__total_tax - tax_clac__total_paid_tax
+        }
     
     context = {
         # submission info
@@ -635,13 +647,7 @@ def tax_report_pdf(request:HttpRequest, submission_id):
         # Income Tax calculation page
         'tax_calc': {
             'errors': error_messages,
-            'income': tax_calc__income,
-            'uk_tax': tax_calc__uk_tax,
-            'class_4': tax_calc__class_4_tax,
-            'class_2': tax_calc__class_2_tax,
-            'total_tax': tax_calc__total_tax,
-            'total_paid_tax': tax_clac__total_paid_tax,
-            'total_tax_due': tax_calc__total_tax - tax_clac__total_paid_tax
+            **tax_calc_data
         },
     }
     

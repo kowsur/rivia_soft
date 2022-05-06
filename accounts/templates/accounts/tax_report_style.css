@@ -279,6 +279,15 @@ body{
 .w-80{width: 80pt;}
 .w-90{width: 90pt;}
 .w-100{width: 100pt;}
+.w-200{width: 200pt;}
+.w-300{width: 300pt;}
+.w-400{width: 400pt;}
+.w-500{width: 500pt;}
+.w-600{width: 600pt;}
+.w-700{width: 700pt;}
+.w-800{width: 800pt;}
+.w-900{width: 900pt;}
+.w-1000{width: 1000pt;}
 
 .d-b{display: block;}
 .d-ib{display: inline-block;}

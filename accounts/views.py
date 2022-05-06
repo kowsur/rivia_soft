@@ -602,7 +602,7 @@ def tax_report_pdf(request:HttpRequest, submission_id):
                     'total': 0 if Class2_tax_config.tax_applied_for_income_above>=total_income_for_class_2_tax else Class2_tax_config.flat_tax_amount
                 }
         tax_calc__total_tax = tax_calc__uk_tax.total + tax_calc__class_4_tax.total + tax_calc__class_2_tax['total']
-        tax_clac__total_paid_tax = reduce(lambda taxable_income_1, taxable_income_2: taxable_income_1.paid_income_tax_amount + taxable_income_2.paid_income_tax_amount, taxable_incomes)
+        tax_clac__total_paid_tax = reduce(lambda taxable_income_1, taxable_income_2: taxable_income_1.paid_income_tax_amount + taxable_income_2.paid_income_tax_amount, taxable_incomes, initial=0)
 
         tax_calc_data = {
             'income': tax_calc__income,

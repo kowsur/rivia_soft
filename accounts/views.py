@@ -1,4 +1,3 @@
-from functools import reduce
 import json
 
 from weasyprint import HTML, CSS
@@ -459,6 +458,12 @@ def get_total_taxable_income(taxable_incomes):
         total += calculate_taxable_income(income.amount, income.paid_income_tax_amount)
     return total
 
+def get_total_paid_income_tax_from_taxable_incomes(taxable_incomes):
+    total = 0
+    for taxable_income in taxable_incomes:
+        total += taxable_income.paid_income_tax_amount
+    return total
+
 
 # Cache for weasyprint
 IMAGE_CACHE = {}
@@ -601,8 +606,9 @@ def tax_report_pdf(request:HttpRequest, submission_id):
                     'earning_limit': Class2_tax_config.tax_applied_for_income_above,
                     'total': 0 if Class2_tax_config.tax_applied_for_income_above>=total_income_for_class_2_tax else Class2_tax_config.flat_tax_amount
                 }
+        
         tax_calc__total_tax = tax_calc__uk_tax.total + tax_calc__class_4_tax.total + tax_calc__class_2_tax['total']
-        tax_clac__total_paid_tax = reduce(lambda taxable_income_1, taxable_income_2: taxable_income_1.paid_income_tax_amount + taxable_income_2.paid_income_tax_amount, taxable_incomes, 0)
+        tax_clac__total_paid_tax = get_total_paid_income_tax_from_taxable_incomes(taxable_incomes)
 
         tax_calc_data = {
             'income': tax_calc__income,

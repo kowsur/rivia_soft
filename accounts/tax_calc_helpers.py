@@ -41,6 +41,8 @@ def uk_tax(
 
     if total_income>personal_allowance:
         total_income = total_income-personal_allowance
+    else:
+        total_income = 0
 
     basic_rate_applied_on = 0
     basic_rate_tax_amount = 0

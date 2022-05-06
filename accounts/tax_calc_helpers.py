@@ -67,8 +67,8 @@ def uk_tax(
         higher_rate_applied_on = total_income - basic_rate_max
         higher_rate_tax_amount = percentage_of(higher_rate_applied_on, higher_tax_rate)
 
-    else:
-        basic_rate_applied_on = total_income-personal_allowance
+    elif total_income>0:
+        basic_rate_applied_on = total_income
         basic_rate_tax_amount = percentage_of(basic_rate_applied_on, basic_tax_rate)
     
     total_tax = basic_rate_tax_amount + higher_rate_tax_amount + additional_rate_tax_amount

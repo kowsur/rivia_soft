@@ -539,16 +539,6 @@ def tax_report_pdf(request:HttpRequest, submission_id):
     total_expenses = selfemployment_total_expense + allowance_car_value['capital_allowance_deduction']
     selfemployment_net_profit = selfemployment_total_income - total_expenses
 
-    # Taxable Incomes
-    uk_tax_applicable_incomes = [income for income in taxable_incomes  if income.taxable_income_source.apply_uk_tax]
-    total_income_for_uk_tax = selfemployment_net_profit + get_total_taxable_income(uk_tax_applicable_incomes)
-
-    class_4_tax_applicable_incomes = [income for income in taxable_incomes  if income.taxable_income_source.apply_class4_tax]
-    total_income_for_class_4_tax = selfemployment_net_profit + get_total_taxable_income(class_4_tax_applicable_incomes)
-
-    class_2_tax_applicable_incomes = [income for income in taxable_incomes  if income.taxable_income_source.apply_class2_tax]
-    total_income_for_class_2_tax = selfemployment_net_profit + get_total_taxable_income(class_2_tax_applicable_incomes)
-
     # Income tax page calculations
     # Tax configs
     error_messages = []
@@ -575,8 +565,20 @@ def tax_report_pdf(request:HttpRequest, submission_id):
         personal_allowance_reduction = get_personal_allowance_reduction(total_income, personal_allowance, personal_allowance_limit, one_unit_deducted_from_PA_earned_over_PAL)
         reduced_personal_allowance = personal_allowance-personal_allowance_reduction
 
+        # Taxable Incomes
+        uk_tax_applicable_incomes = [income for income in taxable_incomes  if income.taxable_income_source.apply_uk_tax]
+        total_income_for_uk_tax = selfemployment_net_profit + get_total_taxable_income(uk_tax_applicable_incomes)
+
+        class_4_tax_applicable_incomes = [income for income in taxable_incomes  if income.taxable_income_source.apply_class4_tax]
+        total_income_for_class_4_tax = selfemployment_net_profit + get_total_taxable_income(class_4_tax_applicable_incomes)
+
+        class_2_tax_applicable_incomes = [income for income in taxable_incomes  if income.taxable_income_source.apply_class2_tax]
+        total_income_for_class_2_tax = selfemployment_net_profit + get_total_taxable_income(class_2_tax_applicable_incomes)
+
+
         # Tax Calculation page data
         taxable_income = total_income - reduced_personal_allowance
+        taxable_income = max(taxable_income, 0)
         tax_calc__income = {
             'total_income': total_income,
             'personal_allowance': personal_allowance,

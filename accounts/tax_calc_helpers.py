@@ -113,22 +113,3 @@ def uk_class_4_tax(
     ]
 
     return Tax_ReturnType(total=total_tax, details=details)
-
-def uk_class_2_tax(
-    self_employment_net_income: int|float = 0,
-    other_income: int|float = 0,
-    tax_applied_for_income_above: int|float = 6475,
-    flat_tax_amount: int|float = 159
-):
-    total_income = self_employment_net_income + other_income
-    if total_income>tax_applied_for_income_above:
-        return TaxedIncomeUKClass2(
-            self_employment_net_income = self_employment_net_income,
-            other_income = other_income,
-            tax_applied = flat_tax_amount
-        )
-    return TaxedIncomeUKClass2(
-        self_employment_net_income = self_employment_net_income,
-        other_income = other_income,
-        tax_applied = 0
-    )

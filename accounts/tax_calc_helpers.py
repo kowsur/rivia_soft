@@ -82,11 +82,11 @@ def uk_tax(
 
 
 def uk_class_4_tax(
-    total_income: int|float = 0,
-    basic_rate_start: int|float = 9569,
-    higher_rate_start: int|float = 50270,
-    basic_rate_tax_percentage: int|float = 9,
-    higher_rate_tax_percentage: int|float = 2,
+    total_income: float = 0,
+    basic_rate_start: float = 9569,
+    higher_rate_start: float = 50270,
+    basic_rate_tax_percentage: float = 9,
+    higher_rate_tax_percentage: float = 2,
 ):
     basic_rate_applied_on = 0
     basic_rate_tax_amount = 0

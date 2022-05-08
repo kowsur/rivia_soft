@@ -31,12 +31,12 @@ from companies.url_variables import URL_NAMES_PREFIXED_WITH_APP_NAME
 from .tax_calc_helpers import get_personal_allowance_reduction, uk_tax, uk_class_4_tax
 
 
-def get_object_or_None(model, *args, pk=None, delete_duplicate=True, return_all=False,**kwargs):
+def get_object_or_None(model, *args, pk=None, delete_duplicate=True, return_all=False, **kwargs):
     try:
         if pk is not None:
             record = model.objects.get(pk=pk)
         else:
-            record = model.objects.filter(*args, **kwargs).order_by('pk')
+            record = model.objects.filter(*args, **kwargs)
             if delete_duplicate:
                 if type(record) is QuerySet and len(record)>1:
                     for rec in record[1:]:
@@ -335,28 +335,28 @@ def upsert_taxable_income_for_submission(request:HttpRequest, submission_id, tax
 ##############################################################################
 @login_required
 def get_expenses_for_submission(request: HttpRequest, submission_id):
-    submission_expenses = SelfemploymentExpensesPerTaxYear.objects.filter(client=submission_id).order_by('expense_source', 'month__month_index')
+    submission_expenses = SelfemploymentExpensesPerTaxYear.objects.filter(client=submission_id)
     serialized_data = SelfemploymentExpensesPerTaxYearSerializer(submission_expenses, many=True)
     json_response = dump_to_json.render(serialized_data.data)
     return HttpResponse(json_response, content_type='application/json')
 
 @login_required
 def get_incomes_for_submission(request: HttpRequest, submission_id):
-    submission_incomes = SelfemploymentIncomesPerTaxYear.objects.filter(client=submission_id).order_by('income_source', 'month__month_index')
+    submission_incomes = SelfemploymentIncomesPerTaxYear.objects.filter(client=submission_id)
     serialized_data = SelfemploymentIncomesPerTaxYearSerializer(submission_incomes, many=True)
     json_response = dump_to_json.render(serialized_data.data)
     return HttpResponse(json_response, content_type='application/json')
 
 @login_required
 def get_deductions_for_submission(request: HttpRequest, submission_id):
-    submission_deductions = SelfemploymentDeductionsPerTaxYear.objects.filter(client=submission_id).order_by('deduction_source')
+    submission_deductions = SelfemploymentDeductionsPerTaxYear.objects.filter(client=submission_id)
     serialized_data = SelfemploymentDeductionsPerTaxYearSerializer(submission_deductions, many=True)
     json_response = dump_to_json.render(serialized_data.data)
     return HttpResponse(json_response, content_type='application/json')
 
 @login_required
 def get_taxable_incomes_for_submission(request: HttpRequest, submission_id):
-    taxable_incomes = TaxableIncomeSourceForSubmission.objects.filter(submission=submission_id).order_by('taxable_income_source')
+    taxable_incomes = TaxableIncomeSourceForSubmission.objects.filter(submission=submission_id)
     serialized_data = TaxableIncomeSourceForSubmissionSerializer(taxable_incomes, many=True)
     json_response = dump_to_json.render(serialized_data.data)
     return HttpResponse(json_response, content_type='application/json')

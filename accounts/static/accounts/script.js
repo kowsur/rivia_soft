@@ -78,7 +78,7 @@ async function getTotalTaxableIncome(){
 }
 
 function calculateSelfemploymentIncome(incomeAmount, comission){
-  let actualIncome = incomeAmount-comission
+  let actualIncome = incomeAmount
   if (actualIncome<0) actualIncome=0
   return actualIncome
 }
@@ -432,36 +432,34 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   let allExpensesForSubmission = await getAllExpensesForSubmission()
   let allDeductionsForSubmission = await getAllDeductionsForSubmission()
 
-  Object.entries(groupedAllTaxableIncomesForSubmissionMapBySourceId).forEach(([taxableIncomeSourceId, taxableIncomes]) => {
-    displayTaxableIncomeSource(taxableIncomeSourceId, taxableIncomes, submissionDetails)
-  });
+  allTaxableIncomeSources.forEach(taxableIncomeSource=>{
+    let taxableIncomeSourceId = taxableIncomeSource.id
+    displayTaxableIncomeSource(taxableIncomeSourceId, groupedAllTaxableIncomesForSubmissionMapBySourceId[taxableIncomeSourceId], submissionDetails)
+  })
   displayTaxableIncomeOptions()
   updateTotalTaxableIncome()
 
-  Object.entries(groupedAllSelfemploymentIncomesForSubmissionMapBySourceId).forEach(([incomeSourceId, incomes]) => {
-    displaySelfemploymentIncomeSource(incomeSourceId, incomes, submissionDetails)
-  });
+  allSelfemploymentIncomeSources.forEach(incomeSource=>{
+    let incomeSourceId = incomeSource.id
+    displaySelfemploymentIncomeSource(incomeSourceId, groupedAllSelfemploymentIncomesForSubmissionMapBySourceId[incomeSourceId], submissionDetails)
+  })
   displaySelfemploymentIncomeOptions()
   updateTotalSelfemploymentIncome()
 
   // Show expenses with data from backend
-  Object.entries(groupedAllExpensesForSubmissionMapBySourceId).forEach(([expenseSourceId, expenses]) => {
-    displayExpenseSource(expenseSourceId, expenses, submissionDetails)
-  });
-
-  // Show other expenses that doesn't have data
   allExpenseSources.forEach(expenseSource=>{
-    if (!displayingExpenseIds.has(expenseSource.id)){
-      displayExpenseSource(expenseSource.id, [], submissionDetails)
-    }
+    let expenseSourceId = expenseSource.id
+    displayExpenseSource(expenseSourceId, groupedAllExpensesForSubmissionMapBySourceId[expenseSourceId], submissionDetails)
   })
 
   displayExpenseOptions()
   updateTotalExpense()
   
-  Object.entries(groupedAllDeductionsForSubmissionMapBySourceId).forEach(([deductionSourceId, deductions]) => {
-    displayDeductionSource(deductionSourceId, deductions, submissionDetails)
-  });
+  allDeductionSources.forEach(deductionSource=>{
+    let deductionSourceId = deductionSource.id
+    if (groupedAllDeductionsForSubmissionMapBySourceId.hasOwnProperty(deductionSourceId)) 
+      displayDeductionSource(deductionSourceId, groupedAllDeductionsForSubmissionMapBySourceId[deductionSourceId], submissionDetails)
+  })
   displayDeductionOptions()
   updateTotalDeduction()
 

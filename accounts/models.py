@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import F
 from django.db.models.constraints import UniqueConstraint
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -10,8 +11,11 @@ class SelfemploymentIncomeSources(models.Model):
     class Meta:
         verbose_name = "Income Source"
         verbose_name_plural = "Income Sources"
+        ordering = [F('index_position').asc(nulls_last=True)]
 
     name = models.CharField(_("Name"), max_length=255)
+    index_position = models.IntegerField('Sorting order', blank=True, null=True)
+    backend_identifier = models.CharField('Identifier for application logic', max_length=255, blank=True, null=True)
 
     def __str__(self)->str:
         return self.name
@@ -21,9 +25,12 @@ class SelfemploymentExpenseSources(models.Model):
     class Meta:
         verbose_name = "Expense Source"
         verbose_name_plural = "Expense Sources"
+        ordering = [F('index_position').asc(nulls_last=True)]
     
     name = models.CharField(_("Name"), max_length=255)
     default_personal_usage_percentage = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    index_position = models.IntegerField('Sorting order', blank=True, null=True)
+    backend_identifier = models.CharField('Identifier for application logic', max_length=255, blank=True, null=True)
 
     def __str__(self)->str:
         return self.name
@@ -33,8 +40,11 @@ class SelfemploymentDeductionSources(models.Model):
     class Meta:
         verbose_name = "Deduction Source"
         verbose_name_plural = "Deduction Sources"
+        ordering = [F('index_position').asc(nulls_last=True)]
     
     name = models.CharField(_("Name"), max_length=255)
+    index_position = models.IntegerField('Sorting order', blank=True, null=True)
+    backend_identifier = models.CharField('Identifier for application logic', max_length=255, blank=True, null=True)
 
     def __str__(self)->str:
         return self.name
@@ -60,8 +70,10 @@ class SelfemploymentIncomesPerTaxYear(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['client', 'month', 'income_source'], name="unique record")
         ]
+        ordering = [F('income_source__index_position').asc(nulls_last=True)]
+        
 
-    income_source = models.ForeignKey(SelfemploymentIncomeSources, on_delete=models.RESTRICT)
+    income_source = models.ForeignKey(SelfemploymentIncomeSources, on_delete=models.CASCADE)
     client = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.CASCADE)
     month = models.ForeignKey(Months, on_delete=models.RESTRICT)
     amount = models.FloatField(default=0)
@@ -79,8 +91,9 @@ class SelfemploymentExpensesPerTaxYear(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['client', 'month', 'expense_source'], name="unique expense record")
         ]
+        ordering = [F('expense_source__index_position').asc(nulls_last=True)]
 
-    expense_source = models.ForeignKey(SelfemploymentExpenseSources, on_delete=models.RESTRICT)
+    expense_source = models.ForeignKey(SelfemploymentExpenseSources, on_delete=models.CASCADE)
     client = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.CASCADE)
     month = models.ForeignKey(Months, on_delete=models.RESTRICT)
     amount = models.FloatField(default=0)
@@ -98,8 +111,9 @@ class SelfemploymentDeductionsPerTaxYear(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['client', 'deduction_source'], name="unique deduction record")
         ]
+        ordering = [F('deduction_source__index_position').asc(nulls_last=True)]
 
-    deduction_source = models.ForeignKey(SelfemploymentDeductionSources, on_delete=models.RESTRICT)
+    deduction_source = models.ForeignKey(SelfemploymentDeductionSources, on_delete=models.CASCADE)
     client = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.CASCADE)
     amount = models.FloatField(default=0)
     addition = models.FloatField(default=0)
@@ -111,26 +125,19 @@ class SelfemploymentDeductionsPerTaxYear(models.Model):
     def __str__(self) -> str:
         return f"{self.client} - {self.deduction_source} - {self.amount}"
 
-# class EmploymentIncomeForTaxYear(models.Model):
-#     class Meta:
-#         verbose_name = "Employment Income For Tax Year"
-#         verbose_name_plural = "Employment Incomes For Tax Years"
-    
-#     submission = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.RESTRICT)
-#     income_amount = models.FloatField(default=0)
-#     paid_tax_amount = models.FloatField(default=0)
-
-#     def __str__(self) -> str:
-#         return f"{self.submission} -  {self.income_amount} - {self.paid_tax_amount}"
 
 class TaxableIncomeSources(models.Model):
     class Meta:
         verbose_name = "Taxable Income Source"
         verbose_name_plural = "Taxable Income Sources"
+        ordering = [F('index_position').asc(nulls_last=True)]
+    
     name = models.CharField(default="New Taxable Income Source", max_length=255)
     apply_uk_tax = models.BooleanField()
     apply_class2_tax = models.BooleanField()
     apply_class4_tax = models.BooleanField()
+    index_position = models.IntegerField('Sorting order', blank=True, null=True)
+    backend_identifier = models.CharField('Identifier for application logic', max_length=255, blank=True, null=True)
 
     def __str__(self) -> str:
         return f"{self.name} - uk tax {self.apply_uk_tax} - class 2 {self.apply_class2_tax} - class 4 tax {self.apply_class4_tax}"
@@ -139,9 +146,10 @@ class TaxableIncomeSourceForSubmission(models.Model):
     class Meta:
         verbose_name = "Taxable Income Source For Submission"
         verbose_name_plural = "Taxable Income Sources For Submissions"
+        ordering = [F('taxable_income_source__index_position').asc(nulls_last=True)]
     
     submission = models.ForeignKey(SelfassesmentAccountSubmission, on_delete=models.CASCADE)
-    taxable_income_source = models.ForeignKey(TaxableIncomeSources, on_delete=models.RESTRICT)
+    taxable_income_source = models.ForeignKey(TaxableIncomeSources, on_delete=models.CASCADE)
     amount = models.FloatField(default=0)
     paid_income_tax_amount = models.FloatField(default=0)
     note = models.TextField(default='')
@@ -155,7 +163,7 @@ class SelfemploymentUkTaxConfigForTaxYear(models.Model):
         verbose_name_plural = 'Selfemployment UK Tax Configs For TaxYears'
         constraints = [UniqueConstraint(name='unique_tax_year__uk_tax', fields=['tax_year'])]
     
-    tax_year = models.ForeignKey(SelfassesmentAccountSubmissionTaxYear, on_delete=models.RESTRICT)
+    tax_year = models.ForeignKey(SelfassesmentAccountSubmissionTaxYear, on_delete=models.CASCADE)
     # Allowance reduction configs
     personal_allowance_limit = models.FloatField(default=100000, blank=False, null=True)
     one_pound_reduction_from_PA_earned_over_PAL = models.FloatField(default=2, blank=False, null=True)
@@ -180,7 +188,7 @@ class SelfemploymentClass4TaxConfigForTaxYear(models.Model):
         verbose_name_plural = 'Selfemployment Class 4 Tax Configs For TaxYears'
         constraints = [UniqueConstraint(name='unique_tax_year__class_4_tax', fields=['tax_year'])]
     
-    tax_year = models.ForeignKey(SelfassesmentAccountSubmissionTaxYear, on_delete=models.RESTRICT)
+    tax_year = models.ForeignKey(SelfassesmentAccountSubmissionTaxYear, on_delete=models.CASCADE)
     basic_rate_min = models.FloatField(default=9500, blank=False)
     basic_rate_max = models.FloatField(default=50000, blank=False)
     basic_rate_tax_percentage = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(100)])
@@ -196,7 +204,7 @@ class SelfemploymentClass2TaxConfigForTaxYear(models.Model):
         verbose_name_plural = 'Selfemployment Class 2 Tax Configs For TaxYears'
         constraints = [UniqueConstraint(name='unique_tax_year__class2_tax', fields=['tax_year'])]
     
-    tax_year = models.ForeignKey(SelfassesmentAccountSubmissionTaxYear, on_delete=models.RESTRICT)
+    tax_year = models.ForeignKey(SelfassesmentAccountSubmissionTaxYear, on_delete=models.CASCADE)
     tax_applied_for_income_above = models.FloatField(default=6470, blank=False)
     flat_tax_amount = models.FloatField(default=158, blank=False)
 

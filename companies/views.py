@@ -121,12 +121,15 @@ def get_selfassesment_where_UTR_NOT_SET():
 def get_selfassesment_where_AGENT_NOT_ACTIVE():
   return Selfassesment.objects.filter(HMRC_agent=False)
 
+def get_selfassesment_where_Client_IS_ACTIVE():
+  return Selfassesment.objects.filter(is_active=True)
+
 
 @login_required
 def home_selfassesment(request):
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_file_number', 'client_name', 'is_active', 'incomplete_tasks', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', 'HMRC_agent', "created_by", "date_of_registration"]
+  include_fields = ['client_file_number', 'client_name', 'is_active', 'HMRC_agent', 'incomplete_tasks', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', "created_by", "date_of_registration"]
   keep_include_fields = True
   show_others = False
   model_fields = get_field_names_from_model(Selfassesment)
@@ -146,6 +149,7 @@ def home_selfassesment(request):
     "selfassesment_counts": True,
     "selfassesment_UTR_NOT_SET": get_selfassesment_where_UTR_NOT_SET().count(),
     "selfassesment_AGENT_NOT_ACTIVE": get_selfassesment_where_AGENT_NOT_ACTIVE().count(),
+    "selfassesment_Client_IS_ACTIVE": get_selfassesment_where_Client_IS_ACTIVE().count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
@@ -355,6 +359,7 @@ def search_selfassesment(request, limit: int=-1):
       tasks = {
         "selfassesment_UTR_NOT_SET": get_selfassesment_where_UTR_NOT_SET(),
         "selfassesment_AGENT_NOT_ACTIVE": get_selfassesment_where_AGENT_NOT_ACTIVE(),
+        "selfassesment_Client_IS_ACTIVE": get_selfassesment_where_Client_IS_ACTIVE(),
       }
       records = tasks.get(request.GET.get('tasks'), [])
       data = serialize(queryset=records, format='json')
@@ -1303,11 +1308,14 @@ def get_limited_where_COMPANY_AUTH_CODE_NOT_SET():
 def get_limited_where_AGENT_NOT_ACTIVE():
   return Limited.objects.filter(HMRC_agent=False)
 
+def get_limited_where_Client_IS_ACTIVE():
+  return Limited.objects.filter(is_active=True)
+
 @login_required
 def home_limited(request):
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_file_number', 'client_name', 'is_active', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent', "created_by", "date_of_registration"]
+  include_fields = ['client_file_number', 'client_name', 'is_active', 'HMRC_agent', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', "created_by", "date_of_registration"]
   keep_include_fields = True
   show_others = False
   model_fields = get_field_names_from_model(Limited)
@@ -1328,6 +1336,7 @@ def home_limited(request):
     "limited_UTR_NOT_SET": get_limited_where_UTR_NOT_SET().count(),
     "limited_COMPANY_AUTH_CODE_NOT_SET": get_limited_where_COMPANY_AUTH_CODE_NOT_SET().count(),
     "limited_AGENT_NOT_ACTIVE": get_limited_where_AGENT_NOT_ACTIVE().count(),
+    "limited_Client_IS_ACTIVE": get_limited_where_Client_IS_ACTIVE().count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
@@ -1478,6 +1487,7 @@ def search_limited(request, limit: int=-1):
         "limited_UTR_NOT_SET": get_limited_where_UTR_NOT_SET(),
         "limited_COMPANY_AUTH_CODE_NOT_SET": get_limited_where_COMPANY_AUTH_CODE_NOT_SET(),
         "limited_AGENT_NOT_ACTIVE": get_limited_where_AGENT_NOT_ACTIVE(),
+        "limited_Client_IS_ACTIVE": get_limited_where_Client_IS_ACTIVE(),
       }
       records = tasks.get(request.GET.get('tasks'), [])
       data = serialize(queryset=records, format='json')

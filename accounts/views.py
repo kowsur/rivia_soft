@@ -3,7 +3,7 @@ import json
 from weasyprint import HTML, CSS
 from weasyprint.text.fonts import FontConfiguration
 
-from django.http import Http404, HttpResponseNotFound, JsonResponse
+from django.http import Http404, HttpResponseNotFound
 from django.http.request import HttpRequest
 from django.template.loader import get_template
 
@@ -111,7 +111,7 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
             expense_for_tax_year.note = note
         expense_for_tax_year.save()
         return HttpResponse(json.dumps({'success': 'Updated existing record'}))
-    
+
     # Save new record
     expense_for_tax_year = SelfemploymentExpensesPerTaxYear(
         expense_source=expense,
@@ -474,7 +474,7 @@ class RaiseErrorMessages(Exception):
         return f"{self.__class__.__name__}({self.messages})"
 
 def filter_selfemployment_incomes(selfemployment_incomes):
-    return [income for income in selfemployment_incomes if income.amount>0 or income.comission>0]
+    return [income for income in selfemployment_incomes if income.amount>0]
 def filter_selfemployment_expenses(selfemployment_expenses):
     return [expense for expense in selfemployment_expenses if expense.amount>0]
 def filter_taxable_incomes(taxable_incomes):
@@ -634,17 +634,17 @@ def tax_report_pdf(request:HttpRequest, submission_id):
         return Http404("Submission for the submission_id specified does not exist!")
     tax_year = account_submission.tax_year
     selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
-    selfemployment_incomes = [income for income in selfemployment_incomes if income.amount>0 or income.comission>0]
+    selfemployment_incomes = filter_selfemployment_incomes(selfemployment_incomes)
     selfemployment_total_comission = get_total_selfemployment_comission(selfemployment_incomes)
 
     selfemployment_expenses = get_object_or_None(SelfemploymentExpensesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
-    selfemployment_expenses = [expense for expense in selfemployment_expenses if expense.amount>0]
+    selfemployment_expenses = filter_selfemployment_expenses(selfemployment_expenses)
 
     taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission_id, delete_duplicate=False, return_all=True)
     taxable_incomes = [taxable_income for taxable_income in taxable_incomes if taxable_income.amount>0]
     
     deductions_and_allowances = get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
-    deductions_and_allowances = [amount for amount in deductions_and_allowances if amount.amount>0]
+    deductions_and_allowances = filter_deductions_and_allowances(deductions_and_allowances)
 
     # selfemployment
     selfemployment_total_income = get_total_selfemployment_income(selfemployment_incomes)

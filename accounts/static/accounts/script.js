@@ -232,8 +232,9 @@ async function overviewLoader(e){
     <div>Total Tax ${overview_data.tax.toFixed(2)}</div>
   `
 }
+let overviewReloadButton = document.querySelector("#reload-overview")
 window.addEventListener('load', (e)=>overviewLoader()) 
-document.body.addEventListener('input', overviewLoader)
+overviewReloadButton.addEventListener('click', overviewLoader)
 
 const displayingTaxableIncomeIds = new Set()
 const displayingSelfemploymentIncomeIds = new Set()

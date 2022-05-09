@@ -504,9 +504,21 @@ function displayTaxableIncomeSource(taxableIncomeSourceId, taxableIncomes, submi
       <img src='/static/accounts/expand.svg'/>
     </div>
     <div class="months invisible">
+      <div class="table" data-display-table-name="taxable-income">
+        <div class="thead">
+          <div class="row">
+            <span>Amount</span>
+            <span>Paid income tax amount</span>
+            <span>Note</span>
+          </div>
+        </div>
+        <div class="body">
+        </div>
+      </div>
     </div>
   </div>`)
 
+  let body = taxableIncomeContainer.querySelector('.body')
   let taxableIncomeTotalContainer = taxableIncomeContainer.querySelector('span[data-total-container-for-taxable-income-source]')
   let monthContainer = taxableIncomeContainer.querySelector('.months')
   let toggle = taxableIncomeContainer.querySelector('.toggle')
@@ -536,19 +548,16 @@ function displayTaxableIncomeSource(taxableIncomeSourceId, taxableIncomes, submi
   let inputNoteId = `taxable_income_note_${taxableIncomeSourceId}`
 
   let taxableIncomeMarkup = `
-  <div class="month">
-    <div>
-      <label for="${inputAmountId}">Amount</label>
+  <div class="row">
+    <span>
       <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${taxableIncome?.amount}" data-submission-id="${submissionId}" data-taxable-income-id="${taxableIncome.taxable_income_source}" data-update-type="amount">
-    </div>
-    <div>
-      <label for="${inputPaidIncomeTaxAmountId}">Paid income tax amount</label>
+    </span>
+    <span>
       <input type="number" max=${DB_MAX_INT_VALUE} id=${inputPaidIncomeTaxAmountId} value="${taxableIncome?.paid_income_tax_amount}" data-submission-id="${submissionId}" data-taxable-income-id="${taxableIncome.taxable_income_source}" data-update-type="paid_income_tax_amount">
-    </div>
-    <div>
-      <label for="${inputNoteId}">Note</label>
+    </span>
+    <span>
       <textarea id=${inputNoteId} data-submission-id="${submissionId}" data-taxable-income-id="${taxableIncome.taxable_income_source}" data-update-type="note">${taxableIncome.note}</textarea>
-    </div>
+    </span>
   </div>
   `
 
@@ -566,7 +575,7 @@ function displayTaxableIncomeSource(taxableIncomeSourceId, taxableIncomes, submi
   addEventListenersToElements(inputPaidIncomeTaxAmount, 'input', [validateMaxValue, handleTaxableIncomeUpdate, updateTotalTaxableIncome, updateNetProfit])
   addEventListenersToElements(inputNote, 'input', handleTaxableIncomeUpdate)
 
-  monthContainer.appendChild(node)
+  body.appendChild(node)
   taxableIncomesContainer.appendChild(taxableIncomeContainer)
 }
 
@@ -592,7 +601,6 @@ function displaySelfemploymentIncomeSource(incomeSourceId, incomes, submission){
           </div>
         </div>
         <div class="body">
-          <div class="row"></div>
         </div>
       </div>
     </div>
@@ -807,9 +815,24 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
       <img src='/static/accounts/expand.svg'/>
     </div>
     <div class="months invisible">
+    <div class="table" data-display-table-name="deduction-and-allowance">
+        <div class="thead">
+          <div class="row">
+            <span>Amount</span>
+            <span>Addition</span>
+            <span>Disposal</span>
+            <span>Allowance(%)</span>
+            <span>Personal Usage(%)</span>
+            <span>Note</span>
+          </div>
+        </div>
+        <div class="body">
+        </div>
+    </div>
     </div>
   </div>`)
 
+  let body = deductionContainer.querySelector('.body')
   let totalContainer = deductionContainer.querySelector('span[data-total-container-for-deduction-source]')
   let monthContainer = deductionContainer.querySelector('.months')
   let toggle = deductionContainer.querySelector('.toggle')
@@ -846,31 +869,25 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
 
   // Prepare markup for a single month
   let deductionMarkup = `
-      <div class='month'>
-        <div>
-          <label for="${inputAmountId}">Amount</label>
+      <div class='row'>
+        <span>
           <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${deduction?.amount}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="amount">
-        </div>
-        <div>
-          <label for="${inputAdditionId}">Addition</label>
+        </span>
+        <span>
           <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAdditionId} value="${deduction?.addition}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="addition">
-        </div>
-        <div>
-          <label for="${inputDisposalId}">Disposal</label>
+        </span>
+        <span>
           <input type="number" max=${DB_MAX_INT_VALUE} id=${inputDisposalId} value="${deduction?.disposal}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="disposal">
-        </div>
-        <div>
-          <label for="${inputAllowancePercentageId}">Allowance(%)</label>
+        </span>
+        <span>
           <input type="number" min="0" max='100' id=${inputAllowancePercentageId} value="${deduction?.allowance_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="allowance_percentage">
-        </div>
-        <div>
-          <label for="${inputPersonalUsagePercentageId}">Personal Usage(%)</label>
+        </span>
+        <span>
           <input type="number" min="0" max='100' id=${inputPersonalUsagePercentageId} value="${deduction?.personal_usage_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="personal_usage_percentage">
-        </div>
-        <div>
-          <label for="${inputNoteId}">Note</label>
+        </span>
+        <span>
           <textarea id=${inputNoteId} data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="note">${deduction?.note}</textarea>
-        </div>
+        </span>
       </div>
       `
   
@@ -892,7 +909,7 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
   addEventListenersToElements([inputAmount, inputAllowancePercentage, inputPersonalUsage], 'input', [updateTotalDeduction, updateNetProfit])
   addEventListenersToElements([inputAllowancePercentage, inputPersonalUsage], 'input', validatePercentageValue)
 
-  monthContainer.appendChild(node)
+  body.appendChild(node)
 
   deductionsContainer.appendChild(deductionContainer)
 }

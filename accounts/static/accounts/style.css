@@ -10,9 +10,15 @@ h3{
 .selfemployment-income-source, .taxable-income-source, .month-name{
     font-weight: 500;
 }
+
 textarea{
-    height: 4rem;
+    resize: both;
+    width: max-content;
+    min-width: 15rem;
+    height: max-content;
+    min-height: 2.5rem;
 }
+
 :disabled{
     filter: brightness(75%);
 }
@@ -211,9 +217,18 @@ textarea{
 }
 .table .row {
     display: grid;
-    grid-template-columns: 10ch 1fr 1fr 2fr;
+    grid-template-columns: 10ch 18ch 18ch 1fr;
     grid-gap: 4px;
     margin: 4px 0px;
+}
+.expense .table .row {
+    grid-template-columns: 18ch 10ch 1fr;
+}
+.table[data-display-table-name="taxable-income"] .row{
+    grid-template-columns: 18ch 15ch 1fr;
+}
+.table[data-display-table-name="deduction-and-allowance"] .row{
+    grid-template-columns: 18ch 15ch 15ch 12ch 10ch 1fr;
 }
 
 .table .thead .row span{

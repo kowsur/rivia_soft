@@ -815,7 +815,7 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
       <img src='/static/accounts/expand.svg'/>
     </div>
     <div class="months invisible">
-    <div class="table" data-display-table-name="deduction-and-allowance">
+      <div class="table" data-display-table-name="deduction-and-allowance">
         <div class="thead">
           <div class="row">
             <span>Amount</span>
@@ -828,7 +828,7 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
         </div>
         <div class="body">
         </div>
-    </div>
+      </div>
     </div>
   </div>`)
 

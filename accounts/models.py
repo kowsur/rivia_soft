@@ -18,7 +18,7 @@ class SelfemploymentIncomeSources(models.Model):
     backend_identifier = models.CharField('Identifier for application logic', max_length=255, blank=True, null=True)
 
     def __str__(self)->str:
-        return self.name
+        return f"IncomeSource(order={self.index_position}, name={self.name})"
 
 
 class SelfemploymentExpenseSources(models.Model):
@@ -33,7 +33,7 @@ class SelfemploymentExpenseSources(models.Model):
     backend_identifier = models.CharField('Identifier for application logic', max_length=255, blank=True, null=True)
 
     def __str__(self)->str:
-        return self.name
+        return f"ExpenseSource(order={self.index_position}, name={self.name})"
 
 
 class SelfemploymentDeductionSources(models.Model):
@@ -47,7 +47,7 @@ class SelfemploymentDeductionSources(models.Model):
     backend_identifier = models.CharField('Identifier for application logic', max_length=255, blank=True, null=True)
 
     def __str__(self)->str:
-        return self.name
+        return f"DeductionSource(order={self.index_position}, name={self.name})"
 
 
 class Months(models.Model):
@@ -140,7 +140,7 @@ class TaxableIncomeSources(models.Model):
     backend_identifier = models.CharField('Identifier for application logic', max_length=255, blank=True, null=True)
 
     def __str__(self) -> str:
-        return f"{self.name} - uk tax {self.apply_uk_tax} - class 2 {self.apply_class2_tax} - class 4 tax {self.apply_class4_tax}"
+        return f"TaxableIncomeSource(order={self.index_position}, name={self.name}, uk_tax={self.apply_uk_tax}, class4_tax={self.apply_class4_tax}, class2_tax={self.apply_class2_tax})"
 
 class TaxableIncomeSourceForSubmission(models.Model):
     class Meta:

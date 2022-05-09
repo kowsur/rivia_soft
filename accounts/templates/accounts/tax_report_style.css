@@ -96,9 +96,12 @@ strong{ font-size: inherit; }
 }
 
 body{
-    font-size: 11pt;
+    font-size: 12pt;
     font-family: sans-serif;
     text-align: justify;
+}
+p{
+    line-height: 1.8;
 }
 
 .spacer{
@@ -134,6 +137,17 @@ body{
 .font-normal{font-weight: normal;}
 .font-lighter{font-weight: lighter;}
 
+.fs-inherit{font-size: inherit;}
+.fs-100{ font-size: 100pt; }
+.fs-90{ font-size: 90pt; }
+.fs-80{ font-size: 80pt; }
+.fs-70{ font-size: 70pt; }
+.fs-60{ font-size: 60pt; }
+.fs-50{ font-size: 50pt; }
+.fs-40{ font-size: 40pt; }
+.fs-30{ font-size: 30pt; }
+.fs-25{ font-size: 25pt; }
+.fs-20{ font-size: 20pt; }
 .fs-19{ font-size: 19pt; }
 .fs-18{ font-size: 18pt; }
 .fs-17{ font-size: 17pt; }
@@ -318,6 +332,6 @@ body{
 }
 #profit-and-loss {}
 
-#tax-calculation{
-
+#tax-calculation table{
+    margin:auto;
 }

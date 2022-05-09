@@ -37,14 +37,12 @@
     <div class="tab" data-tab-name="incomesAndExpenses">
       <div>
         <h1 class="title">Account for <span id="ie-client-name"></span> Tax-year <span id="ie-client-tax-year"></span>.</h1>
-        <div class="overview">
+        <section class="overview">
           <h2 class"overview-title">Overview</h2>
-          <div>Other Taxable Income: <span data-total-taxable-income-container>0</span></div>
-          <div>Total Selfemployment Income: <span data-total-selfemployment-income-container>0</span></div>
-          <div>Total Expense: <span data-total-expense-container>0</span></div>
-          <div>Total Deduction: <span data-total-deduction-and-allownce-container>0</span></div>
-          <div>Selfemployment Net Profit: <span data-net-profit-container>0</span></div>
-        </div>
+          <div data-overview-container>
+            
+          </div>
+        </section>
       </div>
       <div>
         <h1 class="title">Taxable Incomes Total: <span data-total-taxable-income-container>0</span></h1>
@@ -78,6 +76,11 @@
           </div>
         </div>
 
+        <div>
+          <label for="expense_personal_usage_bulk_updater">Personal Usage(%) for all expenses</label>
+          <input type="number" min="0" max='100' id="expense_personal_usage_bulk_updater" value="">
+        </div>
+  
         <div class="expenses">
         </div>
       </div>

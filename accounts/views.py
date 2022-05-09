@@ -3,7 +3,7 @@ import json
 from weasyprint import HTML, CSS
 from weasyprint.text.fonts import FontConfiguration
 
-from django.http import Http404
+from django.http import Http404, HttpResponseNotFound, JsonResponse
 from django.http.request import HttpRequest
 from django.template.loader import get_template
 
@@ -28,7 +28,7 @@ from companies.views import URLS, serialized
 from companies.decorators import allowed_for_staff, allowed_for_superuser
 from companies.url_variables import URL_NAMES_PREFIXED_WITH_APP_NAME
 
-from .tax_calc_helpers import get_personal_allowance_reduction, uk_tax, uk_class_4_tax
+from .tax_calc_helpers import get_personal_allowance_reduction, percentage_of, uk_tax, uk_class_4_tax
 
 
 def get_object_or_None(model, *args, pk=None, delete_duplicate=True, return_all=False, **kwargs):
@@ -465,6 +465,153 @@ def get_total_paid_income_tax_from_taxable_incomes(taxable_incomes):
     return total
 
 
+
+class RaiseErrorMessages(Exception):
+    def __init__(self, messages=[]) -> None:
+        self.messages = messages
+    
+    def __str__(self) -> str:
+        return f"{self.__class__.__name__}({self.messages})"
+
+def filter_selfemployment_incomes(selfemployment_incomes):
+    return [income for income in selfemployment_incomes if income.amount>0 or income.comission>0]
+def filter_selfemployment_expenses(selfemployment_expenses):
+    return [expense for expense in selfemployment_expenses if expense.amount>0]
+def filter_taxable_incomes(taxable_incomes):
+    return [taxable_income for taxable_income in taxable_incomes if taxable_income.amount>0]
+def filter_deductions_and_allowances(deductions_and_allowances):
+    return [amount for amount in deductions_and_allowances if amount.amount>0]
+
+
+def get_total_selfemployment_income_by_submission_id(submission_id):
+    """Selfemployment Income (Including Tips)"""
+    selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    selfemployment_incomes = filter_selfemployment_incomes(selfemployment_incomes)
+    return get_total_selfemployment_income(selfemployment_incomes)
+
+def get_total_selfemployment_expense_by_submission_id(submission_id):
+    """Selfemployment Expense total of expenses + commission from incomes and deductions from deduction sources"""
+    selfemployment_expenses = get_object_or_None(SelfemploymentExpensesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    selfemployment_expenses = filter_selfemployment_expenses(selfemployment_expenses)
+
+    deductions_and_allowances = get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    deductions_and_allowances = filter_deductions_and_allowances(deductions_and_allowances)
+
+    selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    selfemployment_incomes = filter_selfemployment_incomes(selfemployment_incomes)
+
+    selfemployment_expense = get_total_selfemployment_expense(selfemployment_expenses)
+    office_and_admin_charge = get_total_selfemployment_comission(selfemployment_incomes)
+    deduction_and_allowance = get_total_selfemployment_deduction_and_allowance(deductions_and_allowances)
+    return selfemployment_expense + office_and_admin_charge + deduction_and_allowance
+
+def get_total_selfemployment_net_profit_by_submission_id(submission_id):
+    """Selfemployment net profit"""
+    total_income = get_total_selfemployment_income_by_submission_id(submission_id)
+    total_expense = get_total_selfemployment_expense_by_submission_id(submission_id)
+    return total_income-total_expense
+
+def get_total_taxable_income_by_submission_id(submission_id):
+    """total taxable income"""
+    error_messages = []
+
+    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+    if not account_submission:
+        error_messages.append(f"Account submission does not exist for {submission_id} submission id.")
+        raise RaiseErrorMessages(error_messages)
+    tax_year = account_submission.tax_year
+    
+    UK_tax_config = get_object_or_None(SelfemploymentUkTaxConfigForTaxYear, tax_year=tax_year, delete_duplicate=False)
+    if not UK_tax_config:
+        error_messages.append(f"Uk tax configuration for {tax_year} tax-year not found.")
+        raise RaiseErrorMessages(error_messages)
+    
+    taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission_id, delete_duplicate=False, return_all=True)
+    taxable_incomes = filter_taxable_incomes(taxable_incomes)
+    
+    total_taxable_income = get_total_taxable_income(taxable_incomes)
+    total_income = get_total_selfemployment_net_profit_by_submission_id(submission_id) + total_taxable_income
+
+    personal_allowance_reduction = get_personal_allowance_reduction(
+        total_income,
+        UK_tax_config.personal_allowance,
+        UK_tax_config.personal_allowance_limit,
+        UK_tax_config.one_pound_reduction_from_PA_earned_over_PAL)
+    reduced_personal_allowance = UK_tax_config.personal_allowance-personal_allowance_reduction
+
+    taxable_income = max(total_income-reduced_personal_allowance, 0)
+    return taxable_income
+
+def get_total_tax_by_submission_id(submission_id):
+    error_messages = []
+
+    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+    if not account_submission:
+        error_messages.append(f"Account submission does not exist for {submission_id} submission id.")
+        raise RaiseErrorMessages(error_messages)
+    tax_year = account_submission.tax_year
+
+    taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission_id, delete_duplicate=False, return_all=True)
+    taxable_incomes = filter_taxable_incomes(taxable_incomes)
+
+    UK_tax_config = get_object_or_None(SelfemploymentUkTaxConfigForTaxYear, tax_year=tax_year, delete_duplicate=False)
+    Class4_tax_config = get_object_or_None(SelfemploymentClass4TaxConfigForTaxYear, tax_year=tax_year, delete_duplicate=False)
+    Class2_tax_config = get_object_or_None(SelfemploymentClass2TaxConfigForTaxYear, tax_year=tax_year, delete_duplicate=False)
+    if not UK_tax_config:
+        error_messages.append(f'UK tax configuration not found for the year {tax_year.tax_year}!')
+    if not Class4_tax_config:
+        error_messages.append(f'Class 4 configuration not found for the year {tax_year.tax_year}!')
+    if not Class2_tax_config:
+        error_messages.append(f'Class 2 configuration not found for the year {tax_year.tax_year}!')
+    if error_messages:
+        raise RaiseErrorMessages(error_messages)
+
+    # Taxable Incomes
+    selfemployment_net_profit = get_total_selfemployment_net_profit_by_submission_id(submission_id)
+
+    uk_tax_applicable_incomes = [income for income in taxable_incomes  if income.taxable_income_source.apply_uk_tax]
+    total_income_for_uk_tax = selfemployment_net_profit + get_total_taxable_income(uk_tax_applicable_incomes)
+
+    class_4_tax_applicable_incomes = [income for income in taxable_incomes  if income.taxable_income_source.apply_class4_tax]
+    total_income_for_class_4_tax = selfemployment_net_profit + get_total_taxable_income(class_4_tax_applicable_incomes)
+
+    class_2_tax_applicable_incomes = [income for income in taxable_incomes  if income.taxable_income_source.apply_class2_tax]
+    total_income_for_class_2_tax = selfemployment_net_profit + get_total_taxable_income(class_2_tax_applicable_incomes)
+
+
+    tax_calc__uk_tax = uk_tax(
+        total_income=total_income_for_uk_tax,
+        personal_allowance=UK_tax_config.personal_allowance,
+        basic_rate_max=UK_tax_config.basic_rate_max,
+        higher_rate_max=UK_tax_config.higher_rate_max,
+        basic_tax_rate=UK_tax_config.basic_rate_tax_percentage,
+        higher_tax_rate=UK_tax_config.higher_rate_tax_percentage,
+        additional_tax_rate=UK_tax_config.additional_rate_tax_percentage,
+        personal_allowance_limit=UK_tax_config.personal_allowance_limit,
+        one_pound_reduction_from_PA_earned_over_PAL=UK_tax_config.one_pound_reduction_from_PA_earned_over_PAL
+        )
+    tax_calc__class_4_tax = uk_class_4_tax(
+        total_income=total_income_for_class_4_tax,
+        basic_rate_start=Class4_tax_config.basic_rate_min,
+        higher_rate_start=Class4_tax_config.basic_rate_max,
+        basic_rate_tax_percentage=Class4_tax_config.basic_rate_tax_percentage,
+        higher_rate_tax_percentage=Class4_tax_config.higher_rate_tax_percentage
+    )
+    tax_calc__class_2_tax = {
+            'total': 0 if Class2_tax_config.tax_applied_for_income_above>=total_income_for_class_2_tax else Class2_tax_config.flat_tax_amount
+        }
+    
+    total_tax = tax_calc__uk_tax.total + tax_calc__class_4_tax.total + tax_calc__class_2_tax['total']
+    deducton_at_source = get_total_paid_income_tax_from_taxable_incomes(taxable_incomes)
+    
+    total_tax -= deducton_at_source
+    advanced_tax = percentage_of(total_tax, 50) if total_tax>1000 else 0
+
+    due_tax = total_tax + advanced_tax
+    # due_tax = max(due_tax, 0)
+    return due_tax
+
+
 # Cache for weasyprint
 IMAGE_CACHE = {}
 FONT_CONFIG = FontConfiguration()
@@ -474,6 +621,11 @@ STYLESHEETS_CACHE = [
 @login_required
 @allowed_for_staff()
 def tax_report_pdf(request:HttpRequest, submission_id):
+    IMAGE_CACHE = {}
+    FONT_CONFIG = FontConfiguration()
+    STYLESHEETS_CACHE = [
+            CSS(filename='accounts/templates/accounts/tax_report_style.css'),
+        ]
     template = get_template('accounts/tax_report.html')
     
     # Retrive data from database
@@ -610,7 +762,10 @@ def tax_report_pdf(request:HttpRequest, submission_id):
                 }
         
         tax_calc__total_tax = tax_calc__uk_tax.total + tax_calc__class_4_tax.total + tax_calc__class_2_tax['total']
-        tax_clac__total_paid_tax = get_total_paid_income_tax_from_taxable_incomes(taxable_incomes)
+        tax_calc__total_paid_tax = get_total_paid_income_tax_from_taxable_incomes(taxable_incomes)
+        tax_calc__total_tax_due = tax_calc__total_tax - tax_calc__total_paid_tax
+        tax_calc__adv_tax = percentage_of(tax_calc__total_tax_due, 50) if tax_calc__total_tax_due>1000 else 0
+        net_total_tax = tax_calc__adv_tax + tax_calc__total_tax_due
 
         tax_calc_data = {
             'income': tax_calc__income,
@@ -618,8 +773,10 @@ def tax_report_pdf(request:HttpRequest, submission_id):
             'class_4': tax_calc__class_4_tax,
             'class_2': tax_calc__class_2_tax,
             'total_tax': tax_calc__total_tax,
-            'total_paid_tax': tax_clac__total_paid_tax,
-            'total_tax_due': tax_calc__total_tax - tax_clac__total_paid_tax
+            'total_paid_tax': tax_calc__total_paid_tax,
+            'total_tax_due': tax_calc__total_tax_due,
+            'adv_tax': tax_calc__adv_tax,
+            'net_total_tax': net_total_tax
         }
     
     context = {
@@ -661,7 +818,7 @@ def tax_report_pdf(request:HttpRequest, submission_id):
     
     # Initiate file like HttpResponse object
     response = HttpResponse(content_type="application/pdf")
-    response['Content-Disposition'] = f"inline; filename='Account of {context['submission'].client_id.client_name} Tax Year-{tax_year.tax_year}.pdf'"
+    response['Content-Disposition'] = f"inline; filename=Account of {context['submission'].client_id.client_name} Tax Year-{tax_year.tax_year}.pdf"
     
     # Render html template to string
     html_markup = template.render(context)
@@ -671,3 +828,22 @@ def tax_report_pdf(request:HttpRequest, submission_id):
     weasyprinted_markup.write_pdf(response, stylesheets=STYLESHEETS_CACHE, font_config=FONT_CONFIG, image_cache=IMAGE_CACHE)
 
     return response
+
+
+def overview_section_data(request:HttpRequest, submission_id):
+    try:
+        selfemployment_income = get_total_selfemployment_income_by_submission_id(submission_id)
+        total_taxable_income = get_total_taxable_income_by_submission_id(submission_id)
+        total_expense = get_total_selfemployment_expense_by_submission_id(submission_id)
+        selfemployment_net_profit = get_total_selfemployment_net_profit_by_submission_id(submission_id)
+        total_tax = get_total_tax_by_submission_id(submission_id)
+        data = {
+            'income': selfemployment_income,
+            'expense': total_expense,
+            'profit': selfemployment_net_profit,
+            'taxable_income': total_taxable_income,
+            'tax': total_tax
+        }
+        return HttpResponse(dump_to_json.render(data))
+    except RaiseErrorMessages as e:
+        return HttpResponseNotFound(content=dump_to_json.render(e.messages))

@@ -2,13 +2,19 @@ h1, h1.title{
     font-size: 2.2em;
 }
 h2{
-    font-size: 1.8em;
+    font-size: 1.3em;
 }
 h3{
-    font-size: 1.3em;
+    font-size: 1.2em;
 }
 .selfemployment-income-source, .taxable-income-source, .month-name{
     font-weight: 500;
+}
+textarea{
+    height: 4rem;
+}
+:disabled{
+    filter: brightness(75%);
 }
 
 /* Select search */

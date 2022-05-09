@@ -454,9 +454,10 @@ async function updateIncomeAndExpenseTab(submissionDetails){
 
   allTaxableIncomeSources.forEach(taxableIncomeSource=>{
     let taxableIncomeSourceId = taxableIncomeSource.id
-    if (groupedAllTaxableIncomesForSubmissionMapBySourceId.hasOwnProperty(taxableIncomeSourceId)) displayTaxableIncomeSource(taxableIncomeSourceId, groupedAllTaxableIncomesForSubmissionMapBySourceId[taxableIncomeSourceId], submissionDetails)
-    else{
-      displayTaxableIncomeSource(taxableIncomeSourceId, [], submissionDetails)
+    if (groupedAllTaxableIncomesForSubmissionMapBySourceId.hasOwnProperty(taxableIncomeSourceId)) {
+      displayTaxableIncomeSource(taxableIncomeSourceId, groupedAllTaxableIncomesForSubmissionMapBySourceId[taxableIncomeSourceId], submissionDetails)
+    }else{
+      // displayTaxableIncomeSource(taxableIncomeSourceId, [], submissionDetails)
     }
   })
   displayTaxableIncomeOptions()
@@ -464,8 +465,11 @@ async function updateIncomeAndExpenseTab(submissionDetails){
 
   allSelfemploymentIncomeSources.forEach(incomeSource=>{
     let incomeSourceId = incomeSource.id
-    if (groupedAllSelfemploymentIncomesForSubmissionMapBySourceId.hasOwnProperty(incomeSourceId)) displaySelfemploymentIncomeSource(incomeSourceId, groupedAllSelfemploymentIncomesForSubmissionMapBySourceId[incomeSourceId], submissionDetails)
-    else{displaySelfemploymentIncomeSource(incomeSourceId, [], submissionDetails)}
+    if (groupedAllSelfemploymentIncomesForSubmissionMapBySourceId.hasOwnProperty(incomeSourceId)){
+      displaySelfemploymentIncomeSource(incomeSourceId, groupedAllSelfemploymentIncomesForSubmissionMapBySourceId[incomeSourceId], submissionDetails)
+    }else{
+      // displaySelfemploymentIncomeSource(incomeSourceId, [], submissionDetails)
+    }
   })
   displaySelfemploymentIncomeOptions()
   updateTotalSelfemploymentIncome()
@@ -473,8 +477,11 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   // Show expenses with data from backend
   allExpenseSources.forEach(expenseSource=>{
     let expenseSourceId = expenseSource.id
-    if (groupedAllExpensesForSubmissionMapBySourceId.hasOwnProperty(expenseSourceId)) displayExpenseSource(expenseSourceId, groupedAllExpensesForSubmissionMapBySourceId[expenseSourceId], submissionDetails)
-    else{displayExpenseSource(expenseSourceId, [], submissionDetails)}
+    if (groupedAllExpensesForSubmissionMapBySourceId.hasOwnProperty(expenseSourceId)){
+      displayExpenseSource(expenseSourceId, groupedAllExpensesForSubmissionMapBySourceId[expenseSourceId], submissionDetails)
+    } else{
+      displayExpenseSource(expenseSourceId, [], submissionDetails)
+    }
   })
 
   displayExpenseOptions()
@@ -482,9 +489,11 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   
   allDeductionSources.forEach(deductionSource=>{
     let deductionSourceId = deductionSource.id
-    if (groupedAllDeductionsForSubmissionMapBySourceId.hasOwnProperty(deductionSourceId)) 
+    if (groupedAllDeductionsForSubmissionMapBySourceId.hasOwnProperty(deductionSourceId)){
       displayDeductionSource(deductionSourceId, groupedAllDeductionsForSubmissionMapBySourceId[deductionSourceId], submissionDetails)
-    else{displayDeductionSource(deductionSourceId, [], submissionDetails)}
+    }else{
+      // displayDeductionSource(deductionSourceId, [], submissionDetails)
+    }
   })
   displayDeductionOptions()
   updateTotalDeduction()

@@ -639,11 +639,6 @@ STYLESHEETS_CACHE = [
 @login_required
 @allowed_for_staff()
 def tax_report_pdf(request:HttpRequest, submission_id):
-    IMAGE_CACHE = {}
-    FONT_CONFIG = FontConfiguration()
-    STYLESHEETS_CACHE = [
-            CSS(filename='accounts/templates/accounts/tax_report_style.css'),
-        ]
     template = get_template('accounts/tax_report.html')
     
     # Retrive data from database

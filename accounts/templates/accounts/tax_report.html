@@ -98,14 +98,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% if selfemployment_total_income_comission != 0 %}
-                            <tr>
-                                <td>Office and Admin Charge</td>
-                                <td class="text-right">{{selfemployment_total_income_comission|floatformat:"2g"}}</td>
-                                <td class="text-right">{{0|floatformat:"2g"}}</td>
-                                <td class="text-right">{{selfemployment_total_income_comission|floatformat:"2g"}}</td>
-                            </tr>
-                        {% endif %}
                         {% for expense in selfemployment_expenses %}
                             <tr>
                                 <td>{{expense.expense_source.name}}</td>

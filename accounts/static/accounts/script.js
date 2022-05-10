@@ -754,6 +754,16 @@ function handleOfficeAndAdminChargeAmountUpdate(){
     let officeAndAdminChargePercentage = parseFloat(officeAndAdminChargePercengateInput.value||0)
     
     let officeAndAdminChargeAmount = getOfficeAndAdminChargeAmount(officeAndAdminChargePercentage)
+    amountInput.value = officeAndAdminChargeAmount
+
+    let detail = {amount: officeAndAdminChargeAmount, personal_usage_percentage: personalUsage, [BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE]: officeAndAdminChargePercentage}
+    let {submissionId, monthId, expenseId} = amountInput.dataset
+    fetch_url({
+      // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"
+      url: `/accounts/set_expense/${submissionId}/${monthId}/${expenseId}/`,
+      req_method: "POST",
+      data_object: JSON.stringify(detail)
+    })
     updateElementValueAndDispatchEvent(amountInput, 'input', officeAndAdminChargeAmount)
   }
 }
@@ -772,6 +782,16 @@ function handleFuelAmountUpdate(){
     let FuelPercentage = parseFloat(FuelPercengateInput.value||0)
     
     let FuelAmount = getFuelAmount(FuelPercentage, personalUsage)
+    amountInput.value = FuelAmount
+
+    let detail = {amount: FuelAmount, personal_usage_percentage: personalUsage, [BACKEND_IDENTIFIERS.FUEL]: FuelPercentage}
+    let {submissionId, monthId, expenseId} = amountInput.dataset
+    fetch_url({
+      // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"
+      url: `/accounts/set_expense/${submissionId}/${monthId}/${expenseId}/`,
+      req_method: "POST",
+      data_object: JSON.stringify(detail)
+    })
     updateElementValueAndDispatchEvent(amountInput, 'input', FuelAmount)
   }
 }
@@ -846,13 +866,13 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
 
       <div class="row">
         <span>
-          <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" data-update-type="amount">
+          <input type="number" max="${DB_MAX_INT_VALUE}" id="${inputAmountId}" value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" data-update-type="amount">
         </span>
         <span>
-          <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" disabled data-update-type="personal_usage_percentage">
+          <input type="number" min="0" max='100' id="${inputPersonalUsageId}" value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" disabled data-update-type="personal_usage_percentage">
         </span>
         <span>
-          <textarea id=${inputNoteId} data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="note">${expense?.note}</textarea>
+          <textarea id="${inputNoteId}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="note">${expense?.note}</textarea>
         </span>
       </div>
 
@@ -875,16 +895,16 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
 
           <div class="row" data-template-cols="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
             <span>
-              <input value=${expense.percentage_for_office_and_admin_charge_amount_value} type="number" min="0" max='100' id=${inputOfficeAndAdminChargePercentageId} data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}" data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
+              <input value="${expense.percentage_for_office_and_admin_charge_amount_value}" type="number" min="0" max='100' id=${inputOfficeAndAdminChargePercentageId} data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}" data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
             </span>
             <span>
-              <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" disabled data-update-type="amount" data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
+              <input type="number" max="${DB_MAX_INT_VALUE}" id="${inputAmountId}" value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" disabled data-update-type="amount" data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
             </span>
             <span>
-              <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" disabled data-update-type="personal_usage_percentage" data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
+              <input type="number" min="0" max='100' id="${inputPersonalUsageId}" value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" disabled data-update-type="personal_usage_percentage" data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
             </span>
             <span>
-              <textarea id=${inputNoteId} data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="note">${expense?.note}</textarea>
+              <textarea id="${inputNoteId}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="note">${expense?.note}</textarea>
             </span>
           </div>
 
@@ -907,16 +927,16 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
 
           <div class="row" data-template-cols="${BACKEND_IDENTIFIERS.FUEL}">
             <span>
-              <input value=${expense.percentage_for_fuel_amount_value} type="number" min="0" max='100' id=${inputFuelPercentageId} data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="${BACKEND_IDENTIFIERS.FUEL}" data-auto-update="${BACKEND_IDENTIFIERS.FUEL}">
+              <input value="${expense.percentage_for_fuel_amount_value}" type="number" min="0" max='100' id="${inputFuelPercentageId}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="${BACKEND_IDENTIFIERS.FUEL}" data-auto-update="${BACKEND_IDENTIFIERS.FUEL}">
             </span>
             <span>
-              <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" disabled data-update-type="amount" data-auto-update="${BACKEND_IDENTIFIERS.FUEL}">
+              <input type="number" max="${DB_MAX_INT_VALUE}" id="${inputAmountId}" value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" disabled data-update-type="amount" data-auto-update="${BACKEND_IDENTIFIERS.FUEL}">
             </span>
             <span>
-              <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" disabled data-update-type="personal_usage_percentage" data-auto-update="${BACKEND_IDENTIFIERS.FUEL}">
+              <input type="number" min="0" max='100' id="${inputPersonalUsageId}" value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" disabled data-update-type="personal_usage_percentage" data-auto-update="${BACKEND_IDENTIFIERS.FUEL}">
             </span>
             <span>
-              <textarea id=${inputNoteId} data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="note">${expense?.note}</textarea>
+              <textarea id="${inputNoteId}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="note">${expense?.note}</textarea>
             </span>
           </div>
 

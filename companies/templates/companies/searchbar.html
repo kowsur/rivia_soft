@@ -21,5 +21,18 @@
       <a href="{% url create_url %}" class="create px-4 py-2 h-10 rounded-md">Create</a>
     </div> -->
     {% endcomment %}
+    {% if tax_years %}
+      <div class="inline-block">
+        <select name="tax_years" id="tax_years">
+          {% for tax_year in tax_years %}
+            {% if tax_year.id == current_tax_year.id %}
+              <option selected value="{{tax_year.id}}">{{tax_year}}</option>
+            {% else %}
+              <option value="{{tax_year.id}}">{{tax_year}}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
   </div>
 </div>

@@ -1,4 +1,8 @@
 const DB_MAX_INT_VALUE = 2147483647
+const BACKEND_IDENTIFIERS = {
+  OFFICE_AND_ADMIN_CHARGE: "office_and_admin_charge",
+  FUEL: "fuel"
+}
 
 let tabNavList = document.querySelector(".tab-nav")
 
@@ -78,7 +82,7 @@ async function getTotalTaxableIncome(){
 }
 
 function calculateSelfemploymentIncome(incomeAmount, comission){
-  let actualIncome = incomeAmount-comission
+  let actualIncome = incomeAmount
   if (actualIncome<0) actualIncome=0
   return actualIncome
 }
@@ -136,17 +140,21 @@ async function getTotalExpense(){
 // update the function
 async function getTotalDeduction(){
   let inputAmountFields = document.querySelectorAll('.deductions_and_allowances input[data-update-type="amount"]')
+  let inputAdditionFields = document.querySelectorAll('.deductions_and_allowances input[data-update-type="addition"]')
+  let inputDisposalFields = document.querySelectorAll('.deductions_and_allowances input[data-update-type="disposal"]')
   let inputAllowancePercentageFields = document.querySelectorAll('.deductions_and_allowances input[data-update-type="allowance_percentage"]')
   let inputPersonalUsagePercentageFields = document.querySelectorAll('.deductions_and_allowances input[data-update-type="personal_usage_percentage"]')
   let totalDeduction = 0
 
   for (let i=0; i<inputAmountFields.length; i++){
       let amount = parseFloat(inputAmountFields[i].value) || 0
+      let addition = parseFloat(inputAdditionFields[i].value) || 0
+      let disposal = parseFloat(inputDisposalFields[i].value) || 0
       let allowance_percentage = parseFloat(inputAllowancePercentageFields[i].value) || 0
       let personal_usage_percentage = parseFloat(inputPersonalUsagePercentageFields[i].value) || 0
 
       // Calculate actual allowance
-      let allowance = amount*(allowance_percentage/100)
+      let allowance = (amount+addition+disposal)*(allowance_percentage/100)
 
       // Calculate actual personal usage
       let personal_usage = allowance*(personal_usage_percentage/100)
@@ -215,6 +223,23 @@ async function updateNetProfit(){
 let urlParams = getAllUrlParams(location.href)
 let submissionId = urlParams.pk
 
+async function overviewLoader(e){
+  let overviewContainer = document.querySelector("[data-overview-container]")
+  let response = await fetch_url({url:`/accounts/overview/${urlParams.pk}/`})
+  let overview_data = await response.json()
+
+  overviewContainer.innerHTML = `
+    <div>Selfemployment Income (Including Tips) ${overview_data.income.toFixed(2)}</div>
+    <div>Total Expenses ${overview_data.expense.toFixed(2)}</div>
+    <div>Selemployment Net profit ${overview_data.profit.toFixed(2)}</div>
+    <div>Taxable income ${overview_data.taxable_income.toFixed(2)}</div>
+    <div>Total Tax ${overview_data.tax.toFixed(2)}</div>
+  `
+}
+let overviewReloadButton = document.querySelector("#reload-overview")
+window.addEventListener('load', (e)=>overviewLoader()) 
+overviewReloadButton.addEventListener('click', overviewLoader)
+
 const displayingTaxableIncomeIds = new Set()
 const displayingSelfemploymentIncomeIds = new Set()
 const displayingExpenseIds = new Set()
@@ -244,7 +269,7 @@ const groupedAllDeductionsForSubmissionMapBySourceId = {}
 
 
 // get data
-getSubmissionDetails(updateDetailsTab, updateIncomeAndExpenseTab)
+getSubmissionDetails(updateDetailsTab, updateIncomeAndExpenseTab, updateTaxReportTab)
 getTaxableIncomeSources()
 getSelfemploymentIncomeSources()
 getExpneseSources()
@@ -432,36 +457,49 @@ async function updateIncomeAndExpenseTab(submissionDetails){
   let allExpensesForSubmission = await getAllExpensesForSubmission()
   let allDeductionsForSubmission = await getAllDeductionsForSubmission()
 
-  Object.entries(groupedAllTaxableIncomesForSubmissionMapBySourceId).forEach(([taxableIncomeSourceId, taxableIncomes]) => {
-    displayTaxableIncomeSource(taxableIncomeSourceId, taxableIncomes, submissionDetails)
-  });
+  allTaxableIncomeSources.forEach(taxableIncomeSource=>{
+    let taxableIncomeSourceId = taxableIncomeSource.id
+    if (groupedAllTaxableIncomesForSubmissionMapBySourceId.hasOwnProperty(taxableIncomeSourceId)) {
+      displayTaxableIncomeSource(taxableIncomeSourceId, groupedAllTaxableIncomesForSubmissionMapBySourceId[taxableIncomeSourceId], submissionDetails)
+    }else{
+      // displayTaxableIncomeSource(taxableIncomeSourceId, [], submissionDetails)
+    }
+  })
   displayTaxableIncomeOptions()
   updateTotalTaxableIncome()
 
-  Object.entries(groupedAllSelfemploymentIncomesForSubmissionMapBySourceId).forEach(([incomeSourceId, incomes]) => {
-    displaySelfemploymentIncomeSource(incomeSourceId, incomes, submissionDetails)
-  });
+  allSelfemploymentIncomeSources.forEach(incomeSource=>{
+    let incomeSourceId = incomeSource.id
+    if (groupedAllSelfemploymentIncomesForSubmissionMapBySourceId.hasOwnProperty(incomeSourceId)){
+      displaySelfemploymentIncomeSource(incomeSourceId, groupedAllSelfemploymentIncomesForSubmissionMapBySourceId[incomeSourceId], submissionDetails)
+    }else{
+      // displaySelfemploymentIncomeSource(incomeSourceId, [], submissionDetails)
+    }
+  })
   displaySelfemploymentIncomeOptions()
   updateTotalSelfemploymentIncome()
 
   // Show expenses with data from backend
-  Object.entries(groupedAllExpensesForSubmissionMapBySourceId).forEach(([expenseSourceId, expenses]) => {
-    displayExpenseSource(expenseSourceId, expenses, submissionDetails)
-  });
-
-  // Show other expenses that doesn't have data
   allExpenseSources.forEach(expenseSource=>{
-    if (!displayingExpenseIds.has(expenseSource.id)){
-      displayExpenseSource(expenseSource.id, [], submissionDetails)
+    let expenseSourceId = expenseSource.id
+    if (groupedAllExpensesForSubmissionMapBySourceId.hasOwnProperty(expenseSourceId)){
+      displayExpenseSource(expenseSourceId, groupedAllExpensesForSubmissionMapBySourceId[expenseSourceId], submissionDetails)
+    } else{
+      displayExpenseSource(expenseSourceId, [], submissionDetails)
     }
   })
 
   displayExpenseOptions()
   updateTotalExpense()
   
-  Object.entries(groupedAllDeductionsForSubmissionMapBySourceId).forEach(([deductionSourceId, deductions]) => {
-    displayDeductionSource(deductionSourceId, deductions, submissionDetails)
-  });
+  allDeductionSources.forEach(deductionSource=>{
+    let deductionSourceId = deductionSource.id
+    if (groupedAllDeductionsForSubmissionMapBySourceId.hasOwnProperty(deductionSourceId)){
+      displayDeductionSource(deductionSourceId, groupedAllDeductionsForSubmissionMapBySourceId[deductionSourceId], submissionDetails)
+    }else{
+      // displayDeductionSource(deductionSourceId, [], submissionDetails)
+    }
+  })
   displayDeductionOptions()
   updateTotalDeduction()
 
@@ -476,13 +514,26 @@ function displayTaxableIncomeSource(taxableIncomeSourceId, taxableIncomes, submi
   let taxableIncomeContainer = createNodeFromMarkup(`
   <div class="taxable-income" data-taxable-income-section="${taxableIncomeSource.id}">
     <div class="toggle">
-      <h2 class="taxable-income-source">${taxableIncomeSource.name}</h2>
+      <h2 class="taxable-income-source">${taxableIncomeSource.name} Total: <span data-total-container-for-taxable-income-source>0</span></h2>
       <img src='/static/accounts/expand.svg'/>
     </div>
     <div class="months invisible">
+      <div class="table" data-display-table-name="taxable-income">
+        <div class="thead">
+          <div class="row">
+            <span>Amount</span>
+            <span>Paid income tax amount</span>
+            <span>Note</span>
+          </div>
+        </div>
+        <div class="body">
+        </div>
+      </div>
     </div>
   </div>`)
 
+  let body = taxableIncomeContainer.querySelector('.body')
+  let taxableIncomeTotalContainer = taxableIncomeContainer.querySelector('span[data-total-container-for-taxable-income-source]')
   let monthContainer = taxableIncomeContainer.querySelector('.months')
   let toggle = taxableIncomeContainer.querySelector('.toggle')
   let toggleImg = taxableIncomeContainer.querySelector('.toggle img')
@@ -511,19 +562,16 @@ function displayTaxableIncomeSource(taxableIncomeSourceId, taxableIncomes, submi
   let inputNoteId = `taxable_income_note_${taxableIncomeSourceId}`
 
   let taxableIncomeMarkup = `
-  <div class="month">
-    <div>
-      <label for="${inputAmountId}">Amount</label>
+  <div class="row">
+    <span>
       <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${taxableIncome?.amount}" data-submission-id="${submissionId}" data-taxable-income-id="${taxableIncome.taxable_income_source}" data-update-type="amount">
-    </div>
-    <div>
-      <label for="${inputPaidIncomeTaxAmountId}">Paid income tax amount</label>
+    </span>
+    <span>
       <input type="number" max=${DB_MAX_INT_VALUE} id=${inputPaidIncomeTaxAmountId} value="${taxableIncome?.paid_income_tax_amount}" data-submission-id="${submissionId}" data-taxable-income-id="${taxableIncome.taxable_income_source}" data-update-type="paid_income_tax_amount">
-    </div>
-    <div>
-      <label for="${inputNoteId}">Note</label>
+    </span>
+    <span>
       <textarea id=${inputNoteId} data-submission-id="${submissionId}" data-taxable-income-id="${taxableIncome.taxable_income_source}" data-update-type="note">${taxableIncome.note}</textarea>
-    </div>
+    </span>
   </div>
   `
 
@@ -532,11 +580,16 @@ function displayTaxableIncomeSource(taxableIncomeSourceId, taxableIncomes, submi
   let inputPaidIncomeTaxAmount = node.querySelector(`#${inputPaidIncomeTaxAmountId}`)
   let inputNote = node.querySelector(`#${inputNoteId}`)
 
-  addEventListenersToElements(inputAmount, 'input', [validateMaxValue, handleTaxableIncomeUpdate, updateTotalTaxableIncome, updateNetProfit])
+  taxableIncomeTotalContainer.innerText = taxableIncome.amount
+  let totalIncomeTotalContainer = (e)=>{
+    taxableIncomeTotalContainer.innerText = inputAmount.value
+  }
+
+  addEventListenersToElements(inputAmount, 'input', [validateMaxValue, handleTaxableIncomeUpdate, updateTotalTaxableIncome, updateNetProfit, totalIncomeTotalContainer])
   addEventListenersToElements(inputPaidIncomeTaxAmount, 'input', [validateMaxValue, handleTaxableIncomeUpdate, updateTotalTaxableIncome, updateNetProfit])
   addEventListenersToElements(inputNote, 'input', handleTaxableIncomeUpdate)
 
-  monthContainer.appendChild(node)
+  body.appendChild(node)
   taxableIncomesContainer.appendChild(taxableIncomeContainer)
 }
 
@@ -562,7 +615,6 @@ function displaySelfemploymentIncomeSource(incomeSourceId, incomes, submission){
           </div>
         </div>
         <div class="body">
-          <div class="row"></div>
         </div>
       </div>
     </div>
@@ -618,8 +670,8 @@ function displaySelfemploymentIncomeSource(incomeSourceId, incomes, submission){
   let inputAmountElements = displayTable.querySelectorAll('input[data-update-type="amount"]')
   let inputComissionElements = displayTable.querySelectorAll('input[data-update-type="comission"]')
   let inputNoteElements = displayTable.querySelectorAll('textarea[data-update-type="note"]')
-  addEventListenersToElements(Array.from(inputAmountElements), 'input', [validateMaxValue, handleSelfemploymentIncomeUpdate, updateTotalSelfemploymentIncome, updateNetProfit])
-  addEventListenersToElements(Array.from(inputComissionElements), 'input', [validateMaxValue, handleSelfemploymentIncomeUpdate, updateTotalSelfemploymentIncome, updateNetProfit])
+  addEventListenersToElements(Array.from(inputAmountElements), 'input', [validateMaxValue, handleSelfemploymentIncomeUpdate, updateTotalSelfemploymentIncome, updateNetProfit, handleFuelAmountUpdate])
+  addEventListenersToElements(Array.from(inputComissionElements), 'input', [validateMaxValue, handleSelfemploymentIncomeUpdate, updateTotalSelfemploymentIncome, updateNetProfit, handleOfficeAndAdminChargeAmountUpdate])
   addEventListenersToElements(Array.from(inputNoteElements), 'input', [handleSelfemploymentIncomeUpdate])
   
   // add the newly prepared income source to incomes
@@ -652,7 +704,101 @@ function addEventListenersToElements(element_or_elements, eventName, eventFuncti
   }
 }
 
+function getTotalSelfemploymentIncomeCommission(){
+  let selfemploymentIncomeCommissionInputs = document.querySelectorAll('[data-display-table-name="income"] input[data-update-type="comission"]')
+  let total = 0
+  selfemploymentIncomeCommissionInputs.forEach(commissionInput=>{
+    let commission = parseFloat(commissionInput.value||0)
+    total+=commission
+  })
+  return total
+}
+function getTotalSelfemploymentIncomeAmount(){
+  let selfemploymentIncomeCommissionInputs = document.querySelectorAll('[data-display-table-name="income"] input[data-update-type="amount"]')
+  let total = 0
+  selfemploymentIncomeCommissionInputs.forEach(commissionInput=>{
+    let amount = parseFloat(commissionInput.value||0)
+    total+=amount
+  })
+  return total
+}
 
+
+function getOfficeAndAdminChargeAmount(percentage_of_total_selfemployment_income=20){
+  let totalSelfemploymentIncome = getTotalSelfemploymentIncomeCommission()
+  return (totalSelfemploymentIncome*percentage_of_total_selfemployment_income)/100
+}
+function getFuelAmount(percentage_for_fuel_amount_value=20, personal_usage_percentage=20){
+  let totalSelfemploymentIncome = getTotalSelfemploymentIncomeAmount()
+  let amount = ((totalSelfemploymentIncome*percentage_for_fuel_amount_value)/100) * (100/(100-personal_usage_percentage))
+  return amount
+}
+
+function updateElementValueAndDispatchEvent(Element, event_name, value){
+  Element.value = value
+  Element.dispatchEvent(new Event(event_name, { bubbles: true, cancelable: true }))
+}
+
+function handleOfficeAndAdminChargeAmountUpdate(){
+  let amountInputs = document.querySelectorAll(`input[data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}"][data-update-type="amount"]`)
+  let personalUsageInputs = document.querySelectorAll(`input[data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}"][data-update-type="personal_usage_percentage"]`)
+  let officeAndAdminChargePercengateInputs = document.querySelectorAll(`input[data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}"][data-update-type="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}"]`)
+
+  for(let i=0; i<amountInputs.length; i++){
+    let amountInput = amountInputs[i]
+    let personalUsageInput = personalUsageInputs[i]
+    let officeAndAdminChargePercengateInput = officeAndAdminChargePercengateInputs[i]
+
+    let amount = parseFloat(amountInput.value||0)
+    let personalUsage = parseFloat(personalUsageInput.value||0)
+    let officeAndAdminChargePercentage = parseFloat(officeAndAdminChargePercengateInput.value||0)
+    
+    let officeAndAdminChargeAmount = getOfficeAndAdminChargeAmount(officeAndAdminChargePercentage)
+    amountInput.value = officeAndAdminChargeAmount
+
+    let detail = {amount: officeAndAdminChargeAmount, personal_usage_percentage: personalUsage, [BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE]: officeAndAdminChargePercentage}
+    let {submissionId, monthId, expenseId} = amountInput.dataset
+    fetch_url({
+      // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"
+      url: `/accounts/set_expense/${submissionId}/${monthId}/${expenseId}/`,
+      req_method: "POST",
+      data_object: JSON.stringify(detail)
+    })
+    updateElementValueAndDispatchEvent(amountInput, 'input', officeAndAdminChargeAmount)
+  }
+}
+function handleFuelAmountUpdate(){
+  let amountInputs = document.querySelectorAll(`input[data-auto-update="${BACKEND_IDENTIFIERS.FUEL}"][data-update-type="amount"]`)
+  let personalUsageInputs = document.querySelectorAll(`input[data-auto-update="${BACKEND_IDENTIFIERS.FUEL}"][data-update-type="personal_usage_percentage"]`)
+  let FuelPercengateInputs = document.querySelectorAll(`input[data-auto-update="${BACKEND_IDENTIFIERS.FUEL}"][data-update-type="${BACKEND_IDENTIFIERS.FUEL}"]`)
+
+  for(let i=0; i<amountInputs.length; i++){
+    let amountInput = amountInputs[i]
+    let personalUsageInput = personalUsageInputs[i]
+    let FuelPercengateInput = FuelPercengateInputs[i]
+
+    let amount = parseFloat(amountInput.value||0)
+    let personalUsage = parseFloat(personalUsageInput.value||0)
+    let FuelPercentage = parseFloat(FuelPercengateInput.value||0)
+    
+    let FuelAmount = getFuelAmount(FuelPercentage, personalUsage)
+    amountInput.value = FuelAmount
+
+    let detail = {amount: FuelAmount, personal_usage_percentage: personalUsage, [BACKEND_IDENTIFIERS.FUEL]: FuelPercentage}
+    let {submissionId, monthId, expenseId} = amountInput.dataset
+    fetch_url({
+      // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"
+      url: `/accounts/set_expense/${submissionId}/${monthId}/${expenseId}/`,
+      req_method: "POST",
+      data_object: JSON.stringify(detail)
+    })
+    updateElementValueAndDispatchEvent(amountInput, 'input', FuelAmount)
+  }
+}
+
+
+let personalUsageBulkUpdater = document.querySelector('#expense_personal_usage_bulk_updater')
+addEventListenersToElements(personalUsageBulkUpdater, 'input', validatePercentageValue)
 function displayExpenseSource(expenseSourceId, expenses, submission){
   // add current incomeSourceId to displayingIncomeIds set to filter them out while searching
   displayingExpenseIds.add(parseInt(expenseSourceId))
@@ -661,12 +807,13 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
   let expenseContainer = createNodeFromMarkup(`
   <div class="expense">
     <div class="toggle">
-      <h2 class="selfemployment-income-source">${expenseSource.name}</h2>
+      <h2 class="selfemployment-income-source">${expenseSource.name} Total: <span data-total-container-for-selfemployment-expense-source>0</span></h2>
       <img src='/static/accounts/expand.svg'/>
     </div>
-    <div class="months invisible">
+    <div class="months">
     </div>
   </div>`)
+  let totalExpenseContainer = expenseContainer.querySelector('[data-total-container-for-selfemployment-expense-source]')
   let monthContainer = expenseContainer.querySelector('.months')
   let toggle = expenseContainer.querySelector('.toggle')
   let toggleImg = expenseContainer.querySelector('.toggle img')
@@ -693,35 +840,141 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
     'note': '',
     "expense_source": expenseSourceId,
     "client": submissionId,
-    "month": month.id
+    "month": month.id,
+    "percentage_for_office_and_admin_charge_amount_value": 0,
+    "percentage_for_fuel_amount_value": 0
   }
+  
   let inputAmountId = `expense_amount_${month.id}_${submission.submission_id}_${expense.expense_source}`
   let inputPersonalUsageId = `expense_personalUsage_${month.id}_${submission.submission_id}_${expense.expense_source}`
   let inputNoteId = `expense_note_${month.id}_${submission.submission_id}_${expense.expense_source}`
+  let inputOfficeAndAdminChargePercentageId = `expense_${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}_${month.id}_${submission.submission_id}_${expense.expense_source}`
+  let inputFuelPercentageId = `expense_${BACKEND_IDENTIFIERS.FUEL}_${month.id}_${submission.submission_id}_${expense.expense_source}`
 
   // Prepare markup for a single month
   let expenseMarkup = `
-      <div class='month'>
-        <div>
-          <label for="${inputAmountId}">Amount</label>
-          <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" data-update-type="amount">
+  <div class="table income-display-table">
+    <div class="thead">
+      <div class="row">
+        <span>Amount</span>
+        <span>Personal Usage</span>
+        <span>Note</span>
+      </div>
+    </div>
+
+    <div class="body">
+
+      <div class="row">
+        <span>
+          <input type="number" max="${DB_MAX_INT_VALUE}" id="${inputAmountId}" value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" data-update-type="amount">
+        </span>
+        <span>
+          <input type="number" min="0" max='100' id="${inputPersonalUsageId}" value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" disabled data-update-type="personal_usage_percentage">
+        </span>
+        <span>
+          <textarea id="${inputNoteId}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="note">${expense?.note}</textarea>
+        </span>
+      </div>
+
+    </div>
+  </div>
+  `
+  if(expenseSource.backend_identifier===BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE){
+    expenseMarkup = `
+      <div class="table income-display-table">
+        <div class="thead">
+          <div class="row" data-template-cols="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
+            <span>Selfemployment income commission(%)</span>
+            <span>Amount</span>
+            <span>Personal Usage</span>
+            <span>Note</span>
+          </div>
         </div>
-        <div>
-          <label for="${inputPersonalUsageId}">Personal Usage(%)</label>
-          <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="personal_usage_percentage">
-        </div>
-        <div>
-          <label for="${inputNoteId}">Note</label>
-          <textarea id=${inputNoteId} data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="note">${expense?.note}</textarea>
+
+        <div class="body">
+
+          <div class="row" data-template-cols="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
+            <span>
+              <input value="${expense.percentage_for_office_and_admin_charge_amount_value}" type="number" min="0" max='100' id=${inputOfficeAndAdminChargePercentageId} data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}" data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
+            </span>
+            <span>
+              <input type="number" max="${DB_MAX_INT_VALUE}" id="${inputAmountId}" value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" disabled data-update-type="amount" data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
+            </span>
+            <span>
+              <input type="number" min="0" max='100' id="${inputPersonalUsageId}" value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" disabled data-update-type="personal_usage_percentage" data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
+            </span>
+            <span>
+              <textarea id="${inputNoteId}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="note">${expense?.note}</textarea>
+            </span>
+          </div>
+
         </div>
       </div>
       `
+  }else if(expenseSource.backend_identifier===BACKEND_IDENTIFIERS.FUEL){
+    expenseMarkup = `
+      <div class="table income-display-table">
+        <div class="thead">
+          <div class="row" data-template-cols="${BACKEND_IDENTIFIERS.FUEL}">
+            <span>Selfemployment income(%)</span>
+            <span>Amount</span>
+            <span>Personal Usage</span>
+            <span>Note</span>
+          </div>
+        </div>
+
+        <div class="body">
+
+          <div class="row" data-template-cols="${BACKEND_IDENTIFIERS.FUEL}">
+            <span>
+              <input value="${expense.percentage_for_fuel_amount_value}" type="number" min="0" max='100' id="${inputFuelPercentageId}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="${BACKEND_IDENTIFIERS.FUEL}" data-auto-update="${BACKEND_IDENTIFIERS.FUEL}">
+            </span>
+            <span>
+              <input type="number" max="${DB_MAX_INT_VALUE}" id="${inputAmountId}" value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" disabled data-update-type="amount" data-auto-update="${BACKEND_IDENTIFIERS.FUEL}">
+            </span>
+            <span>
+              <input type="number" min="0" max='100' id="${inputPersonalUsageId}" value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" disabled data-update-type="personal_usage_percentage" data-auto-update="${BACKEND_IDENTIFIERS.FUEL}">
+            </span>
+            <span>
+              <textarea id="${inputNoteId}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="note">${expense?.note}</textarea>
+            </span>
+          </div>
+
+        </div>
+      </div>
+      `
+  }
   let node = createNodeFromMarkup(expenseMarkup)
   let inputAmount = node.querySelector(`#${inputAmountId}`)
   let inputPersonalUsage = node.querySelector(`#${inputPersonalUsageId}`)
   let inputNote = node.querySelector(`#${inputNoteId}`)
+  let inputOfficeAndAdminChargePercentage = node.querySelector(`#${inputOfficeAndAdminChargePercentageId}`) // this might return null
+  let inputFuelPercentage = node.querySelector(`#${inputFuelPercentageId}`) // this might return null
+
+  if(inputOfficeAndAdminChargePercentage!==null){
+    addEventListenersToElements(inputOfficeAndAdminChargePercentage, 'input', [validatePercentageValue, handleExpenseUpdate, handleOfficeAndAdminChargeAmountUpdate])
+    addEventListenersToElements(inputPersonalUsage, 'input', handleOfficeAndAdminChargeAmountUpdate)
+  }
+  if(inputFuelPercentage!==null){
+    addEventListenersToElements(inputFuelPercentage, 'input', [validatePercentageValue, handleExpenseUpdate, handleFuelAmountUpdate])
+    addEventListenersToElements(inputPersonalUsage, 'input', handleFuelAmountUpdate)
+  }
+
+  if (!expenseSource.default_personal_usage_percentage==0){
+    addEventListenersToElements(personalUsageBulkUpdater, 'input', (e)=>{
+      inputPersonalUsage.value = e.target.value
+      let event = new Event('input', { bubbles: true, cancelable: true } );
+      
+      inputPersonalUsage.dispatchEvent(event)
+    })
+  }
   
-  addEventListenersToElements(inputAmount, 'input', [validateMaxValue, handleExpenseUpdate, updateTotalExpense, updateNetProfit])
+  totalExpenseContainer.innerText = expense.amount
+  let totalUpdater = (e)=>{
+    totalExpenseContainer.innerText = inputAmount.value
+  }
+  
+  addEventListenersToElements(inputAmount, 'input', [validateMaxValue, handleExpenseUpdate, updateTotalExpense, updateNetProfit, totalUpdater])
   addEventListenersToElements(inputPersonalUsage, 'input', [validatePercentageValue, handleExpenseUpdate, updateTotalExpense, updateNetProfit])
   addEventListenersToElements(inputNote, 'input', [handleExpenseUpdate])
 
@@ -742,12 +995,29 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
   let deductionContainer = createNodeFromMarkup(`
   <div class="deduction">
     <div class="toggle">
-      <h2 class="selfemployment-income-source">${deductionSource.name}</h2>
+      <h2 class="selfemployment-income-source">${deductionSource.name} Total: <span data-total-container-for-deduction-source></span></h2>
       <img src='/static/accounts/expand.svg'/>
     </div>
     <div class="months invisible">
+      <div class="table" data-display-table-name="deduction-and-allowance">
+        <div class="thead">
+          <div class="row">
+            <span>Amount</span>
+            <span>Addition</span>
+            <span>Disposal</span>
+            <span>Allowance(%)</span>
+            <span>Personal Usage(%)</span>
+            <span>Note</span>
+          </div>
+        </div>
+        <div class="body">
+        </div>
+      </div>
     </div>
   </div>`)
+
+  let body = deductionContainer.querySelector('.body')
+  let totalContainer = deductionContainer.querySelector('span[data-total-container-for-deduction-source]')
   let monthContainer = deductionContainer.querySelector('.months')
   let toggle = deductionContainer.querySelector('.toggle')
   let toggleImg = deductionContainer.querySelector('.toggle img')
@@ -766,6 +1036,8 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
   // Get the existing/default deduction object
   let deduction = deductions.find(deduction=>deduction.deduction_source===deductionSourceId) || {
     "amount": 0,
+    "addition": 0,
+    "disposal": 0,
     "allowance_percentage": 0,
     "personal_usage_percentage": 0,
     "note": '',
@@ -773,43 +1045,55 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
     "client": submissionId,
   }
   let inputAmountId = `deduction_amount_${submission.submission_id}_${deduction.deduction_source}`
+  let inputAdditionId = `deduction_addition_${submission.submission_id}_${deduction.deduction_source}`
+  let inputDisposalId = `deduction_disposal_${submission.submission_id}_${deduction.deduction_source}`
   let inputAllowancePercentageId = `deduction_allowance_percentage_${submission.submission_id}_${deduction.deduction_source}`
   let inputPersonalUsagePercentageId = `deduction_personalUsage_percentage_${submission.submission_id}_${deduction.deduction_source}`
   let inputNoteId = `deduction_note_${submission.submission_id}_${deduction.deduction_source}`
 
   // Prepare markup for a single month
   let deductionMarkup = `
-      <div class='month'>
-        <div>
-          <label for="${inputAmountId}">Amount</label>
+      <div class='row'>
+        <span>
           <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${deduction?.amount}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="amount">
-        </div>
-        <div>
-          <label for="${inputAllowancePercentageId}">Allowance(%)</label>
+        </span>
+        <span>
+          <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAdditionId} value="${deduction?.addition}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="addition">
+        </span>
+        <span>
+          <input type="number" max=${DB_MAX_INT_VALUE} id=${inputDisposalId} value="${deduction?.disposal}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="disposal">
+        </span>
+        <span>
           <input type="number" min="0" max='100' id=${inputAllowancePercentageId} value="${deduction?.allowance_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="allowance_percentage">
-        </div>
-        <div>
-          <label for="${inputPersonalUsagePercentageId}">Personal Usage(%)</label>
+        </span>
+        <span>
           <input type="number" min="0" max='100' id=${inputPersonalUsagePercentageId} value="${deduction?.personal_usage_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="personal_usage_percentage">
-        </div>
-        <div>
-          <label for="${inputNoteId}">Note</label>
+        </span>
+        <span>
           <textarea id=${inputNoteId} data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="note">${deduction?.note}</textarea>
-        </div>
+        </span>
       </div>
       `
+  
   let node = createNodeFromMarkup(deductionMarkup)
   let inputAmount = node.querySelector(`#${inputAmountId}`)
+  let inputAddition = node.querySelector(`#${inputAdditionId}`)
+  let inputDisposal = node.querySelector(`#${inputDisposalId}`)
   let inputAllowancePercentage = node.querySelector(`#${inputAllowancePercentageId}`)
   let inputPersonalUsage = node.querySelector(`#${inputPersonalUsagePercentageId}`)
   let inputNote = node.querySelector(`#${inputNoteId}`)
+  
+  totalContainer.innerText = deduction.amount
+  let totalUpdater = (e)=>{
+    totalContainer.innerText = inputAmount.value
+  }
 
-  addEventListenersToElements(inputAmount, 'input', validateMaxValue)
-  addEventListenersToElements([inputAmount, inputAllowancePercentage, inputPersonalUsage, inputNote], 'input', handleDeductionUpdate)
+  addEventListenersToElements(inputAmount, 'input', [validateMaxValue, totalUpdater])
+  addEventListenersToElements([inputAmount, inputAddition, inputDisposal, inputAllowancePercentage, inputPersonalUsage, inputNote], 'input', handleDeductionUpdate)
   addEventListenersToElements([inputAmount, inputAllowancePercentage, inputPersonalUsage], 'input', [updateTotalDeduction, updateNetProfit])
   addEventListenersToElements([inputAllowancePercentage, inputPersonalUsage], 'input', validatePercentageValue)
 
-  monthContainer.appendChild(node)
+  body.appendChild(node)
 
   deductionsContainer.appendChild(deductionContainer)
 }
@@ -827,8 +1111,9 @@ function validateMaxValue(e){
 
 function validatePercentageValue(e){
   let input = e.target
-  let value = parseFloat(e.target.value) || 0
-  if (!(value>=0 && value<=100)){
+  let value = parseFloat(input.value)
+
+  if(!(value>=0 && value<=100)||isNaN(value)){
     input.setCustomValidity(`Your input should be between 0 and 100!`);
     input.reportValidity();
   }else{
@@ -860,20 +1145,27 @@ function groupRecordsByAttribute(records, attributeName, groupedRecords=null){
   return groupedRecords
 }
 
-let taxReportIframes = Array.from(document.querySelectorAll('iframe[data-tax-report]'))
-Array.from(taxReportIframes).forEach(iframe=>{
-  iframe.src = `/accounts/tax_report/${submissionId}/`
-})
 let taxCalculationTab = document.querySelector('li[data-tab-name="taxReport"]')
-console.log(taxCalculationTab)
-taxCalculationTab.addEventListener('click', updateTaxReport)
+
+taxCalculationTab.addEventListener('click', async (e)=>{
+  await getSubmissionDetails()
+  updateTaxReport(submissionDetails)
+})
 // Update info in Tax Report tab
 function updateTaxReport(submissionDetails){
+  let taxReportIframes = Array.from(document.querySelectorAll('iframe[data-tax-report]'))
+  Array.from(taxReportIframes).forEach(iframe=>{
+    iframe.src = `/accounts/tax_report/${submissionId}/`
+  })
+
   taxReportIframes.forEach(iframe=>{
-    iframe.contentWindow.location.reload()
+    let newIFrame = createNodeFromMarkup(`<iframe src="/accounts/tax_report/${submissionId}/" data-tax-report></iframe>`)
+    iframe.parentNode.replaceChild(newIFrame, iframe)
   })
 }
-
+function updateTaxReportTab(submissionDetails){
+  updateTaxReport(submissionDetails)
+}
 
 // =============================================================================================================================
 // Handlers
@@ -1026,6 +1318,8 @@ function handleExpenseUpdate(e){
   if (updateType==="amount") data_object.amount = parseFloat(inputField.value) || 0
   else if (updateType==="personal_usage_percentage") data_object.personal_usage_percentage = parseFloat(inputField.value) || 0
   else if (updateType==="note") data_object.note = inputField.value
+  else if (updateType===BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE) data_object[BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE] = parseFloat(inputField.value) || 0
+  else if (updateType===BACKEND_IDENTIFIERS.FUEL) data_object[BACKEND_IDENTIFIERS.FUEL] = parseFloat(inputField.value) || 0
 
   fetch_url({
     // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"
@@ -1041,6 +1335,8 @@ function handleDeductionUpdate(e){
   let data_object = { } // amount or personal_usage_percentage or allowance_percentage must be specified
 
   if (updateType==="amount") data_object.amount = parseFloat(inputField.value) || 0
+  else if (updateType==="addition") data_object.addition = parseFloat(inputField.value) || 0
+  else if (updateType==="disposal") data_object.disposal = parseFloat(inputField.value) || 0
   else if (updateType==="allowance_percentage") data_object.allowance_percentage = parseFloat(inputField.value) || 0
   else if (updateType==="personal_usage_percentage") data_object.personal_usage_percentage = parseFloat(inputField.value) || 0
   else if (updateType==="note") data_object.note = inputField.value

@@ -32,51 +32,29 @@ let doneTypingInterval = 1000;//time in ms (4/5 seconds)
 //         typingTimer = setTimeout(search_function, doneTypingInterval);
 //     }
 // });
+const tax_year_select_input = document.querySelector('select#tax_years')
 const search_bar = document.querySelector('input[name="search"]');
-if (search_bar){
-  search_bar.addEventListener('input', (event)=>{
-    let search_url = DATA.search_url
-    let search_text = search_bar.value.trim()
-    
-    // reset timer to prevent extra search
-    clearTimeout(typingTimer);
-    // set the timer again to call api after doneTypingInterval
-    if (search_text===''){
-      typingTimer = setTimeout( async () => {
-        loadAllRecords()
-      }, doneTypingInterval); // Get all the records
-    }else{
-      typingTimer = setTimeout(async (search_text, search_url)=>{
-        let search_records = await db_search_records(search_text, search_url)
-        populate_with_data(search_records)
-      }, doneTypingInterval, search_text, search_url); // search with text
-    }
-  })
-
-  // OpenSearch
-  let current_url = window.location.href
-  let url = new URL(current_url)
-  let open_query = url.searchParams.get('q')
-  let client_id = url.searchParams.get('client_id')
-  if (client_id) {client_id = client_id.trim()}
-  if (open_query){open_query=open_query.trim()}
-
-  if (client_id){
-    typingTimer = setTimeout(async (client_id, search_url)=>{
-      let search_records = await db_search_records_client_id(client_id, search_url)
-      populate_with_data(search_records)
-    }, 10, client_id, (DATA.search_url)); // search with text
-  }
-  else if (open_query){
+function searchHandler(event){
+  let search_url = DATA.search_url
+  let search_text = search_bar.value.trim()
+  
+  // reset timer to prevent extra search
+  clearTimeout(typingTimer);
+  // set the timer again to call api after doneTypingInterval
+  if (search_text===''){
+    typingTimer = setTimeout( async () => {
+      loadAllRecords()
+    }, doneTypingInterval); // Get all the records
+  }else{
     typingTimer = setTimeout(async (search_text, search_url)=>{
+      
       let search_records = await db_search_records(search_text, search_url)
       populate_with_data(search_records)
-    }, 10, open_query, DATA.search_url); // search with text
-  }else{
-    // when page loads load all the records
-    loadAllRecords();
+    }, doneTypingInterval, search_text, search_url); // search with text
   }
 }
+if (search_bar){ search_bar.addEventListener('input', searchHandler) }
+if (tax_year_select_input){ tax_year_select_input.addEventListener('change', searchHandler) }
 
 export function loadAllRecords(){
   setTimeout(async ()=>{
@@ -84,3 +62,4 @@ export function loadAllRecords(){
     populate_with_data(all_records)
   }, 10); // search with text
 }
+loadAllRecords()

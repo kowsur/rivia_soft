@@ -452,8 +452,8 @@ def slefassesment_account_submission_auto_row(request, selfassesment, tax_year, 
     if message:
       messages.error(request, "Failed auto creation of Selfassesment Account Submission a row already exists.")
 
-def get_selfassesment_data_collection_records_where_for_current_year():
-  return SelfemploymentIncomeAndExpensesDataCollection.objects.filter(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year())
+def get_selfassesment_data_collection_row_count():
+  return SelfemploymentIncomeAndExpensesDataCollection.objects.filter()
 
 @login_required
 def home_selfassesment_data_collection(request):
@@ -476,7 +476,7 @@ def home_selfassesment_data_collection(request):
 
     "counts": True,
     "selfassesment_data_collection_counts": True,
-    "selfassesment_data_collection_record_for_current_year": get_selfassesment_data_collection_records_where_for_current_year().count(),
+    "selfassesment_data_collection_row_count": get_selfassesment_data_collection_row_count().filter(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year()).count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Data_Collection_viewall_url,
@@ -485,6 +485,9 @@ def home_selfassesment_data_collection(request):
       'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Data_Collection_delete_url,
       'model_fields': model_fields
     },
+
+    'tax_years': SelfassesmentAccountSubmissionTaxYear.objects.all(),
+    'current_tax_year': SelfassesmentAccountSubmissionTaxYear.get_max_year(),
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -686,11 +689,22 @@ def delete_selfassesment_data_collection(request, data_id:int):
 @login_required
 def search_selfassesment_data_collection(request, limit:int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    tax_year = request.GET.get('tax_year', None)
+    if tax_year:
+      try:
+        tax_year = int(tax_year)
+      except ValueError:
+        tax_year = None
+
     if request.GET.get('tasks'):
       tasks = {
-        "selfassesment_data_collection_record_for_current_year": get_selfassesment_data_collection_records_where_for_current_year(),
+        "selfassesment_data_collection_row_count": get_selfassesment_data_collection_row_count(),
       }
-      records = tasks.get(request.GET.get('tasks'), [])
+      records = tasks.get(request.GET.get('tasks'), SelfemploymentIncomeAndExpensesDataCollection.objects.none())
+      if tax_year:
+        records = records.filter(tax_year=tax_year)
+      records = records.order_by('-created_at')
+
       data = serialize(queryset=records, format='json')
       return HttpResponse(data, content_type='application/json')
 
@@ -698,7 +712,10 @@ def search_selfassesment_data_collection(request, limit:int=-1):
     if search_text.strip()=='':
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_viewall_name)
     records = db_search_SelfemploymentIncomeAndExpensesDataCollection(search_text, limit)
+    if tax_year:
+      records = records.filter(tax_year=tax_year)
     records = records.order_by("-created_at")
+
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
   raise Http404
@@ -706,8 +723,18 @@ def search_selfassesment_data_collection(request, limit:int=-1):
 @login_required
 def all_selfassesment_data_collection(request, limit:int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    tax_year = request.GET.get('tax_year', None)
+    if tax_year:
+      try:
+        tax_year = int(tax_year)
+      except ValueError:
+        tax_year = None
+    
     records = db_all_SelfemploymentIncomeAndExpensesDataCollection(limit)
+    if tax_year:
+      records = records.filter(tax_year=tax_year)
     records = records.order_by("-created_at")
+
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
   raise Http404
@@ -821,6 +848,9 @@ def home_selfassesment_account_submission(request):
       'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_delete_url,  
       'model_fields': get_field_names_from_model(SelfassesmentAccountSubmission)
     },
+
+    'tax_years': SelfassesmentAccountSubmissionTaxYear.objects.all(),
+    'current_tax_year': SelfassesmentAccountSubmissionTaxYear.get_max_year(),
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -937,7 +967,13 @@ def search_selfassesment_account_submission(request, limit: int=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
     search_text = request.GET.get('q', '')
     submission_id = request.GET.get('pk', None)
-    
+    tax_year = request.GET.get('tax_year', None)
+    if tax_year:
+      try:
+        tax_year = int(tax_year)
+      except ValueError:
+        tax_year = None
+
     if submission_id:
       error_message = {'error': 'The resource you are looking for does not exist'}
       error_response = HttpResponse(json.dumps(error_message), content_type='application/json', status=404)
@@ -971,13 +1007,19 @@ def search_selfassesment_account_submission(request, limit: int=-1):
         "selfassesment_account_submission_status_NOT_ASSIGEND": get_selfassesment_account_submissions_where_status_NOT_ASSIGNED(),
         "selfassesment_account_submission_data_collected": get_selfassesment_account_submissions_where_data_collected(),
       }
-      records = tasks.get(request.GET.get('tasks'), [])
+      records = tasks.get(request.GET.get('tasks'), SelfassesmentAccountSubmission.objects.none())
+      if tax_year:
+        records = records.filter(tax_year=tax_year)
+
       data = serialize(queryset=records, format='json')
       return HttpResponse(data, content_type='application/json')
 
     if search_text.strip()=='':
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_viewall_name)
     records = db_search_SelfassesmentAccountSubmission(search_text, limit)
+    if tax_year:
+      records = records.filter(tax_year=tax_year)
+
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
   raise Http404
@@ -985,7 +1027,16 @@ def search_selfassesment_account_submission(request, limit: int=-1):
 @login_required
 def all_selfassesment_account_submission(request, limit=-1):
   if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    tax_year = request.GET.get('tax_year', None)
+    if tax_year:
+      try:
+        tax_year = int(tax_year)
+      except ValueError:
+        tax_year = None
+    
     records = db_all_SelfassesmentAccountSubmission(limit)
+    if tax_year:
+      records = records.filter(tax_year=tax_year)
     data = serialize(queryset=records, format='json')
     return HttpResponse(data, content_type='application/json')
   raise Http404

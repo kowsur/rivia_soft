@@ -4,6 +4,7 @@ import { removeAllEventListeners } from './utilities.js'
 import DATA from './parse_data.js'
 import merge from './merged_tracker_sort_by_deadline.js';
 
+loadAllTrackers()
 
 const Limited = DATA.Limited
 const limited_template_query_string = 'template#limited_tracker_template'
@@ -56,8 +57,9 @@ let doneTypingInterval = 1000;//time in ms (4/5 seconds)
 //         typingTimer = setTimeout(search_function, doneTypingInterval);
 //     }
 // });
+const tax_year_select_input = document.querySelector('select#tax_years')
 const search_bar = document.querySelector('input[name="search"]');
-if (search_bar){
+function searchHandler(){
   let limited_search_url = Limited.search_url
   let selfassesment_search_url = Selfassesment.search_url
   
@@ -75,20 +77,9 @@ if (search_bar){
      searchTrackers(doneTypingInterval, search_text, limited_search_url, selfassesment_search_url)
     }
   })
-
-  // OpenSearch
-  let current_url = window.location.href
-  let url = new URL(current_url)
-  let open_query = url.searchParams.get('q')
-  if (open_query){open_query=open_query.trim()}
-
-  if (open_query){
-    searchTrackers(0, open_query, limited_search_url, selfassesment_search_url)
-  }else{
-    // when page loads load all the records
-    loadAllTrackers();
-  }
 }
+if (search_bar){ search_bar.addEventListener('input', searchHandler) }
+if (tax_year_select_input){ tax_year_select_input.addEventListener('input', searchHandler) }
 
 export function loadAllTrackers(){
   setTimeout(async ()=>{
@@ -150,7 +141,7 @@ for (let task of tasks){
     let param = task.getAttribute('data-tasks')
   
     // prepare url to fetch
-    let params = {tasks: param}
+    let params = {tasks: param, tax_year: DATA.tax_year}
     // params['q'] = 'ifta'
 
     let search_param = new URLSearchParams(params).toString()

@@ -4,9 +4,15 @@ import DATA from "./parse_data.js";
 
 //====================================================================================================================================
 // get data from backend
-export async function db_all_records(all_url = DATA.all_url) {
+export async function db_all_records(all_url = DATA.all_url, tax_year=null) {
+  if (tax_year===null) tax_year = DATA.tax_year
+  let params = {tax_year: tax_year}
+  let search_param = new URLSearchParams(params).toString()
+
+  let url_to_fetch = `${all_url}?${search_param}`
+
   let kwargs = {
-    url: all_url,
+    url: url_to_fetch,
     req_method: 'GET'
   }
   const records = await fetch_url(kwargs)
@@ -15,11 +21,15 @@ export async function db_all_records(all_url = DATA.all_url) {
   return records; // return data
 }
 
-export async function db_search_records(search_text, search_url = DATA.search_url) {
-  let params = {q:search_text}
+export async function db_search_records(search_text, search_url = DATA.search_url, tax_year=null) {
+  if (tax_year===null) tax_year = DATA.tax_year
+  let params = {q:search_text, tax_year:tax_year}
   let search_param = new URLSearchParams(params).toString()
+
+  let url_to_fetch = `${search_url}?${search_param}`
+
   let kwargs = {
-    url: `${search_url}?${search_param}`,
+    url: url_to_fetch,
     req_method: 'GET'
   }
   const records = await fetch_url(kwargs)

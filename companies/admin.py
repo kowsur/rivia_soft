@@ -1,9 +1,10 @@
 from django.contrib import admin
-from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker, SelfassesmentType, SelfassesmentAccountSubmissionTaxYear
+from .models import Selfassesment, SelfassesmentAccountSubmission, SelfemploymentIncomeAndExpensesDataCollection, SelfassesmentTracker, SelfassesmentType, SelfassesmentAccountSubmissionTaxYear
 from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 
 
 admin.site.register(SelfassesmentType)
+admin.site.register(SelfemploymentIncomeAndExpensesDataCollection)
 
 # Register your models here.
 class SelfassesmentTrackerAdmin(admin.ModelAdmin):

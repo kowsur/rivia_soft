@@ -454,8 +454,15 @@ def get_total_selfemployment_comission(selfemployment_incomes):
     return total
 
 
-def calculate_capital_allowance(amount, allowance_percentage, personal_usage_percentage):
-    allowance = (amount*allowance_percentage)/100
+def calculate_capital_allowance(deduction_and_allowance):
+    amount = deduction_and_allowance.amount
+    addition = deduction_and_allowance.addition
+    disposal = deduction_and_allowance.disposal
+    allowance_percentage = deduction_and_allowance.allowance_percentage
+    personal_usage_percentage = deduction_and_allowance.personal_usage_percentage
+
+    total = amount + addition + disposal
+    allowance = (total*allowance_percentage)/100
     personal_usage = (allowance*personal_usage_percentage)/100
     capital_allowance = allowance - personal_usage
     return capital_allowance if capital_allowance>=0 else 0
@@ -463,7 +470,7 @@ def calculate_capital_allowance(amount, allowance_percentage, personal_usage_per
 def get_total_selfemployment_deduction_and_allowance(selfemployment_deductions_and_allowances):
     total = 0
     for deduction in selfemployment_deductions_and_allowances:
-        total += calculate_capital_allowance(deduction.amount, deduction.allowance_percentage, deduction.personal_usage_percentage)
+        total += calculate_capital_allowance(deduction)
     return total
 
 
@@ -515,8 +522,8 @@ def get_total_selfemployment_expense_by_submission_id(submission_id):
     deductions_and_allowances = get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
     deductions_and_allowances = filter_deductions_and_allowances(deductions_and_allowances)
 
-    selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
-    selfemployment_incomes = filter_selfemployment_incomes(selfemployment_incomes)
+    # selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    # selfemployment_incomes = filter_selfemployment_incomes(selfemployment_incomes)
 
     selfemployment_expense = get_total_selfemployment_expense(selfemployment_expenses)
     deduction_and_allowance = get_total_selfemployment_deduction_and_allowance(deductions_and_allowances)

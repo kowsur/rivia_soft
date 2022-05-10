@@ -1113,13 +1113,9 @@ function validatePercentageValue(e){
   let input = e.target
   let value = parseFloat(input.value)
 
-  if(isNaN(value)){
-    input.value=0
-  }
-  else if (!(value>=0 && value<=100)){
+  if(!(value>=0 && value<=100)||isNaN(value)){
     input.setCustomValidity(`Your input should be between 0 and 100!`);
     input.reportValidity();
-    input.value=100
   }else{
     input.setCustomValidity("");
   }

@@ -76,12 +76,22 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
     amount = loaded_data.get("amount", None)
     personal_usage_percentage = loaded_data.get("personal_usage_percentage", None)
     note = loaded_data.get("note", None)
+
+    percentage_for_office_and_admin_charge_amount_value = loaded_data.get("office_and_admin_charge", None)
+    percentage_for_fuel_amount_value = loaded_data.get("fuel", None)
+
     
-    if amount is None and personal_usage_percentage is None and note is None:
-        return HttpResponse(json.dumps({'error': f'amount or personal_usage or note is required'}), status=400)
+    if amount is None and personal_usage_percentage is None and note is None and percentage_for_fuel_amount_value is None and percentage_for_office_and_admin_charge_amount_value is None:
+        return HttpResponse(json.dumps({'error': f'amount or personal_usage or note or office_and_admin_charge or fuel is required'}), status=400)
     
     if personal_usage_percentage is not None and not 0<=personal_usage_percentage<=100:
         return HttpResponse(json.dumps({'error': f'personal_usage value should be between 0 and 100!'}), status=400)
+    
+    if percentage_for_office_and_admin_charge_amount_value is not None and not 0<=percentage_for_office_and_admin_charge_amount_value<=100:
+        return HttpResponse(json.dumps({'error': f'percentage_for_office_and_admin_charge_amount_value value should be between 0 and 100!'}), status=400)
+    
+    if percentage_for_fuel_amount_value is not None and not 0<=percentage_for_fuel_amount_value<=100:
+        return HttpResponse(json.dumps({'error': f'percentage_for_fuel_amount_value value should be between 0 and 100!'}), status=400)
 
     # retrive selfassemsent account submission record
     client = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
@@ -109,6 +119,10 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
             expense_for_tax_year.personal_usage_percentage = personal_usage_percentage
         if note is not None:
             expense_for_tax_year.note = note
+        if percentage_for_office_and_admin_charge_amount_value is not None:
+            expense_for_tax_year.percentage_for_office_and_admin_charge_amount_value = percentage_for_office_and_admin_charge_amount_value
+        if percentage_for_fuel_amount_value is not None:
+            expense_for_tax_year.percentage_for_fuel_amount_value = percentage_for_fuel_amount_value
         expense_for_tax_year.save()
         return HttpResponse(json.dumps({'success': 'Updated existing record'}))
 
@@ -124,6 +138,10 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
         expense_for_tax_year.personal_usage_percentage = personal_usage_percentage
     if note is not None:
         expense_for_tax_year.note = note
+    if percentage_for_office_and_admin_charge_amount_value is not None:
+            expense_for_tax_year.percentage_for_office_and_admin_charge_amount_value = percentage_for_office_and_admin_charge_amount_value
+    if percentage_for_fuel_amount_value is not None:
+        expense_for_tax_year.percentage_for_fuel_amount_value = percentage_for_fuel_amount_value
     expense_for_tax_year.save()
     return HttpResponse(json.dumps({'success': 'Updated existing record'}), status=201)
 

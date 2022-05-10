@@ -1,4 +1,8 @@
 const DB_MAX_INT_VALUE = 2147483647
+const BACKEND_IDENTIFIERS = {
+  OFFICE_AND_ADMIN_CHARGE: "office_and_admin_charge",
+  FUEL: "fuel"
+}
 
 let tabNavList = document.querySelector(".tab-nav")
 
@@ -666,8 +670,8 @@ function displaySelfemploymentIncomeSource(incomeSourceId, incomes, submission){
   let inputAmountElements = displayTable.querySelectorAll('input[data-update-type="amount"]')
   let inputComissionElements = displayTable.querySelectorAll('input[data-update-type="comission"]')
   let inputNoteElements = displayTable.querySelectorAll('textarea[data-update-type="note"]')
-  addEventListenersToElements(Array.from(inputAmountElements), 'input', [validateMaxValue, handleSelfemploymentIncomeUpdate, updateTotalSelfemploymentIncome, updateNetProfit])
-  addEventListenersToElements(Array.from(inputComissionElements), 'input', [validateMaxValue, handleSelfemploymentIncomeUpdate, updateTotalSelfemploymentIncome, updateNetProfit])
+  addEventListenersToElements(Array.from(inputAmountElements), 'input', [validateMaxValue, handleSelfemploymentIncomeUpdate, updateTotalSelfemploymentIncome, updateNetProfit, handleFuelAmountUpdate])
+  addEventListenersToElements(Array.from(inputComissionElements), 'input', [validateMaxValue, handleSelfemploymentIncomeUpdate, updateTotalSelfemploymentIncome, updateNetProfit, handleOfficeAndAdminChargeAmountUpdate])
   addEventListenersToElements(Array.from(inputNoteElements), 'input', [handleSelfemploymentIncomeUpdate])
   
   // add the newly prepared income source to incomes
@@ -699,6 +703,79 @@ function addEventListenersToElements(element_or_elements, eventName, eventFuncti
     }
   }
 }
+
+function getTotalSelfemploymentIncomeCommission(){
+  let selfemploymentIncomeCommissionInputs = document.querySelectorAll('[data-display-table-name="income"] input[data-update-type="comission"]')
+  let total = 0
+  selfemploymentIncomeCommissionInputs.forEach(commissionInput=>{
+    let commission = parseFloat(commissionInput.value||0)
+    total+=commission
+  })
+  return total
+}
+function getTotalSelfemploymentIncomeAmount(){
+  let selfemploymentIncomeCommissionInputs = document.querySelectorAll('[data-display-table-name="income"] input[data-update-type="amount"]')
+  let total = 0
+  selfemploymentIncomeCommissionInputs.forEach(commissionInput=>{
+    let amount = parseFloat(commissionInput.value||0)
+    total+=amount
+  })
+  return total
+}
+
+
+function getOfficeAndAdminChargeAmount(percentage_of_total_selfemployment_income=20){
+  let totalSelfemploymentIncome = getTotalSelfemploymentIncomeCommission()
+  return (totalSelfemploymentIncome*percentage_of_total_selfemployment_income)/100
+}
+function getFuelAmount(percentage_for_fuel_amount_value=20, personal_usage_percentage=20){
+  let totalSelfemploymentIncome = getTotalSelfemploymentIncomeAmount()
+  let amount = ((totalSelfemploymentIncome*percentage_for_fuel_amount_value)/100) * (100/(100-personal_usage_percentage))
+  return amount
+}
+
+function updateElementValueAndDispatchEvent(Element, event_name, value){
+  Element.value = value
+  Element.dispatchEvent(new Event(event_name, { bubbles: true, cancelable: true }))
+}
+
+function handleOfficeAndAdminChargeAmountUpdate(){
+  let amountInputs = document.querySelectorAll(`input[data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}"][data-update-type="amount"]`)
+  let personalUsageInputs = document.querySelectorAll(`input[data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}"][data-update-type="personal_usage_percentage"]`)
+  let officeAndAdminChargePercengateInputs = document.querySelectorAll(`input[data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}"][data-update-type="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}"]`)
+
+  for(let i=0; i<amountInputs.length; i++){
+    let amountInput = amountInputs[i]
+    let personalUsageInput = personalUsageInputs[i]
+    let officeAndAdminChargePercengateInput = officeAndAdminChargePercengateInputs[i]
+
+    let amount = parseFloat(amountInput.value||0)
+    let personalUsage = parseFloat(personalUsageInput.value||0)
+    let officeAndAdminChargePercentage = parseFloat(officeAndAdminChargePercengateInput.value||0)
+    
+    let officeAndAdminChargeAmount = getOfficeAndAdminChargeAmount(officeAndAdminChargePercentage)
+    updateElementValueAndDispatchEvent(amountInput, 'input', officeAndAdminChargeAmount)
+  }
+}
+function handleFuelAmountUpdate(){
+  let amountInputs = document.querySelectorAll(`input[data-auto-update="${BACKEND_IDENTIFIERS.FUEL}"][data-update-type="amount"]`)
+  let personalUsageInputs = document.querySelectorAll(`input[data-auto-update="${BACKEND_IDENTIFIERS.FUEL}"][data-update-type="personal_usage_percentage"]`)
+  let FuelPercengateInputs = document.querySelectorAll(`input[data-auto-update="${BACKEND_IDENTIFIERS.FUEL}"][data-update-type="${BACKEND_IDENTIFIERS.FUEL}"]`)
+
+  for(let i=0; i<amountInputs.length; i++){
+    let amountInput = amountInputs[i]
+    let personalUsageInput = personalUsageInputs[i]
+    let FuelPercengateInput = FuelPercengateInputs[i]
+
+    let amount = parseFloat(amountInput.value||0)
+    let personalUsage = parseFloat(personalUsageInput.value||0)
+    let FuelPercentage = parseFloat(FuelPercengateInput.value||0)
+    
+    let FuelAmount = getFuelAmount(FuelPercentage, personalUsage)
+    updateElementValueAndDispatchEvent(amountInput, 'input', FuelAmount)
+  }
+}
+
 
 let personalUsageBulkUpdater = document.querySelector('#expense_personal_usage_bulk_updater')
 addEventListenersToElements(personalUsageBulkUpdater, 'input', validatePercentageValue)
@@ -743,12 +820,16 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
     'note': '',
     "expense_source": expenseSourceId,
     "client": submissionId,
-    "month": month.id
+    "month": month.id,
+    "percentage_for_office_and_admin_charge_amount_value": 0,
+    "percentage_for_fuel_amount_value": 0
   }
   
   let inputAmountId = `expense_amount_${month.id}_${submission.submission_id}_${expense.expense_source}`
   let inputPersonalUsageId = `expense_personalUsage_${month.id}_${submission.submission_id}_${expense.expense_source}`
   let inputNoteId = `expense_note_${month.id}_${submission.submission_id}_${expense.expense_source}`
+  let inputOfficeAndAdminChargePercentageId = `expense_${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}_${month.id}_${submission.submission_id}_${expense.expense_source}`
+  let inputFuelPercentageId = `expense_${BACKEND_IDENTIFIERS.FUEL}_${month.id}_${submission.submission_id}_${expense.expense_source}`
 
   // Prepare markup for a single month
   let expenseMarkup = `
@@ -778,18 +859,91 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
     </div>
   </div>
   `
+  if(expenseSource.backend_identifier===BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE){
+    expenseMarkup = `
+      <div class="table income-display-table">
+        <div class="thead">
+          <div class="row" data-template-cols="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
+            <span>Selfemployment income commission(%)</span>
+            <span>Amount</span>
+            <span>Personal Usage</span>
+            <span>Note</span>
+          </div>
+        </div>
+
+        <div class="body">
+
+          <div class="row" data-template-cols="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
+            <span>
+              <input value=${expense.percentage_for_office_and_admin_charge_amount_value} type="number" min="0" max='100' id=${inputOfficeAndAdminChargePercentageId} data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}" data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
+            </span>
+            <span>
+              <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" disabled data-update-type="amount" data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
+            </span>
+            <span>
+              <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" disabled data-update-type="personal_usage_percentage" data-auto-update="${BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE}">
+            </span>
+            <span>
+              <textarea id=${inputNoteId} data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="note">${expense?.note}</textarea>
+            </span>
+          </div>
+
+        </div>
+      </div>
+      `
+  }else if(expenseSource.backend_identifier===BACKEND_IDENTIFIERS.FUEL){
+    expenseMarkup = `
+      <div class="table income-display-table">
+        <div class="thead">
+          <div class="row" data-template-cols="${BACKEND_IDENTIFIERS.FUEL}">
+            <span>Selfemployment income(%)</span>
+            <span>Amount</span>
+            <span>Personal Usage</span>
+            <span>Note</span>
+          </div>
+        </div>
+
+        <div class="body">
+
+          <div class="row" data-template-cols="${BACKEND_IDENTIFIERS.FUEL}">
+            <span>
+              <input value=${expense.percentage_for_fuel_amount_value} type="number" min="0" max='100' id=${inputFuelPercentageId} data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="${BACKEND_IDENTIFIERS.FUEL}" data-auto-update="${BACKEND_IDENTIFIERS.FUEL}">
+            </span>
+            <span>
+              <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${expense?.amount}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense.expense_source}" disabled data-update-type="amount" data-auto-update="${BACKEND_IDENTIFIERS.FUEL}">
+            </span>
+            <span>
+              <input type="number" min="0" max='100' id=${inputPersonalUsageId} value="${expense?.personal_usage_percentage}" data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" disabled data-update-type="personal_usage_percentage" data-auto-update="${BACKEND_IDENTIFIERS.FUEL}">
+            </span>
+            <span>
+              <textarea id=${inputNoteId} data-month-id="${month.id}" data-submission-id="${submissionId}" data-expense-id="${expense?.expense_source}" data-update-type="note">${expense?.note}</textarea>
+            </span>
+          </div>
+
+        </div>
+      </div>
+      `
+  }
   let node = createNodeFromMarkup(expenseMarkup)
   let inputAmount = node.querySelector(`#${inputAmountId}`)
   let inputPersonalUsage = node.querySelector(`#${inputPersonalUsageId}`)
   let inputNote = node.querySelector(`#${inputNoteId}`)
+  let inputOfficeAndAdminChargePercentage = node.querySelector(`#${inputOfficeAndAdminChargePercentageId}`) // this might return null
+  let inputFuelPercentage = node.querySelector(`#${inputFuelPercentageId}`) // this might return null
+
+  if(inputOfficeAndAdminChargePercentage!==null){
+    addEventListenersToElements(inputOfficeAndAdminChargePercentage, 'input', [validatePercentageValue, handleExpenseUpdate, handleOfficeAndAdminChargeAmountUpdate])
+    addEventListenersToElements(inputPersonalUsage, 'input', handleOfficeAndAdminChargeAmountUpdate)
+  }
+  if(inputFuelPercentage!==null){
+    addEventListenersToElements(inputFuelPercentage, 'input', [validatePercentageValue, handleExpenseUpdate, handleFuelAmountUpdate])
+    addEventListenersToElements(inputPersonalUsage, 'input', handleFuelAmountUpdate)
+  }
 
   if (!expenseSource.default_personal_usage_percentage==0){
     addEventListenersToElements(personalUsageBulkUpdater, 'input', (e)=>{
       inputPersonalUsage.value = e.target.value
-      let event = new Event('input', {
-        bubbles: true,
-        cancelable: true,
-      });
+      let event = new Event('input', { bubbles: true, cancelable: true } );
       
       inputPersonalUsage.dispatchEvent(event)
     })
@@ -937,10 +1091,15 @@ function validateMaxValue(e){
 
 function validatePercentageValue(e){
   let input = e.target
-  let value = parseFloat(e.target.value) || 0
-  if (!(value>=0 && value<=100)){
+  let value = parseFloat(input.value)
+
+  if(isNaN(value)){
+    input.value=0
+  }
+  else if (!(value>=0 && value<=100)){
     input.setCustomValidity(`Your input should be between 0 and 100!`);
     input.reportValidity();
+    input.value=100
   }else{
     input.setCustomValidity("");
   }
@@ -1143,6 +1302,8 @@ function handleExpenseUpdate(e){
   if (updateType==="amount") data_object.amount = parseFloat(inputField.value) || 0
   else if (updateType==="personal_usage_percentage") data_object.personal_usage_percentage = parseFloat(inputField.value) || 0
   else if (updateType==="note") data_object.note = inputField.value
+  else if (updateType===BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE) data_object[BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE] = parseFloat(inputField.value) || 0
+  else if (updateType===BACKEND_IDENTIFIERS.FUEL) data_object[BACKEND_IDENTIFIERS.FUEL] = parseFloat(inputField.value) || 0
 
   fetch_url({
     // url = "/accounts/set_expense/<submission_id>/<month_id>/<expense_id>/"

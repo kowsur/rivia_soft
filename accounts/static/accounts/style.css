@@ -230,6 +230,12 @@ textarea{
 .table[data-display-table-name="deduction-and-allowance"] .row{
     grid-template-columns: 18ch 15ch 15ch 12ch 10ch 1fr;
 }
+.expense .table .row[data-template-cols="office_and_admin_charge"]{
+    grid-template-columns: 22ch 18ch 10ch 1fr;
+}
+.expense .table .row[data-template-cols="fuel"]{
+    grid-template-columns: 22ch 18ch 10ch 1fr;
+}
 
 .table .thead .row span{
     font-weight: 900;

@@ -519,9 +519,8 @@ def get_total_selfemployment_expense_by_submission_id(submission_id):
     selfemployment_incomes = filter_selfemployment_incomes(selfemployment_incomes)
 
     selfemployment_expense = get_total_selfemployment_expense(selfemployment_expenses)
-    office_and_admin_charge = get_total_selfemployment_comission(selfemployment_incomes)
     deduction_and_allowance = get_total_selfemployment_deduction_and_allowance(deductions_and_allowances)
-    return selfemployment_expense + office_and_admin_charge + deduction_and_allowance
+    return selfemployment_expense + deduction_and_allowance
 
 def get_total_selfemployment_net_profit_by_submission_id(submission_id):
     """Selfemployment net profit"""
@@ -661,7 +660,7 @@ def tax_report_pdf(request:HttpRequest, submission_id):
 
     # selfemployment
     selfemployment_total_income = get_total_selfemployment_income(selfemployment_incomes)
-    selfemployment_total_expense = get_total_selfemployment_expense(selfemployment_expenses) + selfemployment_total_comission
+    selfemployment_total_expense = get_total_selfemployment_expense(selfemployment_expenses)
     selfemployment_total_deduction_and_allowance = get_total_selfemployment_deduction_and_allowance(deductions_and_allowances)
 
     # Car value calculations

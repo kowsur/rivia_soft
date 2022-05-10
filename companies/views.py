@@ -751,6 +751,9 @@ def get_selfassesment_account_submissions_where_status_NOT_PAID():
 def get_selfassesment_account_submissions_where_status_REQUEST():
   return SelfassesmentAccountSubmission.objects.filter(status="REQUEST")
 
+def get_selfassesment_account_submissions_where_status_PRIORITY():
+  return SelfassesmentAccountSubmission.objects.filter(status="PRIORITY")
+
 def get_selfassesment_account_submissions_where_status_PROCESSING():
   return SelfassesmentAccountSubmission.objects.filter(status="PROCESSING")
 
@@ -801,6 +804,7 @@ def home_selfassesment_account_submission(request):
     "selfassesment_account_submission_status_PAID": get_selfassesment_account_submissions_where_status_PAID().count(),
     "selfassesment_account_submission_status_NOT_PAID": get_selfassesment_account_submissions_where_status_NOT_PAID().count(),
     "selfassesment_account_submission_status_REQUEST": get_selfassesment_account_submissions_where_status_REQUEST().count(),
+    "selfassesment_account_submission_status_PRIORITY": get_selfassesment_account_submissions_where_status_PRIORITY().count(),
     "selfassesment_account_submission_status_PROCESSING": get_selfassesment_account_submissions_where_status_PROCESSING().count(),
     "selfassesment_account_submission_status_BOOK_APPOINTMENT": get_selfassesment_account_submissions_where_status_BOOK_APPOINTMENT().count(),
     "selfassesment_account_submission_status_READY_FOR_SUBMIT": get_selfassesment_account_submissions_where_status_READY_FOR_SUBMIT().count(),
@@ -957,6 +961,7 @@ def search_selfassesment_account_submission(request, limit: int=-1):
         "selfassesment_account_submission_status_PAID": get_selfassesment_account_submissions_where_status_PAID(),
         "selfassesment_account_submission_status_NOT_PAID": get_selfassesment_account_submissions_where_status_NOT_PAID(),
         "selfassesment_account_submission_status_REQUEST": get_selfassesment_account_submissions_where_status_REQUEST(),
+        "selfassesment_account_submission_status_PRIORITY": get_selfassesment_account_submissions_where_status_PRIORITY(),
         "selfassesment_account_submission_status_PROCESSING": get_selfassesment_account_submissions_where_status_PROCESSING(),
         "selfassesment_account_submission_status_BOOK_APPOINTMENT": get_selfassesment_account_submissions_where_status_BOOK_APPOINTMENT(),
         "selfassesment_account_submission_status_READY_FOR_SUBMIT": get_selfassesment_account_submissions_where_status_READY_FOR_SUBMIT(),

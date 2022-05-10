@@ -230,6 +230,7 @@ class SelfassesmentAccountSubmission(models.Model):
     request_date = models.DateField("Request Date", blank=False, null=True, default=timezone.now)
     status_choices = (
         ("REQUEST", "REQUEST",),
+        ("PRIORITY", "PRIORITY",),
         ("PROCESSING", "PROCESSING",),
         ("BOOK APPOINTMENT", "BOOK APPOINTMENT", ),
         ("READY FOR SUBMIT", "READY FOR SUBMIT", ),

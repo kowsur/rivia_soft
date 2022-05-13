@@ -803,9 +803,11 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
   // add current incomeSourceId to displayingIncomeIds set to filter them out while searching
   displayingExpenseIds.add(parseInt(expenseSourceId))
   let expenseSource = expenseSourcesMapById[expenseSourceId]
+  let is_office_and_admin_charge = expenseSource.backend_identifier===BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE
+  let is_fuel = expenseSource.backend_identifier===BACKEND_IDENTIFIERS.FUEL
   
   let expenseContainer = createNodeFromMarkup(`
-  <div class="expense">
+  <div class="expense" ${is_office_and_admin_charge ? 'style="display:none;"': ''}>
     <div class="toggle">
       <h2 class="selfemployment-income-source">${expenseSource.name} Total: <span data-total-container-for-selfemployment-expense-source>0</span></h2>
       <img src='/static/accounts/expand.svg'/>
@@ -841,7 +843,7 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
     "expense_source": expenseSourceId,
     "client": submissionId,
     "month": month.id,
-    "percentage_for_office_and_admin_charge_amount_value": 0,
+    "percentage_for_office_and_admin_charge_amount_value": 100, // 100 is default value in the backend
     "percentage_for_fuel_amount_value": 0
   }
   
@@ -879,7 +881,7 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
     </div>
   </div>
   `
-  if(expenseSource.backend_identifier===BACKEND_IDENTIFIERS.OFFICE_AND_ADMIN_CHARGE){
+  if(is_office_and_admin_charge){
     expenseMarkup = `
       <div class="table income-display-table">
         <div class="thead">
@@ -911,7 +913,7 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
         </div>
       </div>
       `
-  }else if(expenseSource.backend_identifier===BACKEND_IDENTIFIERS.FUEL){
+  }else if(is_fuel){
     expenseMarkup = `
       <div class="table income-display-table">
         <div class="thead">

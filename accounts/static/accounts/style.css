@@ -212,7 +212,6 @@ textarea{
 
 
 .table{
-    margin: auto;
     padding: 0 1em;
 }
 .table .row {
@@ -234,7 +233,7 @@ textarea{
     grid-template-columns: 22ch 18ch 10ch 1fr;
 }
 .expense .table .row[data-template-cols="fuel"]{
-    grid-template-columns: 22ch 18ch 10ch 1fr;
+    grid-template-columns: 15ch 18ch 10ch 1fr;
 }
 
 .table .thead .row span{

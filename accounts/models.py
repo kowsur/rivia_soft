@@ -103,7 +103,7 @@ class SelfemploymentExpensesPerTaxYear(models.Model):
     # this will be used to calculate amount and update data in the backend from the frontend
     # for the expense sources which has backend_identifier value 'office_and_admin_charge'
     # the formula for amount value is `amount = (selfemployment_total_comission*percentage_for_office_and_admin_charge)/100`
-    percentage_for_office_and_admin_charge_amount_value = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    percentage_for_office_and_admin_charge_amount_value = models.FloatField(default=100, validators=[MinValueValidator(0), MaxValueValidator(100)])
 
     # this will be used to calculate amount and update data in the backend from the frontend
     # for the expense sources which has backend_identifier value 'fuel'

@@ -14,11 +14,27 @@
 {% block content %}
 
 <div class="tab-container">
-  <ul class="tab-nav">
-    <li class="tab-nav-item" data-tab-name="details">Details</li>
-    <li class="tab-nav-item" data-tab-name="incomesAndExpenses">Income and expense</li>
-    <li class="tab-nav-item active" data-tab-name="taxReport">TAX Account</li>
-  </ul>
+  <nav style="display:flex; margin: 1rem 0;">
+    <ul class="tab-nav">
+      <li class="tab-nav-item" data-tab-name="details">Details</li>
+      <li class="tab-nav-item" data-tab-name="incomesAndExpenses">Income and expense</li>
+      <li class="tab-nav-item active" data-tab-name="taxReport">View</li>
+    </ul>
+    <div>
+      <h1 class="title">Account for <span id="ie-client-name"></span> Tax-year <span id="ie-client-tax-year"></span>.</h1>
+      <section class="overview">
+        {% comment %} <h2 class"overview-title">Overview</h2> {% endcomment %}
+        <div data-overview-container>
+          <div>Turnover 0</div>
+          {% comment %} <div>Total Expenses 0</div> {% endcomment %}
+          <div>Selemployment Net profit 0</div>
+          {% comment %} <div>Taxable income 0</div> {% endcomment %}
+          <div>Total Tax 0</div>
+        </div>
+        <button class="block px-4 py-2 mt-2 text-sm font-semibold rounded-lg md:mt-0 focus:outline-none focus:shadow-outline create" id="reload-overview">Calculate</button>
+      </section>
+    </div>
+  </nav>
 
   <div class="tabs">
     <!-- Details Tab -->
@@ -35,20 +51,6 @@
 
     <!-- Income and Expense Tab -->
     <div class="tab" data-tab-name="incomesAndExpenses">
-      <div>
-        <h1 class="title">Account for <span id="ie-client-name"></span> Tax-year <span id="ie-client-tax-year"></span>.</h1>
-        <section class="overview">
-          <h2 class"overview-title">Overview</h2>
-          <div data-overview-container>
-            <div>Turnover 0</div>
-            {% comment %} <div>Total Expenses 0</div> {% endcomment %}
-            <div>Selemployment Net profit 0</div>
-            {% comment %} <div>Taxable income 0</div> {% endcomment %}
-            <div>Total Tax 0</div>
-          </div>
-          <button class="block px-4 py-2 mt-2 text-sm font-semibold rounded-lg md:mt-0 focus:outline-none focus:shadow-outline create" id="reload-overview">Calculate</button>
-        </section>
-      </div>
 
       <div>
         <h1 class="title">Selfemployment Incomes Total: <span data-total-selfemployment-income-container>0</span></h1>

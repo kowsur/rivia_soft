@@ -2,11 +2,15 @@ h1, h1.title{
     font-size: 1.4rem;
 }
 h2{
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
 .selfemployment-income-source, .taxable-income-source, .month-name{
     font-weight: 500;
+}
+
+input[type="number"]::-webkit-inner-spin-button{
+    display: none;
 }
 
 textarea{
@@ -16,7 +20,6 @@ textarea{
     height: 2.5rem;
     min-height: 2rem;
 }
-
 :disabled{
     filter: brightness(75%);
 }
@@ -104,6 +107,7 @@ textarea{
 }
 
 .tab-nav{
+    height: 1rem;
     display: flex;
     flex-wrap: wrap;
     user-select: none;
@@ -142,11 +146,12 @@ textarea{
 }
 [data-overview-container]{
     display: flex;
-    gap: 1rem;
+    gap: 5ch;
 }
 
 .expenses .expense h2{
     width: 30ch;
+    text-align: right;
 }
 .expenses .expense{
     display: flex;

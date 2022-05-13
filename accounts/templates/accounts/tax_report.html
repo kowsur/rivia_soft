@@ -83,12 +83,12 @@
             <h1 class="to-upper text-center fs-11">Profit and loss for the year ended 5 April {{tax_year_next}}</h1>
             
             <br>
-            <h2 class="fs-9 font-normal d-f justify-between">Selfemployment Income (Including Tips) <span>£{{selfemployment_total_income|floatformat:"2g"}}</span></h2>
+            <h2 class="fs-11 font-normal d-f justify-between">Selfemployment Income (Including Tips) <span>£{{selfemployment_total_income|floatformat:"2g"}}</span></h2>
             <br>
 
-            <section>
+            <section >
                 
-                <table class="fs-8" data-expense-list>
+                <table data-expense-list class="fs-11">
                     <thead>
                         <tr>
                             <th class="bb-1">Less: Expenses</th>
@@ -121,7 +121,7 @@
 
 
                 {% if car_value %}
-                    <table data-car-value>
+                    <table data-car-value class="fs-11">
                         <thead>
                             <tr>
                                 <th class="bb-1" colspan="7">LESS : DEDUCTIONS AND ALLOWANCES</th>
@@ -188,8 +188,8 @@
                         </tbody>
                     </table>
                 {% endif %}
-                <h2 class="fs-9 font-normal d-f justify-between">Total Expenses <span>£{{total_expenses|floatformat:"2g"}}</span></h2>
-                <h2 class="fs-9 font-bold d-f justify-between doubble-underline">Net {% if selfemployment_is_loss %}Loss{% else %}Profit{% endif %} for the year <span>£{{selfemployment_net_profit|floatformat:"2g"}}</span></h2>
+                <h2 class="fs-11 font-normal d-f justify-between">Total Expenses <span>£{{total_expenses|floatformat:"2g"}}</span></h2>
+                <h2 class="fs-11 font-bold d-f justify-between doubble-underline">Net {% if selfemployment_is_loss %}Loss{% else %}Profit{% endif %} for the year <span>£{{selfemployment_net_profit|floatformat:"2g"}}</span></h2>
             </section>
         </section>
     </article>

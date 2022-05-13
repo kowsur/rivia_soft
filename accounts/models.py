@@ -108,7 +108,7 @@ class SelfemploymentExpensesPerTaxYear(models.Model):
     # this will be used to calculate amount and update data in the backend from the frontend
     # for the expense sources which has backend_identifier value 'fuel'
     # the formula for amount value is `amount = ((income*percentage_for_fuel_amount_value)/100) * (100/(100-personal_usage_percentage))`
-    percentage_for_fuel_amount_value = models.FloatField(default=0, validators=[MinValueValidator(0), MaxValueValidator(100)])
+    percentage_for_fuel_amount_value = models.FloatField(default=18, validators=[MinValueValidator(0), MaxValueValidator(100)])
 
     def __str__(self) -> str:
         return f"{self.client.client_id.client_name} - {self.expense_source} - {self.month} - {self.amount}"

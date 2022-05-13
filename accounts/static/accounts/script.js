@@ -550,7 +550,7 @@ function displayTaxableIncomeSource(taxableIncomeSourceId, taxableIncomes, submi
   })
 
   let taxableIncome = taxableIncomes.find(taxableIncome=>taxableIncome.taxable_income_source===taxableIncomeSource.id) || {
-    "amount": 0,
+    // "amount": 0,
     "paid_income_tax_amount": 0,
     "note": "",
     "submission": submissionId,
@@ -641,7 +641,7 @@ function displaySelfemploymentIncomeSource(incomeSourceId, incomes, submission){
   allMonths.forEach(month=>{
     // Get the existing/default income object
     let income = incomes.find(income=>income.month===month.id) || {
-      "amount": 0,
+      // "amount": 0,
       "comission": 0,
       "note": '',
       "income_source": incomeSourceId,
@@ -828,8 +828,9 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
     "client": submissionId,
     "month": month.id,
     "percentage_for_office_and_admin_charge_amount_value": 100, // 100 is default value in the backend
-    "percentage_for_fuel_amount_value": 0
+    "percentage_for_fuel_amount_value": 18, // 18 is default in the backend
   }
+  if (expense.amount===0) expense.amount=''
   
   let inputAmountId = `expense_amount_${month.id}_${submission.submission_id}_${expense.expense_source}`
   let inputPersonalUsageId = `expense_personalUsage_${month.id}_${submission.submission_id}_${expense.expense_source}`
@@ -1021,11 +1022,11 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
 
   // Get the existing/default deduction object
   let deduction = deductions.find(deduction=>deduction.deduction_source===deductionSourceId) || {
-    "amount": 0,
-    "addition": 0,
-    "disposal": 0,
-    "allowance_percentage": 0,
-    "personal_usage_percentage": 0,
+    // "amount": 0,
+    // "addition": 0,
+    // "disposal": 0,
+    "allowance_percentage": 18,
+    "personal_usage_percentage": 20,
     "note": '',
     "deduction_source": deductionSourceId,
     "client": submissionId,
@@ -1074,6 +1075,14 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
     totalContainer.innerText = inputAmount.value
   }
 
+  // event listener to update value when "Personal Usage(%) for all expenses" changes
+  addEventListenersToElements(personalUsageBulkUpdater, 'input', (e)=>{
+    inputPersonalUsage.value = e.target.value
+    let event = new Event('input', { bubbles: true, cancelable: true } );
+    
+    inputPersonalUsage.dispatchEvent(event)
+  })
+
   addEventListenersToElements(inputAmount, 'input', [validateMaxValue, totalUpdater])
   addEventListenersToElements([inputAmount, inputAddition, inputDisposal, inputAllowancePercentage, inputPersonalUsage, inputNote], 'input', handleDeductionUpdate)
   addEventListenersToElements([inputAmount, inputAllowancePercentage, inputPersonalUsage], 'input', [updateTotalDeduction, updateNetProfit])
@@ -1083,6 +1092,20 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
 
   deductionsContainer.appendChild(deductionContainer)
 }
+
+function prventInputValueUpdateWhenArrowKeysPressed(e){
+  let target = e.target
+  if (target.tagName==='INPUT' && target.type==="number"){
+    switch(e.code){
+      case "ArrowUp":
+        e.preventDefault()
+      case "ArrowDown":
+        e.preventDefault()
+    }
+  }
+}
+document.body.addEventListener('keydown', prventInputValueUpdateWhenArrowKeysPressed)
+
 
 function validateMaxValue(e){
   let input = e.target

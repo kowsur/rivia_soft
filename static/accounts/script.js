@@ -229,10 +229,10 @@ async function overviewLoader(e){
   let overview_data = await response.json()
 
   overviewContainer.innerHTML = `
-    <div>Selfemployment Income (Including Tips) ${overview_data.income.toFixed(2)}</div>
-    <div>Total Expenses ${overview_data.expense.toFixed(2)}</div>
+    <div>Turnover ${overview_data.income.toFixed(2)}</div>
+    <!-- <div>Total Expenses ${overview_data.expense.toFixed(2)}</div> -->
     <div>Selemployment Net profit ${overview_data.profit.toFixed(2)}</div>
-    <div>Taxable income ${overview_data.taxable_income.toFixed(2)}</div>
+    <!-- <div>Taxable income ${overview_data.taxable_income.toFixed(2)}</div> -->
     <div>Total Tax ${overview_data.tax.toFixed(2)}</div>
   `
 }
@@ -808,28 +808,12 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
   
   let expenseContainer = createNodeFromMarkup(`
   <div class="expense" ${is_office_and_admin_charge ? 'style="display:none;"': ''}>
-    <div class="toggle">
-      <h2 class="selfemployment-income-source">${expenseSource.name} Total: <span data-total-container-for-selfemployment-expense-source>0</span></h2>
-      <img src='/static/accounts/expand.svg'/>
-    </div>
+      <h2 class="selfemployment-income-source">${expenseSource.name}<!-- Total: <span data-total-container-for-selfemployment-expense-source>0</span> --></h2>
     <div class="months">
     </div>
   </div>`)
-  let totalExpenseContainer = expenseContainer.querySelector('[data-total-container-for-selfemployment-expense-source]')
+  // let totalExpenseContainer = expenseContainer.querySelector('[data-total-container-for-selfemployment-expense-source]')
   let monthContainer = expenseContainer.querySelector('.months')
-  let toggle = expenseContainer.querySelector('.toggle')
-  let toggleImg = expenseContainer.querySelector('.toggle img')
-
-  // adding event listener to show or hide details for an expense source
-  toggle.addEventListener('click', (e)=>{
-    if (monthContainer.classList.contains('invisible')) {
-      monthContainer.classList.remove('invisible')
-      toggleImg.src = '/static/accounts/collapse.svg'
-    }else{
-      monthContainer.classList.add('invisible')
-      toggleImg.src = '/static/accounts/expand.svg'
-    }
-  })
 
   // =====================================================================================================================
   // Start Show a single month
@@ -971,12 +955,12 @@ function displayExpenseSource(expenseSourceId, expenses, submission){
     })
   }
   
-  totalExpenseContainer.innerText = expense.amount
-  let totalUpdater = (e)=>{
-    totalExpenseContainer.innerText = inputAmount.value
-  }
+  // totalExpenseContainer.innerText = expense.amount
+  // let totalUpdater = (e)=>{
+  //   totalExpenseContainer.innerText = inputAmount.value
+  // }
   
-  addEventListenersToElements(inputAmount, 'input', [validateMaxValue, handleExpenseUpdate, updateTotalExpense, updateNetProfit, totalUpdater])
+  addEventListenersToElements(inputAmount, 'input', [validateMaxValue, handleExpenseUpdate, updateTotalExpense, updateNetProfit,]) //totalUpdater])
   addEventListenersToElements(inputPersonalUsage, 'input', [validatePercentageValue, handleExpenseUpdate, updateTotalExpense, updateNetProfit])
   addEventListenersToElements(inputNote, 'input', [handleExpenseUpdate])
 

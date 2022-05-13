@@ -1093,7 +1093,7 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
   deductionsContainer.appendChild(deductionContainer)
 }
 
-function prventInputValueUpdateWhenArrowKeysPressed(e){
+function preventInputValueUpdateWhenArrowKeysPressed(e){
   let target = e.target
   if (target.tagName==='INPUT' && target.type==="number"){
     switch(e.code){
@@ -1104,8 +1104,49 @@ function prventInputValueUpdateWhenArrowKeysPressed(e){
     }
   }
 }
-document.body.addEventListener('keydown', prventInputValueUpdateWhenArrowKeysPressed)
+document.body.addEventListener('keydown', preventInputValueUpdateWhenArrowKeysPressed)
 
+
+function expressionEvaluator(match){
+  let namedGroups = arguments[arguments.length-1]
+  let offset = arguments[arguments.length-3]
+  let expression = namedGroups.expression
+  // from "=[EXPRESSION]" slice "EXPRESSION"
+  let expressionToEvaluate = namedGroups.expressionToEvaluate
+
+  let evaluationResult = ''
+  let result = ''
+  try {
+    evaluationResult = eval(expressionToEvaluate)|| 0
+    evaluationResult = evaluationResult.toFixed(2)
+  } catch (error) {
+    evaluationResult = 'Invalid Expression!'
+  }
+  result = `${expression} -> [${evaluationResult}]`
+  return result
+}
+const EXPRESSION_REGEX = /(?<expression>=\[(?<expressionToEvaluate>(?:.|\n)*?)\])(?:\s*->\s*(?:\[.+?\])?)?/gm;
+function handleExpressionEvaluation(e){
+  let target = e.target
+  if (target.tagName==="TEXTAREA" && !e.detail.evaluationDone){
+    e.preventDefault()
+    // remember current edit point/cursor position
+    let selectionStart = target.selectionStart
+    let selectionEnd = target.selectionEnd
+
+    let value = target.value
+    value = value.replaceAll(EXPRESSION_REGEX, expressionEvaluator)
+    target.value = value
+
+    // restore previously edit point/cursor position
+    target.selectionStart = selectionStart
+    target.selectionEnd = selectionEnd
+
+    // trigger after evaluation and ignore this event to prevent infinite calls
+    target.dispatchEvent(new CustomEvent('input', {detail: {evaluationDone: true}}))
+  }
+}
+document.body.addEventListener('input', handleExpressionEvaluation)
 
 function validateMaxValue(e){
   let input = e.target

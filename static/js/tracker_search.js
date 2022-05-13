@@ -27,7 +27,7 @@ async function handleTaskClick(event){
   let response = await fetch_url(kwargs)
   let data = await response.json()
 
-  if(event?.detail?.update_counters_only) populate_with_data(data)
+  if(!event?.detail?.update_counters_only) populate_with_data(data)
 
   let counts = task.querySelector('#task-count')
   counts.innerText = data.length

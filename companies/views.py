@@ -457,6 +457,7 @@ def get_selfassesment_data_collection_row_count():
 
 @login_required
 def home_selfassesment_data_collection(request):
+  current_tax_year = SelfassesmentAccountSubmissionTaxYear.get_max_year()
   pk_field = 'id'
   exclude_fields = []
   include_fields = ['selfassesment', 'tax_year', 'is_submitted']
@@ -476,7 +477,7 @@ def home_selfassesment_data_collection(request):
 
     "counts": True,
     "selfassesment_data_collection_counts": True,
-    "selfassesment_data_collection_row_count": get_selfassesment_data_collection_row_count().filter(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year()).count(),
+    "selfassesment_data_collection_row_count": get_selfassesment_data_collection_row_count().filter(tax_year=current_tax_year).count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Data_Collection_viewall_url,
@@ -487,7 +488,7 @@ def home_selfassesment_data_collection(request):
     },
 
     'tax_years': SelfassesmentAccountSubmissionTaxYear.objects.all(),
-    'current_tax_year': SelfassesmentAccountSubmissionTaxYear.get_max_year(),
+    'current_tax_year': current_tax_year,
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -802,13 +803,14 @@ def get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(user):
 def get_selfassesment_account_submissions_where_status_NOT_ASSIGNED():
   return SelfassesmentAccountSubmission.objects.filter(assigned_to=None)
 
-def get_selfassesment_account_submissions_where_data_collected():
-  collected_data_for_clients_for_current_year = SelfemploymentIncomeAndExpensesDataCollection.objects.filter(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year())
-  return SelfassesmentAccountSubmission.objects.filter(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year(), client_id__in=Subquery(collected_data_for_clients_for_current_year.values('selfassesment__pk')))
+def get_selfassesment_account_submissions_where_data_collected(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year()):
+  collected_data_for_clients_for_current_year = SelfemploymentIncomeAndExpensesDataCollection.objects.filter(tax_year=tax_year)
+  return SelfassesmentAccountSubmission.objects.filter(tax_year=tax_year, client_id__in=Subquery(collected_data_for_clients_for_current_year.values('selfassesment__pk')))
 
 
 @login_required
 def home_selfassesment_account_submission(request):
+  current_tax_year = SelfassesmentAccountSubmissionTaxYear.get_max_year()
   pk_field = 'submission_id'
   exclude_fields = []
   keep_include_fields = True
@@ -828,18 +830,18 @@ def home_selfassesment_account_submission(request):
 
     "counts": True,
     "selfassesment_account_submission_counts": True,
-    "selfassesment_account_submission_status_PAID": get_selfassesment_account_submissions_where_status_PAID().count(),
-    "selfassesment_account_submission_status_NOT_PAID": get_selfassesment_account_submissions_where_status_NOT_PAID().count(),
-    "selfassesment_account_submission_status_REQUEST": get_selfassesment_account_submissions_where_status_REQUEST().count(),
-    "selfassesment_account_submission_status_PRIORITY": get_selfassesment_account_submissions_where_status_PRIORITY().count(),
-    "selfassesment_account_submission_status_PROCESSING": get_selfassesment_account_submissions_where_status_PROCESSING().count(),
-    "selfassesment_account_submission_status_BOOK_APPOINTMENT": get_selfassesment_account_submissions_where_status_BOOK_APPOINTMENT().count(),
-    "selfassesment_account_submission_status_READY_FOR_SUBMIT": get_selfassesment_account_submissions_where_status_READY_FOR_SUBMIT().count(),
-    "selfassesment_account_submission_status_WAITING_FOR_CONFIRMATION": get_selfassesment_account_submissions_where_status_WAITING_FOR_CONFIRMATION().count(),
-    "selfassesment_account_submission_status_SUBMITTED": get_selfassesment_account_submissions_where_status_SUBMITTED().count(),
-    "selfassesment_account_submission_status_ASSIGEND_TO_ME": get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(request.user).count(),
-    "selfassesment_account_submission_status_NOT_ASSIGEND": get_selfassesment_account_submissions_where_status_NOT_ASSIGNED().count(),
-    "selfassesment_account_submission_data_collected": get_selfassesment_account_submissions_where_data_collected().count(),
+    "selfassesment_account_submission_status_PAID": get_selfassesment_account_submissions_where_status_PAID().filter(tax_year=current_tax_year).count(),
+    "selfassesment_account_submission_status_NOT_PAID": get_selfassesment_account_submissions_where_status_NOT_PAID().filter(tax_year=current_tax_year).count(),
+    "selfassesment_account_submission_status_REQUEST": get_selfassesment_account_submissions_where_status_REQUEST().filter(tax_year=current_tax_year).count(),
+    "selfassesment_account_submission_status_PRIORITY": get_selfassesment_account_submissions_where_status_PRIORITY().filter(tax_year=current_tax_year).count(),
+    "selfassesment_account_submission_status_PROCESSING": get_selfassesment_account_submissions_where_status_PROCESSING().filter(tax_year=current_tax_year).count(),
+    "selfassesment_account_submission_status_BOOK_APPOINTMENT": get_selfassesment_account_submissions_where_status_BOOK_APPOINTMENT().filter(tax_year=current_tax_year).count(),
+    "selfassesment_account_submission_status_READY_FOR_SUBMIT": get_selfassesment_account_submissions_where_status_READY_FOR_SUBMIT().filter(tax_year=current_tax_year).count(),
+    "selfassesment_account_submission_status_WAITING_FOR_CONFIRMATION": get_selfassesment_account_submissions_where_status_WAITING_FOR_CONFIRMATION().filter(tax_year=current_tax_year).count(),
+    "selfassesment_account_submission_status_SUBMITTED": get_selfassesment_account_submissions_where_status_SUBMITTED().filter(tax_year=current_tax_year).count(),
+    "selfassesment_account_submission_status_ASSIGEND_TO_ME": get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(request.user).filter(tax_year=current_tax_year).count(),
+    "selfassesment_account_submission_status_NOT_ASSIGEND": get_selfassesment_account_submissions_where_status_NOT_ASSIGNED().filter(tax_year=current_tax_year).count(),
+    "selfassesment_account_submission_data_collected": get_selfassesment_account_submissions_where_data_collected(current_tax_year).count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_viewall_url,
@@ -850,7 +852,7 @@ def home_selfassesment_account_submission(request):
     },
 
     'tax_years': SelfassesmentAccountSubmissionTaxYear.objects.all(),
-    'current_tax_year': SelfassesmentAccountSubmissionTaxYear.get_max_year(),
+    'current_tax_year': current_tax_year,
   }
   return render(request=request, template_name='companies/home.html', context=context)
 
@@ -1005,7 +1007,7 @@ def search_selfassesment_account_submission(request, limit: int=-1):
         "selfassesment_account_submission_status_SUBMITTED": get_selfassesment_account_submissions_where_status_SUBMITTED(),
         "selfassesment_account_submission_status_ASSIGEND_TO_ME": get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(request.user),
         "selfassesment_account_submission_status_NOT_ASSIGEND": get_selfassesment_account_submissions_where_status_NOT_ASSIGNED(),
-        "selfassesment_account_submission_data_collected": get_selfassesment_account_submissions_where_data_collected(),
+        "selfassesment_account_submission_data_collected": get_selfassesment_account_submissions_where_data_collected(tax_year=tax_year),
       }
       records = tasks.get(request.GET.get('tasks'), SelfassesmentAccountSubmission.objects.none())
       if tax_year:

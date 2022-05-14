@@ -855,7 +855,7 @@ def tax_report_pdf(request:HttpRequest, submission_id):
 
 
 def public_tax_report_pdf(request:HttpRequest, view_key):
-    account_submission = get_object_or_None(SelfassesmentAccountSubmission, unique_public_view_key=view_key)
+    account_submission = get_object_or_None(SelfassesmentAccountSubmission, unique_public_view_key=view_key, delete_duplicate=False)
 
     if not account_submission:
         raise Http404("Invalid view key!")

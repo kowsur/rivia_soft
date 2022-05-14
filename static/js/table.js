@@ -11,15 +11,17 @@ let template = document.querySelector(template_querySelector);
 export async function get_tr_for_table(data, template=template, model_fields=DATA.model_fields, update_url=DATA.update_url, delete_url=DATA.delete_url) {
   // prepare table row for table using template and data
   let seflassesmentAccountSubmission_home_pathname = '/companies/SAS/home/'
+
   let instance = template.content.cloneNode(true)
   let serial_num = instance.getElementById('pk')
-  if (serial_num) {
-    if (location.pathname==seflassesmentAccountSubmission_home_pathname) {
-      serial_num.innerHTML = `<a href="/accounts/?pk=${data.pk}">${data.pk}</a>`
-    }
-    else serial_num.textContent = data.pk
+
+  if (serial_num && location.pathname==seflassesmentAccountSubmission_home_pathname) {
+    serial_num.innerHTML = `<a href="/accounts/?pk=${data.pk}">${data.pk}</a>`
+  }else{
+    serial_num.textContent = data.pk
   }
   
+
   let update_link = `${update_url}${data.pk}/`
   let delete_link = `${delete_url}${data.pk}/`
   instance.getElementById('edit').href = `${update_link}`
@@ -133,20 +135,24 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
       continue
     }
 
-    // show preformatted text
-    td.appendChild(formatted_text)
+    let public_view_link = instance.getElementById('unique_public_view_key')
+    if (public_view_link && location.pathname==seflassesmentAccountSubmission_home_pathname){
+      public_view_link.innerHTML = `<a href='/accounts/public_tax_report/${data.fields.unique_public_view_key}/'>${data.fields.unique_public_view_key}</a>`
+    }else{
+      // show preformatted text
+      td.appendChild(formatted_text)
 
-    // pretty-format text
-    td.classList.add('whitespace-normal')
-    td.style.textAlign = 'justify'
-    td.style.minWidth = `${field_data.length+1}ch`
-    if (field_data.length >= 37){
-      td.classList.remove('whitespace-nowrap')
-      td.style.minWidth = '37ch'
-      formatted_text.style.maxWidth = '37ch'
-      formatted_text.style.whiteSpace = 'pre-wrap'
+      // pretty-format text
+      td.classList.add('whitespace-normal')
+      td.style.textAlign = 'justify'
+      td.style.minWidth = `${field_data.length+1}ch`
+      if (field_data.length >= 37){
+        td.classList.remove('whitespace-nowrap')
+        td.style.minWidth = '37ch'
+        formatted_text.style.maxWidth = '37ch'
+        formatted_text.style.whiteSpace = 'pre-wrap'
+      }
     }
-
   }
   return instance;
 }

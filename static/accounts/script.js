@@ -1107,7 +1107,7 @@ function preventInputValueUpdateWhenArrowKeysPressed(e){
 document.body.addEventListener('keydown', preventInputValueUpdateWhenArrowKeysPressed)
 
 
-const ALLOWED_CHARS_IN_EXPRESSION = /^[\d\s+\-*\/()]*$/;
+const ALLOWED_CHARS_IN_EXPRESSION = /^[\d\s+\-*.\/()]*$/;
 function expressionEvaluator(match){
   let namedGroups = arguments[arguments.length-1]
   let offset = arguments[arguments.length-3]
@@ -1116,7 +1116,7 @@ function expressionEvaluator(match){
   let expressionToEvaluate = namedGroups.expressionToEvaluate
   let expressionContainsOnlyValidCharacters = expressionToEvaluate.match(ALLOWED_CHARS_IN_EXPRESSION)
 
-  let evaluationResult = 'Expression contains invalid character(s). Only 0-9, +, -, *, /, ( and ) are valid!'
+  let evaluationResult = 'Expression contains invalid character(s). Only 0-9, ., +, -, *, /, ( and ) are valid!'
 
   if (expressionContainsOnlyValidCharacters){
     try {

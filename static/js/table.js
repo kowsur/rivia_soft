@@ -135,23 +135,24 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
       continue
     }
 
-    let public_view_link = instance.getElementById('unique_public_view_key')
-    if (public_view_link && location.pathname==seflassesmentAccountSubmission_home_pathname){
+    if (location.pathname===seflassesmentAccountSubmission_home_pathname && field==="unique_public_view_key"){
+      let public_view_link = instance.getElementById('unique_public_view_key')
       public_view_link.innerHTML = `<a href='/accounts/public_tax_report/${data.pk}/${data.fields.unique_public_view_key}/'>${data.fields.unique_public_view_key}</a>`
-    }else{
-      // show preformatted text
-      td.appendChild(formatted_text)
+      continue
+    }
 
-      // pretty-format text
-      td.classList.add('whitespace-normal')
-      td.style.textAlign = 'justify'
-      td.style.minWidth = `${field_data.length+1}ch`
-      if (field_data.length >= 37){
-        td.classList.remove('whitespace-nowrap')
-        td.style.minWidth = '37ch'
-        formatted_text.style.maxWidth = '37ch'
-        formatted_text.style.whiteSpace = 'pre-wrap'
-      }
+    // show preformatted text
+    td.appendChild(formatted_text)
+
+    // pretty-format text
+    td.classList.add('whitespace-normal')
+    td.style.textAlign = 'justify'
+    td.style.minWidth = `${field_data.length+1}ch`
+    if (field_data.length >= 37){
+      td.classList.remove('whitespace-nowrap')
+      td.style.minWidth = '37ch'
+      formatted_text.style.maxWidth = '37ch'
+      formatted_text.style.whiteSpace = 'pre-wrap'
     }
   }
   return instance;

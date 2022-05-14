@@ -1129,7 +1129,7 @@ function expressionEvaluator(match){
   let result = `${expression} -> [${evaluationResult}]`
   return result
 }
-const EXPRESSION_REGEX = /(?<expression>=\[(?<expressionToEvaluate>(?:.|\n)*?)\])(?:\s*->\s*(?:\[.+?\])?)?/gm;
+const EXPRESSION_REGEX = /(?<expression>=\[(?<expressionToEvaluate>(?:.|\n)*?)\])(?:\s*->\s*(?:\[(?:.*?|\s*?)\])?)?/gm;
 function handleExpressionEvaluation(e){
   let target = e.target
   if (target.tagName==="TEXTAREA" && !e.detail.evaluationDone){

@@ -137,7 +137,7 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
 
     let public_view_link = instance.getElementById('unique_public_view_key')
     if (public_view_link && location.pathname==seflassesmentAccountSubmission_home_pathname){
-      public_view_link.innerHTML = `<a href='/accounts/public_tax_report/${data.fields.unique_public_view_key}/'>${data.fields.unique_public_view_key}</a>`
+      public_view_link.innerHTML = `<a href='/accounts/public_tax_report/${data.pk}/${data.fields.unique_public_view_key}/'>${data.fields.unique_public_view_key}</a>`
     }else{
       // show preformatted text
       td.appendChild(formatted_text)

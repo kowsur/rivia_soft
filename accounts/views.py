@@ -635,6 +635,25 @@ def get_total_tax_by_submission_id(submission_id):
     # due_tax = max(due_tax, 0)
     return due_tax
 
+@login_required
+def overview_section_data(request:HttpRequest, submission_id):
+    try:
+        selfemployment_income = get_total_selfemployment_income_by_submission_id(submission_id)
+        total_taxable_income = get_total_taxable_income_by_submission_id(submission_id)
+        total_expense = get_total_selfemployment_expense_by_submission_id(submission_id)
+        selfemployment_net_profit = get_total_selfemployment_net_profit_by_submission_id(submission_id)
+        total_tax = get_total_tax_by_submission_id(submission_id)
+        data = {
+            'income': selfemployment_income,
+            'expense': total_expense,
+            'profit': selfemployment_net_profit,
+            'taxable_income': total_taxable_income,
+            'tax': total_tax
+        }
+        return HttpResponse(dump_to_json.render(data))
+    except RaiseErrorMessages as e:
+        return HttpResponseNotFound(content=dump_to_json.render(e.messages))
+
 
 # Cache for weasyprint
 IMAGE_CACHE = {}
@@ -854,30 +873,10 @@ def tax_report_pdf(request:HttpRequest, submission_id):
     return generate_tax_report_pdf(account_submission)
 
 
-def public_tax_report_pdf(request:HttpRequest, view_key):
-    account_submission = get_object_or_None(SelfassesmentAccountSubmission, unique_public_view_key=view_key, delete_duplicate=False)
+def public_tax_report_pdf(request:HttpRequest, submission_id, view_key):
+    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
 
-    if not account_submission:
+    if not account_submission or account_submission.unique_public_view_key!=view_key:
         raise Http404("Invalid view key!")
 
     return generate_tax_report_pdf(account_submission)
-
-
-
-def overview_section_data(request:HttpRequest, submission_id):
-    try:
-        selfemployment_income = get_total_selfemployment_income_by_submission_id(submission_id)
-        total_taxable_income = get_total_taxable_income_by_submission_id(submission_id)
-        total_expense = get_total_selfemployment_expense_by_submission_id(submission_id)
-        selfemployment_net_profit = get_total_selfemployment_net_profit_by_submission_id(submission_id)
-        total_tax = get_total_tax_by_submission_id(submission_id)
-        data = {
-            'income': selfemployment_income,
-            'expense': total_expense,
-            'profit': selfemployment_net_profit,
-            'taxable_income': total_taxable_income,
-            'tax': total_tax
-        }
-        return HttpResponse(dump_to_json.render(data))
-    except RaiseErrorMessages as e:
-        return HttpResponseNotFound(content=dump_to_json.render(e.messages))

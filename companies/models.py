@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -272,6 +274,7 @@ class SelfassesmentAccountSubmission(models.Model):
     )
     payment_status = models.CharField("Payment Status", blank=False, max_length=55, choices=payment_status_choices, default="NOT PAID")
     paid_amount = models.BigIntegerField(verbose_name='Amount Paid', blank=True, null=True)
+    unique_public_view_key = models.UUIDField(default=uuid.uuid4, editable=False)
 
     last_updated_by = models.ForeignKey(
         to='users.CustomUser',

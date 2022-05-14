@@ -11,7 +11,6 @@ from django.contrib import messages
 from django.urls.exceptions import NoReverseMatch
 from django.db.models import DurationField, F, ExpressionWrapper
 from django.db.utils import IntegrityError
-from django.contrib.auth import get_user_model
 
 #forms
 from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm

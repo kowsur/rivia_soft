@@ -1107,22 +1107,26 @@ function preventInputValueUpdateWhenArrowKeysPressed(e){
 document.body.addEventListener('keydown', preventInputValueUpdateWhenArrowKeysPressed)
 
 
+const ALLOWED_CHARS_IN_EXPRESSION = /^[\d\s+\-*\/()]*$/;
 function expressionEvaluator(match){
   let namedGroups = arguments[arguments.length-1]
   let offset = arguments[arguments.length-3]
   let expression = namedGroups.expression
   // from "=[EXPRESSION]" slice "EXPRESSION"
   let expressionToEvaluate = namedGroups.expressionToEvaluate
+  let expressionContainsOnlyValidCharacters = expressionToEvaluate.match(ALLOWED_CHARS_IN_EXPRESSION)
 
-  let evaluationResult = ''
-  let result = ''
-  try {
-    evaluationResult = eval(expressionToEvaluate)|| 0
-    evaluationResult = evaluationResult.toFixed(2)
-  } catch (error) {
-    evaluationResult = 'Invalid Expression!'
+  let evaluationResult = 'Expression contains invalid character(s). Only 0-9, +, -, *, /, ( and ) are valid!'
+
+  if (expressionContainsOnlyValidCharacters){
+    try {
+      evaluationResult = eval(expressionToEvaluate)|| 0
+      evaluationResult = evaluationResult.toFixed(2)
+    } catch (error) {
+      evaluationResult = 'Invalid Expression!'
+    }
   }
-  result = `${expression} -> [${evaluationResult}]`
+  let result = `${expression} -> [${evaluationResult}]`
   return result
 }
 const EXPRESSION_REGEX = /(?<expression>=\[(?<expressionToEvaluate>(?:.|\n)*?)\])(?:\s*->\s*(?:\[.+?\])?)?/gm;

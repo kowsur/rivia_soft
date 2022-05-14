@@ -642,15 +642,11 @@ FONT_CONFIG = FontConfiguration()
 STYLESHEETS_CACHE = [
         CSS(filename='accounts/templates/accounts/tax_report_style.css'),
     ]
-@login_required
-@allowed_for_staff()
-def tax_report_pdf(request:HttpRequest, submission_id):
+def generate_tax_report_pdf(account_submission):
     template = get_template('accounts/tax_report.html')
-    
-    # Retrive data from database
-    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
-    if not account_submission:
-        raise Http404("Submission for the submission_id specified does not exist!")
+
+    submission_id = account_submission.pk
+
     tax_year = account_submission.tax_year
     selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
     selfemployment_incomes = filter_selfemployment_incomes(selfemployment_incomes)
@@ -847,6 +843,25 @@ def tax_report_pdf(request:HttpRequest, submission_id):
     weasyprinted_markup.write_pdf(response, stylesheets=STYLESHEETS_CACHE, font_config=FONT_CONFIG, image_cache=IMAGE_CACHE)
 
     return response
+
+@login_required
+def tax_report_pdf(request:HttpRequest, submission_id):
+    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+
+    if not account_submission:
+        raise Http404("Submission for the submission_id specified does not exist!")
+
+    return generate_tax_report_pdf(account_submission)
+
+
+def public_tax_report_pdf(request:HttpRequest, view_key):
+    account_submission = get_object_or_None(SelfassesmentAccountSubmission, unique_public_view_key=view_key)
+
+    if not account_submission:
+        raise Http404("Invalid view key!")
+
+    return generate_tax_report_pdf(account_submission)
+
 
 
 def overview_section_data(request:HttpRequest, submission_id):

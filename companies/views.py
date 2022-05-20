@@ -559,7 +559,9 @@ def create_selfassesment_data_collection_for_client(request, utr=None):
         assesment.save()
 
         # Create row in selfassesment account submission
-        slefassesment_account_submission_auto_row(request, selfassesment, tax_year)
+        account_submission = get_object_or_None(SelfassesmentAccountSubmission, client_id=selfassesment, tax_year=tax_year, delete_duplicate=False)
+        if not account_submission:
+          slefassesment_account_submission_auto_row(request, selfassesment, tax_year)
 
         messages.add_message(request, messages.SUCCESS, 'We recieved your data!')
         return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
@@ -619,7 +621,9 @@ def create_selfassesment_data_collection(request):
         assesment.save()
 
         # Create row in selfassesment account submission
-        slefassesment_account_submission_auto_row(request, selfassesment, tax_year, message=True)
+        account_submission = get_object_or_None(SelfassesmentAccountSubmission, client_id=selfassesment, tax_year=tax_year, delete_duplicate=False)
+        if not account_submission:
+          slefassesment_account_submission_auto_row(request, selfassesment, tax_year)
 
         messages.success(request, "Record created")
       else:

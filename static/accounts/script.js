@@ -419,24 +419,33 @@ function mapRecordsByAttribute(records, attributeName, map=null){
 // =============================================================================================================================
 // Update info in Details tab
 function updateDetailsTab(submissionDetails){
-    let taxYear = document.querySelector('#tax-year')
-    let clientName = document.querySelector('#client-name')
-    let clientPersonalAddress = document.querySelector('#client-personal-address')
-    let clientBusinessAddress = document.querySelector('#client-business-address')
-    let clientDob = document.querySelector('#client-dob')
-    let clientUtr = document.querySelector('#client-utr')
-    let clientNino = document.querySelector('#client-nino')
-    let clientAccountStatus = document.querySelector('#client-account-status')
+    let selfassesment_update_url = `/companies/SA/update/${submissionDetails.client_id.client_id}/?hide_navbar=1`
+    let selfassesmentIframe = document.querySelector('iframe[data-update-selfassesment]')
+    selfassesmentIframe.src = selfassesment_update_url
 
-    taxYear.textContent = submissionDetails.tax_year.tax_year
-    clientName.textContent = submissionDetails.client_id.client_name
-    clientPersonalAddress.textContent = submissionDetails.client_id.personal_address
-    clientBusinessAddress.textContent = submissionDetails.client_id.business_address
-    clientDob.textContent = submissionDetails.client_id.date_of_birth
-    clientUtr.textContent = submissionDetails.client_id.UTR
-    clientNino.textContent = submissionDetails.client_id.NINO
-    clientAccountStatus.textContent = submissionDetails.status
-    clientAccountStatus.href = `/companies/SAS/update/${submissionId}/`
+    let selfassesmentAccountSubmission_update_url = `/companies/SAS/update/${submissionDetails.submission_id}/?hide_navbar=1`
+    let selfassesmentAccountSubmissionIframe = document.querySelector('iframe[data-update-selfassesment-account-submission]')
+    selfassesmentAccountSubmissionIframe.src = selfassesmentAccountSubmission_update_url
+
+
+    // let taxYear = document.querySelector('#tax-year')
+    // let clientName = document.querySelector('#client-name')
+    // let clientPersonalAddress = document.querySelector('#client-personal-address')
+    // let clientBusinessAddress = document.querySelector('#client-business-address')
+    // let clientDob = document.querySelector('#client-dob')
+    // let clientUtr = document.querySelector('#client-utr')
+    // let clientNino = document.querySelector('#client-nino')
+    // let clientAccountStatus = document.querySelector('#client-account-status')
+
+    // taxYear.textContent = submissionDetails.tax_year.tax_year
+    // clientName.textContent = submissionDetails.client_id.client_name
+    // clientPersonalAddress.textContent = submissionDetails.client_id.personal_address
+    // clientBusinessAddress.textContent = submissionDetails.client_id.business_address
+    // clientDob.textContent = submissionDetails.client_id.date_of_birth
+    // clientUtr.textContent = submissionDetails.client_id.UTR
+    // clientNino.textContent = submissionDetails.client_id.NINO
+    // clientAccountStatus.textContent = submissionDetails.status
+    // clientAccountStatus.href = `/companies/SAS/update/${submissionId}/`
 }
 
 // Update info in Income and Expense tab
@@ -1054,7 +1063,7 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
           <input type="number" min="0" max='100' id=${inputAllowancePercentageId} value="${deduction?.allowance_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="allowance_percentage">
         </span>
         <span>
-          <input type="number" min="0" max='100' id=${inputPersonalUsagePercentageId} value="${deduction?.personal_usage_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="personal_usage_percentage">
+          <input type="number" min="0" max='100' id=${inputPersonalUsagePercentageId} disabled value="${deduction?.personal_usage_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="personal_usage_percentage">
         </span>
         <span>
           <textarea id=${inputNoteId} data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="note">${deduction?.note}</textarea>

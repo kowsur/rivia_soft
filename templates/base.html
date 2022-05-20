@@ -17,8 +17,10 @@
   </head>
   
   <body class="font-normal text-gray-700 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 min-w-full min-h-screen">
-    <!-- navbar -->
-    {% include "navbar.html" %}
+    {% if not hide_navbar %}
+      <!-- navbar -->
+      {% include "navbar.html" %}
+    {% endif %}
     
     <!-- content -->
     <div class="mx-auto" style="padding: .5em;">

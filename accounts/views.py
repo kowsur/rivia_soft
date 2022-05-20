@@ -671,7 +671,8 @@ def generate_tax_report_pdf(account_submission):
     selfemployment_incomes = filter_selfemployment_incomes(selfemployment_incomes)
     selfemployment_total_comission = get_total_selfemployment_comission(selfemployment_incomes)
 
-    selfemployment_expenses = get_object_or_None(SelfemploymentExpensesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    selfemployment_expenses = get_object_or_None(SelfemploymentExpensesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True).order_by('-personal_usage_percentage')
+    personal_usage_heading_value = selfemployment_expenses[0].personal_usage_percentage if selfemployment_expenses else 20
     selfemployment_expenses = filter_selfemployment_expenses(selfemployment_expenses)
 
     taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission_id, delete_duplicate=False, return_all=True)
@@ -839,6 +840,7 @@ def generate_tax_report_pdf(account_submission):
         # client's income and expenses info
         'selfemployment_incomes': selfemployment_incomes,
         'selfemployment_expenses': selfemployment_expenses,
+        'personal_usage_heading_value': personal_usage_heading_value,
         'deductions_and_allowances': deductions_and_allowances,
         'taxable_incomes': taxable_incomes,
         'car_value': allowance_car_value,

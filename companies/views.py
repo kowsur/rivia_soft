@@ -258,6 +258,9 @@ def mark_tracker_complete(tracker:SelfassesmentTracker)->None:
 
 @login_required
 def update_selfassesment(request, client_id:int):
+  hide_navbar = False
+  if request.method=='GET':
+    hide_navbar = request.GET.get('hide_navbar', False)
   context = {
     **URLS,
     'page_title': f'Update Selfassesment',
@@ -265,7 +268,8 @@ def update_selfassesment(request, client_id:int):
     'id': client_id,
     'update_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_update_name,
     'form_title': 'Selfassesment Update Form',
-    'form': SelfassesmentChangeForm()
+    'form': SelfassesmentChangeForm(),
+    'hide_navbar': hide_navbar
   }
 
   try:
@@ -890,6 +894,10 @@ def create_selfassesment_account_submission(request):
 
 @login_required
 def update_selfassesment_account_submission(request, submission_id:int):
+  hide_navbar = False
+  if request.method=='GET':
+    hide_navbar = request.GET.get('hide_navbar', False)
+
   context = {
     **URLS,
     'page_title': f'Update Selfassesment Account Submission',
@@ -897,7 +905,8 @@ def update_selfassesment_account_submission(request, submission_id:int):
     'id': submission_id,
     'update_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_update_name,
     'form_title': 'Selfassesment Account Submission Update Form',
-    'form': SelfassesmentAccountSubmissionChangeForm()
+    'form': SelfassesmentAccountSubmissionChangeForm(),
+    'hide_navbar': hide_navbar
   }
 
   try:

@@ -8,9 +8,11 @@
 
 {% block content %}
 <div class="max-w-6xl mx-auto mt-5">
+  {% if not hide_navbar %}
   <div class="text-right">
   <a href="{% url view_url %}">View</a>
   </div>
+  {% endif %}
 
   <!-- messages -->
   {% if messages %}

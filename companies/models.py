@@ -259,6 +259,7 @@ class SelfassesmentAccountSubmission(models.Model):
         blank=False,
         null=True)
     is_submitted = models.BooleanField(verbose_name='Is Submitted', blank=True, null=False, default=False)
+    is_data_collected = models.BooleanField(verbose_name='Is Data Collected', blank=True, null=False, default=False)
     prepared_by = models.ForeignKey(
         to='users.CustomUser',
         on_delete=models.CASCADE,
@@ -855,4 +856,26 @@ class SelfemploymentIncomeAndExpensesDataCollection(models.Model):
 
     def __str__(self):
         return f"{self.tax_year} - {self.selfassesment}"
-    
+
+
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
+
+@receiver(post_save, sender=SelfemploymentIncomeAndExpensesDataCollection, weak=False)
+def update_selfassesment_account_submission_Is_Data_Collected(sender, instance, created, **kwargs):
+    selfassesment = instance.selfassesment
+    tax_year = instance.tax_year
+
+    account_submission = SelfassesmentAccountSubmission.objects.filter(client_id=selfassesment, tax_year=tax_year).first()
+    if account_submission:
+        account_submission.is_data_collected = True
+        account_submission.save()
+
+@receiver(pre_save, sender=SelfassesmentAccountSubmission, weak=False)
+def set_selfassesment_account_submission_Is_Data_Collected_field_value(sender, instance, **kwargs):
+    selfassesment = instance.client_id
+    tax_year = instance.tax_year
+
+    data_collection = SelfemploymentIncomeAndExpensesDataCollection.objects.filter(selfassesment=selfassesment, tax_year=tax_year).first()
+    if data_collection:
+        instance.is_data_collected = True

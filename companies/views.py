@@ -553,15 +553,15 @@ def create_selfassesment_data_collection_for_client(request, utr=None):
         return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
       
       if form.is_valid():
-        assesment = form.save(commit=False)
-        assesment.tax_year = tax_year
-        assesment.selfassesment = selfassesment
-        assesment.save()
-
         # Create row in selfassesment account submission
         account_submission = get_object_or_None(SelfassesmentAccountSubmission, client_id=selfassesment, tax_year=tax_year, delete_duplicate=False)
         if not account_submission:
           slefassesment_account_submission_auto_row(request, selfassesment, tax_year)
+        
+        assesment = form.save(commit=False)
+        assesment.tax_year = tax_year
+        assesment.selfassesment = selfassesment
+        assesment.save()
 
         messages.add_message(request, messages.SUCCESS, 'We recieved your data!')
         return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_auth_name_for_client)
@@ -618,13 +618,13 @@ def create_selfassesment_data_collection(request):
       tax_year = assesment.tax_year
       existing_record = get_object_or_None(SelfemploymentIncomeAndExpensesDataCollection, selfassesment=selfassesment, tax_year=tax_year, delete_duplicate=False, return_all=True)
       if not existing_record:
-        assesment.save()
-
         # Create row in selfassesment account submission
         account_submission = get_object_or_None(SelfassesmentAccountSubmission, client_id=selfassesment, tax_year=tax_year, delete_duplicate=False)
         if not account_submission:
           slefassesment_account_submission_auto_row(request, selfassesment, tax_year)
-
+    
+        assesment.save()
+        
         messages.success(request, "Record created")
       else:
         messages.error(request, "There is an existing Record for the selected client and the current year")

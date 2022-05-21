@@ -26,7 +26,7 @@ dump_to_json = JSONRenderer()
 
 from companies.views import URLS, serialized
 from companies.decorators import allowed_for_staff, allowed_for_superuser
-from companies.url_variables import URL_NAMES_PREFIXED_WITH_APP_NAME
+from companies.url_variables import URL_NAMES, URL_NAMES_PREFIXED_WITH_APP_NAME, URL_PATHS
 
 from .tax_calc_helpers import get_personal_allowance_reduction, percentage_of, uk_tax, uk_class_4_tax
 
@@ -55,8 +55,16 @@ def get_object_or_None(model, *args, pk=None, delete_duplicate=True, return_all=
 @login_required
 @allowed_for_staff()
 def index(request):
-    context = {**URLS}
-    return render(request, "accounts/index.html", context)
+    if request.method=='GET':
+        pk = request.GET.get('pk', None)
+        account_submission = SelfassesmentAccountSubmission.objects.get(pk=pk)
+        if account_submission.status=='SUBMITTED':
+            messages.error(request, 'The submission data you are trying to access is submitted therefore this can not be edited.')
+            return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_home_name)
+            
+        context = {**URLS}
+        return render(request, "accounts/index.html", context)
+    raise Http404
 
 
 ##############################################################################

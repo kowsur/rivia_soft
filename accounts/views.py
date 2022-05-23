@@ -748,7 +748,8 @@ def generate_tax_report_pdf(account_submission):
         error_messages.append(f'Class 2 configuration not found for the year {tax_year.tax_year}!')
 
     total_income_from_taxable_incomes = get_total_taxable_income(taxable_incomes)
-    total_income = selfemployment_net_profit + total_income_from_taxable_incomes
+    total_income = total_income_from_taxable_incomes
+    total_income += selfemployment_net_profit if selfemployment_net_profit>0 else 0
 
     tax_calc_data={}
     if not error_messages:

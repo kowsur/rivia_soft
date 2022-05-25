@@ -13,7 +13,7 @@ config.json
 ENVIRONMENT.py
 
 ### Custom ###
-staticfiles/
+staticfiles
 static/css/style.css
 static/css/style.min.css
 

@@ -602,13 +602,16 @@ def get_total_tax_by_submission_id(submission_id):
     selfemployment_net_profit = get_total_selfemployment_net_profit_by_submission_id(submission_id)
 
     uk_tax_applicable_incomes = [income for income in taxable_incomes  if income.taxable_income_source.apply_uk_tax]
-    total_income_for_uk_tax = selfemployment_net_profit + get_total_taxable_income(uk_tax_applicable_incomes)
+    total_income_for_uk_tax = get_total_taxable_income(uk_tax_applicable_incomes)
+    total_income_for_uk_tax += selfemployment_net_profit if selfemployment_net_profit>0 else 0
 
     class_4_tax_applicable_incomes = [income for income in taxable_incomes  if income.taxable_income_source.apply_class4_tax]
-    total_income_for_class_4_tax = selfemployment_net_profit + get_total_taxable_income(class_4_tax_applicable_incomes)
+    total_income_for_class_4_tax = get_total_taxable_income(class_4_tax_applicable_incomes)
+    total_income_for_class_4_tax += selfemployment_net_profit if selfemployment_net_profit>0 else 0
 
     class_2_tax_applicable_incomes = [income for income in taxable_incomes  if income.taxable_income_source.apply_class2_tax]
-    total_income_for_class_2_tax = selfemployment_net_profit + get_total_taxable_income(class_2_tax_applicable_incomes)
+    total_income_for_class_2_tax = get_total_taxable_income(class_2_tax_applicable_incomes)
+    total_income_for_class_2_tax += selfemployment_net_profit if selfemployment_net_profit>0 else 0
 
 
     tax_calc__uk_tax = uk_tax(

@@ -1869,8 +1869,11 @@ def export_limited_tracker(request):
 def get_limited_submissions_where_deadline_not_set():
   return LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline = None)
 
-def get_limited_submissions_where_deadline_missed():
+def get_limited_submissions_where_company_house_deadline_missed():
   return LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False)
+
+def get_limited_submissions_where_HMRC_deadline_missed():
+  return LimitedSubmissionDeadlineTracker.objects.filter(our_deadline__lt = timezone.now(), is_submitted=False)
 
 def get_limited_submission_where_period_end(limit=-1):
     records = LimitedSubmissionDeadlineTracker.objects.filter(period__lt = timezone.now(), is_submitted=False).order_by()
@@ -1902,8 +1905,9 @@ def home_limited_submission_deadline_tracker(request):
     'counts': True,
     'limited_submission_counts': True,
     'submission_deadline_not_set': get_limited_submissions_where_deadline_not_set().count(),
-    'submission_deadline_missed': get_limited_submissions_where_deadline_missed().count(),
-    'submission_periodend': get_limited_submission_where_period_end().count(),
+    'submission_company_house_deadline_missed': get_limited_submissions_where_company_house_deadline_missed().count(),
+    'submission_HMRC_deadline_missed': get_limited_submissions_where_HMRC_deadline_missed().count(),
+    'submission_period_ended': get_limited_submission_where_period_end().count(),
 
     'template_tag': generate_template_tag_for_model(LimitedSubmissionDeadlineTracker, show_id=False, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, ordering=field_ordering, fk_fields=fk_fields),
     'data_container': generate_data_container_table(LimitedSubmissionDeadlineTracker, show_id=False, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, ordering=field_ordering),
@@ -2050,8 +2054,9 @@ def search_limited_submission_deadline_tracker(request, limit: int=-1):
     if tasks_key:
       tasks = {
         'submission_deadline_not_set': get_limited_submissions_where_deadline_not_set(),
-        'submission_deadline_missed': get_limited_submissions_where_deadline_missed(),
-        'submission_periodend': get_limited_submission_where_period_end(),
+        'submission_company_house_deadline_missed': get_limited_submissions_where_company_house_deadline_missed(),
+        'submission_HMRC_deadline_missed': get_limited_submissions_where_HMRC_deadline_missed(),
+        'submission_period_ended': get_limited_submission_where_period_end(),
       }
       records = tasks.get(tasks_key, [])
       data = serialize(queryset=records, format='json')
@@ -2134,7 +2139,7 @@ def home_limited_vat_tracker(request):
     'counts': True,
     'limited_vat_counts': True,
     'submission_deadline_not_set': get_limited_vats_where_deadline_not_set().count(),
-    'submission_deadline_missed': get_limited_vats_where_deadline_missed().count(),
+    'submission_vat_deadline_missed': get_limited_vats_where_deadline_missed().count(),
     'period_diff_gt_3months': get_limited_vats_where_period_difference_more_than_3months().count(),
 
     'template_tag': generate_template_tag_for_model(LimitedVATTracker, pk_field=pk_field, show_id=False, ordering=field_ordering, fk_fields=fk_fields),
@@ -2268,7 +2273,7 @@ def search_limited_vat_tracker(request, limit: int=-1):
     if tasks_key:
       tasks = {
         'submission_deadline_not_set': get_limited_vats_where_deadline_not_set(),
-        'submission_deadline_missed': get_limited_vats_where_deadline_missed(),
+        'submission_vat_deadline_missed': get_limited_vats_where_deadline_missed(),
         'period_diff_gt_3months': get_limited_vats_where_period_difference_more_than_3months()
       }
       records = tasks.get(tasks_key, [])

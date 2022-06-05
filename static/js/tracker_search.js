@@ -34,5 +34,5 @@ async function handleTaskClick(event){
 }
 
 for (let task of tasks){
-  task.addEventListener('click', handleTaskClick)
+  if(!task.hasAttribute('data-disabled')) task.addEventListener('click', handleTaskClick)
 }

@@ -63,3 +63,18 @@ export function loadAllRecords(){
   }, 10); // search with text
 }
 // loadAllRecords()
+
+
+// OpenSearch
+let current_url = window.location.href
+let url = new URL(current_url)
+let tasks = url.searchParams.get('tasks')
+if (tasks){
+  let taskCounter = document.querySelector(`.task[data-tasks="${tasks}"]`)
+  if (taskCounter) taskCounter.click()
+}
+
+// if (url.pathname==="/companies/SAS/home/"){
+//   let reloadBtn = document.querySelector(".action.action-reload")
+//   reloadBtn.click()
+// }

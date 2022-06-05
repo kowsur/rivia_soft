@@ -34,6 +34,10 @@ def get_date_today(date_format = '%Y-%m-%d'):
     return today
 
 class SelfassesmentCreationForm(forms.ModelForm):
+    start_date = forms.DateField(
+        label='Start Date',
+        widget=forms.DateInput(attrs={'type': 'date', 'placehoder': 'Selfassesment Start Date'})
+    )
     date_of_registration = forms.DateField(
         label='Registration date',
         widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today, 'placehoder': 'Registration date'})
@@ -56,6 +60,7 @@ class SelfassesmentCreationForm(forms.ModelForm):
 
             'client_file_number',
             'client_name',
+            'start_date',
 
             'date_of_birth',
             'PAYE_number',
@@ -85,7 +90,7 @@ class SelfassesmentCreationForm(forms.ModelForm):
         fieldsets = (
             Fieldset(
                 title = 'Client Info',
-                fields = ('client_file_number', 'selfassesment_type', 'date_of_registration', 'client_name', 'remarks', 'is_active', )
+                fields = ('client_file_number', 'selfassesment_type', 'date_of_registration', 'client_name', 'remarks', 'is_active', 'start_date')
                 ),
             Fieldset(
                 title = 'Personal Info',
@@ -107,6 +112,10 @@ class SelfassesmentCreationForm(forms.ModelForm):
 
 
 class SelfassesmentChangeForm(forms.ModelForm):
+    start_date = forms.DateField(
+        label='Start Date',
+        widget=forms.DateInput(attrs={'type': 'date', 'placehoder': 'Selfassesment Start Date'})
+    )
     date_of_registration = forms.DateField(
         label='Registration date',
         widget=forms.DateInput(attrs={'type': 'date', 'value': get_date_today, 'placehoder': 'Registration date'})
@@ -129,6 +138,7 @@ class SelfassesmentChangeForm(forms.ModelForm):
 
             'client_file_number',
             'client_name',
+            'start_date',
 
             'date_of_birth',
             'PAYE_number',
@@ -158,7 +168,7 @@ class SelfassesmentChangeForm(forms.ModelForm):
         fieldsets = (
             Fieldset(
                 title = 'Client Info',
-                fields = ('client_file_number', 'selfassesment_type', 'date_of_registration', 'client_name', 'remarks', 'is_active', )
+                fields = ('client_file_number', 'selfassesment_type', 'date_of_registration', 'client_name', 'remarks', 'is_active', 'start_date')
                 ),
             Fieldset(
                 title = 'Personal Info',

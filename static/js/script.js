@@ -42,9 +42,9 @@ function searchHandler(event){
   clearTimeout(typingTimer);
   // set the timer again to call api after doneTypingInterval
   if (search_text===''){
-    typingTimer = setTimeout( async () => {
-      loadAllRecords()
-    }, doneTypingInterval); // Get all the records
+    // typingTimer = setTimeout( async () => {
+    //   loadAllRecords()
+    // }, doneTypingInterval); // Get all the records
   }else{
     typingTimer = setTimeout(async (search_text, search_url)=>{
       
@@ -62,4 +62,4 @@ export function loadAllRecords(){
     populate_with_data(all_records)
   }, 10); // search with text
 }
-loadAllRecords()
+// loadAllRecords()

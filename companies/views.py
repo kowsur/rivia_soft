@@ -123,9 +123,14 @@ def get_selfassesment_where_AGENT_NOT_ACTIVE():
 def get_selfassesment_where_Client_IS_ACTIVE():
   return Selfassesment.objects.filter(is_active=True)
 
+def get_selfassesment_which_are_not_added_in_selfassesment_account_submission(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year()):
+  selfassesment_account_submission_created_for_selfassesments = SelfassesmentAccountSubmission.objects.filter(tax_year=tax_year)
+  return Selfassesment.objects.exclude(pk__in=Subquery(selfassesment_account_submission_created_for_selfassesments.values('client_id')))
+
 
 @login_required
 def home_selfassesment(request):
+  current_tax_year = SelfassesmentAccountSubmissionTaxYear.get_max_year()
   pk_field = 'client_id'
   exclude_fields = []
   include_fields = ['client_file_number', 'client_name', 'is_active', 'HMRC_agent', 'incomplete_tasks', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', "created_by", "date_of_registration"]
@@ -149,6 +154,7 @@ def home_selfassesment(request):
     "selfassesment_UTR_NOT_SET": get_selfassesment_where_UTR_NOT_SET().count(),
     "selfassesment_AGENT_NOT_ACTIVE": get_selfassesment_where_AGENT_NOT_ACTIVE().count(),
     "selfassesment_Client_IS_ACTIVE": get_selfassesment_where_Client_IS_ACTIVE().count(),
+    "selfassesment_not_added_in_selfassesment_account_submission": get_selfassesment_which_are_not_added_in_selfassesment_account_submission(tax_year=current_tax_year).count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
@@ -359,10 +365,12 @@ def search_selfassesment(request, limit: int=-1):
 
     # if tasks query paramter exists then return tasks
     if request.GET.get('tasks'):
+      current_tax_year = SelfassesmentAccountSubmissionTaxYear.get_max_year()
       tasks = {
         "selfassesment_UTR_NOT_SET": get_selfassesment_where_UTR_NOT_SET(),
         "selfassesment_AGENT_NOT_ACTIVE": get_selfassesment_where_AGENT_NOT_ACTIVE(),
         "selfassesment_Client_IS_ACTIVE": get_selfassesment_where_Client_IS_ACTIVE(),
+        "selfassesment_not_added_in_selfassesment_account_submission": get_selfassesment_which_are_not_added_in_selfassesment_account_submission(tax_year=current_tax_year),
       }
       records = tasks.get(request.GET.get('tasks'), [])
       data = serialize(queryset=records, format='json')
@@ -386,6 +394,9 @@ def all_selfassesment(request, limit=-1):
   raise Http404
 
 @login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to export this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_home_name)
 def export_selfassesment(request):
   response = HttpResponse(
     content_type='text/csv',
@@ -748,6 +759,9 @@ def all_selfassesment_data_collection(request, limit:int=-1):
   raise Http404
 
 @login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to export this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_home_name)
 def export_selfassesment_data_collection(request):
   response = HttpResponse(
     content_type='text/csv',
@@ -849,6 +863,8 @@ def home_selfassesment_account_submission(request):
     "selfassesment_account_submission_status_ASSIGEND_TO_ME": get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(request.user).filter(tax_year=current_tax_year).count(),
     "selfassesment_account_submission_status_NOT_ASSIGEND": get_selfassesment_account_submissions_where_status_NOT_ASSIGNED().filter(tax_year=current_tax_year).count(),
     "selfassesment_account_submission_data_collected": get_selfassesment_account_submissions_where_data_collected(current_tax_year).count(),
+    "selfassesment_account_submission__selfassesment_which_are_not_added_in_selfassesment_account_submission": get_selfassesment_account_submissions_where_data_collected(current_tax_year).count(),
+    "selfassesment_not_added_in_selfassesment_account_submission": get_selfassesment_which_are_not_added_in_selfassesment_account_submission(tax_year=current_tax_year).count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_viewall_url,
@@ -1020,6 +1036,7 @@ def search_selfassesment_account_submission(request, limit: int=-1):
         "selfassesment_account_submission_status_ASSIGEND_TO_ME": get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(request.user),
         "selfassesment_account_submission_status_NOT_ASSIGEND": get_selfassesment_account_submissions_where_status_NOT_ASSIGNED(),
         "selfassesment_account_submission_data_collected": get_selfassesment_account_submissions_where_data_collected(tax_year=tax_year),
+        "selfassesment_not_added_in_selfassesment_account_submission": get_selfassesment_which_are_not_added_in_selfassesment_account_submission(tax_year=tax_year),
       }
       records = tasks.get(request.GET.get('tasks'), SelfassesmentAccountSubmission.objects.none())
       if tax_year:
@@ -1056,6 +1073,9 @@ def all_selfassesment_account_submission(request, limit=-1):
   raise Http404
 
 @login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to export this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_home_name)
 def export_selfassesment_account_submission(request):
   response = HttpResponse(
     content_type='text/csv',
@@ -1581,6 +1601,9 @@ def all_limited(request, limit=-1):
   raise Http404
 
 @login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to export this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name)
 def export_limited(request):
   response = HttpResponse(
     content_type='text/csv',
@@ -2079,6 +2102,9 @@ def all_limited_submission_deadline_tracker(request, limit=-1):
   raise Http404
 
 @login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to export this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)
 def export_limited_submission_deadline_tracker(request):
   response = HttpResponse(
     content_type='text/csv',
@@ -2297,6 +2323,9 @@ def all_limited_vat_tracker(request, limit=-1):
   raise Http404
 
 @login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to export this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_VAT_Tracker_home_name)
 def export_limited_vat_tracker(request):
   response = HttpResponse(
     content_type='text/csv',
@@ -2507,6 +2536,9 @@ def all_limited_confirmation_statement_tracker(request, limit=-1):
   raise Http404
 
 @login_required
+@allowed_for_superuser(
+  message="Sorry! You are not authorized to export this.",
+  redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Confirmation_Statement_Tracker_home_name)
 def export_limited_confirmation_statement_tracker(request):
   response = HttpResponse(
     content_type='text/csv',

@@ -79,6 +79,10 @@
           <span id="task-count">{{ selfassesment_AGENT_NOT_ACTIVE }}</span>
           <span class="task-tooltip">Agent Inactive.</span>
         </span>
+        <span class="task task-own" data-tasks='selfassesment_not_added_in_selfassesment_account_submission'>
+          <span id="task-count">{{ selfassesment_not_added_in_selfassesment_account_submission }}</span>
+          <span class="task-tooltip">Selfssesments not added in Selfassesment Account Submission for current tax year</span>
+        </span>
       </div>
     {% elif selfassesment_account_submission_counts %}
       <div class="task-container">
@@ -129,6 +133,10 @@
         <span class="task task-done" data-tasks='selfassesment_account_submission_data_collected'>
           <span id="task-count">{{ selfassesment_account_submission_data_collected }}</span>
           <span class="task-tooltip">Data collected.</span>
+        </span>
+        <span class="task task-own" data-disabled data-tasks='selfassesment_not_added_in_selfassesment_account_submission'>
+          <a target="_blank" href="/companies/SA/home/?tasks=selfassesment_not_added_in_selfassesment_account_submission">{{ selfassesment_not_added_in_selfassesment_account_submission }}</a>
+          <span class="task-tooltip">Selfssesments not added in Selfassesment Account Submission for current tax year</span>
         </span>
       </div>
     {% elif limited_counts %}
@@ -245,7 +253,9 @@
   {% autoescape off %}
     {{ data_container }}
   {% endautoescape %}
-  <span class="absolute top-0 right-0 px-2 py-1 text-xs font-normal text-white bg-indigo-600 sm:text-sm sm:font-normal md:text-base md:font-medium" id="loading-indicator">Loading Data</span>
+  <span class="absolute top-0 right-0 px-2 py-1 text-xs font-normal text-white bg-indigo-600 sm:text-sm sm:font-normal md:text-base md:font-medium hidden" id="loading-indicator">
+    Loading Data
+  </span>
 </div>
 
 <!-- data template -->

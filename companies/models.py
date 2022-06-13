@@ -79,7 +79,7 @@ class Selfassesment(models.Model):
     
     client_file_number = models.DecimalField(verbose_name='File Number', max_digits=19, decimal_places=3, unique=True, blank=False, null=True, editable=True)
     client_name = models.CharField(verbose_name='Full Name / Business Name', max_length=100, blank=False, null=False, db_index=True)
-    start_date = models.DateField(verbose_name='Selfassesment Start Date', blank=False, null=True, default=None)
+    start_date = models.DateField(verbose_name='Selfassesment Start Date', blank=True, null=True, default=None)
     
     # Personal Info
     date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=True)

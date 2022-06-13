@@ -36,6 +36,7 @@ def get_date_today(date_format = '%Y-%m-%d'):
 class SelfassesmentCreationForm(forms.ModelForm):
     start_date = forms.DateField(
         label='Start Date',
+        required=False,
         widget=forms.DateInput(attrs={'type': 'date', 'placehoder': 'Selfassesment Start Date'})
     )
     date_of_registration = forms.DateField(
@@ -114,6 +115,7 @@ class SelfassesmentCreationForm(forms.ModelForm):
 class SelfassesmentChangeForm(forms.ModelForm):
     start_date = forms.DateField(
         label='Start Date',
+        required=False,
         widget=forms.DateInput(attrs={'type': 'date', 'placehoder': 'Selfassesment Start Date'})
     )
     date_of_registration = forms.DateField(

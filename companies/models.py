@@ -670,6 +670,17 @@ class LimitedSubmissionDeadlineTracker(models.Model):
         related_name='limited_account_submission_client_id',
         blank=False,
         null=True)
+    
+    status_choices = (
+        ("DOCUMENT REQUESTED", "DOCUMENT REQUESTED"),
+        ("WAITING FOR INFORMATION", "WAITING FOR INFORMATION"),
+        ("DOCUMENT RECEIVED", "DOCUMENT RECEIVED"),
+        ("PROCESSING", "PROCESSING"),
+        ("WAITING FOR CONFIRMATION", "WAITING FOR CONFIRMATION"),
+        ("COMPLETED", "COMPLETED"),
+    )
+    status = models.CharField("Status", blank=False, max_length=55, choices=status_choices, default="DOCUMENT REQUESTED")
+
     period_start_date = models.DateField(verbose_name='Period Start', blank=True, null=True)
     period = models.DateField(
         verbose_name='Period End',

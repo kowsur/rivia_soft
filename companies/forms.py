@@ -1210,6 +1210,7 @@ class LimitedSubmissionDeadlineTrackerCreationForm(forms.ModelForm):
         fields = (
             # "submission_id",
             "client_id",
+            "status",
             "period_start_date",
             "period",
             
@@ -1280,6 +1281,7 @@ class LimitedSubmissionDeadlineTrackerChangeForm(forms.ModelForm):
         fields = (
             # "submission_id",
             "client_id",
+            "status",
             "period_start_date",
             "period",
 

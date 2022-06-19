@@ -176,6 +176,30 @@
           <span id="task-count">{{ submission_period_ended }}</span>
           <span class="task-tooltip">Period End.</span>
         </span>
+        <span class="task task-previous" data-tasks='limited_submissions_status_DOCUMENT_REQUESTED'>
+          <span id="task-count">{{ limited_submissions_status_DOCUMENT_REQUESTED }}</span>
+          <span class="task-tooltip">Status - DOCUMENT REQUESTED</span>
+        </span>
+        <span class="task task-today" data-tasks='limited_submissions_status_WAITING_FOR_INFORMATION'>
+          <span id="task-count">{{ limited_submissions_status_WAITING_FOR_INFORMATION }}</span>
+          <span class="task-tooltip">Status - WAITING FOR INFORMATION</span>
+        </span>
+        <span class="task task-own" data-tasks='limited_submissions_status_DOCUMENT_RECEIVED'>
+          <span id="task-count">{{ limited_submissions_status_DOCUMENT_RECEIVED }}</span>
+          <span class="task-tooltip">Status - DOCUMENT RECEIVED</span>
+        </span>
+        <span class="task task-issue" data-tasks='limited_submissions_status_PROCESSING'>
+          <span id="task-count">{{ limited_submissions_status_PROCESSING }}</span>
+          <span class="task-tooltip">Status - PROCESSING</span>
+        </span>
+        <span class="task task-upcoming" data-tasks='limited_submissions_status_WAITING_FOR_CONFIRMATION'>
+          <span id="task-count">{{ limited_submissions_status_WAITING_FOR_CONFIRMATION }}</span>
+          <span class="task-tooltip">Status - WAITING FOR CONFIRMATION</span>
+        </span>
+        <span class="task task-done" data-tasks='limited_submissions_status_COMPLETED'>
+          <span id="task-count">{{ limited_submissions_status_COMPLETED }}</span>
+          <span class="task-tooltip">Status - COMPLETED</span>
+        </span>
       </div>
     {% elif limited_vat_counts %}
       <div class="task-container">

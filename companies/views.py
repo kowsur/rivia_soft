@@ -1889,6 +1889,24 @@ def export_limited_tracker(request):
 # =============================================================================================================
 # =============================================================================================================
 # LimitedSubmissionDeadlineTracker
+def get_limited_submissions_where_status_DOCUMENT_REQUESTED():
+  return LimitedSubmissionDeadlineTracker.objects.filter(status="DOCUMENT REQUESTED")
+
+def get_limited_submissions_where_status_WAITING_FOR_INFORMATION():
+  return LimitedSubmissionDeadlineTracker.objects.filter(status="WAITING FOR INFORMATION")
+
+def get_limited_submissions_where_status_DOCUMENT_RECEIVED():
+  return LimitedSubmissionDeadlineTracker.objects.filter(status="DOCUMENT RECEIVED")
+
+def get_limited_submissions_where_status_PROCESSING():
+  return LimitedSubmissionDeadlineTracker.objects.filter(status="PROCESSING")
+
+def get_limited_submissions_where_status_WAITING_FOR_CONFIRMATION():
+  return LimitedSubmissionDeadlineTracker.objects.filter(status="WAITING FOR CONFIRMATION")
+
+def get_limited_submissions_where_status_COMPLETED():
+  return LimitedSubmissionDeadlineTracker.objects.filter(status="COMPLETED")
+
 def get_limited_submissions_where_deadline_not_set():
   return LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline = None)
 
@@ -1909,7 +1927,7 @@ def get_limited_submission_where_period_end(limit=-1):
 def home_limited_submission_deadline_tracker(request):
   pk_field = 'submission_id'
   exclude_fields = []
-  field_ordering = ['client_id', 'period_start_date', 'period', 'remarks', 'HMRC_deadline', 'is_submitted', 'submitted_by', 'submission_date', 'our_deadline', 'is_submitted_hmrc', 'submitted_by_hmrc', 'submission_date_hmrc', 'is_documents_uploaded', ]
+  field_ordering = ['client_id', 'status', 'period_start_date', 'period', 'remarks', 'HMRC_deadline', 'is_submitted', 'submitted_by', 'submission_date', 'our_deadline', 'is_submitted_hmrc', 'submitted_by_hmrc', 'submission_date_hmrc', 'is_documents_uploaded', ]
   keep_include_fields = False
   fk_fields = {
       'updated_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
@@ -1931,6 +1949,12 @@ def home_limited_submission_deadline_tracker(request):
     'submission_company_house_deadline_missed': get_limited_submissions_where_company_house_deadline_missed().count(),
     'submission_HMRC_deadline_missed': get_limited_submissions_where_HMRC_deadline_missed().count(),
     'submission_period_ended': get_limited_submission_where_period_end().count(),
+    'limited_submissions_status_DOCUMENT_REQUESTED': get_limited_submissions_where_status_DOCUMENT_REQUESTED().count(),
+    'limited_submissions_status_WAITING_FOR_INFORMATION': get_limited_submissions_where_status_WAITING_FOR_INFORMATION().count(),
+    'limited_submissions_status_DOCUMENT_RECEIVED': get_limited_submissions_where_status_DOCUMENT_RECEIVED().count(),
+    'limited_submissions_status_PROCESSING': get_limited_submissions_where_status_PROCESSING().count(),
+    'limited_submissions_status_WAITING_FOR_CONFIRMATION': get_limited_submissions_where_status_WAITING_FOR_CONFIRMATION().count(),
+    'limited_submissions_status_COMPLETED': get_limited_submissions_where_status_COMPLETED().count(),
 
     'template_tag': generate_template_tag_for_model(LimitedSubmissionDeadlineTracker, show_id=False, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, ordering=field_ordering, fk_fields=fk_fields),
     'data_container': generate_data_container_table(LimitedSubmissionDeadlineTracker, show_id=False, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, ordering=field_ordering),
@@ -2080,6 +2104,12 @@ def search_limited_submission_deadline_tracker(request, limit: int=-1):
         'submission_company_house_deadline_missed': get_limited_submissions_where_company_house_deadline_missed(),
         'submission_HMRC_deadline_missed': get_limited_submissions_where_HMRC_deadline_missed(),
         'submission_period_ended': get_limited_submission_where_period_end(),
+        'limited_submissions_status_DOCUMENT_REQUESTED': get_limited_submissions_where_status_DOCUMENT_REQUESTED(),
+        'limited_submissions_status_WAITING_FOR_INFORMATION': get_limited_submissions_where_status_WAITING_FOR_INFORMATION(),
+        'limited_submissions_status_DOCUMENT_RECEIVED': get_limited_submissions_where_status_DOCUMENT_RECEIVED(),
+        'limited_submissions_status_PROCESSING': get_limited_submissions_where_status_PROCESSING(),
+        'limited_submissions_status_WAITING_FOR_CONFIRMATION': get_limited_submissions_where_status_WAITING_FOR_CONFIRMATION(),
+        'limited_submissions_status_COMPLETED': get_limited_submissions_where_status_COMPLETED(),
       }
       records = tasks.get(tasks_key, [])
       data = serialize(queryset=records, format='json')

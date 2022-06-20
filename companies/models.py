@@ -680,7 +680,7 @@ class LimitedSubmissionDeadlineTracker(models.Model):
         ("WAITING FOR CONFIRMATION", "WAITING FOR CONFIRMATION"),
         ("COMPLETED", "COMPLETED"),
     )
-    status = models.CharField("Status", blank=False, max_length=55, choices=status_choices, default=None)
+    status = models.CharField("Status", blank=True, null=True, max_length=55, choices=status_choices, default=None)
 
     period_start_date = models.DateField(verbose_name='Period Start', blank=True, null=True)
     period = models.DateField(

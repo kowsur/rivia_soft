@@ -1405,7 +1405,7 @@ def get_limited_where_Client_IS_ACTIVE():
 def home_limited(request):
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_file_number', 'client_name', 'is_active', 'HMRC_agent', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', "created_by", "date_of_registration"]
+  include_fields = ['client_file_number', 'client_name', 'is_active', 'HMRC_agent', 'is_payroll', 'payment_method', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', "created_by", "date_of_registration"]
   keep_include_fields = True
   show_others = False
   model_fields = get_field_names_from_model(Limited)
@@ -1609,7 +1609,7 @@ def export_limited(request):
     content_type='text/csv',
     headers={'Content-Disposition': f'attachment; filename="limited_{timezone.localtime()}.csv"'},
   )
-  include_fields = ['is_active', 'client_file_number', 'client_name', 'company_reg_number', 'company_auth_code', 'remakrs', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent']
+  include_fields = ['is_active', 'is_payroll', 'payment_method', 'client_file_number', 'client_name', 'company_reg_number', 'company_auth_code', 'remakrs', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent']
   exclude_fields = ['client_id',]
   keep_include_fields = True
   show_others = False

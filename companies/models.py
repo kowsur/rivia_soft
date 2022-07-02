@@ -486,6 +486,7 @@ class Limited(models.Model):
 
     date_of_registration = models.DateField(verbose_name='Registration date', blank=False, null=True, default=timezone.now)
     is_active = models.BooleanField(verbose_name='Active Status', blank=False, null=False, default=True)
+    is_payroll = models.BooleanField(verbose_name="Is Payroll", blank=False, default=False, null=False)
     remarks = models.TextField(_("Remarks"), blank=True, null=True)
     
     client_file_number = models.DecimalField(verbose_name='File Number', max_digits=19, decimal_places=3, unique=True, blank=False, null=True, editable=True)
@@ -493,6 +494,14 @@ class Limited(models.Model):
     company_reg_number = models.CharField(verbose_name='Company Registration Number', max_length=100, blank=False, null=True, unique=True, db_index=True)
     company_auth_code = models.CharField(verbose_name='Company Authentication Code', max_length=100, blank=True, null=True, db_index=True, validators=[AUTH_CODE_VALIDATOR])
     
+    payment_method_choices = (
+        (None, "--------------"),
+        ("CASH", "CASH"),
+        ("DIRECT DEBIT","DIRECT DEBIT"),
+        ("BANK TRANSFER","BANK TRANSFER"),
+    )
+    payment_method = models.CharField("Payment Method", blank=True, null=True, max_length=55, choices=payment_method_choices, default=None)
+
     # Director Info
     date_of_birth = models.DateField(verbose_name="Date of Birth", null=True, blank=True)
     PAYE_number = models.CharField(verbose_name='PAYE Number', max_length=255, blank=True, null=True, unique=True, db_index=True)

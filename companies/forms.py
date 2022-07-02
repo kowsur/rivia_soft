@@ -850,12 +850,14 @@ class LimitedCreationForm(forms.ModelForm):
             # 'is_updated',
             'date_of_registration',
             'is_active',
+            'is_payroll',
             'remarks',
 
             'client_file_number',
             'client_name',
             'company_reg_number',
             'company_auth_code',
+            'payment_method',
 
             'date_of_birth',
             'PAYE_number',
@@ -888,7 +890,7 @@ class LimitedCreationForm(forms.ModelForm):
         fieldsets = (
             Fieldset(
                 title = 'Client Info',
-                fields = ('client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', )
+                fields = ('client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', 'is_payroll', 'payment_method', )
                 ),
             Fieldset(
                 title = 'Director Info',
@@ -927,12 +929,14 @@ class LimitedChangeForm(forms.ModelForm):
             # 'is_updated',
             'date_of_registration',
             'is_active',
+            'is_payroll',
             'remarks',
 
             'client_file_number',
             'client_name',
             'company_reg_number',
             'company_auth_code',
+            'payment_method',
 
             'date_of_birth',
             'PAYE_number',
@@ -965,7 +969,7 @@ class LimitedChangeForm(forms.ModelForm):
         fieldsets = (
             Fieldset(
                 title = 'Client Info',
-                fields = ('client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', )
+                fields = ('client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', 'is_payroll', 'payment_method', )
                 ),
             Fieldset(
                 title = 'Director Info',

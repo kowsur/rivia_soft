@@ -30,6 +30,7 @@
     <!-- js -->
     <script type="module" src='{% static "js/script.js" %}'></script>
     <script>
+      {% comment %} Open decendent links of table in new tab {% endcomment %}
       const table = document.querySelector('table')
       table.addEventListener('click', e=>{
         e.preventDefault()

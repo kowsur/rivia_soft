@@ -284,6 +284,7 @@ def update_selfassesment(request, client_id:int):
 
   try:
     record =  Selfassesment.objects.get(client_id=client_id)
+    current_is_active_value = record.is_active
     context['form'] = SelfassesmentChangeForm(instance=record)
   except Selfassesment.DoesNotExist:
     messages.error(request, f'Selfassesment Account having id {client_id} does not exists!')
@@ -294,6 +295,12 @@ def update_selfassesment(request, client_id:int):
     form = SelfassesmentChangeForm(request.POST, instance=record)
     context['form'] = form
     if form.is_valid():
+      # Prevent non admin users from updating active status
+      if form.cleaned_data.get('is_active')!=current_is_active_value and not request.user.is_superuser:
+        form.add_error('is_active', 'Only admins can change the active status.')
+        messages.error(request, 'Update failed due to permission error.')
+        return render(request, template_name='companies/update.html', context=context)
+
       assesment = form.save()
       # Update auto created trackers as compeleted
       if assesment.UTR:
@@ -1517,6 +1524,7 @@ def update_limited(request, client_id:int):
 
   try:
     record = Limited.objects.get(client_id=client_id)
+    current_is_active_value = record.is_active
     had_vat = bool(record.vat)
     context['form'] = LimitedChangeForm(instance=record)
   except Limited.DoesNotExist:
@@ -1527,7 +1535,13 @@ def update_limited(request, client_id:int):
   if request.method == 'POST':
     form = LimitedChangeForm(request.POST, instance=record)
     context['form'] = form
-    if form.is_valid():
+    if form.is_valid():  
+      # Prevent non admin users from updating active status
+      if form.cleaned_data.get('is_active')!=current_is_active_value and not request.user.is_superuser:
+        form.add_error('is_active', 'Only admins can change the active status.')
+        messages.error(request, 'Update failed due to permission error.')
+        return render(request, template_name='companies/update.html', context=context)
+
       assesment = form.save()
       messages.success(request, f'Limited has been updated having id {client_id}!')
       

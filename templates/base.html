@@ -31,11 +31,11 @@
     <script type="module" src='{% static "js/script.js" %}'></script>
     <script>
       {% comment %} Open decendent links of table in new tab {% endcomment %}
-      const table = document.querySelector('table')
-      table.addEventListener('click', e=>{
-        e.preventDefault()
+      const tbody = document.querySelector('tbody')
+      tbody.addEventListener('click', e=>{
         let element = e.target
-        if(element.tagName=='A'){
+        if(element.tagName=='A' && element.matches('td[id="client_id"]>a')){
+          e.preventDefault()
           let href = element.href
           window.open(href, "_blank")
         }

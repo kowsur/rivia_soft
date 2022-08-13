@@ -2053,6 +2053,17 @@ def update_limited_submission_deadline_tracker(request, submission_id:int):
     context['form'] = form
     if form.is_valid():
       assesment = form.save(commit=False)
+
+      # To submit the first record of a client require Period Start and Period End
+      first_row_for_current_client = LimitedSubmissionDeadlineTracker.objects.filter(client_id=record.client_id).order_by('pk').first()
+      if first_row_for_current_client==record and assesment.is_submitted==True and assesment.is_submitted_hmrc:
+        if not form.cleaned_data.get('period_start_date'):
+          form.add_error('period_start_date', 'This is the first record of this client therefore this field is required.')
+        if not form.cleaned_data.get('period'):
+          form.add_error('period', 'This is the first record of this client therefore this field is required.')
+        if not form.is_valid():
+          return render(request, template_name='companies/update.html', context=context)
+
       assesment.set_defaults(request)
       assesment.save()
       context['form'] = LimitedSubmissionDeadlineTrackerChangeForm(instance=assesment)
@@ -2078,6 +2089,8 @@ def update_limited_submission_deadline_tracker(request, submission_id:int):
         new_assesment.updated_by = request.user
         new_assesment.HMRC_deadline = assesment.HMRC_deadline + relativedelta(years=1) # Compnay House deadline
         new_assesment.our_deadline = assesment.our_deadline + relativedelta(years=1) # HMRC Deadline
+        new_assesment.period_start_date = assesment.period_start_date + relativedelta(years=1) # Period Start
+        new_assesment.period = assesment.period + relativedelta(years=1) # Period End
         new_assesment.save()
         messages.success(request, f'New Limited Submission Deadline Tracker has been created {new_assesment}')
         return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)

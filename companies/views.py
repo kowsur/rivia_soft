@@ -1933,8 +1933,11 @@ def get_limited_submissions_where_status_COMPLETED():
 def get_limited_submissions_where_deadline_not_set():
   return LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline = None)
 
-def get_limited_submissions_where_company_house_deadline_missed():
-  return LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False)
+def get_limited_submissions_where_company_house_deadline_missed_of_active_clients():
+  return LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False, client_id__is_active=True)
+
+def get_limited_submissions_where_company_house_deadline_missed_of_inactive_clients():
+  return LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False, client_id__is_active=False)
 
 def get_limited_submissions_where_HMRC_deadline_missed():
   return LimitedSubmissionDeadlineTracker.objects.filter(our_deadline__lt = timezone.now(), is_submitted=False)
@@ -1969,7 +1972,8 @@ def home_limited_submission_deadline_tracker(request):
     'counts': True,
     'limited_submission_counts': True,
     'submission_deadline_not_set': get_limited_submissions_where_deadline_not_set().count(),
-    'submission_company_house_deadline_missed': get_limited_submissions_where_company_house_deadline_missed().count(),
+    'submission_company_house_deadline_missed_of_active_clients': get_limited_submissions_where_company_house_deadline_missed_of_active_clients().count(),
+    'submission_company_house_deadline_missed_of_inactive_clients': get_limited_submissions_where_company_house_deadline_missed_of_inactive_clients().count(),
     'submission_HMRC_deadline_missed': get_limited_submissions_where_HMRC_deadline_missed().count(),
     'submission_period_ended': get_limited_submission_where_period_end().count(),
     'limited_submissions_status_DOCUMENT_REQUESTED': get_limited_submissions_where_status_DOCUMENT_REQUESTED().count(),
@@ -2124,7 +2128,8 @@ def search_limited_submission_deadline_tracker(request, limit: int=-1):
     if tasks_key:
       tasks = {
         'submission_deadline_not_set': get_limited_submissions_where_deadline_not_set(),
-        'submission_company_house_deadline_missed': get_limited_submissions_where_company_house_deadline_missed(),
+        'submission_company_house_deadline_missed_of_active_clients': get_limited_submissions_where_company_house_deadline_missed_of_active_clients(),
+        'submission_company_house_deadline_missed_of_inactive_clients': get_limited_submissions_where_company_house_deadline_missed_of_inactive_clients(),
         'submission_HMRC_deadline_missed': get_limited_submissions_where_HMRC_deadline_missed(),
         'submission_period_ended': get_limited_submission_where_period_end(),
         'limited_submissions_status_DOCUMENT_REQUESTED': get_limited_submissions_where_status_DOCUMENT_REQUESTED(),

@@ -172,9 +172,13 @@
           <span id="task-count">{{ submission_deadline_not_set }}</span>
           <span class="task-tooltip">Limited Submission HMRC Deadline not set.</span>
         </span>
-        <span class="task task-previous" data-tasks='submission_company_house_deadline_missed'>
-          <span id="task-count">{{ submission_company_house_deadline_missed }}</span>
-          <span class="task-tooltip">Company house deadline overdue.</span>
+        <span class="task task-previous" data-tasks='submission_company_house_deadline_missed_of_active_clients'>
+          <span id="task-count">{{ submission_company_house_deadline_missed_of_active_clients }}</span>
+          <span class="task-tooltip">Company house deadline overdue of active clients.</span>
+        </span>
+        <span class="task task-today" data-tasks='submission_company_house_deadline_missed_of_inactive_clients'>
+          <span id="task-count">{{ submission_company_house_deadline_missed_of_inactive_clients }}</span>
+          <span class="task-tooltip">Company house deadline overdue of inactive clients.</span>
         </span>
         <span class="task task-previous" data-tasks='submission_HMRC_deadline_missed'>
           <span id="task-count">{{ submission_HMRC_deadline_missed }}</span>

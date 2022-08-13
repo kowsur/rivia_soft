@@ -123,6 +123,9 @@ def get_selfassesment_where_AGENT_NOT_ACTIVE():
 def get_selfassesment_where_Client_IS_ACTIVE():
   return Selfassesment.objects.filter(is_active=True)
 
+def get_selfassesment_where_Client_IS_INACTIVE():
+  return Selfassesment.objects.filter(is_active=False)
+
 def get_selfassesment_which_are_not_added_in_selfassesment_account_submission(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year()):
   selfassesment_account_submission_created_for_selfassesments = SelfassesmentAccountSubmission.objects.filter(tax_year=tax_year)
   return Selfassesment.objects.exclude(pk__in=Subquery(selfassesment_account_submission_created_for_selfassesments.values('client_id')))
@@ -154,6 +157,7 @@ def home_selfassesment(request):
     "selfassesment_UTR_NOT_SET": get_selfassesment_where_UTR_NOT_SET().count(),
     "selfassesment_AGENT_NOT_ACTIVE": get_selfassesment_where_AGENT_NOT_ACTIVE().count(),
     "selfassesment_Client_IS_ACTIVE": get_selfassesment_where_Client_IS_ACTIVE().count(),
+    "selfassesment_Client_IS_INACTIVE": get_selfassesment_where_Client_IS_INACTIVE().count(),
     "selfassesment_not_added_in_selfassesment_account_submission": get_selfassesment_which_are_not_added_in_selfassesment_account_submission(tax_year=current_tax_year).count(),
 
     'frontend_data':{
@@ -370,6 +374,7 @@ def search_selfassesment(request, limit: int=-1):
         "selfassesment_UTR_NOT_SET": get_selfassesment_where_UTR_NOT_SET(),
         "selfassesment_AGENT_NOT_ACTIVE": get_selfassesment_where_AGENT_NOT_ACTIVE(),
         "selfassesment_Client_IS_ACTIVE": get_selfassesment_where_Client_IS_ACTIVE(),
+        "selfassesment_Client_IS_INACTIVE": get_selfassesment_where_Client_IS_INACTIVE(),
         "selfassesment_not_added_in_selfassesment_account_submission": get_selfassesment_which_are_not_added_in_selfassesment_account_submission(tax_year=current_tax_year),
       }
       records = tasks.get(request.GET.get('tasks'), [])
@@ -1400,6 +1405,8 @@ def get_limited_where_AGENT_NOT_ACTIVE():
 
 def get_limited_where_Client_IS_ACTIVE():
   return Limited.objects.filter(is_active=True)
+def get_limited_where_Client_IS_INACTIVE():
+  return Limited.objects.filter(is_active=False)
 
 @login_required
 def home_limited(request):
@@ -1427,6 +1434,7 @@ def home_limited(request):
     "limited_COMPANY_AUTH_CODE_NOT_SET": get_limited_where_COMPANY_AUTH_CODE_NOT_SET().count(),
     "limited_AGENT_NOT_ACTIVE": get_limited_where_AGENT_NOT_ACTIVE().count(),
     "limited_Client_IS_ACTIVE": get_limited_where_Client_IS_ACTIVE().count(),
+    "limited_Client_IS_INACTIVE": get_limited_where_Client_IS_INACTIVE().count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
@@ -1578,6 +1586,7 @@ def search_limited(request, limit: int=-1):
         "limited_COMPANY_AUTH_CODE_NOT_SET": get_limited_where_COMPANY_AUTH_CODE_NOT_SET(),
         "limited_AGENT_NOT_ACTIVE": get_limited_where_AGENT_NOT_ACTIVE(),
         "limited_Client_IS_ACTIVE": get_limited_where_Client_IS_ACTIVE(),
+        "limited_Client_IS_INACTIVE": get_limited_where_Client_IS_INACTIVE(),
       }
       records = tasks.get(request.GET.get('tasks'), [])
       data = serialize(queryset=records, format='json')

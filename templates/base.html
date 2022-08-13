@@ -23,11 +23,22 @@
     {% endif %}
     
     <!-- content -->
-    <div class="mx-auto" style="padding: .5em;">
+    <div class="mx-auto" style="padding: .5em;" id="main-content">
       {% block content %} {% endblock content %}
     </div>
 
     <!-- js -->
     <script type="module" src='{% static "js/script.js" %}'></script>
+    <script>
+      const table = document.querySelector('table')
+      table.addEventListener('click', e=>{
+        e.preventDefault()
+        let element = e.target
+        if(element.tagName=='A'){
+          let href = element.href
+          window.open(href, "_blank")
+        }
+    })
+    </script>
   </body>
 </html>

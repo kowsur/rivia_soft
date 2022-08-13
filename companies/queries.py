@@ -47,9 +47,10 @@ def db_search_Selfassesment(search_text: str, limit=-1):
     return Selfassesment.objects.filter(Query)[:limit]
 
 def db_all_Selfassesment(limit=-1):
+    result = Selfassesment.objects.filter(is_active=True)
     if limit<=-1:
-        return Selfassesment.objects.all()
-    return Selfassesment.objects.all()[:limit]
+        return result
+    return result[:limit]
 
 
 # SelfemploymentIncomeAndExpensesDataCollection
@@ -244,9 +245,10 @@ def db_search_Limited(search_text: str, limit=-1):
     return Limited.objects.filter(Query)[:limit]
 
 def db_all_Limited(limit=-1):
+    result = Limited.objects.filter(is_active=True)
     if limit<=-1:
-        return Limited.objects.all()
-    return Limited.objects.all()[:limit]
+        return result
+    return result[:limit]
 
 
 # =============================================================================================================

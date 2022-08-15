@@ -31,7 +31,7 @@ from companies.url_variables import URL_NAMES, URL_NAMES_PREFIXED_WITH_APP_NAME,
 from .tax_calc_helpers import get_personal_allowance_reduction, percentage_of, uk_tax, uk_class_4_tax
 
 
-def get_object_or_None(model, *args, pk=None, delete_duplicate=True, return_all=False, **kwargs):
+def get_object_or_None(model, *args, pk=None, delete_duplicate=False, return_all=False, **kwargs):
     try:
         if pk is not None:
             record = model.objects.get(pk=pk)
@@ -102,22 +102,22 @@ def upsert_expese_for_submission(request:HttpRequest, submission_id, month_id, e
         return HttpResponse(json.dumps({'error': f'percentage_for_fuel_amount_value value should be between 0 and 100!'}), status=400)
 
     # retrive selfassemsent account submission record
-    client = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+    client = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id, delete_duplicate=True)
     if client is None:
         return HttpResponse(json.dumps({'error': f'SelfassesmentAccountSubmission with pk={submission_id} does not exist'}), status=404)
     
     # retrive month 
-    month = get_object_or_None(Months, pk=month_id)
+    month = get_object_or_None(Months, pk=month_id, delete_duplicate=True)
     if month is None:
         return HttpResponse(json.dumps({'error': f'Month with pk={month_id} does not exist'}), status=404)
     
     # retrive expense source
-    expense = get_object_or_None(SelfemploymentExpenseSources, pk=expense_id)
+    expense = get_object_or_None(SelfemploymentExpenseSources, pk=expense_id, delete_duplicate=True)
     if expense is None:
         return HttpResponse(json.dumps({'error': f'Expense with pk={expense_id} does not exist'}), status=404)
 
     # Try to retrive ExpensesPerTaxYear if does not exist create it
-    expense_for_tax_year = get_object_or_None(SelfemploymentExpensesPerTaxYear, client=client, month=month, expense_source=expense)
+    expense_for_tax_year = get_object_or_None(SelfemploymentExpensesPerTaxYear, delete_duplicate=True, client=client, month=month, expense_source=expense)
 
     # Update existing record 
     if expense_for_tax_year is not None:
@@ -172,22 +172,22 @@ def upsert_income_for_submission(request:HttpRequest, submission_id, month_id, i
         return HttpResponse(json.dumps({'error': f'amount or comission or note must be specified'}), status=400)
 
     # retrive selfassemsent account submission record
-    client = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+    client = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id, delete_duplicate=True)
     if client is None:
         return HttpResponse(json.dumps({'error': f'SelfassesmentAccountSubmission with pk={submission_id} does not exist'}), status=404)
     
     # retrive month 
-    month = get_object_or_None(Months, pk=month_id)
+    month = get_object_or_None(Months, pk=month_id, delete_duplicate=True)
     if month is None:
         return HttpResponse(json.dumps({'error': f'Month with pk={month_id} does not exist'}), status=404)
     
     # retrive income source
-    income = get_object_or_None(SelfemploymentIncomeSources, pk=income_id)
+    income = get_object_or_None(SelfemploymentIncomeSources, pk=income_id, delete_duplicate=True)
     if income is None:
         return HttpResponse(json.dumps({'error': f'IncomeSource with pk={income_id} does not exist'}), status=404)
     
     # Try to retrive IncomesPerTaxYear if does not exist create it
-    income_for_tax_year = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=client, month=month, income_source=income)
+    income_for_tax_year = get_object_or_None(SelfemploymentIncomesPerTaxYear, delete_duplicate=True, client=client, month=month, income_source=income)
     
     # Update existing record 
     if income_for_tax_year:
@@ -244,17 +244,17 @@ def upsert_deduction_for_submission(request:HttpRequest, submission_id, deductio
         return HttpResponse(json.dumps({'error': f'personal_usage_percentage must be between 0 and 100!'}), status=400)
 
     # retrive selfassemsent account submission record
-    client = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+    client = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id, delete_duplicate=True)
     if client is None:
         return HttpResponse(json.dumps({'error': f'SelfassesmentAccountSubmission with pk={submission_id} does not exist'}), status=404)
     
     # retrive deduction source
-    deduction_source = get_object_or_None(SelfemploymentDeductionSources, pk=deduction_id)
+    deduction_source = get_object_or_None(SelfemploymentDeductionSources, pk=deduction_id, delete_duplicate=True)
     if deduction_source is None:
         return HttpResponse(json.dumps({'error': f'DeductionSource with pk={deduction_id} does not exist'}), status=404)
     
     # Try to retrive IncomesPerTaxYear if does not exist create it
-    deduction_for_tax_year = get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=client, deduction_source=deduction_id)
+    deduction_for_tax_year = get_object_or_None(SelfemploymentDeductionsPerTaxYear, delete_duplicate=True, client=client, deduction_source=deduction_id)
     
     # Update existing record 
     if deduction_for_tax_year:
@@ -317,17 +317,17 @@ def upsert_taxable_income_for_submission(request:HttpRequest, submission_id, tax
     #     return HttpResponse(json.dumps({'error': f'paid_income_tax_amount must be between 0 and 100!'}), status=400)
 
     # retrive selfassemsent account submission record
-    submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+    submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id, delete_duplicate=True)
     if submission is None:
         return HttpResponse(json.dumps({'error': f'SelfassesmentAccountSubmission with pk={submission_id} does not exist'}), status=404)
     
     # retrive deduction source
-    taxable_income_source = get_object_or_None(TaxableIncomeSources, pk=taxable_income_id)
+    taxable_income_source = get_object_or_None(TaxableIncomeSources, pk=taxable_income_id, delete_duplicate=True)
     if taxable_income_source is None:
         return HttpResponse(json.dumps({'error': f'DeductionSource with pk={taxable_income_id} does not exist'}), status=404)
     
     # Try to retrive TaxableIncomeSourceForSubmission if does not exist create it
-    taxable_income_for_tax_year = get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission, taxable_income_source=taxable_income_id)
+    taxable_income_for_tax_year = get_object_or_None(TaxableIncomeSourceForSubmission, delete_duplicate=True, submission=submission, taxable_income_source=taxable_income_id)
     
     # Update existing record 
     if taxable_income_for_tax_year:
@@ -518,19 +518,19 @@ def filter_deductions_and_allowances(deductions_and_allowances):
 
 def get_total_selfemployment_income_by_submission_id(submission_id):
     """Selfemployment Income (Including Tips)"""
-    selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, delete_duplicate=False, return_all=True, client=submission_id)
     selfemployment_incomes = filter_selfemployment_incomes(selfemployment_incomes)
     return get_total_selfemployment_income(selfemployment_incomes)
 
 def get_total_selfemployment_expense_by_submission_id(submission_id):
     """Selfemployment Expense total of expenses + commission from incomes and deductions from deduction sources"""
-    selfemployment_expenses = get_object_or_None(SelfemploymentExpensesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    selfemployment_expenses = get_object_or_None(SelfemploymentExpensesPerTaxYear, delete_duplicate=False, return_all=True, client=submission_id)
     selfemployment_expenses = filter_selfemployment_expenses(selfemployment_expenses)
 
-    deductions_and_allowances = get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    deductions_and_allowances = get_object_or_None(SelfemploymentDeductionsPerTaxYear, delete_duplicate=False, return_all=True, client=submission_id)
     deductions_and_allowances = filter_deductions_and_allowances(deductions_and_allowances)
 
-    # selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    # selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, delete_duplicate=False, return_all=True, client=submission_id)
     # selfemployment_incomes = filter_selfemployment_incomes(selfemployment_incomes)
 
     selfemployment_expense = get_total_selfemployment_expense(selfemployment_expenses)
@@ -547,18 +547,18 @@ def get_total_taxable_income_by_submission_id(submission_id):
     """total taxable income"""
     error_messages = []
 
-    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id, delete_duplicate=True)
     if not account_submission:
         error_messages.append(f"Account submission does not exist for {submission_id} submission id.")
         raise RaiseErrorMessages(error_messages)
     tax_year = account_submission.tax_year
     
-    UK_tax_config = get_object_or_None(SelfemploymentUkTaxConfigForTaxYear, tax_year=tax_year, delete_duplicate=False)
+    UK_tax_config = get_object_or_None(SelfemploymentUkTaxConfigForTaxYear, delete_duplicate=False, tax_year=tax_year)
     if not UK_tax_config:
         error_messages.append(f"Uk tax configuration for {tax_year} tax-year not found.")
         raise RaiseErrorMessages(error_messages)
     
-    taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission_id, delete_duplicate=False, return_all=True)
+    taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, delete_duplicate=False, return_all=True, submission=submission_id)
     taxable_incomes = filter_taxable_incomes(taxable_incomes)
     
     total_taxable_income = get_total_taxable_income(taxable_incomes)
@@ -577,18 +577,18 @@ def get_total_taxable_income_by_submission_id(submission_id):
 def get_total_tax_by_submission_id(submission_id):
     error_messages = []
 
-    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id, delete_duplicate=True)
     if not account_submission:
         error_messages.append(f"Account submission does not exist for {submission_id} submission id.")
         raise RaiseErrorMessages(error_messages)
     tax_year = account_submission.tax_year
 
-    taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission_id, delete_duplicate=False, return_all=True)
+    taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, delete_duplicate=False, return_all=True, submission=submission_id)
     taxable_incomes = filter_taxable_incomes(taxable_incomes)
 
-    UK_tax_config = get_object_or_None(SelfemploymentUkTaxConfigForTaxYear, tax_year=tax_year, delete_duplicate=False)
-    Class4_tax_config = get_object_or_None(SelfemploymentClass4TaxConfigForTaxYear, tax_year=tax_year, delete_duplicate=False)
-    Class2_tax_config = get_object_or_None(SelfemploymentClass2TaxConfigForTaxYear, tax_year=tax_year, delete_duplicate=False)
+    UK_tax_config = get_object_or_None(SelfemploymentUkTaxConfigForTaxYear, delete_duplicate=False, tax_year=tax_year)
+    Class4_tax_config = get_object_or_None(SelfemploymentClass4TaxConfigForTaxYear, delete_duplicate=False, tax_year=tax_year)
+    Class2_tax_config = get_object_or_None(SelfemploymentClass2TaxConfigForTaxYear, delete_duplicate=False, tax_year=tax_year)
     if not UK_tax_config:
         error_messages.append(f'UK tax configuration not found for the year {tax_year.tax_year}!')
     if not Class4_tax_config:
@@ -678,18 +678,18 @@ def generate_tax_report_pdf(account_submission):
     submission_id = account_submission.pk
 
     tax_year = account_submission.tax_year
-    selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    selfemployment_incomes = get_object_or_None(SelfemploymentIncomesPerTaxYear, delete_duplicate=False, return_all=True, client=submission_id)
     selfemployment_incomes = filter_selfemployment_incomes(selfemployment_incomes)
     selfemployment_total_comission = get_total_selfemployment_comission(selfemployment_incomes)
 
-    selfemployment_expenses = get_object_or_None(SelfemploymentExpensesPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True).order_by('-personal_usage_percentage')
+    selfemployment_expenses = get_object_or_None(SelfemploymentExpensesPerTaxYear, delete_duplicate=False, return_all=True, client=submission_id).order_by('-personal_usage_percentage')
     personal_usage_heading_value = selfemployment_expenses[0].personal_usage_percentage if selfemployment_expenses else 20
     selfemployment_expenses = filter_selfemployment_expenses(selfemployment_expenses)
 
-    taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, submission=submission_id, delete_duplicate=False, return_all=True)
+    taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, delete_duplicate=False, return_all=True, submission=submission_id)
     taxable_incomes = [taxable_income for taxable_income in taxable_incomes if taxable_income.amount>0]
     
-    deductions_and_allowances = get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=submission_id, delete_duplicate=False, return_all=True)
+    deductions_and_allowances = get_object_or_None(SelfemploymentDeductionsPerTaxYear, delete_duplicate=False, return_all=True, client=submission_id)
     deductions_and_allowances = filter_deductions_and_allowances(deductions_and_allowances)
 
     # selfemployment
@@ -698,7 +698,7 @@ def generate_tax_report_pdf(account_submission):
     selfemployment_total_deduction_and_allowance = get_total_selfemployment_deduction_and_allowance(deductions_and_allowances)
 
     # Car value calculations
-    car_value_deduction_and_allowance = get_object_or_None(SelfemploymentDeductionsPerTaxYear, client=submission_id, deduction_source__name__icontains="Car Value", return_all=False, delete_duplicate=False)
+    car_value_deduction_and_allowance = get_object_or_None(SelfemploymentDeductionsPerTaxYear, delete_duplicate=False, return_all=False, client=submission_id, deduction_source__name__icontains="Car Value")
     allowance_car_value = {
         'value': 0,
         'addition': 0,
@@ -740,9 +740,9 @@ def generate_tax_report_pdf(account_submission):
     # Income tax page calculations
     # Tax configs
     error_messages = []
-    UK_tax_config = get_object_or_None(SelfemploymentUkTaxConfigForTaxYear, tax_year=tax_year, delete_duplicate=False)
-    Class4_tax_config = get_object_or_None(SelfemploymentClass4TaxConfigForTaxYear, tax_year=tax_year, delete_duplicate=False)
-    Class2_tax_config = get_object_or_None(SelfemploymentClass2TaxConfigForTaxYear, tax_year=tax_year, delete_duplicate=False)
+    UK_tax_config = get_object_or_None(SelfemploymentUkTaxConfigForTaxYear, delete_duplicate=False, tax_year=tax_year)
+    Class4_tax_config = get_object_or_None(SelfemploymentClass4TaxConfigForTaxYear, delete_duplicate=False, tax_year=tax_year)
+    Class2_tax_config = get_object_or_None(SelfemploymentClass2TaxConfigForTaxYear, delete_duplicate=False, tax_year=tax_year)
     if not UK_tax_config:
         error_messages.append(f'UK tax configuration not found for the year {tax_year.tax_year}!')
     if not Class4_tax_config:
@@ -882,7 +882,7 @@ def generate_tax_report_pdf(account_submission):
 
 @login_required
 def tax_report_pdf(request:HttpRequest, submission_id):
-    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id, delete_duplicate=True)
 
     if not account_submission:
         raise Http404("Submission for the submission_id specified does not exist!")
@@ -891,7 +891,7 @@ def tax_report_pdf(request:HttpRequest, submission_id):
 
 
 def public_tax_report_pdf(request:HttpRequest, submission_id, view_key):
-    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id)
+    account_submission = get_object_or_None(SelfassesmentAccountSubmission, pk=submission_id, delete_duplicate=True)
 
     if not account_submission or account_submission.unique_public_view_key!=view_key:
         raise Http404("Invalid view key!")

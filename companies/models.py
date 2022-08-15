@@ -45,6 +45,7 @@ class Selfassesment(models.Model):
     class Meta:
         verbose_name = _("Selfassesment")
         verbose_name_plural = _("Selfassesments")
+        ordering = ['-date_of_registration']
     
     # identifier
     client_id = models.AutoField(
@@ -204,6 +205,7 @@ class SelfassesmentAccountSubmission(models.Model):
     class Meta:
         verbose_name = _("Selfassesment Submission")
         verbose_name_plural = _("Selfassesment Submissions")
+        ordering = ['-appointment_date']
         constraints = [
             models.UniqueConstraint(
                 fields = ('client_id', 'tax_year',),
@@ -321,6 +323,7 @@ class SelfassesmentTracker(models.Model):
     class Meta:
         verbose_name = _("Selfassesment Tracker")
         verbose_name_plural = _("Selfassesment Trackers")
+        ordering = ['-deadline']
 
     tracker_id = models.AutoField(verbose_name = 'Tracker ID', blank=True, null=False, primary_key=True, db_index=True)
     client_id = models.ForeignKey(
@@ -465,6 +468,7 @@ class Limited(models.Model):
     class Meta:
         verbose_name = _("Limited")
         verbose_name_plural = _("Limiteds")
+        ordering = ['-date_of_registration']
     
     # identifier
     client_id = models.AutoField(
@@ -606,6 +610,7 @@ class LimitedTracker(models.Model):
     class Meta:
         verbose_name = _("Limited Tracker")
         verbose_name_plural = _("Limited Trackers")
+        ordering = ['-deadline']
 
     tracker_id = models.AutoField(verbose_name = 'Tracker ID', blank=True, null=False, primary_key=True, db_index=True)
     client_id = models.ForeignKey(
@@ -669,6 +674,7 @@ class LimitedSubmissionDeadlineTracker(models.Model):
     class Meta:
         verbose_name = _("Limited Submission")
         verbose_name_plural = _("Limited Submissions")
+        ordering = ['-HMRC_deadline', '-our_deadline',]
 
     submission_id = models.AutoField(verbose_name='Submission ID', primary_key=True, null=False, db_index=True, editable=False)
     client_id = models.ForeignKey(
@@ -754,6 +760,7 @@ class LimitedVATTracker(models.Model):
     class Meta:
         verbose_name = _("Limited VAT Tracker")
         verbose_name_plural = _("Limited VAT Trackers")
+        ordering = ['-HMRC_deadline']
 
     vat_id = models.AutoField(verbose_name='VAT Tracker ID', primary_key=True, null=False, db_index=True, editable=False)
     client_id = models.ForeignKey(
@@ -800,6 +807,7 @@ class LimitedConfirmationStatementTracker(models.Model):
     class Meta:
         verbose_name = _("Limited Confirmation Statement")
         verbose_name_plural = _("Limited Confirmation Statements")
+        ordering = ['-HMRC_deadline']
 
     statement_id = models.AutoField(verbose_name='Statement ID', primary_key=True, null=False, db_index=True, editable=False)
     client_id = models.ForeignKey(
@@ -841,6 +849,7 @@ class SelfemploymentIncomeAndExpensesDataCollection(models.Model):
     class Model:
         verbose_name = 'Selfemployment Class 2 Tax Config For TaxYear'
         verbose_name_plural = 'Selfemployment Class 2 Tax Configs For TaxYears'
+        ordering = ['-created_at']
         constraints = [
             models.UniqueConstraint(
                 fields = ('selfassesment', 'tax_year'),

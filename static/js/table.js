@@ -16,7 +16,7 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
   let serial_num = instance.getElementById('pk')
 
   if (serial_num && location.pathname==seflassesmentAccountSubmission_home_pathname) {
-    serial_num.innerHTML = `<a data-field="${field}" href="/accounts/?pk=${data.pk}">${data.pk}</a>`
+    serial_num.innerHTML = `<a href="/accounts/?pk=${data.pk}">${data.pk}</a>`
   }else if(serial_num){
     serial_num.textContent = data.pk
   }

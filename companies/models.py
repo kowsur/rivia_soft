@@ -184,6 +184,7 @@ class SelfassesmentAccountSubmissionTaxYear(models.Model):
     class Meta:
         verbose_name = _("Selfassesment Tax Year")
         verbose_name_plural = _("Selfassesment Tax Years")
+        ordering = ['-pk']
         constraints = [
             models.UniqueConstraint(fields=['tax_year'], name='unique_tax_year'),
         ]

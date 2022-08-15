@@ -109,13 +109,13 @@ def db_search_SelfassesmentAccountSubmissionTaxYear(search_text:str, limit=-1):
     except Exception:
         pass
 
-    records = SelfassesmentAccountSubmissionTaxYear.objects.filter(Query).order_by('-id')
+    records = SelfassesmentAccountSubmissionTaxYear.objects.filter(Query)
     if limit==-1:
         return records
     return records[:limit]
 
 def db_all_SelfassesmentAccountSubmissionTaxYear(limit=-1):
-    records = SelfassesmentAccountSubmissionTaxYear.objects.all().order_by('-id')
+    records = SelfassesmentAccountSubmissionTaxYear.objects.all()
     if limit<=-1:
         return records
     return records[:limit]
@@ -148,7 +148,7 @@ def db_search_SelfassesmentAccountSubmission(search_text: str, limit=-1):
                 Q(paid_amount                   = num)
     except Exception:
         pass
-    records = SelfassesmentAccountSubmission.objects.filter(Query).order_by('-tax_year')
+    records = SelfassesmentAccountSubmission.objects.filter(Query)
     if limit==-1:
         return records
     return records[:limit]
@@ -156,7 +156,7 @@ def db_search_SelfassesmentAccountSubmission(search_text: str, limit=-1):
 
 def db_all_SelfassesmentAccountSubmission(limit=-1):
     # records = SelfassesmentAccountSubmission.objects.filter(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year())
-    records = SelfassesmentAccountSubmission.objects.all().order_by('-tax_year', '-request_date')
+    records = SelfassesmentAccountSubmission.objects.all()
     if limit<=-1:
         return records
     return records[:limit]
@@ -186,7 +186,7 @@ def db_search_SelfassesmentTracker(search_text: str, user_email='', is_superuser
         records = SelfassesmentTracker.objects.filter(Query)
     else:
         records = SelfassesmentTracker.objects.filter(Query)[:limit]
-    return records.order_by('is_completed', '-pk')
+    return records
 
 def db_all_SelfassesmentTracker(user_email='', is_superuser=False, limit=-1):
     Query = Q(is_completed=False)
@@ -198,7 +198,7 @@ def db_all_SelfassesmentTracker(user_email='', is_superuser=False, limit=-1):
         records = SelfassesmentTracker.objects.filter(Query)
     else:
         records = SelfassesmentTracker.objects.filter(Query)[:limit]
-    return records.order_by('is_completed', '-pk')
+    return records
 
 
 
@@ -276,7 +276,7 @@ def db_search_LimitedTracker(search_text: str, user_email='', is_superuser=False
         records = LimitedTracker.objects.filter(Query)
     else:
         records = LimitedTracker.objects.filter(Query)[:limit]
-    return records.order_by('is_completed', '-pk')
+    return records
 
 def db_all_LimitedTracker(user_email='', is_superuser=False, limit=-1):
     Query = Q(is_completed=False)
@@ -288,7 +288,7 @@ def db_all_LimitedTracker(user_email='', is_superuser=False, limit=-1):
         records = LimitedTracker.objects.filter(Query)
     else:
         records = LimitedTracker.objects.filter(Query)[:limit]
-    return records.order_by('is_completed', '-pk')
+    return records
 
 # LimitedSubmissionDeadlineTracker
 def db_search_LimitedSubmissionDeadlineTracker(search_text: str, limit=-1):
@@ -321,8 +321,7 @@ def db_search_LimitedSubmissionDeadlineTracker(search_text: str, limit=-1):
 
 def db_all_LimitedSubmissionDeadlineTracker(limit=-1):
     records = LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__gte = timezone.now())
-    records = records.order_by('HMRC_deadline')
-    other_records = LimitedSubmissionDeadlineTracker.objects.filter().exclude(HMRC_deadline__gte = timezone.now()).order_by()
+    other_records = LimitedSubmissionDeadlineTracker.objects.filter().exclude(HMRC_deadline__gte = timezone.now())
     records = chain(records, other_records)
     if limit<=-1:
         return records
@@ -360,8 +359,7 @@ def db_search_LimitedVATTracker(search_text: str, limit=-1):
 
 def db_all_LimitedVATTracker(limit=-1):
     records = LimitedVATTracker.objects.filter(HMRC_deadline__gte = timezone.now())
-    records = records.order_by('HMRC_deadline')
-    other_records = LimitedVATTracker.objects.filter().exclude(HMRC_deadline__gte = timezone.now()).order_by()
+    other_records = LimitedVATTracker.objects.filter().exclude(HMRC_deadline__gte = timezone.now())
     records = chain(records, other_records)
     if limit<=-1:
         return records
@@ -396,8 +394,7 @@ def db_search_LimitedConfirmationStatementTracker(search_text: str, limit=-1):
 
 def db_all_LimitedConfirmationStatementTracker(limit=-1):
     records = LimitedConfirmationStatementTracker.objects.filter(HMRC_deadline__gte = timezone.now())
-    records = records.order_by('HMRC_deadline')
-    other_records = LimitedConfirmationStatementTracker.objects.filter().exclude(HMRC_deadline__gte = timezone.now()).order_by()
+    other_records = LimitedConfirmationStatementTracker.objects.filter().exclude(HMRC_deadline__gte = timezone.now())
     records = chain(records, other_records)
     if limit<=-1:
         return records

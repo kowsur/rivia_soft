@@ -16,7 +16,7 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
   let serial_num = instance.getElementById('pk')
 
   if (serial_num && location.pathname==seflassesmentAccountSubmission_home_pathname) {
-    serial_num.innerHTML = `<a href="/accounts/?pk=${data.pk}">${data.pk}</a>`
+    serial_num.innerHTML = `<a data-field="${field}" href="/accounts/?pk=${data.pk}">${data.pk}</a>`
   }else if(serial_num){
     serial_num.textContent = data.pk
   }
@@ -37,7 +37,7 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
     let formatted_text = document.createElement('pre')
     let td = instance.getElementById(field)
     if (!td) continue
-
+    
     let data_field = td.getAttribute('data-field')
     if (data_field) {
       let field_data_format = `{${data_field}}`
@@ -79,16 +79,7 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
           let hrefURL = td.getAttribute('data-href-url')
           if (hrefURL){
             let url = `${hrefURL}${field_data}`
-
-            td.innerHTML = `<a href="${url}">${makeSafeHTML(string)}</a>`
-          }
-
-          if (field=='incomplete_tasks'){
-            td.innerHTML = `<a href="/companies/SATrc/home/?client_id=${data.pk}">${string}</a>`
-          }
-          if (len>0) {
-            td.style.color = 'red'
-            td.style.fontWeight = 'bold'
+            td.innerHTML = `<a data-field="${field}" href="${url}">${makeSafeHTML(string)}</a>`
           }
         })
       }else{
@@ -102,12 +93,8 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
         
         let hrefURL = td.getAttribute('data-href-url')
         if (hrefURL){
-            td.innerHTML = `<a href="${hrefURL}${field_data}">${makeSafeHTML(string)}</a>`
+            td.innerHTML = `<a data-field="${field}" href="${hrefURL}${field_data}">${makeSafeHTML(string)}</a>`
           }
-        if (field=='incomplete_tasks'){
-          td.innerHTML = `<a href="/companies/SATrc/home/?client_id=${data.pk}">${string}</a>`
-        }
-        if (len>0) td.style.color = 'red'
       }
       continue
     }
@@ -137,7 +124,7 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
 
     if (location.pathname===seflassesmentAccountSubmission_home_pathname && field==="unique_public_view_key"){
       let public_view_link = instance.getElementById('unique_public_view_key')
-      public_view_link.innerHTML = `<a href='/accounts/public_tax_report/${data.pk}/${data.fields.unique_public_view_key}/'>${data.fields.unique_public_view_key}</a>`
+      public_view_link.innerHTML = `<a data-field="${field}" href='/accounts/public_tax_report/${data.pk}/${data.fields.unique_public_view_key}/'>${data.fields.unique_public_view_key}</a>`
       continue
     }
 

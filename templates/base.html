@@ -27,6 +27,14 @@
       {% block content %} {% endblock content %}
     </div>
 
+
+    <style>
+      a[data-field="incomplete_tasks"]{
+        color: red;
+        font-weight: bold;
+      }
+    </style>
+
     <!-- js -->
     <script type="module" src='{% static "js/script.js" %}'></script>
     <script>

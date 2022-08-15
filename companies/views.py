@@ -87,7 +87,7 @@ from pprint import pp
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import QuerySet
 
-def get_object_or_None(model, *args, pk=None, delete_duplicate=True, return_all=False,**kwargs):
+def get_object_or_None(model, *args, pk=None, delete_duplicate=False, return_all=False,**kwargs):
     try:
         if pk is not None:
             record = model.objects.get(pk=pk)
@@ -577,7 +577,7 @@ def create_selfassesment_data_collection_for_client(request, utr=None):
       
       if form.is_valid():
         # Create row in selfassesment account submission
-        account_submission = get_object_or_None(SelfassesmentAccountSubmission, client_id=selfassesment, tax_year=tax_year, delete_duplicate=False)
+        account_submission = get_object_or_None(SelfassesmentAccountSubmission, delete_duplicate=False, client_id=selfassesment, tax_year=tax_year)
         if not account_submission:
           slefassesment_account_submission_auto_row(request, selfassesment, tax_year)
         
@@ -639,10 +639,10 @@ def create_selfassesment_data_collection(request):
 
       selfassesment = assesment.selfassesment
       tax_year = assesment.tax_year
-      existing_record = get_object_or_None(SelfemploymentIncomeAndExpensesDataCollection, selfassesment=selfassesment, tax_year=tax_year, delete_duplicate=False, return_all=True)
+      existing_record = get_object_or_None(SelfemploymentIncomeAndExpensesDataCollection, delete_duplicate=False, return_all=True, selfassesment=selfassesment, tax_year=tax_year)
       if not existing_record:
         # Create row in selfassesment account submission
-        account_submission = get_object_or_None(SelfassesmentAccountSubmission, client_id=selfassesment, tax_year=tax_year, delete_duplicate=False)
+        account_submission = get_object_or_None(SelfassesmentAccountSubmission, delete_duplicate=False, client_id=selfassesment, tax_year=tax_year)
         if not account_submission:
           slefassesment_account_submission_auto_row(request, selfassesment, tax_year)
     
@@ -1953,13 +1953,16 @@ def get_limited_submission_where_period_end(limit=-1):
 def home_limited_submission_deadline_tracker(request):
   pk_field = 'submission_id'
   exclude_fields = []
-  field_ordering = ['client_id', 'status', 'period_start_date', 'period', 'remarks', 'HMRC_deadline', 'is_submitted', 'submitted_by', 'submission_date', 'our_deadline', 'is_submitted_hmrc', 'submitted_by_hmrc', 'submission_date_hmrc', 'is_documents_uploaded', ]
+  field_ordering = ['client_id', 'company_registration_number', 'status', 'period_start_date', 'period', 'remarks', 'HMRC_deadline', 'is_submitted', 'submitted_by', 'submission_date', 'our_deadline', 'is_submitted_hmrc', 'submitted_by_hmrc', 'submission_date_hmrc', 'is_documents_uploaded', ]
+  model_fields = get_field_names_from_model(LimitedSubmissionDeadlineTracker)
+  model_fields.append('company_registration_number')
   keep_include_fields = False
   fk_fields = {
       'updated_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'submitted_by_hmrc': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': HTML_Generator.Limited_client_id_repr_format, 'href-url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url,},
+      'company_registration_number': { 'details_url_without_argument': '/companies/LTD/details/', 'repr-format': r'{company_reg_number}', 'data-field': 'fields.client_id'},
       }
   context = {
     **URLS,
@@ -1991,7 +1994,7 @@ def home_limited_submission_deadline_tracker(request):
       'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_search_url,
       'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_update_url,
       'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Submission_Deadline_Tracker_delete_url,  
-      'model_fields': get_field_names_from_model(LimitedSubmissionDeadlineTracker)
+      'model_fields': model_fields
     },
   }
   return render(request=request, template_name='companies/home.html', context=context)

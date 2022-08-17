@@ -718,7 +718,7 @@ class LimitedSubmissionDeadlineTracker(models.Model):
         null=True)
     submission_date_hmrc = models.DateField(verbose_name='Submission Date(HM)', blank=True, null=True)
 
-    HMRC_deadline = models.DateField(verbose_name='CompanyHouse Deadline', blank=False, null=True)
+    HMRC_deadline = models.DateField(verbose_name='Deadline(CH)', blank=False, null=True)
     is_submitted = models.BooleanField(verbose_name='Is Submitted(CH)', default=False, null=False)
     submitted_by = models.ForeignKey(
         to='users.CustomUser',

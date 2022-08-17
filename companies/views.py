@@ -845,6 +845,25 @@ def get_selfassesment_account_submissions_where_data_collected(tax_year=Selfasse
 def home_selfassesment_account_submission(request):
   current_tax_year = SelfassesmentAccountSubmissionTaxYear.get_max_year()
   pk_field = 'submission_id'
+  include_fields = [
+    "submission_id",
+    "client_id",
+    "request_date",
+    "status",
+    "appointment_date",
+    "tax_year",
+    "remarks",
+    "submitted_by",
+    "is_submitted",
+    "is_data_collected",
+    "prepared_by",
+    "payment_status",
+    "paid_amount",
+    "unique_public_view_key",
+    "assigned_to",
+    "last_updated_by",
+    "last_updated_on",
+  ]
   exclude_fields = []
   keep_include_fields = True
   context = {
@@ -858,8 +877,8 @@ def home_selfassesment_account_submission(request):
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_create_name,
     'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_export_name,
 
-    'template_tag': generate_template_tag_for_model(SelfassesmentAccountSubmission, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
-    'data_container': generate_data_container_table(SelfassesmentAccountSubmission, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    'template_tag': generate_template_tag_for_model(SelfassesmentAccountSubmission, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
+    'data_container': generate_data_container_table(SelfassesmentAccountSubmission, pk_field=pk_field, show_id=True, include_fields=include_fields, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields),
 
     "counts": True,
     "selfassesment_account_submission_counts": True,
@@ -1953,16 +1972,18 @@ def get_limited_submission_where_period_end(limit=-1):
 def home_limited_submission_deadline_tracker(request):
   pk_field = 'submission_id'
   exclude_fields = []
-  field_ordering = ['client_id', 'company_registration_number', 'status', 'period_start_date', 'period', 'remarks', 'HMRC_deadline', 'is_submitted', 'submitted_by', 'submission_date', 'our_deadline', 'is_submitted_hmrc', 'submitted_by_hmrc', 'submission_date_hmrc', 'is_documents_uploaded', ]
+  field_ordering = ['client_id', 'file_#', 'reg_num', 'status', 'period_start_date', 'period', 'remarks', 'HMRC_deadline', 'is_submitted', 'submitted_by', 'submission_date', 'our_deadline', 'is_submitted_hmrc', 'submitted_by_hmrc', 'submission_date_hmrc', 'is_documents_uploaded', ]
   model_fields = get_field_names_from_model(LimitedSubmissionDeadlineTracker)
-  model_fields.append('company_registration_number')
+  model_fields.append('reg_num')
+  model_fields.append('file_#')
   keep_include_fields = False
   fk_fields = {
       'updated_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'submitted_by_hmrc': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
-      'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': HTML_Generator.Limited_client_id_repr_format, 'href-url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url,},
-      'company_registration_number': { 'details_url_without_argument': '/companies/LTD/details/', 'repr-format': r'{company_reg_number}', 'data-field': 'fields.client_id'},
+      'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': r"🏢{client_name}", 'href-url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url,},
+      'reg_num': { 'details_url_without_argument': '/companies/LTD/details/', 'repr-format': r'{company_reg_number}', 'data-field': 'fields.client_id'},
+      'file_#': { 'details_url_without_argument': '/companies/LTD/details/', 'repr-format': r'{client_file_number}', 'data-field': 'fields.client_id'},
       }
   context = {
     **URLS,

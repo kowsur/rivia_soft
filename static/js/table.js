@@ -51,6 +51,7 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
     
     // data to compare elements in table_sort.js
     td.setAttribute('data-cmp', field_data)
+    td.setAttribute('data-identifier', field)
 
     
     // Foreign Data

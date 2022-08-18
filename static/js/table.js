@@ -61,29 +61,6 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
       td.setAttribute('data-foreign-data', 'true');
       //this is a foreign key field. fetch the data and format it
       populate_with_foreign_data(td, field, field_data)
-        // (!URL_HasQueryParams(data_url)) ? data_url = `${data_url}${field_data}/`: data_url = `${data_url}${field_data}`
-        // if (field_data=='null') continue
-
-        // let kwargs = {
-        //   url: data_url,
-        //   req_method: 'GET'
-        // }
-        // if (!CACHE[data_url]){
-        //   let resp = await fetch_url(kwargs).then(response => response.json())
-        //   CACHE[data_url] = resp
-        // }
-        // let string = repr_format.format(CACHE[data_url])
-      
-        // td.textContent = string
-        // td.removeAttribute('data-url')
-        // td.removeAttribute('data-repr-format')
-        // td.setAttribute('data-cmp', string)
-        
-        // let hrefURL = td.getAttribute('data-href-url')
-        // if (hrefURL){
-        //   let url = `${hrefURL}${field_data}`
-        //   td.innerHTML = `<a data-field="${field}" href="${url}">${makeSafeHTML(string)}</a>`
-        // }
       continue
     }
 

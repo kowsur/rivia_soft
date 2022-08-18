@@ -58,9 +58,8 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
     let data_url = td.getAttribute('data-url')
     let repr_format = td.getAttribute('data-repr-format')
     if (data_url && field_data){
-      td.setAttribute('data-foreign-data', 'true');
       //this is a foreign key field. fetch the data and format it
-      populate_with_foreign_data(td, field, field_data)
+      populate_with_foreign_data(td, field, field_data, data)
       continue
     }
 
@@ -111,7 +110,11 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
 }
 
 
-export async function populate_with_foreign_data(td, field, field_data){
+export async function populate_with_foreign_data(td, field, field_data, data){
+  td.setAttribute('data-foreign-data', 'true');
+  td.setAttribute('data-foreign-model', data.model)
+  td.setAttribute('data-foreign-field-name', field)
+
   let data_url = td.getAttribute('data-url');
   let repr_format = td.getAttribute('data-repr-format');
   (!URL_HasQueryParams(data_url)) ? data_url = `${data_url}${field_data}/`: data_url = `${data_url}${field_data}`;
@@ -128,7 +131,7 @@ export async function populate_with_foreign_data(td, field, field_data){
   }
   if (CACHE[data_url]==="FETCHING"){
     setTimeout(()=>{
-      populate_with_foreign_data(td, field, field_data)
+      populate_with_foreign_data(td, field, field_data, data)
     }, 150)
     return 
   }
@@ -138,6 +141,18 @@ export async function populate_with_foreign_data(td, field, field_data){
   td.removeAttribute('data-url')
   td.removeAttribute('data-repr-format')
   td.setAttribute('data-cmp', string)
+  
+  td.classList.add('whitespace-normal')
+  td.style.textAlign = 'justify'
+  td.style.whiteSpace = 'nowrap'
+  td.style.minWidth = `${field_data.length+1}ch`
+  if (string.length >= 37){
+    td.classList.remove('whitespace-nowrap')
+    td.style.minWidth = '37ch'
+    td.style.maxWidth = '37ch'
+    td.style.whiteSpace = 'pre-wrap'
+  }
+  
   
   let hrefURL = td.getAttribute('data-href-url')
   if (hrefURL){

@@ -60,29 +60,30 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
     if (data_url && field_data){
       td.setAttribute('data-foreign-data', 'true');
       //this is a foreign key field. fetch the data and format it
-      (!URL_HasQueryParams(data_url)) ? data_url = `${data_url}${field_data}/`: data_url = `${data_url}${field_data}`
-      if (field_data=='null') continue
+      populate_with_foreign_data(td, field, field_data)
+        // (!URL_HasQueryParams(data_url)) ? data_url = `${data_url}${field_data}/`: data_url = `${data_url}${field_data}`
+        // if (field_data=='null') continue
 
-      let kwargs = {
-        url: data_url,
-        req_method: 'GET'
-      }
-      if (!CACHE[data_url]){
-        let resp = await fetch_url(kwargs).then(response => response.json())
-        CACHE[data_url] = resp
-      }
-      let string = repr_format.format(CACHE[data_url])
-    
-      td.textContent = string
-      td.removeAttribute('data-url')
-      td.removeAttribute('data-repr-format')
-      td.setAttribute('data-cmp', string)
+        // let kwargs = {
+        //   url: data_url,
+        //   req_method: 'GET'
+        // }
+        // if (!CACHE[data_url]){
+        //   let resp = await fetch_url(kwargs).then(response => response.json())
+        //   CACHE[data_url] = resp
+        // }
+        // let string = repr_format.format(CACHE[data_url])
       
-      let hrefURL = td.getAttribute('data-href-url')
-      if (hrefURL){
-        let url = `${hrefURL}${field_data}`
-        td.innerHTML = `<a data-field="${field}" href="${url}">${makeSafeHTML(string)}</a>`
-      }
+        // td.textContent = string
+        // td.removeAttribute('data-url')
+        // td.removeAttribute('data-repr-format')
+        // td.setAttribute('data-cmp', string)
+        
+        // let hrefURL = td.getAttribute('data-href-url')
+        // if (hrefURL){
+        //   let url = `${hrefURL}${field_data}`
+        //   td.innerHTML = `<a data-field="${field}" href="${url}">${makeSafeHTML(string)}</a>`
+        // }
       continue
     }
 
@@ -131,6 +132,43 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
   }
   return instance;
 }
+
+
+export async function populate_with_foreign_data(td, field, field_data){
+  let data_url = td.getAttribute('data-url');
+  let repr_format = td.getAttribute('data-repr-format');
+  (!URL_HasQueryParams(data_url)) ? data_url = `${data_url}${field_data}/`: data_url = `${data_url}${field_data}`;
+  if (field_data=='null') return 
+
+  let kwargs = {
+    url: data_url,
+    req_method: 'GET'
+  }
+  if (!CACHE[data_url]){
+    CACHE[data_url] = "FETCHING"
+    let resp = await fetch_url(kwargs).then(response => response.json())
+    CACHE[data_url] = resp
+  }
+  if (CACHE[data_url]==="FETCHING"){
+    setTimeout(()=>{
+      populate_with_foreign_data(td, field, field_data)
+    }, 500)
+    return 
+  }
+  let string = repr_format.format(CACHE[data_url])
+
+  td.textContent = string
+  td.removeAttribute('data-url')
+  td.removeAttribute('data-repr-format')
+  td.setAttribute('data-cmp', string)
+  
+  let hrefURL = td.getAttribute('data-href-url')
+  if (hrefURL){
+    let url = `${hrefURL}${field_data}`
+    td.innerHTML = `<a data-field="${field}" href="${url}">${makeSafeHTML(string)}</a>`
+  }
+}
+
 
 // Update table date with the provided data
 export async function populate_with_data(

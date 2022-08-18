@@ -129,7 +129,7 @@ export async function populate_with_foreign_data(td, field, field_data){
   if (CACHE[data_url]==="FETCHING"){
     setTimeout(()=>{
       populate_with_foreign_data(td, field, field_data)
-    }, 500)
+    }, 150)
     return 
   }
   let string = repr_format.format(CACHE[data_url])

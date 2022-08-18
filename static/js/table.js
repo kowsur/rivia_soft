@@ -58,6 +58,7 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
     let data_url = td.getAttribute('data-url')
     let repr_format = td.getAttribute('data-repr-format')
     if (data_url && field_data){
+      td.setAttribute('data-foreign-data', 'true');
       //this is a foreign key field. fetch the data and format it
       (!URL_HasQueryParams(data_url)) ? data_url = `${data_url}${field_data}/`: data_url = `${data_url}${field_data}`
       if (field_data=='null') continue
@@ -67,35 +68,20 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
         req_method: 'GET'
       }
       if (!CACHE[data_url]){
-        fetch_url(kwargs).then(response => response.json()).then(resp => {
-          CACHE[data_url] = resp
-          let string = repr_format.format(CACHE[data_url])
-          let len = parseInt(string)
-        
-          td.textContent = string
-          td.removeAttribute('data-url')
-          td.removeAttribute('data-repr-format')
-          td.setAttribute('data-cmp', string)
-          
-          let hrefURL = td.getAttribute('data-href-url')
-          if (hrefURL){
-            let url = `${hrefURL}${field_data}`
-            td.innerHTML = `<a data-field="${field}" href="${url}">${makeSafeHTML(string)}</a>`
-          }
-        })
-      }else{
-        let string = repr_format.format(CACHE[data_url])
-        let len = parseInt(string)
-
-        td.textContent = string
-        td.removeAttribute('data-url')
-        td.removeAttribute('data-repr-format')
-        td.setAttribute('data-cmp', string)
-        
-        let hrefURL = td.getAttribute('data-href-url')
-        if (hrefURL){
-            td.innerHTML = `<a data-field="${field}" href="${hrefURL}${field_data}">${makeSafeHTML(string)}</a>`
-          }
+        let resp = await fetch_url(kwargs).then(response => response.json())
+        CACHE[data_url] = resp
+      }
+      let string = repr_format.format(CACHE[data_url])
+    
+      td.textContent = string
+      td.removeAttribute('data-url')
+      td.removeAttribute('data-repr-format')
+      td.setAttribute('data-cmp', string)
+      
+      let hrefURL = td.getAttribute('data-href-url')
+      if (hrefURL){
+        let url = `${hrefURL}${field_data}`
+        td.innerHTML = `<a data-field="${field}" href="${url}">${makeSafeHTML(string)}</a>`
       }
       continue
     }

@@ -1,4 +1,6 @@
 import uuid
+from datetime import timedelta, date
+from itertools import chain
 
 from django.db import models
 from django.utils import timezone
@@ -7,8 +9,8 @@ from django.core.validators import MinValueValidator
 
 from users.models import CustomUser
 from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR, AUTH_CODE_VALIDATOR, TAX_YEAR_VALIDATOR
+from .utils import ChainWithCount
 
-from datetime import timedelta, date
 
 
 class SelfassesmentType(models.Model):
@@ -671,11 +673,42 @@ class LimitedTracker(models.Model):
         return f"Deadline: {self.deadline} | Created By: {self.created_by}"
 
 
+class LimitedSubmissionDeadlineTrackerManager(models.Manager):
+    def ordered_all(self):
+        upcoming = self.ordered_upcoming_all()
+        previous = self.ordered_previous_all()
+        chained_queryset = chain(upcoming, previous)
+        
+        upcoming_count = upcoming.count()
+        previous_count = previous.count()
+        total_count = upcoming_count + previous_count
+        return ChainWithCount(chained_queryset, total_count)
+
+    def ordered_filter(self, *args, **kwargs):
+        upcoming = self.ordered_upcoming_all().filter(*args, **kwargs)
+        previous = self.ordered_previous_all().filter(*args, **kwargs)
+        chained_queryset = chain(upcoming, previous)
+        
+        upcoming_count = upcoming.count()
+        previous_count = previous.count()
+        total_count = upcoming_count + previous_count
+        return ChainWithCount(chained_queryset, total_count)
+    
+    def ordered_upcoming_all(self):
+        return self.filter(HMRC_deadline__gte = timezone.now()).order_by('HMRC_deadline')
+
+    def ordered_previous_all(self):
+        return self.filter(HMRC_deadline__lt = timezone.now()).order_by('-HMRC_deadline')
+
+
 class LimitedSubmissionDeadlineTracker(models.Model):
     class Meta:
         verbose_name = _("Limited Submission")
         verbose_name_plural = _("Limited Submissions")
         ordering = ['-HMRC_deadline', '-our_deadline',]
+
+    objects = models.Manager()
+    ordered_manager = LimitedSubmissionDeadlineTrackerManager()
 
     submission_id = models.AutoField(verbose_name='Submission ID', primary_key=True, null=False, db_index=True, editable=False)
     client_id = models.ForeignKey(
@@ -803,12 +836,42 @@ class LimitedVATTracker(models.Model):
         self.save()
 
 
+class LimitedConfirmationStatementTrackerManager(models.Manager):
+    def ordered_all(self):
+        upcoming = self.ordered_upcoming_all()
+        previous = self.ordered_previous_all()
+        chained_queryset = chain(upcoming, previous)
+        
+        upcoming_count = upcoming.count()
+        previous_count = previous.count()
+        total_count = upcoming_count + previous_count
+        return ChainWithCount(chained_queryset, total_count)
+
+    def ordered_filter(self, *args, **kwargs):
+        upcoming = self.ordered_upcoming_all().filter(*args, **kwargs)
+        previous = self.ordered_previous_all().filter(*args, **kwargs)
+        chained_queryset = chain(upcoming, previous)
+        
+        upcoming_count = upcoming.count()
+        previous_count = previous.count()
+        total_count = upcoming_count + previous_count
+        return ChainWithCount(chained_queryset, total_count)
+    
+    def ordered_upcoming_all(self):
+        return self.filter(HMRC_deadline__gte = timezone.now()).order_by('HMRC_deadline')
+
+    def ordered_previous_all(self):
+        return self.filter(HMRC_deadline__lt = timezone.now()).order_by('-HMRC_deadline')
+
 # Limited Confirmation Statement Tracker
 class LimitedConfirmationStatementTracker(models.Model):
     class Meta:
         verbose_name = _("Limited Confirmation Statement")
         verbose_name_plural = _("Limited Confirmation Statements")
         ordering = ['-HMRC_deadline']
+
+    objects = models.Manager()
+    ordered_manager = LimitedConfirmationStatementTrackerManager()
 
     statement_id = models.AutoField(verbose_name='Statement ID', primary_key=True, null=False, db_index=True, editable=False)
     client_id = models.ForeignKey(

@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls.exceptions import NoReverseMatch
-from django.db.models import DurationField, F, ExpressionWrapper
+from django.db.models import DurationField, F, ExpressionWrapper, Q
 from django.db.utils import IntegrityError
 
 #forms
@@ -81,7 +81,7 @@ URLS = {
 }
 user_details_url_without_argument = '/u/details/'
 
-from pprint import pp
+from pprint import pp, pprint
 
 
 from django.core.exceptions import ObjectDoesNotExist
@@ -1274,7 +1274,7 @@ def update_selfassesment_tracker(request, tracker_id:int):
     'view_url': selfassesment_tracker_home_redirect_page,
     'id': tracker_id,
     'update_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Tracker_update_name,
-    'form_title': 'Selfassesment Update Form',
+    'form_title': 'Selfassesment Tracker Update Form',
     'form': SelfassesmentTrackerChangeForm()
   }
 
@@ -1784,7 +1784,7 @@ def update_limited_tracker(request, tracker_id:int):
     'view_url': limited_tracker_home_redirect_page,
     'id': tracker_id,
     'update_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Tracker_update_name,
-    'form_title': 'Limited Update Form',
+    'form_title': 'Limited Tracker Update Form',
     'form': LimitedTrackerChangeForm()
   }
 
@@ -1932,41 +1932,38 @@ def export_limited_tracker(request):
 # =============================================================================================================
 # LimitedSubmissionDeadlineTracker
 def get_limited_submissions_where_status_DOCUMENT_REQUESTED():
-  return LimitedSubmissionDeadlineTracker.objects.filter(status="DOCUMENT REQUESTED")
+  return LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(status="DOCUMENT REQUESTED")
 
 def get_limited_submissions_where_status_WAITING_FOR_INFORMATION():
-  return LimitedSubmissionDeadlineTracker.objects.filter(status="WAITING FOR INFORMATION")
+  return LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(status="WAITING FOR INFORMATION")
 
 def get_limited_submissions_where_status_DOCUMENT_RECEIVED():
-  return LimitedSubmissionDeadlineTracker.objects.filter(status="DOCUMENT RECEIVED")
+  return LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(status="DOCUMENT RECEIVED")
 
 def get_limited_submissions_where_status_PROCESSING():
-  return LimitedSubmissionDeadlineTracker.objects.filter(status="PROCESSING")
+  return LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(status="PROCESSING")
 
 def get_limited_submissions_where_status_WAITING_FOR_CONFIRMATION():
-  return LimitedSubmissionDeadlineTracker.objects.filter(status="WAITING FOR CONFIRMATION")
+  return LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(status="WAITING FOR CONFIRMATION")
 
 def get_limited_submissions_where_status_COMPLETED():
-  return LimitedSubmissionDeadlineTracker.objects.filter(status="COMPLETED")
+  return LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(status="COMPLETED")
 
 def get_limited_submissions_where_deadline_not_set():
-  return LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline = None)
+  return LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(HMRC_deadline = None)
 
 def get_limited_submissions_where_company_house_deadline_missed_of_active_clients():
-  return LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False, client_id__is_active=True)
+  return LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(HMRC_deadline__lt = timezone.now(), is_submitted=False, client_id__is_active=True)
 
 def get_limited_submissions_where_company_house_deadline_missed_of_inactive_clients():
-  return LimitedSubmissionDeadlineTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False, client_id__is_active=False)
+  return LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(HMRC_deadline__lt = timezone.now(), is_submitted=False, client_id__is_active=False)
 
 def get_limited_submissions_where_HMRC_deadline_missed():
-  return LimitedSubmissionDeadlineTracker.objects.filter(our_deadline__lt = timezone.now(), is_submitted=False)
+  return LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(our_deadline__lt = timezone.now(), is_submitted=False)
 
 def get_limited_submission_where_period_end(limit=-1):
-    records = LimitedSubmissionDeadlineTracker.objects.filter(period__lt = timezone.now(), is_submitted=False).order_by()
-    records = records.order_by('HMRC_deadline')
-    if limit<=-1:
-        return records
-    return records[:limit]
+  records = LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(period__lt = timezone.now(), is_submitted=False)
+  return records
 
 @login_required
 def home_limited_submission_deadline_tracker(request):
@@ -2449,10 +2446,10 @@ def export_limited_vat_tracker(request):
 # =============================================================================================================
 # LimitedConfirmationStatementTracker
 def get_limited_statements_where_deadline_not_set():
-  return LimitedConfirmationStatementTracker.objects.filter(HMRC_deadline = None)
+  return LimitedConfirmationStatementTracker.ordered_manager.ordered_filter(HMRC_deadline = None)
 
 def get_limited_statements_where_deadline_missed():
-  return LimitedConfirmationStatementTracker.objects.filter(HMRC_deadline__lt = timezone.now(), is_submitted=False)
+  return LimitedConfirmationStatementTracker.ordered_manager.ordered_filter(HMRC_deadline__lt = timezone.now(), is_submitted=False)
 
 
 @login_required

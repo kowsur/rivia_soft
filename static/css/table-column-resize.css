@@ -1,4 +1,4 @@
-tbody td[data-identifier="client_id"], tbody td[data-identifier="selfassesment"]{
+tbody td[data-foreign-data]{
     min-width: 35ch;
     white-space: break-spaces;
 }

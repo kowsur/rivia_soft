@@ -833,9 +833,10 @@ class LimitedVATTracker(models.Model):
 
 class LimitedConfirmationStatementTrackerManager(models.Manager):
     def ordered_all(self):
-        upcoming = self.ordered_upcoming_all()
-        previous = self.ordered_previous_all()
-        deadline_not_set = self.ordered_deadline_not_set_all()
+        query = models.Q(client_id__is_active=True)
+        upcoming = self.ordered_upcoming_all().filter(query)
+        previous = self.ordered_previous_all().filter(query)
+        deadline_not_set = self.ordered_deadline_not_set_all().filter(query)
         return ChainedQuerysetsWithCount(upcoming, previous, deadline_not_set)
 
     def ordered_filter(self, *args, **kwargs):

@@ -2445,10 +2445,12 @@ def export_limited_vat_tracker(request):
 # =============================================================================================================
 # LimitedConfirmationStatementTracker
 def get_limited_statements_where_deadline_not_set():
-  return LimitedConfirmationStatementTracker.ordered_manager.ordered_filter(company_house_deadline = None)
+  query = Q(client_id__is_active=True) & Q(company_house_deadline = None)
+  return LimitedConfirmationStatementTracker.ordered_manager.ordered_filter(query)
 
 def get_limited_statements_where_deadline_missed():
-  return LimitedConfirmationStatementTracker.ordered_manager.ordered_filter(company_house_deadline__lt = timezone.now(), is_submitted=False)
+  query = Q(client_id__is_active=True) & Q(company_house_deadline__lt = timezone.now()) & Q(is_submitted=False)
+  return LimitedConfirmationStatementTracker.ordered_manager.ordered_filter(query)
 
 
 @login_required

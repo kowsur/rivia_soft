@@ -858,7 +858,7 @@ class LimitedConfirmationStatementTracker(models.Model):
     class Meta:
         verbose_name = _("Limited Confirmation Statement")
         verbose_name_plural = _("Limited Confirmation Statements")
-        ordering = ['-company_house_deadline']
+        ordering = ['company_house_deadline']
 
     objects = models.Manager()
     ordered_manager = LimitedConfirmationStatementTrackerManager()

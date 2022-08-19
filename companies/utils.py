@@ -1,7 +1,10 @@
-class ChainWithCount:
-    def __init__(self, chained_queryset, total_count):
-        self.chained_queryset = chained_queryset
-        self.total_count = total_count
+from itertools import chain
+
+
+class ChainedQuerysetsWithCount:
+    def __init__(self, *querysets):
+        self.chained_queryset = chain(*querysets)
+        self.total_count = sum(map(lambda queryset: queryset.count(), querysets))
 
     def __iter__(self):
         return self.chained_queryset

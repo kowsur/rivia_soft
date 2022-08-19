@@ -9,7 +9,7 @@ from django.core.validators import MinValueValidator
 
 from users.models import CustomUser
 from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR, AUTH_CODE_VALIDATOR, TAX_YEAR_VALIDATOR
-from .utils import ChainWithCount
+from .utils import ChainedQuerysetsWithCount
 
 
 
@@ -677,28 +677,23 @@ class LimitedSubmissionDeadlineTrackerManager(models.Manager):
     def ordered_all(self):
         upcoming = self.ordered_upcoming_all()
         previous = self.ordered_previous_all()
-        chained_queryset = chain(upcoming, previous)
-        
-        upcoming_count = upcoming.count()
-        previous_count = previous.count()
-        total_count = upcoming_count + previous_count
-        return ChainWithCount(chained_queryset, total_count)
+        deadline_not_set = self.ordered_deadline_not_set_all()
+        return ChainedQuerysetsWithCount(upcoming, previous, deadline_not_set)
 
     def ordered_filter(self, *args, **kwargs):
         upcoming = self.ordered_upcoming_all().filter(*args, **kwargs)
         previous = self.ordered_previous_all().filter(*args, **kwargs)
-        chained_queryset = chain(upcoming, previous)
-        
-        upcoming_count = upcoming.count()
-        previous_count = previous.count()
-        total_count = upcoming_count + previous_count
-        return ChainWithCount(chained_queryset, total_count)
+        deadline_not_set = self.ordered_deadline_not_set_all().filter(*args, **kwargs)
+        return ChainedQuerysetsWithCount(upcoming, previous, deadline_not_set)
     
     def ordered_upcoming_all(self):
         return self.filter(HMRC_deadline__gte = timezone.now()).order_by('HMRC_deadline')
 
     def ordered_previous_all(self):
         return self.filter(HMRC_deadline__lt = timezone.now()).order_by('-HMRC_deadline')
+    
+    def ordered_deadline_not_set_all(self):
+        return self.filter(HMRC_deadline = None).order_by('submission_id')
 
 
 class LimitedSubmissionDeadlineTracker(models.Model):
@@ -840,28 +835,23 @@ class LimitedConfirmationStatementTrackerManager(models.Manager):
     def ordered_all(self):
         upcoming = self.ordered_upcoming_all()
         previous = self.ordered_previous_all()
-        chained_queryset = chain(upcoming, previous)
-        
-        upcoming_count = upcoming.count()
-        previous_count = previous.count()
-        total_count = upcoming_count + previous_count
-        return ChainWithCount(chained_queryset, total_count)
+        deadline_not_set = self.ordered_deadline_not_set_all()
+        return ChainedQuerysetsWithCount(upcoming, previous, deadline_not_set)
 
     def ordered_filter(self, *args, **kwargs):
         upcoming = self.ordered_upcoming_all().filter(*args, **kwargs)
         previous = self.ordered_previous_all().filter(*args, **kwargs)
-        chained_queryset = chain(upcoming, previous)
-        
-        upcoming_count = upcoming.count()
-        previous_count = previous.count()
-        total_count = upcoming_count + previous_count
-        return ChainWithCount(chained_queryset, total_count)
+        deadline_not_set = self.ordered_deadline_not_set_all().filter(*args, **kwargs)
+        return ChainedQuerysetsWithCount(upcoming, previous, deadline_not_set)
     
     def ordered_upcoming_all(self):
         return self.filter(HMRC_deadline__gte = timezone.now()).order_by('HMRC_deadline')
 
     def ordered_previous_all(self):
         return self.filter(HMRC_deadline__lt = timezone.now()).order_by('-HMRC_deadline')
+    
+    def ordered_deadline_not_set_all(self):
+        return self.filter(HMRC_deadline=None).order_by('statement_id')
 
 # Limited Confirmation Statement Tracker
 class LimitedConfirmationStatementTracker(models.Model):

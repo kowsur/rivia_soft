@@ -2549,6 +2549,7 @@ def update_limited_confirmation_statement_tracker(request, statement_id:int):
       if assesment.is_submitted:
         statement = LimitedConfirmationStatementTracker()
         statement.client_id = assesment.client_id
+        statement.company_house_deadline = assesment.company_house_deadline + relativedelta(years=1) #- relativedelta(days=1)
         statement.set_defaults(request)
         statement.save()
         messages.success(request, f'New Limited Confirmation Statement Tracker has been created {statement}!')

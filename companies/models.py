@@ -845,20 +845,20 @@ class LimitedConfirmationStatementTrackerManager(models.Manager):
         return ChainedQuerysetsWithCount(upcoming, previous, deadline_not_set)
     
     def ordered_upcoming_all(self):
-        return self.filter(HMRC_deadline__gte = timezone.now()).order_by('HMRC_deadline')
+        return self.filter(company_house_deadline__gte = timezone.now()).order_by('company_house_deadline')
 
     def ordered_previous_all(self):
-        return self.filter(HMRC_deadline__lt = timezone.now()).order_by('-HMRC_deadline')
+        return self.filter(company_house_deadline__lt = timezone.now()).order_by('-company_house_deadline')
     
     def ordered_deadline_not_set_all(self):
-        return self.filter(HMRC_deadline=None).order_by('statement_id')
+        return self.filter(company_house_deadline=None).order_by('statement_id')
 
 # Limited Confirmation Statement Tracker
 class LimitedConfirmationStatementTracker(models.Model):
     class Meta:
         verbose_name = _("Limited Confirmation Statement")
         verbose_name_plural = _("Limited Confirmation Statements")
-        ordering = ['-HMRC_deadline']
+        ordering = ['-company_house_deadline']
 
     objects = models.Manager()
     ordered_manager = LimitedConfirmationStatementTrackerManager()
@@ -872,7 +872,7 @@ class LimitedConfirmationStatementTracker(models.Model):
         related_name='limited_confirmation_client_id',
         blank=False,
         null=True)
-    HMRC_deadline = models.DateField(verbose_name='HMRC Deadline', blank=False, null=True)
+    company_house_deadline = models.DateField(verbose_name='CH Deadline', blank=False, null=True)
     is_submitted = models.BooleanField(verbose_name='Is Submitted', default=False, null=False)
     submitted_by = models.TextField(verbose_name='Submitted By', blank=True, default='', null=True)
     submission_date = models.DateField(verbose_name='Submission Date', blank=True, null=True)

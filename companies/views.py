@@ -2454,10 +2454,27 @@ def get_limited_statements_where_deadline_missed():
 @login_required
 def home_limited_confirmation_statement_tracker(request):
   pk_field = 'statement_id'
+  exclude_fields = []
   keep_include_fields = True
+  field_ordering = [
+    "statement_id",
+    "client_id",
+    "reg_num",
+    "company_house_deadline",
+    "is_submitted",
+    "submitted_by",
+    "submission_date",
+    "is_documents_uploaded",
+    "remarks",
+    "updated_by",
+    "last_updated_on",
+  ]
+  model_fields = get_field_names_from_model(LimitedConfirmationStatementTracker)
+  model_fields.append('reg_num')
   fk_fields = {
       'updated_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': HTML_Generator.Limited_client_id_repr_format, 'href-url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url,},
+      'reg_num': { 'details_url_without_argument': '/companies/LTD/details/', 'repr-format': r'{company_reg_number}', 'data-field': 'fields.client_id'},
       }
   context = {
     **URLS,
@@ -2472,15 +2489,15 @@ def home_limited_confirmation_statement_tracker(request):
     'statement_deadline_not_set': get_limited_statements_where_deadline_not_set().count(),
     'statement_deadline_missed': get_limited_statements_where_deadline_missed().count(),
 
-    'template_tag': generate_template_tag_for_model(LimitedConfirmationStatementTracker, pk_field=pk_field, show_id=True, fk_fields=fk_fields),
-    'data_container': generate_data_container_table(LimitedConfirmationStatementTracker, pk_field=pk_field, show_id=True),
+    'template_tag': generate_template_tag_for_model(LimitedConfirmationStatementTracker, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, ordering=field_ordering, fk_fields=fk_fields, keep_include_fields=keep_include_fields),
+    'data_container': generate_data_container_table(LimitedConfirmationStatementTracker, pk_field=pk_field, show_id=True, exclude_fields=exclude_fields, ordering=field_ordering, keep_include_fields=keep_include_fields, ),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Confirmation_Statement_Tracker_viewall_url,
       'search_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Confirmation_Statement_Tracker_search_url,
       'update_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Confirmation_Statement_Tracker_update_url,
       'delete_url':  Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_Confirmation_Statement_Tracker_delete_url,  
-      'model_fields': get_field_names_from_model(LimitedConfirmationStatementTracker)
+      'model_fields': model_fields
     },
   }
   return render(request=request, template_name='companies/home.html', context=context)

@@ -109,8 +109,19 @@ def get_object_or_None(model, *args, pk=None, delete_duplicate=False, return_all
 
 
 
-SELFASSESMENT_FK_FIELDS_FOR_EXPORT = 'all' #['client_name', 'client_file_number', 'HMRC_referance', 'personal_post_code']
-LIMITED_FK_FIELDS_FOR_EXPORT = 'all' #['client_name', 'client_file_number', 'director_phone_number', 'director_post_code']
+SELFASSESMENT_FK_FIELDS_FOR_EXPORT = [ # 'all'
+  'client_name',
+  'client_file_number',
+  'personal_phone_number',
+  'personal_post_code',
+]
+LIMITED_FK_FIELDS_FOR_EXPORT = [ # 'all'
+  'client_name',
+  'client_file_number',
+  'company_reg_number',
+  # 'director_phone_number',
+  # 'director_post_code'
+]
 # =============================================================================================================
 # =============================================================================================================
 # Selfassesment
@@ -782,7 +793,7 @@ def export_selfassesment_data_collection(request):
   include_fields = []
   exclude_fields = []
   fk_fields = {
-    'selfassesment': 'all',
+    'selfassesment': SELFASSESMENT_FK_FIELDS_FOR_EXPORT,
     'tax_year': ['tax_year']
   }
   keep_include_fields = True
@@ -1115,7 +1126,7 @@ def export_selfassesment_account_submission(request):
   include_fields = []
   exclude_fields = ['submission_id']
   fk_fields = {
-    'client_id': ['client_name', 'client_file_number', 'personal_phone_number', 'personal_post_code']
+    'client_id': SELFASSESMENT_FK_FIELDS_FOR_EXPORT
   }
   keep_include_fields = True
   show_others = True
@@ -1651,7 +1662,7 @@ def export_limited(request):
     content_type='text/csv',
     headers={'Content-Disposition': f'attachment; filename="limited_{timezone.localtime()}.csv"'},
   )
-  include_fields = ['is_active', 'is_payroll', 'payment_method', 'client_file_number', 'client_name', 'company_reg_number', 'company_auth_code', 'remakrs', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent']
+  include_fields = ['is_active', 'is_payroll', 'payment_method', 'client_file_number', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent']
   exclude_fields = ['client_id',]
   keep_include_fields = True
   show_others = False
@@ -2110,7 +2121,7 @@ def update_limited_submission_deadline_tracker(request, submission_id:int):
         new_assesment.updated_by = request.user
         new_assesment.HMRC_deadline = assesment.HMRC_deadline + relativedelta(years=1) # Compnay House deadline
         new_assesment.our_deadline = assesment.our_deadline + relativedelta(years=1) # HMRC Deadline
-        new_assesment.period_start_date = assesment.period_start_date + relativedelta(years=1) # Period Start
+        new_assesment.period_start_date = assesment.period + relativedelta(days=1) # Period Start
         new_assesment.period = assesment.period + relativedelta(years=1) # Period End
         new_assesment.save()
         messages.success(request, f'New Limited Submission Deadline Tracker has been created {new_assesment}')

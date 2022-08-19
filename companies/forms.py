@@ -1459,7 +1459,7 @@ class LimitedConfirmationStatementTrackerCreationForm(forms.ModelForm):
         empty_label=None,
         disabled=False
         )
-    HMRC_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    company_house_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     submission_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
     
     class Meta:
@@ -1467,7 +1467,7 @@ class LimitedConfirmationStatementTrackerCreationForm(forms.ModelForm):
         fields = (
             # "statement_id",
             "client_id",
-            "HMRC_deadline",
+            "company_house_deadline",
             "is_submitted",
             "submitted_by",
             "submission_date",
@@ -1498,7 +1498,7 @@ class LimitedConfirmationStatementTrackerChangeForm(forms.ModelForm):
         empty_label=None,
         disabled=False
         )
-    HMRC_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    company_house_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     submission_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
     
     class Meta:
@@ -1506,7 +1506,7 @@ class LimitedConfirmationStatementTrackerChangeForm(forms.ModelForm):
         fields = (
             # "statement_id",
             "client_id",
-            "HMRC_deadline",
+            "company_house_deadline",
             "is_submitted",
             "submitted_by",
             "submission_date",

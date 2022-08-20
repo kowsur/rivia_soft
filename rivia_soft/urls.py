@@ -26,7 +26,6 @@ urlpatterns = [
     path('accounts/', include('accounts.urls'), name='accounts'),
     path('u/', include('users.urls')),
     path('only-admins-can-access-this/', admin.site.urls, name='admin'),
-    path('opensearch.xml', lambda request: FileResponse(open('I:/Projects/rs/static/osd.xml','rb')), name='opensearch'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

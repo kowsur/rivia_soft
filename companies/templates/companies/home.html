@@ -212,6 +212,14 @@
           <span id="task-count">{{ limited_submissions_status_COMPLETED }}</span>
           <span class="task-tooltip">Status - COMPLETED</span>
         </span>
+        <span class="task task-previous" data-tasks='limited_submissions_payment_status_NOT_PAID'>
+          <span id="task-count">{{ limited_submissions_payment_status_NOT_PAID }}</span>
+          <span class="task-tooltip">Payment Status - NOT PAID.</span>
+        </span>
+        <span class="task task-done" data-tasks='limited_submissions_payment_status_PAID'>
+          <span id="task-count">{{ limited_submissions_payment_status_PAID }}</span>
+          <span class="task-tooltip">Payment Status - PAID.</span>
+        </span>
       </div>
     {% elif limited_vat_counts %}
       <div class="task-container">

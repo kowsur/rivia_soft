@@ -1977,6 +1977,15 @@ def get_limited_submission_where_period_end(limit=-1):
   records = LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(period__lt = timezone.now(), is_submitted=False)
   return records
 
+def get_limited_submission_where_payment_status_NOT_PAID(limit=-1):
+  records = LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(payment_status="NOT PAID")
+  return records
+
+def get_limited_submission_where_payment_status_PAID(limit=-1):
+  records = LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(payment_status="PAID")
+  return records
+
+
 @login_required
 def home_limited_submission_deadline_tracker(request):
   pk_field = 'submission_id'
@@ -2015,6 +2024,8 @@ def home_limited_submission_deadline_tracker(request):
     'limited_submissions_status_PROCESSING': get_limited_submissions_where_status_PROCESSING().count(),
     'limited_submissions_status_WAITING_FOR_CONFIRMATION': get_limited_submissions_where_status_WAITING_FOR_CONFIRMATION().count(),
     'limited_submissions_status_COMPLETED': get_limited_submissions_where_status_COMPLETED().count(),
+    'limited_submissions_payment_status_NOT_PAID': get_limited_submission_where_payment_status_NOT_PAID().count(),
+    'limited_submissions_payment_status_PAID': get_limited_submission_where_payment_status_PAID().count(),
 
     'template_tag': generate_template_tag_for_model(LimitedSubmissionDeadlineTracker, show_id=False, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, ordering=field_ordering, fk_fields=fk_fields),
     'data_container': generate_data_container_table(LimitedSubmissionDeadlineTracker, show_id=False, pk_field=pk_field, exclude_fields=exclude_fields, keep_include_fields=keep_include_fields, ordering=field_ordering),
@@ -2184,6 +2195,8 @@ def search_limited_submission_deadline_tracker(request, limit: int=-1):
         'limited_submissions_status_PROCESSING': get_limited_submissions_where_status_PROCESSING(),
         'limited_submissions_status_WAITING_FOR_CONFIRMATION': get_limited_submissions_where_status_WAITING_FOR_CONFIRMATION(),
         'limited_submissions_status_COMPLETED': get_limited_submissions_where_status_COMPLETED(),
+        'limited_submissions_payment_status_NOT_PAID': get_limited_submission_where_payment_status_NOT_PAID(),
+        'limited_submissions_payment_status_PAID': get_limited_submission_where_payment_status_PAID(),
       }
       records = tasks.get(tasks_key, [])
       data = serialize(queryset=records, format='json')

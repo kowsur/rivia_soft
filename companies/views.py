@@ -2083,7 +2083,7 @@ def update_limited_submission_deadline_tracker(request, submission_id:int):
 
   try:
     record =  LimitedSubmissionDeadlineTracker.objects.get(submission_id=submission_id)
-    if record.is_submitted and record.is_submitted_hmrc:
+    if (record.is_submitted and record.is_submitted_hmrc) and not request.user.is_superuser:
       messages.error(request, message=f"Limited Submission Deadline Tracker {submission_id} is submitted therefore can't be updated!")
       return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)
     context['form'] = LimitedSubmissionDeadlineTrackerChangeForm(instance=record)

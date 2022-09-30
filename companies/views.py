@@ -869,6 +869,7 @@ def home_selfassesment_account_submission(request):
     "is_data_collected",
     "prepared_by",
     "payment_status",
+    "payment_method",
     "paid_amount",
     "unique_public_view_key",
     "assigned_to",

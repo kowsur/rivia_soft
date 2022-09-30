@@ -551,6 +551,7 @@ class SelfassesmentAccountSubmissionCreationForm(forms.ModelForm):
             "request_date",
             "remarks",
             "payment_status",
+            "payment_method",
             "paid_amount",
             # "prepared_by",
             # "submitted_by",
@@ -644,6 +645,7 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
             "tax_year",
             "remarks",
             "payment_status",
+            "payment_method",
             "paid_amount",
             "prepared_by",
             # "submitted_by",
@@ -1229,6 +1231,11 @@ class LimitedSubmissionDeadlineTrackerCreationForm(forms.ModelForm):
             # "submission_date",
             # "is_documents_uploaded",
             "remarks",
+
+            # "payment_status",
+            # "payment_method",
+            # "paid_amount",
+
             # "updated_by",
             # "last_updated_on",
             )
@@ -1301,6 +1308,11 @@ class LimitedSubmissionDeadlineTrackerChangeForm(forms.ModelForm):
 
             "is_documents_uploaded",
             "remarks",
+
+            "payment_status",
+            "payment_method",
+            "paid_amount",
+
             # "updated_by",
             # "last_updated_on",
             )

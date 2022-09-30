@@ -280,6 +280,13 @@ class SelfassesmentAccountSubmission(models.Model):
         ("PAID", "PAID"),
     )
     payment_status = models.CharField("Payment Status", blank=False, max_length=55, choices=payment_status_choices, default="NOT PAID")
+    payment_method_choices = (
+        (None, "--------------"),
+        ("CASH", "CASH"),
+        ("DIRECT DEBIT","DIRECT DEBIT"),
+        ("BANK TRANSFER","BANK TRANSFER"),
+    )
+    payment_method = models.CharField("Payment Method", blank=True, null=True, max_length=55, choices=payment_method_choices, default=None)
     paid_amount = models.BigIntegerField(verbose_name='Amount Paid', blank=True, null=True)
     unique_public_view_key = models.UUIDField(default=uuid.uuid4, editable=False)
 

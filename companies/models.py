@@ -244,7 +244,9 @@ class SelfassesmentAccountSubmission(models.Model):
         ("READY FOR SUBMIT", "READY FOR SUBMIT", ),
         ("WAITING FOR INFORMATION", "WAITING FOR INFORMATION",),
         ("WAITING FOR CONFIRMATION", "WAITING FOR CONFIRMATION",),
-        ("SUBMITTED", "SUBMITTED",)
+        ("SUBMITTED", "SUBMITTED",),
+        ("NOT ISSUED", "NOT ISSUED",),
+        ("CLIENT CLOSED", "CLIENT CLOSED",),
     )
     status = models.CharField("Status", blank=False, max_length=55, choices=status_choices, default="REQUEST")
     appointment_date = models.DateField(verbose_name='Appointment Date', blank=True, null=True, default=timezone.now)

@@ -682,8 +682,8 @@ def generate_tax_report_pdf(account_submission):
     selfemployment_incomes = filter_selfemployment_incomes(selfemployment_incomes)
     selfemployment_total_comission = get_total_selfemployment_comission(selfemployment_incomes)
 
-    selfemployment_expenses = get_object_or_None(SelfemploymentExpensesPerTaxYear, delete_duplicate=False, return_all=True, client=submission_id).order_by('-personal_usage_percentage')
-    personal_usage_heading_value = selfemployment_expenses[0].personal_usage_percentage if selfemployment_expenses else 20
+    selfemployment_expenses = get_object_or_None(SelfemploymentExpensesPerTaxYear, delete_duplicate=False, return_all=True, client=submission_id)
+    personal_usage_heading_value = selfemployment_expenses.order_by('-personal_usage_percentage')[0].personal_usage_percentage if selfemployment_expenses else 20
     selfemployment_expenses = filter_selfemployment_expenses(selfemployment_expenses)
 
     taxable_incomes = get_object_or_None(TaxableIncomeSourceForSubmission, delete_duplicate=False, return_all=True, submission=submission_id)

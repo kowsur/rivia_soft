@@ -62,21 +62,19 @@ const search_bar = document.querySelector('input[name="search"]');
 function searchHandler(){
   let limited_search_url = Limited.search_url
   let selfassesment_search_url = Selfassesment.search_url
-  
-  search_bar.addEventListener('input', (event)=>{  
-    let search_text = search_bar.value.trim()
 
-    // reset timer to prevent extra search
-    clearTimeout(typingTimer);
-    // set the timer again to call api after doneTypingInterval
-    if (search_text===''){
-      typingTimer = setTimeout( async () => {
-        loadAllTrackers()
-      }, doneTypingInterval); // Get all the records
-    }else{
-     searchTrackers(doneTypingInterval, search_text, limited_search_url, selfassesment_search_url)
-    }
-  })
+  let search_text = search_bar.value.trim()
+
+  // reset timer to prevent extra search
+  clearTimeout(typingTimer);
+  // set the timer again to call api after doneTypingInterval
+  if (search_text===''){
+    typingTimer = setTimeout( async () => {
+      loadAllTrackers()
+    }, doneTypingInterval); // Get all the records
+  }else{
+    searchTrackers(doneTypingInterval, search_text, limited_search_url, selfassesment_search_url)
+  }
 }
 if (search_bar){ search_bar.addEventListener('input', searchHandler) }
 if (tax_year_select_input){ tax_year_select_input.addEventListener('input', searchHandler) }

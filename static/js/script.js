@@ -41,7 +41,7 @@ function searchHandler(event){
   // reset timer to prevent extra search
   clearTimeout(typingTimer);
   // set the timer again to call api after doneTypingInterval
-  if (search_text===''){
+  if (search_text==='' || search_url===undefined){
     // typingTimer = setTimeout( async () => {
     //   loadAllRecords()
     // }, doneTypingInterval); // Get all the records

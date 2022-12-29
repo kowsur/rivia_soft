@@ -607,6 +607,18 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         empty_label=None,
         disabled=False
         )
+    submitted_by = SearchableModelField(
+        queryset=CustomUser.objects.all(),
+        search_url = search_users_url_path,
+        all_url = all_users_url_path,
+        repr_format = Forms.CustomUser_repr_format,
+        model=CustomUser,
+        choices=CustomUser.objects.all().only('user_id', 'first_name'),
+        fk_field='user_id',
+        empty_label=None,
+        disabled=False,
+        required = False
+        )
     prepared_by = SearchableModelField(
         queryset=CustomUser.objects.all(),
         search_url = search_users_url_path,
@@ -648,7 +660,7 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
             "payment_method",
             "paid_amount",
             "prepared_by",
-            # "submitted_by",
+            "submitted_by",
             # "is_submitted",
             # "last_updated_by",
             # "last_updated_on",

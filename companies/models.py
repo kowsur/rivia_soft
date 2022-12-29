@@ -313,11 +313,11 @@ class SelfassesmentAccountSubmission(models.Model):
         self.last_updated_on = timezone.now()
         
         if self.status == "SUBMITTED":
+            # self.submitted_by = request.user
             self.is_submitted = True
-            self.submitted_by = request.user
             self.date_of_submission = timezone.now()
         else:
-            self.submitted_by = None
+            # self.submitted_by = None
             self.is_submitted = False
             self.date_of_submission = None
         self.save()

@@ -25,13 +25,13 @@ textarea{
 }
 
 /* Select search */
-#add_taxable_income{
+#add_expense{
     z-index: 3;
 }
-#add_expense{
+#add_deduction_and_allowance{
     z-index: 2;
 }
-#add_deduction_and_allowance{
+#add_taxable_income{
     z-index: 1;
 }
 

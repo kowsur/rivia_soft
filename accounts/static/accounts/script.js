@@ -986,31 +986,56 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
   // add current incomeSourceId to displayingIncomeIds set to filter them out while searching
   displayingDeductionIds.add(parseInt(deductionSourceId))
   let deductionSource = deductionSourcesMapById[deductionSourceId]
-  
+  let deductionContainer
 
-  let deductionContainer = createNodeFromMarkup(`
-  <div class="deduction">
-    <div class="toggle">
-      <h2 class="selfemployment-income-source">${deductionSource.name} Total: <span data-total-container-for-deduction-source></span></h2>
-      <img src='/static/accounts/expand.svg'/>
-    </div>
-    <div class="months invisible">
-      <div class="table" data-display-table-name="deduction-and-allowance">
-        <div class="thead">
-          <div class="row">
-            <span>Amount</span>
-            <span>Addition</span>
-            <span>Disposal</span>
-            <span>Allowance(%)</span>
-            <span>Personal Usage(%)</span>
-            <span>Note</span>
+  let is_loss_from_previous_year = deductionSource.backend_identifier==="loss_brought_forward_from_previous_year";
+  
+  if (is_loss_from_previous_year){
+    deductionContainer = createNodeFromMarkup(`
+    <div class="deduction">
+      <div class="toggle">
+        <h2 class="selfemployment-income-source">${deductionSource.name} Total: <span data-total-container-for-deduction-source></span></h2>
+        <img src='/static/accounts/expand.svg'/>
+      </div>
+      <div class="months invisible">
+        <div class="table" data-display-table-name="deduction-and-allowance">
+          <div class="thead">
+            <div class="row">
+              <span>Amount</span>
+              <span>Note</span>
+            </div>
+          </div>
+          <div class="body">
           </div>
         </div>
-        <div class="body">
+      </div>
+    </div>`)
+  }else{
+    deductionContainer = createNodeFromMarkup(`
+    <div class="deduction">
+      <div class="toggle">
+        <h2 class="selfemployment-income-source">${deductionSource.name} Total: <span data-total-container-for-deduction-source></span></h2>
+        <img src='/static/accounts/expand.svg'/>
+      </div>
+      <div class="months invisible">
+        <div class="table" data-display-table-name="deduction-and-allowance">
+          <div class="thead">
+            <div class="row">
+              <span>Amount</span>
+              <span>Addition</span>
+              <span>Disposal</span>
+              <span>Allowance(%)</span>
+              <span>Personal Usage(%)</span>
+              <span>Note</span>
+            </div>
+          </div>
+          <div class="body">
+          </div>
         </div>
       </div>
-    </div>
-  </div>`)
+    </div>`)
+  }
+
 
   let body = deductionContainer.querySelector('.body')
   let totalContainer = deductionContainer.querySelector('span[data-total-container-for-deduction-source]')
@@ -1048,28 +1073,54 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
   let inputNoteId = `deduction_note_${submission.submission_id}_${deduction.deduction_source}`
 
   // Prepare markup for a single month
-  let deductionMarkup = `
-      <div class='row'>
-        <span>
-          <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${deduction?.amount}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="amount">
-        </span>
-        <span>
-          <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAdditionId} value="${deduction?.addition}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="addition">
-        </span>
-        <span>
-          <input type="number" max=${DB_MAX_INT_VALUE} id=${inputDisposalId} value="${deduction?.disposal}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="disposal">
-        </span>
-        <span>
-          <input type="number" min="0" max='100' id=${inputAllowancePercentageId} value="${deduction?.allowance_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="allowance_percentage">
-        </span>
-        <span>
-          <input type="number" min="0" max='100' id=${inputPersonalUsagePercentageId} disabled value="${deduction?.personal_usage_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="personal_usage_percentage">
-        </span>
-        <span>
-          <textarea id=${inputNoteId} data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="note">${deduction?.note}</textarea>
-        </span>
-      </div>
-      `
+  let deductionMarkup
+  if (is_loss_from_previous_year){
+    deductionMarkup = `
+        <div class='row'>
+          <span>
+            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${deduction?.amount}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="amount">
+          </span>
+          <span style="display:none">
+            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAdditionId} value="0" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="addition">
+          </span>
+          <span style="display:none">
+            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputDisposalId} value="0" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="disposal">
+          </span>
+          <span style="display:none">
+            <input type="number" min="0" max='100' id=${inputAllowancePercentageId} value="100" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="allowance_percentage">
+          </span>
+          <span style="display:none">
+            <input type="number" min="0" max='100' id=${inputPersonalUsagePercentageId} disabled value="0" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="personal_usage_percentage">
+          </span>
+          <span>
+            <textarea id=${inputNoteId} data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="note">${deduction?.note}</textarea>
+          </span>
+        </div>
+        `
+  }else{
+    deductionMarkup = `
+        <div class='row'>
+          <span>
+            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAmountId} value="${deduction?.amount}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="amount">
+          </span>
+          <span>
+            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputAdditionId} value="${deduction?.addition}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="addition">
+          </span>
+          <span>
+            <input type="number" max=${DB_MAX_INT_VALUE} id=${inputDisposalId} value="${deduction?.disposal}" data-submission-id="${submissionId}" data-deduction-id="${deduction.deduction_source}" data-update-type="disposal">
+          </span>
+          <span>
+            <input type="number" min="0" max='100' id=${inputAllowancePercentageId} value="${deduction?.allowance_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="allowance_percentage">
+          </span>
+          <span>
+            <input type="number" min="0" max='100' id=${inputPersonalUsagePercentageId} disabled value="${deduction?.personal_usage_percentage}" data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="personal_usage_percentage">
+          </span>
+          <span>
+            <textarea id=${inputNoteId} data-submission-id="${submissionId}" data-deduction-id="${deduction?.deduction_source}" data-update-type="note">${deduction?.note}</textarea>
+          </span>
+        </div>
+        `
+  }
   
   let node = createNodeFromMarkup(deductionMarkup)
   let inputAmount = node.querySelector(`#${inputAmountId}`)
@@ -1092,10 +1143,15 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
     inputPersonalUsage.dispatchEvent(event)
   })
 
-  addEventListenersToElements(inputAmount, 'input', [validateMaxValue, totalUpdater])
-  addEventListenersToElements([inputAmount, inputAddition, inputDisposal, inputAllowancePercentage, inputPersonalUsage, inputNote], 'input', handleDeductionUpdate)
-  addEventListenersToElements([inputAmount, inputAllowancePercentage, inputPersonalUsage], 'input', [updateTotalDeduction, updateNetProfit])
-  addEventListenersToElements([inputAllowancePercentage, inputPersonalUsage], 'input', validatePercentageValue)
+  if (is_loss_from_previous_year){
+    addEventListenersToElements(inputAmount, 'input', [validateMaxValue, totalUpdater, updateTotalDeduction, updateNetProfit])
+    addEventListenersToElements([inputAmount, inputNote], 'input', handleDeductionUpdate)
+  }else{
+    addEventListenersToElements(inputAmount, 'input', [validateMaxValue, totalUpdater])
+    addEventListenersToElements([inputAmount, inputAddition, inputDisposal, inputAllowancePercentage, inputPersonalUsage, inputNote], 'input', handleDeductionUpdate)
+    addEventListenersToElements([inputAmount, inputAllowancePercentage, inputPersonalUsage], 'input', [updateTotalDeduction, updateNetProfit])
+    addEventListenersToElements([inputAllowancePercentage, inputPersonalUsage], 'input', validatePercentageValue)
+  }
 
   body.appendChild(node)
 

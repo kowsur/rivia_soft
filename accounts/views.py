@@ -462,23 +462,40 @@ def get_total_selfemployment_comission(selfemployment_incomes):
     return total
 
 
-def calculate_capital_allowance(deduction_and_allowance):
+def calculate_total_for_deduction_and_allowance(deduction_and_allowance):
     amount = deduction_and_allowance.amount
     addition = deduction_and_allowance.addition
     disposal = deduction_and_allowance.disposal
-    allowance_percentage = deduction_and_allowance.allowance_percentage
-    personal_usage_percentage = deduction_and_allowance.personal_usage_percentage
+    return amount + addition + disposal
 
-    total = amount + addition + disposal
-    allowance = (total*allowance_percentage)/100
-    personal_usage = (allowance*personal_usage_percentage)/100
+def calculate_written_down_allowance_for_deduction_and_allowance(deduction_and_allowance):
+    allowance_percentage = deduction_and_allowance.allowance_percentage
+    total = calculate_total_for_deduction_and_allowance(deduction_and_allowance)
+    return (total * allowance_percentage) / 100
+
+def calculate_personal_usage_for_deduction_and_allowance(deduction_and_allowance):
+    personal_usage_percentage = deduction_and_allowance.personal_usage_percentage
+    allowance = calculate_written_down_allowance_for_deduction_and_allowance(deduction_and_allowance)
+    return (allowance * personal_usage_percentage) / 100
+
+def calculate_capital_allowance_for_deduction_and_allowance(deduction_and_allowance):
+    personal_usage = calculate_personal_usage_for_deduction_and_allowance(deduction_and_allowance)
+    allowance = calculate_written_down_allowance_for_deduction_and_allowance(deduction_and_allowance)
     capital_allowance = allowance - personal_usage
     return capital_allowance if capital_allowance>=0 else 0
+
+def calculate_written_down_value_for_deduction_and_allowance(deduction_and_allowance):
+    written_down_allowance = calculate_written_down_allowance_for_deduction_and_allowance(deduction_and_allowance)
+    total = calculate_total_for_deduction_and_allowance(deduction_and_allowance)
+    return total - written_down_allowance
 
 def get_total_selfemployment_deduction_and_allowance(selfemployment_deductions_and_allowances):
     total = 0
     for deduction in selfemployment_deductions_and_allowances:
-        total += calculate_capital_allowance(deduction)
+        if deduction.deduction_source.backend_identifier=="loss_brought_forward_from_previous_year":
+            total += deduction.amount
+        else:
+            total += calculate_capital_allowance_for_deduction_and_allowance(deduction)
     return total
 
 
@@ -513,7 +530,7 @@ def filter_selfemployment_expenses(selfemployment_expenses):
 def filter_taxable_incomes(taxable_incomes):
     return [taxable_income for taxable_income in taxable_incomes if taxable_income.amount>0]
 def filter_deductions_and_allowances(deductions_and_allowances):
-    return [amount for amount in deductions_and_allowances if amount.amount>0]
+    return [allowance for allowance in deductions_and_allowances if allowance.amount>0]
 
 
 def get_total_selfemployment_income_by_submission_id(submission_id):
@@ -698,43 +715,41 @@ def generate_tax_report_pdf(account_submission):
     selfemployment_total_deduction_and_allowance = get_total_selfemployment_deduction_and_allowance(deductions_and_allowances)
 
     # Car value calculations
-    car_value_deduction_and_allowance = get_object_or_None(SelfemploymentDeductionsPerTaxYear, delete_duplicate=False, return_all=False, client=submission_id, deduction_source__name__icontains="Car Value")
+    car_value_deduction_and_allowance = get_object_or_None(SelfemploymentDeductionsPerTaxYear, delete_duplicate=False, return_all=False, client=submission_id, deduction_source__backend_identifier="car_value")
     allowance_car_value = {
-        'value': 0,
+        'amount': 0,
         'addition': 0,
         'disposal': 0,
-        'total': 0,
-
-        'written_down_allowance': 0,
-        'written_down_allowance_percentage': 0,
-        'written_down_value': 0,
-        
-        'capital_allowance': 0,
-        'personal_usage': 0,
         'personal_usage_percentage': 0,
+        'written_down_allowance_percentage': 0,
+
+        'total': 0,
+        'written_down_allowance': 0,
+        'written_down_value': 0,
+        'personal_usage': 0,
         'capital_allowance_deduction': 0,
     }
     if car_value_deduction_and_allowance:
-        allowance_car_value['value'] = car_value_deduction_and_allowance.amount
+        allowance_car_value['amount'] = car_value_deduction_and_allowance.amount
         allowance_car_value['addition'] = car_value_deduction_and_allowance.addition
         allowance_car_value['disposal'] = car_value_deduction_and_allowance.disposal
-        total = car_value_deduction_and_allowance.amount + car_value_deduction_and_allowance.addition + car_value_deduction_and_allowance.disposal
-        allowance_car_value['total'] = total
-
-        written_down_allowance = (total*car_value_deduction_and_allowance.allowance_percentage)/100
-        allowance_car_value['written_down_allowance'] = written_down_allowance
-        allowance_car_value['written_down_allowance_percentage'] = car_value_deduction_and_allowance.allowance_percentage
-        written_down_value = total - written_down_allowance
-        allowance_car_value['written_down_value'] = written_down_value
-
-        allowance_car_value['capital_allowance'] = written_down_allowance
-        personal_usage = (written_down_allowance*car_value_deduction_and_allowance.personal_usage_percentage)/100
-        allowance_car_value['personal_usage'] = personal_usage
         allowance_car_value['personal_usage_percentage'] = car_value_deduction_and_allowance.personal_usage_percentage
-        allowance_car_value['capital_allowance_deduction'] = written_down_allowance-personal_usage
+        allowance_car_value['written_down_allowance_percentage'] = car_value_deduction_and_allowance.allowance_percentage
 
+        allowance_car_value['total'] = calculate_total_for_deduction_and_allowance(car_value_deduction_and_allowance)
+        allowance_car_value['written_down_allowance'] = calculate_written_down_allowance_for_deduction_and_allowance(car_value_deduction_and_allowance)
+        allowance_car_value['written_down_value'] = calculate_written_down_value_for_deduction_and_allowance(car_value_deduction_and_allowance)
+        allowance_car_value['personal_usage'] = calculate_personal_usage_for_deduction_and_allowance(car_value_deduction_and_allowance)
+        allowance_car_value['capital_allowance_deduction'] = calculate_capital_allowance_for_deduction_and_allowance(car_value_deduction_and_allowance)
 
-    total_expenses = selfemployment_total_expense + allowance_car_value['capital_allowance_deduction']
+    # Loss brought forward from previous year
+    loss_brought_forward_from_previous_year = get_object_or_None(SelfemploymentDeductionsPerTaxYear, delete_duplicate=False, return_all=False, client=submission_id, deduction_source__backend_identifier="loss_brought_forward_from_previous_year")
+    if loss_brought_forward_from_previous_year:
+        loss_brought_forward_from_previous_year = loss_brought_forward_from_previous_year.amount if loss_brought_forward_from_previous_year.amount >= 0 else 0
+    else:
+        loss_brought_forward_from_previous_year = 0
+
+    total_expenses = selfemployment_total_expense + allowance_car_value['capital_allowance_deduction'] + loss_brought_forward_from_previous_year
     selfemployment_net_profit = selfemployment_total_income - total_expenses
 
     # Income tax page calculations
@@ -833,8 +848,9 @@ def generate_tax_report_pdf(account_submission):
         # submission info
         'submission': account_submission,
         'tax_year': tax_year.tax_year,
-        'tax_year_prev': tax_year.tax_year[:4],
         'tax_year_next': tax_year.tax_year[5:],
+        'tax_year_prev': tax_year.tax_year[:4],
+        'tax_year_prev_prev': int(tax_year.tax_year[:4])-1,
 
         # client info
         'client_name': account_submission.client_id.client_name,
@@ -845,7 +861,9 @@ def generate_tax_report_pdf(account_submission):
         'selfemployment_total_income': get_total_selfemployment_income(selfemployment_incomes),
         'selfemployment_total_income_comission': selfemployment_total_comission,
         'selfemployment_total_expense': selfemployment_total_expense,
+        'selfemployment_total_expense_with_car_value': selfemployment_total_expense + allowance_car_value['capital_allowance_deduction'],
         'selfemployment_total_deduction_and_allowance': get_total_selfemployment_deduction_and_allowance(deductions_and_allowances),
+        'profit_for_the_year': selfemployment_total_income - allowance_car_value['capital_allowance_deduction'] - selfemployment_total_expense,
         'selfemployment_net_profit': selfemployment_net_profit,
         'selfemployment_is_loss': selfemployment_net_profit<0,
         'total_expenses': total_expenses,
@@ -859,6 +877,7 @@ def generate_tax_report_pdf(account_submission):
         'deductions_and_allowances': deductions_and_allowances,
         'taxable_incomes': taxable_incomes,
         'car_value': allowance_car_value,
+        'loss_brought_forward_from_previous_year': loss_brought_forward_from_previous_year,
 
         # Income Tax calculation page
         'tax_calc': {

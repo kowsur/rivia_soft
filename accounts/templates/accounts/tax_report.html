@@ -131,7 +131,7 @@
                             <tr>
                                 <td colspan="1"></td>
                                 <td colspan="3">Pool Written Down Value b/fwd</td>
-                                <td class="text-right" colspan="1">{{car_value.value|floatformat:"2g"}}</td>
+                                <td class="text-right" colspan="1">{{car_value.amount|floatformat:"2g"}}</td>
                                 <td colspan="2"></td>
                             </tr>
                             <tr>
@@ -173,7 +173,7 @@
                             <tr>
                                 <td colspan="1"></td>
                                 <td colspan="5">Capital Allowance available</td>
-                                <td class="text-right" colspan="1">{{car_value.capital_allowance|floatformat:"2g"}}</td>
+                                <td class="text-right" colspan="1">{{car_value.written_down_allowance|floatformat:"2g"}}</td>
                             </tr>
                             <tr>
                                 <td colspan="1"></td>
@@ -188,7 +188,11 @@
                         </tbody>
                     </table>
                 {% endif %}
-                <h2 class="fs-11 font-normal d-f justify-between">Total Expenses <span>£{{total_expenses|floatformat:"2g"}}</span></h2>
+                <h2 class="fs-11 font-bold d-f justify-between">Total Expenses <span>£{{selfemployment_total_expense_with_car_value|floatformat:"2g"}}</span></h2>
+                {% if loss_brought_forward_from_previous_year > 0 %}
+                <h2 class="fs-11 font-bold d-f justify-between">Profit for the year <span>£{{profit_for_the_year|floatformat:"2g"}}</span></h2>
+                    <h2 class="fs-11 font-bold d-f justify-between">Loss B/f for {{tax_year_prev_prev}}-{{tax_year_prev}} <span>£-{{loss_brought_forward_from_previous_year|floatformat:"2g"}}</span></h2>
+                {% endif %}
                 <h2 class="fs-11 font-bold d-f justify-between doubble-underline">Net {% if selfemployment_is_loss %}Loss{% else %}Profit{% endif %} for the year <span>£{{selfemployment_net_profit|floatformat:"2g"}}</span></h2>
             </section>
         </section>

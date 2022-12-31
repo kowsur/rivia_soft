@@ -1000,6 +1000,12 @@ def update_selfassesment_account_submission(request, submission_id:int):
       try:
         assesment = form.save(commit=False)
         assesment.set_defaults(request)
+        if assesment.status=="SUBMITTED" and assesment.submitted_by==None:
+          form.add_error('submitted_by', 'Submitted By is required when Is Submitted is True')
+          return render(request, template_name='companies/update.html', context=context)
+        if assesment.status!="SUBMITTED" and assesment.submitted_by!=None:
+          form.add_error('status', 'Status must be "SUBMITTED" to update Submitted by')
+          return render(request, template_name='companies/update.html', context=context)
         if not assesment.assigned_to==currently_assigned_to and not request.user.is_superuser:
           messages.error(request, "Only admins can change Assigned to")
           return render(request, template_name='companies/update.html', context=context)

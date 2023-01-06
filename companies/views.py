@@ -1133,6 +1133,8 @@ def all_selfassesment_account_submission(request, limit=-1):
     return HttpResponse(data, content_type='application/json')
   raise Http404
 
+SELFASSESMENT_FK_FIELDS_TO_EXPORT = SELFASSESMENT_FK_FIELDS_FOR_EXPORT.copy()
+SELFASSESMENT_FK_FIELDS_TO_EXPORT.remove('client_name')
 @login_required
 @allowed_for_superuser(
   message="Sorry! You are not authorized to export this.",
@@ -1145,7 +1147,13 @@ def export_selfassesment_account_submission(request):
   include_fields = []
   exclude_fields = ['submission_id']
   fk_fields = {
-    'client_id': SELFASSESMENT_FK_FIELDS_FOR_EXPORT
+    'client_id': [
+        'client_name',
+        'is_active',
+        'start_date',
+        'UTR',
+        'HMRC_agent',
+      ] + SELFASSESMENT_FK_FIELDS_TO_EXPORT
   }
   keep_include_fields = True
   show_others = True

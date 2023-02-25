@@ -26,6 +26,7 @@ urlpatterns = [
     path('companies/', include('companies.urls'), name='companies'),
     path('accounts/', include('accounts.urls'), name='accounts'),
     path('u/', include('users.urls')),
+    path('invoice/', include('invoice.urls'), name='invoice'),
     path('only-admins-can-access-this/', admin.site.urls, name='admin'),
 ]
 if settings.DEBUG:

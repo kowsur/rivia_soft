@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     # "user_logs",
     'companies',
     'accounts',
+    'invoice',
 ]
 
 MIDDLEWARE = [
@@ -160,3 +161,13 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = 'users_login'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ]
+}

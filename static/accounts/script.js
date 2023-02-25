@@ -989,7 +989,7 @@ function displayDeductionSource(deductionSourceId, deductions, submission){
   let deductionContainer
 
   let is_loss_from_previous_year = deductionSource.backend_identifier==="loss_brought_forward_from_previous_year";
-  console.log(is_loss_from_previous_year)
+  
   if (is_loss_from_previous_year){
     deductionContainer = createNodeFromMarkup(`
     <div class="deduction">

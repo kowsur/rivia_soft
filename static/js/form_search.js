@@ -29,7 +29,8 @@ let search_boxes = document.querySelectorAll('div[class="search_field"] > [name=
 search_boxes.forEach((search_box) => {
   let search_field = search_box.parentElement
   let options_container = search_field.querySelector('div.select')
-  // Add event listenners to update selected option
+  
+  // Add event listeners to update selected option
   for(let option of options_container.children){
     option.addEventListener('click', option_selected)
   }
@@ -62,7 +63,7 @@ search_boxes.forEach((search_box) => {
     }, doneTypingInterval, search_text, search_url, all_url, repr_format, select_element, options_container)
   })
 })
-function update_options(records, repr_format, select_element, options_container, option_element_tag='span') {
+async function update_options(records, repr_format, select_element, options_container, option_element_tag='span') {
   // clear options
   options_container.innerHTML = ''
   // select previously selected one default
@@ -81,19 +82,34 @@ function update_options(records, repr_format, select_element, options_container,
   // update options
   for (let record of records){
     // create option
-    let option = document.createElement(option_element_tag)
-    option.value = record.pk
-    option.setAttribute('data-value', record.pk)
-    option.textContent = repr_format.format(record) // `👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} ☎{fields.business_phone_number}`
-    // add class
-    option.classList.add('option')
-    
-    // add event listenner to this option
-    option.addEventListener('click', option_selected)
-    
-    // add option in the select tag
-    options_container.appendChild(option)
+    show_option(record, repr_format, options_container, option_element_tag)
   }
+}
+
+async function show_option(record, repr_format, options_container, option_element_tag='span'){
+  // create option
+  let option = document.createElement(option_element_tag)
+  option.value = record.pk
+  option.setAttribute('data-value', record.pk)
+  
+  if (record.model=="invoice.company" && repr_format=="{formatted}") {
+    let response = await fetch_url({url:`/invoice/companies/${record.pk}/formatted/`, req_method:'GET'})
+    record = await response.json()
+  }
+  if (record.model=="invoice.invoice" && repr_format=="{formatted}"){
+    let response = await fetch_url({url:`/invoice/invoices/${record.pk}/formatted/`, req_method:'GET'})
+    record = await response.json()
+  }
+
+  option.textContent = repr_format.format(record) // `👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} ☎{fields.business_phone_number}`
+  // add class
+  option.classList.add('option')
+  
+  // add event listenner to this option
+  option.addEventListener('click', option_selected)
+  
+  // add option in the select tag
+  options_container.appendChild(option)
 }
 
 //====================================================================================================================================

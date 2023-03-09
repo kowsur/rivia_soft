@@ -94,7 +94,7 @@ const loading_indicator_selector = '#loading-indicator'
 
 export function showLoadingIndicator(){
   let loading_indicator = document.querySelector(loading_indicator_selector)
-  if (!loading_indicator!==null) loading_indicator.classList.remove('hidden')
+  if (loading_indicator!==null) loading_indicator.classList.remove('hidden')
 }
 
 export function hideLoadingIndicator(){

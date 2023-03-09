@@ -21,9 +21,15 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
     serial_num.textContent = data.pk
   }
   
+  let update_link
+  if (update_url.includes('{pk}')) update_link = update_url.replace('{pk}', data.pk)
+  else update_link = `${update_url}${data.pk}/`
 
-  let update_link = `${update_url}${data.pk}/`
-  let delete_link = `${delete_url}${data.pk}/`
+  let delete_link
+  if (delete_url.includes('{pk}')) delete_link = delete_url.replace('{pk}', data.pk)
+  else delete_link = `${delete_link}${data.pk}/`
+
+  
   instance.getElementById('edit').href = `${update_link}`
   instance.getElementById('delete').href = `${delete_link}`
   if (['/', '/companies/', '/companies/MTrc/home/'].includes(location.pathname)){
@@ -111,14 +117,22 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
 
 
 export async function populate_with_foreign_data(td, field, field_data, data){
+  if (field_data=='null') return 
   td.setAttribute('data-foreign-data', 'true');
   td.setAttribute('data-foreign-model', data.model)
   td.setAttribute('data-foreign-field-name', field)
 
   let data_url = td.getAttribute('data-url');
   let repr_format = td.getAttribute('data-repr-format');
-  (!URL_HasQueryParams(data_url)) ? data_url = `${data_url}${field_data}/`: data_url = `${data_url}${field_data}`;
-  if (field_data=='null') return 
+  let url_ending = td.getAttribute('data-url-ending');
+  let has_ending_slash = data_url.slice(-1)=='/'
+  let has_query_params = data_url.includes('?')
+
+  if (!has_ending_slash && !has_query_params) data_url = `${data_url}/`
+
+  if (url_ending) data_url = `${data_url}${field_data}${url_ending}`
+  else if (has_query_params) data_url = `${data_url}${field_data}`;
+  else data_url = `${data_url}${field_data}/`;
 
   let kwargs = {
     url: data_url,

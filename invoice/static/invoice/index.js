@@ -1,30 +1,49 @@
-const { useState } = React;
+import { openModal, closeModal } from '/static/invoice/Modal.js';
+import { textToHTML, OPTIONS, GET, POST, PUT, PATCH, DELETE } from '/static/invoice/utils.js';
 
-function TodoApp() {
-  const [items, setItems] = useState([]);
+closeModal();
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    const text = event.target.elements.todo.value;
-    const newItems = [...items, { text }];
-    setItems(newItems);
-    event.target.reset();
-  }
 
-  return (
-    <div>
-      <h1>Todo App</h1>
-      <form onSubmit={handleSubmit}>
-        <input name="todo" placeholder="Enter task" />
-        <button>Add</button>
-      </form>
-      <ul>
-        {items.map((item, index) => (
-          <li key={index}>{item.text}</li>
-        ))}
-      </ul>
-    </div>
-  );
+// invoice
+const invoiceContainer = document.querySelector('#invoice');
+const invoiceRowTemplate = invoiceContainer.querySelector('template');
+
+const invoiceItemContainer = document.querySelector('#invoice-item');
+const invoiceItemRowTemplate = invoiceItemContainer.querySelector('template');
+
+const transactionContainer = document.querySelector('#transaction');
+const transactionRowTemplate = transactionContainer.querySelector('template');
+
+
+
+const ENDPOINTS = await getEndPoints()
+
+let invoices = await getInvoices()
+
+getInvoiceItems()
+getItemsInInvoice()
+getTransactions()
+
+
+async function getEndPoints() {
+    const response = await fetch('/invoice');
+    const data = await response.json();
+    return data;
 }
 
-ReactDOM.render(<TodoApp />, document.getElementById("root"));
+async function getInvoices(){
+    const invoices = await GET(ENDPOINTS.invoices);
+    return invoices;
+}
+async function getInvoiceItems(){
+    const invoices = await GET(ENDPOINTS.invoice_items);
+    return invoices;
+}
+async function getTransactions(){
+    const invoices = await GET(ENDPOINTS.transactions);
+    return invoices;
+}
+async function getItemsInInvoice(){
+    const invoices = await GET(ENDPOINTS.items_in_invoice);
+    return invoices;
+}

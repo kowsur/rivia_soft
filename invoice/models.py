@@ -1,6 +1,8 @@
 from django.db import models
 from companies.models import Selfassesment, Limited
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 
@@ -17,11 +19,20 @@ class Company(models.Model):
     def __str__(self) -> str:
         return str(self.company)
 
-
     @property
     def company(self):
         return self.selfassesment if self.selfassesment else self.limited
-    
+
+@receiver(post_save, sender=Selfassesment, dispatch_uid="add_selfassesment_to_company")
+def add_selfassesment_to_company(sender, instance, created, **kwargs):
+    if created:
+        Company.objects.create(selfassesment=instance)
+
+@receiver(post_save, sender=Limited, dispatch_uid="add_limited_to_company")
+def add_limited_to_company(sender, instance, created, **kwargs):
+    if created:
+        Company.objects.create(limited=instance)
+
 
 
 class Invoice(models.Model):
@@ -32,8 +43,8 @@ class Invoice(models.Model):
     remarks = models.TextField()
 
     creation_timestamp = models.DateTimeField(auto_now_add=True)
-    service_date = models.DateTimeField()
-    due_date = models.DateTimeField()
+    service_date = models.DateField()
+    due_date = models.DateField()
 
     amount = models.FloatField(default=0)
     discount = models.FloatField(default=0)
@@ -52,7 +63,7 @@ class InvoiceItem(models.Model):
         return f"Name: {self.name}, Rate: {self.rate}, Vat Percent: {self.vat_percent}"
 
 
-class InvoiceItems(models.Model):
+class ItemsInInvoice(models.Model):
     invoice_id = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     invoice_item_id = models.ForeignKey(InvoiceItem, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
@@ -62,8 +73,8 @@ class InvoiceItems(models.Model):
 
 
 class Transaction(models.Model):
-    invoice_id = models.ForeignKey(Invoice, on_delete=models.CASCADE, null=True)
-    customer_id = models.ForeignKey(Company, on_delete=models.CASCADE)
+    invoice_reference_id = models.ForeignKey(Invoice, on_delete=models.CASCADE, null=True)
+    transaction_from = models.ForeignKey(Company, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(auto_now_add=True)
     transaction_types = (
         ("CREDIT", "CREDIT"),
@@ -74,4 +85,4 @@ class Transaction(models.Model):
     amount = models.FloatField(default=0)
 
     def __str__(self) -> str:
-        return f"Type: {self.transaction_type}, Amount: {self.current_balance}, Current Balance: {self.amount}"
+        return f"#{self.id} To: {self.invoice_reference_id.invoice_to}"

@@ -1,0 +1,70 @@
+:root{
+    --bg-dark-color: #101222;
+    --bg-dark-secondary-color: #181e2c;
+    --bg-light-color: #fdfdfd;
+    --bg-light-secondary-color: #ececec;
+    --modal-bg-color: var(--bg-light-secondary-color);
+    --modal-bg-secondary-color: var(--bg-light-color);
+    --modal-separator-color: var(--bg-dark-color);
+    --modal-text-color: var(--bg-dark-color);
+}
+
+@media (prefers-color-scheme: dark){
+    :root{
+        --modal-bg-color: var(--bg-dark-color);
+        --modal-bg-secondary-color: var(--bg-dark-secondary-color);
+        --modal-separator-color: var(--bg-light-color);
+        --modal-text-color: var(--bg-light-color);
+    }
+}
+
+
+[role="dialog"] {
+    isolation: isolate;
+    position: fixed;
+    inset: 1.25rem;
+    z-index: 999;
+    border-radius: 0.5rem;
+    box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+    color: var(--modal-text-color);
+    background-color: var(--modal-bg-secondary-color);
+    display: grid;
+    grid-template-areas: 
+        "head"
+        "body"
+    ;
+    grid-template-rows: 
+        min-content
+        auto;
+}
+
+[role="dialog"] .modal-header, [role="dialog"] .modal-body{
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+}
+
+[role="dialog"] .modal-header{
+    display: flex;
+    grid-area: 'head';
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--modal-separator-color);
+    background-color: var(--modal-bg-color);
+}
+
+[role="dialog"] .modal-header .modal-title{
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+[role="dialog"] .modal-header button{
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+}
+
+[role="dialog"] .modal-body{
+    grid-area: 'body';
+    overflow-y: auto;
+    overflow-x: hidden;
+}

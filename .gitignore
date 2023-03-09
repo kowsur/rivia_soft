@@ -14,8 +14,6 @@ ENVIRONMENT.py
 
 ### Custom ###
 staticfiles/
-static/css/style.css
-static/css/style.min.css
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/django,node,python,vscode,windows,git

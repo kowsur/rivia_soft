@@ -32,16 +32,16 @@ def is_includeable(field, include_fields=[], exclude_fields=[], keep_include_fie
 
 def generate_template_tag_for_model(
     django_model:models.Model,
-    pk_field='id',
+    pk_field = 'id',
     exclude_fields = [],
     include_fields = [],
-    extra_fields=[],
+    extra_fields = [],
     ordering = [],
     keep_include_fields = True,
     show_others = True,
     show_id = True,
-    tag_name='data-template',
-    tag_id='data-template',
+    tag_name = 'data-template',
+    tag_id = 'data-template',
     fk_fields = {
       'last_updated_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'created_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
@@ -56,9 +56,12 @@ def generate_template_tag_for_model(
       'tax_year': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_Tax_Year_details_url, 'repr-format': HTML_Generator.Selfassemsent_tax_year_repr_format },
       'incomplete_tasks': { 'details_url_without_argument': '/companies/SATrc/search/?client_id=', 'repr-format': r'{length}', 'data-field': 'pk', 'href-url':'/companies/SATrc/home/?client_id='},
       'company_registration_number': { 'details_url_without_argument': '/companies/LTD/details/', 'repr-format': r'{company_reg_number}', 'data-field': 'fields.client_id'},
-      }
+      'invoice_from': { 'details_url_without_argument': '/invoice/companies/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/' },
+      'invoice_to': { 'details_url_without_argument': '/invoice/companies/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/' },
+      'invoice_reference_id': { 'details_url_without_argument': '/invoice/invoices/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/' },
+      'transaction_from': { 'details_url_without_argument': '/invoice/companies/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/' }
+    },
   ):
-  
   inner_template_tr = """
   <td class="data-cell data-id" >
     <a class="w-max" href="" id='edit'>
@@ -110,6 +113,7 @@ def generate_template_tag_for_model(
       if show_id and pk_field==field:
         inner_template_tr += f'<td class="data-cell" id="pk"></td>\n'
       continue
+    
     if field in fk_fields:
       data_attrs = f"""
         data-url="{fk_fields[field]['details_url_without_argument']}" 
@@ -125,10 +129,13 @@ def generate_template_tag_for_model(
         '''
       if fk_fields[field].get('href-url'):
         data_attrs += f'''data-href-url="{fk_fields[field]['href-url']}"'''
+      if fk_fields[field].get('data-url-ending'):
+        data_attrs += f'''data-url-ending="{fk_fields[field]['data-url-ending']}"'''
 
       inner_template_tr+=f"""
       <td class="data-cell" id="{field}"
         {data_attrs}></td>\n"""
+    
     else:
       inner_template_tr += f'<td class="data-cell" id="{field}"></td>\n'
   

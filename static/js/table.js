@@ -4,6 +4,18 @@ import { makeSafeHTML, URL_HasQueryParams, dateFormat } from './utilities.js';
 //Cache foriegn key fields
 const CACHE = {}
 
+let CLIENT_RATING_FIELDS = [
+  {
+    model: 'companies.selfassesment',
+    fields: ['client_rating'],
+    rating_symbol: '⭐'
+  },
+  {
+    model: 'companies.limited',
+    fields: ['client_rating'],
+    rating_symbol: '⭐'
+  }
+]
 
 let template_querySelector = 'template#data-template';
 let template = document.querySelector(template_querySelector);
@@ -27,8 +39,7 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
 
   let delete_link
   if (delete_url.includes('{pk}')) delete_link = delete_url.replace('{pk}', data.pk)
-  else delete_link = `${delete_link}${data.pk}/`
-
+  else delete_link = `${delete_url}${data.pk}/`
   
   instance.getElementById('edit').href = `${update_link}`
   instance.getElementById('delete').href = `${delete_link}`
@@ -59,10 +70,15 @@ export async function get_tr_for_table(data, template=template, model_fields=DAT
     td.setAttribute('data-cmp', field_data)
     td.setAttribute('data-identifier', field)
 
+    let matched_for_client_rating = CLIENT_RATING_FIELDS.find((field) => field.model===data.model)
+    if (matched_for_client_rating && matched_for_client_rating.fields.includes(field)) {
+      td.textContent = matched_for_client_rating.rating_symbol.repeat(field_data)
+      continue
+    }
     
     // Foreign Data
     let data_url = td.getAttribute('data-url')
-    let repr_format = td.getAttribute('data-repr-format')
+
     if (data_url && field_data){
       //this is a foreign key field. fetch the data and format it
       populate_with_foreign_data(td, field, field_data, data)
@@ -129,11 +145,11 @@ export async function populate_with_foreign_data(td, field, field_data, data){
   let has_query_params = data_url.includes('?')
 
   if (!has_ending_slash && !has_query_params) data_url = `${data_url}/`
-
+  
   if (url_ending) data_url = `${data_url}${field_data}${url_ending}`
   else if (has_query_params) data_url = `${data_url}${field_data}`;
   else data_url = `${data_url}${field_data}/`;
-
+  
   let kwargs = {
     url: data_url,
     req_method: 'GET'
@@ -149,8 +165,10 @@ export async function populate_with_foreign_data(td, field, field_data, data){
     }, 450)
     return 
   }
-  let string = repr_format.format(CACHE[data_url])
-
+  
+  let string = repr_format.formatMultiplication(CACHE[data_url])
+  string = string.format(CACHE[data_url])
+  
   td.textContent = string
   td.removeAttribute('data-url')
   td.removeAttribute('data-repr-format')
@@ -170,7 +188,10 @@ export async function populate_with_foreign_data(td, field, field_data, data){
   
   let hrefURL = td.getAttribute('data-href-url')
   if (hrefURL){
-    let url = `${hrefURL}${field_data}`
+    let url = hrefURL.format(data)
+    if (!hrefURL.includes('{')){
+      url = `${hrefURL}${field_data}/`
+    }
     td.innerHTML = `<a data-field="${field}" href="${url}">${makeSafeHTML(string)}</a>`
   }
 }
@@ -219,7 +240,7 @@ export async function populate_with_merged_data(
     // Populate the table using the provided data
     for (let record of merged_data){
       let table_row=null;
-      if (record.model==='companies.selfassesmenttracker')table_row = await get_tr_for_table(record, selfassesment_template, selfassesment_model_fields, selfassesment_update_url, selfassesment_delete_url)
+      if (record.model==='companies.selfassesmenttracker') table_row = await get_tr_for_table(record, selfassesment_template, selfassesment_model_fields, selfassesment_update_url, selfassesment_delete_url)
       if (record.model==='companies.limitedtracker') table_row = await get_tr_for_table(record, limited_template, limited_model_fields, limited_update_url, limited_delete_url)
       tbody.appendChild(table_row)
     }

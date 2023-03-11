@@ -5,12 +5,14 @@ from itertools import chain
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from users.models import CustomUser
 from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_VALIDATOR, NINO_VALIDATOR, AUTH_CODE_VALIDATOR, TAX_YEAR_VALIDATOR
 from .utils import ChainedQuerysetsWithCount
 
+
+CLIENT_RATING_SYMBOL = '⭐'
 
 
 class SelfassesmentType(models.Model):
@@ -58,6 +60,13 @@ class Selfassesment(models.Model):
         null=False,
         editable=False,
         db_index=True) # auto incrementing primary field
+    
+    @property
+    def id(self):
+        return self.client_id
+    
+    client_rating = models.IntegerField(verbose_name=f'Client Rating({CLIENT_RATING_SYMBOL})', blank=True, null=True, default=0, validators=[MinValueValidator(0), MaxValueValidator(5)])
+
     created_by = models.ForeignKey(
         to='users.CustomUser',
         on_delete=models.SET_NULL,
@@ -142,7 +151,7 @@ class Selfassesment(models.Model):
         null=True)
 
     def __str__(self) -> str:
-        return f'👥{self.client_name} 📁{self.client_file_number} 📞{self.personal_phone_number} 📭{self.personal_post_code}'
+        return f'{CLIENT_RATING_SYMBOL*self.client_rating} 👥{self.client_name} 📁{self.client_file_number} 📞{self.personal_phone_number} 📭{self.personal_post_code}'
     
     def __repr__(self) -> str:
         return str(self)
@@ -491,6 +500,13 @@ class Limited(models.Model):
         null=False,
         editable=False,
         db_index=True) # auto incrementing primary field
+    
+    @property
+    def id(self):
+        return self.client_id
+    
+    client_rating = models.IntegerField(verbose_name=f'Client Rating({CLIENT_RATING_SYMBOL})', blank=True, null=True, default=0, validators=[MinValueValidator(0), MaxValueValidator(5)])
+
     created_by = models.ForeignKey(
         to='users.CustomUser',
         on_delete=models.SET_NULL,
@@ -499,6 +515,7 @@ class Limited(models.Model):
         to_field='user_id',
         blank=True,
         null=True)
+
 
     date_of_registration = models.DateField(verbose_name='Registration date', blank=False, null=True, default=timezone.now)
     is_active = models.BooleanField(verbose_name='Active Status', blank=False, null=False, default=True)
@@ -583,7 +600,7 @@ class Limited(models.Model):
         null=True)
 
     def __str__(self) -> str:
-        return f'🏢{self.client_name} 📂{self.client_file_number} ☎{self.director_phone_number} 📭{self.director_post_code} ⓇⓃ{self.company_reg_number}'
+        return f'{CLIENT_RATING_SYMBOL*self.client_rating} 🏢{self.client_name} 📂{self.client_file_number} ☎{self.director_phone_number} 📭{self.director_post_code} ⓇⓃ{self.company_reg_number}'
     
     def __repr__(self) -> str:
         return str(self)

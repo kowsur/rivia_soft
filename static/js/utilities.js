@@ -284,10 +284,10 @@ function sleepCallback(milliseconds, func, ...args) {
  * @returns {String}
  */
  export function stringFormat(str, data) {
-  var re = /{([^{}]+)}/g;
+  let re = /{([^{}]+)}/g;
 
-  return str.replace(/{([^{}]+)}/g, function(match, val) {
-    var prop = data;
+  return str.replace(re, function(match, val) {
+    let prop = data;
     val.split('.').forEach(function(key) {
       prop = prop[key];
     });
@@ -296,11 +296,39 @@ function sleepCallback(milliseconds, func, ...args) {
   });
 };
 
+
 /**
  * Python-like format method
  * @param {Object} data - Data to insert strings from.
  * @returns {String}
- */
+*/
 String.prototype.format = function(data) {
   return stringFormat(this, data);
 };
+
+
+/**
+ * Python-like string multiplication with string format methods
+ * @param {String} str - Template string.
+ * @param {Object} data - Data to insert strings from.
+ * @returns {String}
+ */
+ export function stringFormatMultiply(str, data) {
+  let re = /\{("|')(?<string>.*?)\1\*(?<multiplicator>(?:\d+?|{(?<format_string>[^{}]+)}))\}/gm;
+  let rv = str.replaceAll(re, function(...args) {
+    let capturedGroups = args[args.length-1]
+    
+    let multiplicator = capturedGroups.multiplicator
+    if ('format_string' in capturedGroups) multiplicator = multiplicator.format(data)
+    return capturedGroups.string.repeat(multiplicator);
+  });
+  return rv
+};
+
+/**
+ * Python-like string multiplication with string format methods
+ * @returns {String}
+*/
+String.prototype.formatMultiplication = function(data) {
+  return stringFormatMultiply(this, data); 
+}

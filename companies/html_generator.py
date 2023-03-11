@@ -56,10 +56,10 @@ def generate_template_tag_for_model(
       'tax_year': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_Account_Submission_Tax_Year_details_url, 'repr-format': HTML_Generator.Selfassemsent_tax_year_repr_format },
       'incomplete_tasks': { 'details_url_without_argument': '/companies/SATrc/search/?client_id=', 'repr-format': r'{length}', 'data-field': 'pk', 'href-url':'/companies/SATrc/home/?client_id='},
       'company_registration_number': { 'details_url_without_argument': '/companies/LTD/details/', 'repr-format': r'{company_reg_number}', 'data-field': 'fields.client_id'},
-      'invoice_from': { 'details_url_without_argument': '/invoice/companies/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/' },
-      'invoice_to': { 'details_url_without_argument': '/invoice/companies/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/' },
-      'invoice_reference_id': { 'details_url_without_argument': '/invoice/invoices/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/' },
-      'transaction_from': { 'details_url_without_argument': '/invoice/companies/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/' }
+      'invoice_from': { 'details_url_without_argument': '/invoice/companies/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/', 'href-url': r'/invoice/companies/{fields.invoice_from}/redirect_to_original/' },
+      'invoice_to': { 'details_url_without_argument': '/invoice/companies/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/', 'href-url': r'/invoice/companies/{fields.invoice_to}/redirect_to_original/' },
+      'invoice_reference_id': { 'details_url_without_argument': '/invoice/invoices/', 'repr-format': r"{formatted}", 'data-url-ending': '/formatted/', 'href-url': r'/invoice/invoices/{fields.invoice_reference_id}/update_form/' },
+      'transaction_from': { 'details_url_without_argument': '/invoice/companies/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/', 'href-url': r'/invoice/companies/{fields.transaction_from}/redirect_to_original/' }
     },
   ):
   inner_template_tr = """

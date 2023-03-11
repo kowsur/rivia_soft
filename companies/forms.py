@@ -53,6 +53,7 @@ class SelfassesmentCreationForm(forms.ModelForm):
             # 'client_id',
             # 'created_by',
             # 'is_updated',
+            'client_rating',
             'selfassesment_type',
             'date_of_registration',
             'is_active',
@@ -90,7 +91,7 @@ class SelfassesmentCreationForm(forms.ModelForm):
         fieldsets = (
             Fieldset(
                 title = 'Client Info',
-                fields = ('client_file_number', 'selfassesment_type', 'date_of_registration', 'client_name', 'remarks', 'is_active', 'start_date')
+                fields = ('client_rating', 'client_file_number', 'selfassesment_type', 'date_of_registration', 'client_name', 'remarks', 'is_active', 'start_date')
                 ),
             Fieldset(
                 title = 'Personal Info',
@@ -132,6 +133,7 @@ class SelfassesmentChangeForm(forms.ModelForm):
             # 'client_id',
             # 'created_by',
             # 'is_updated',
+            'client_rating',
             'selfassesment_type',
             'date_of_registration',
             'is_active',
@@ -169,7 +171,7 @@ class SelfassesmentChangeForm(forms.ModelForm):
         fieldsets = (
             Fieldset(
                 title = 'Client Info',
-                fields = ('client_file_number', 'selfassesment_type', 'date_of_registration', 'client_name', 'remarks', 'is_active', 'start_date')
+                fields = ('client_rating', 'client_file_number', 'selfassesment_type', 'date_of_registration', 'client_name', 'remarks', 'is_active', 'start_date')
                 ),
             Fieldset(
                 title = 'Personal Info',
@@ -861,6 +863,7 @@ class LimitedCreationForm(forms.ModelForm):
             # 'client_id',
             # 'created_by',
             # 'is_updated',
+            'client_rating',
             'date_of_registration',
             'is_active',
             'is_payroll',
@@ -903,7 +906,7 @@ class LimitedCreationForm(forms.ModelForm):
         fieldsets = (
             Fieldset(
                 title = 'Client Info',
-                fields = ('client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', 'is_payroll', 'payment_method', )
+                fields = ('client_rating', 'client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', 'is_payroll', 'payment_method', )
                 ),
             Fieldset(
                 title = 'Director Info',
@@ -940,6 +943,7 @@ class LimitedChangeForm(forms.ModelForm):
             # 'client_id',
             # 'created_by',
             # 'is_updated',
+            'client_rating',
             'date_of_registration',
             'is_active',
             'is_payroll',
@@ -982,7 +986,7 @@ class LimitedChangeForm(forms.ModelForm):
         fieldsets = (
             Fieldset(
                 title = 'Client Info',
-                fields = ('client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', 'is_payroll', 'payment_method', )
+                fields = ('client_rating', 'client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', 'is_payroll', 'payment_method', )
                 ),
             Fieldset(
                 title = 'Director Info',

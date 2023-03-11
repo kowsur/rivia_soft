@@ -70,7 +70,10 @@ function update_options(records, repr_format, select_element, options_container,
     let option = document.createElement(option_element_tag)
     option.value = record.pk
     option.setAttribute('data-value', record.pk)
-    option.textContent = repr_format.format(record) // `👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} ☎{fields.business_phone_number}`
+    let string = repr_format.formatMultiplication(record)
+    string = string.format(record)
+    option.textContent = string
+    // option.textContent = repr_format.format(record) // `👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} ☎{fields.business_phone_number}`
     // add class
     option.classList.add('option')
     
@@ -208,7 +211,10 @@ function createOption(record, fromModel){
   let repr_format = DATA[fromModel].repr_format
   let option = document.createElement('span')
   option.value = record.pk
-  option.textContent = stringFormat(repr_format, record)
+
+  let string = repr_format.formatMultiplication(record)
+  string = string.format(record)
+  option.textContent = string
   option.classList.add('option')
 
   option.setAttribute('data-model', fromModel)

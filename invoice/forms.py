@@ -21,20 +21,6 @@ def get_date_today(date_format = '%Y-%m-%d'):
 
 
 class InvoiceCreationForm(forms.ModelForm):
-    invoice_from = SearchableModelField(
-        queryset=Company.objects.all(),
-        label = 'Invoice from',
-        search_url = '/invoice/companies/search/',
-        all_url = '/invoice/companies/all/',
-        repr_format = r'{formatted}',
-        model=Company,
-        choices=Company.objects.all(),
-        fk_field='id',
-        empty_label=None,
-        disabled=False,
-        required=True,
-        render_options=True
-        )
     invoice_to = SearchableModelField(
         queryset=Company.objects.all(),
         label = 'Invoice to',
@@ -62,10 +48,9 @@ class InvoiceCreationForm(forms.ModelForm):
     class Meta:
         model = Invoice
         fields = (
-            "invoice_from",
             "invoice_to",
-            "customer_email",
-            "billing_address",
+            # "customer_email",
+            # "billing_address",
             "remarks",
 
             # "creation_timestamp",
@@ -77,20 +62,6 @@ class InvoiceCreationForm(forms.ModelForm):
             )
 
 class InvoiceChangeForm(forms.ModelForm):
-    invoice_from = SearchableModelField(
-        queryset=Company.objects.all(),
-        label = 'Invoice from',
-        search_url = '/invoice/companies/search/',
-        all_url = '/invoice/companies/all/',
-        repr_format = r'{formatted}',
-        model=Company,
-        choices=Company.objects.all(),
-        fk_field='id',
-        empty_label=None,
-        disabled=False,
-        required=True,
-        render_options=True
-        )
     invoice_to = SearchableModelField(
         queryset=Company.objects.all(),
         label = 'Invoice to',
@@ -117,10 +88,9 @@ class InvoiceChangeForm(forms.ModelForm):
     class Meta:
         model = Invoice
         fields = (
-            "invoice_from",
             "invoice_to",
-            "customer_email",
-            "billing_address",
+            # "customer_email",
+            # "billing_address",
             "remarks",
 
             # "creation_timestamp",
@@ -169,13 +139,13 @@ class InvoiceItemDeleteForm(forms.ModelForm):
 
 class TransactionCreationForm(forms.ModelForm):
     invoice_reference_id = SearchableModelField(
-        queryset=Transaction.objects.all(),
+        queryset=Invoice.objects.all(),
         label = 'Invoice Reference',
         search_url = '/invoice/invoices/search/',
         all_url = '/invoice/invoices/all/',
         repr_format = r'{formatted}',
-        model=Transaction,
-        choices=Transaction.objects.all(),
+        model=Invoice,
+        choices=Invoice.objects.all(),
         fk_field='id',
         empty_label=None,
         disabled=False,

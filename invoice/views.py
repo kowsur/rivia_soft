@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.core.serializers import serialize
 from django.http.response import HttpResponse
 from django.db.models import Q
@@ -92,8 +93,17 @@ class InvoiceViewSet(
             context['form'] = form
             
             if form.is_valid():
-                invoice = form.save()
-                return redirect('invoices-home')
+                invoice = form.save(commit=False)
+    
+                if invoice.invoice_to.is_limited:
+                    invoice.customer_email = invoice.invoice_to.limited.business_email or ''
+                    invoice.billing_address = invoice.invoice_to.limited.business_address or ''
+                else:
+                    invoice.customer_email = invoice.invoice_to.selfassesment.personal_email or ''
+                    invoice.billing_address = invoice.invoice_to.selfassesment.personal_address or ''
+                invoice.save()
+
+                return redirect(reverse('invoices-update-form', args=(invoice.id,)))
         return render(request, template_name='invoice/create.html', context=context)
     
     @decorators.action(detail=True, methods=['get', 'post'])
@@ -453,6 +463,16 @@ class CompanyViewSet(
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    @decorators.action(detail=True, methods=['get'])
+    def redirect_to_original(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.is_limited:
+            pk = instance.limited.id
+            return redirect(f"/companies/LTD/update/{pk}/")
+        else:
+            pk = instance.selfassesment.id
+            return redirect(f"/companies/SA/update/{pk}/")
 
     @decorators.action(detail=True, methods=['get'])
     def formatted(self, request, *args, **kwargs):

@@ -1,7 +1,7 @@
 from django.db import models
 from companies.models import Selfassesment, Limited
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 
@@ -20,6 +20,15 @@ class Company(models.Model):
         return str(self.company)
 
     @property
+    def is_limited(self):
+        return True if self.limited else False
+    
+    @property
+    def is_selfassesment(self):
+        return True if self.selfassesment else False
+    
+
+    @property
     def company(self):
         return self.selfassesment if self.selfassesment else self.limited
 
@@ -36,11 +45,10 @@ def add_limited_to_company(sender, instance, created, **kwargs):
 
 
 class Invoice(models.Model):
-    invoice_from = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='invoice_from')
     invoice_to = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='invoice_to')
-    customer_email = models.CharField(max_length=100)
-    billing_address = models.CharField(max_length=255)
-    remarks = models.TextField()
+    customer_email = models.CharField(max_length=100, default='')
+    billing_address = models.CharField(max_length=255, default='')
+    remarks = models.TextField(default='')
 
     creation_timestamp = models.DateTimeField(auto_now_add=True)
     service_date = models.DateField()
@@ -50,7 +58,17 @@ class Invoice(models.Model):
     discount = models.FloatField(default=0)
 
     def __str__(self) -> str:
-        return f"From: {self.invoice_from}, To: {self.invoice_to}, SD: {self.service_date}, DD: {self.due_date}"
+        return f"To: {self.invoice_to}, SD: {self.service_date}, DD: {self.due_date}"
+
+# @receiver(pre_save, sender=Invoice, dispatch_uid="update_client_contact_info")
+# def update_client_contact_info(sender, instance, **kwargs):
+#     if instance.invoice_to.is_limited:
+#         instance.customer_email = instance.invoice_to.limited.director_email
+#         instance.billing_address = instance.invoice_to.limited.director_address
+#     else:
+#         instance.customer_email = instance.invoice_to.selfassesment.personal_email
+#         instance.billing_address = instance.invoice_to.selfassesment.personal_address
+    
 
 
 class InvoiceItem(models.Model):
@@ -67,7 +85,9 @@ class ItemsInInvoice(models.Model):
     invoice_id = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     invoice_item_id = models.ForeignKey(InvoiceItem, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
-
+    rate = models.FloatField(default=0)
+    vat_percent = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(100)], null=True, default=None)
+    
     def __str__(self) -> str:
         return f"Id: {self.invoice_id}, Item Id: {self.invoice_item_id}"
 

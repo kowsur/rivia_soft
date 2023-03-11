@@ -163,9 +163,7 @@ class InvoiceViewSet(
             if query.isnumeric():
                 Query = Q(id=query)
             else:
-                Query = Q(invoice_from__selfassesment__client_name__icontains=query) |\
-                        Q(invoice_from__limited__client_name__icontains=query) |\
-                        Q(invoice_to__selfassesment__client_name__icontains=query) |\
+                Query = Q(invoice_to__selfassesment__client_name__icontains=query) |\
                         Q(invoice_to__limited__client_name__icontains=query)
             queryset = queryset.filter(Query)
         serializer = serialize(queryset=queryset, format='json')

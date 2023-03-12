@@ -72,9 +72,9 @@ class InvoiceChangeForm(forms.ModelForm):
         choices=Company.objects.all(),
         fk_field='id',
         empty_label=None,
-        disabled=False,
-        required=True,
-        render_options=True
+        disabled=True,
+        required=False,
+        render_options=False
         )
     
     service_date = forms.DateField(

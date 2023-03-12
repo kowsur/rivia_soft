@@ -58,7 +58,7 @@ class Invoice(models.Model):
     discount = models.FloatField(default=0)
 
     def __str__(self) -> str:
-        return f"To: {self.invoice_to}, SD: {self.service_date}, DD: {self.due_date}"
+        return f"#{self.id} To: {self.invoice_to}"
 
 # @receiver(pre_save, sender=Invoice, dispatch_uid="update_client_contact_info")
 # def update_client_contact_info(sender, instance, **kwargs):

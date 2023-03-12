@@ -180,7 +180,7 @@ class InvoiceViewSet(
                     'model': self.serializer_class.Meta.model._meta.model_name,
                     'pk': instance.id,
                     'fields': {
-                        'formatted': str(instance)
+                        'formatted': f"#{instance.id} To: {instance.invoice_to}"
                     }
                 }
     def json_queryset(self, queryset):

@@ -24,9 +24,9 @@ class InvoiceCreationForm(forms.ModelForm):
     invoice_to = SearchableModelField(
         queryset=Company.objects.all(),
         label = 'Invoice to',
-        search_url = '/invoice/companies/search/',
-        all_url = '/invoice/companies/all/',
-        repr_format = r'{formatted}',
+        search_url = '/invoice/companies/formatted_search/',
+        all_url = '/invoice/companies/formatted_all/',
+        repr_format = r'{fields.formatted}',
         model=Company,
         choices=Company.objects.all(),
         fk_field='id',
@@ -65,9 +65,9 @@ class InvoiceChangeForm(forms.ModelForm):
     invoice_to = SearchableModelField(
         queryset=Company.objects.all(),
         label = 'Invoice to',
-        search_url = '/invoice/companies/search/',
-        all_url = '/invoice/companies/all/',
-        repr_format = r'{formatted}',
+        search_url = '/invoice/companies/formatted_search/',
+        all_url = '/invoice/companies/formatted_all/',
+        repr_format = r'{fields.formatted}',
         model=Company,
         choices=Company.objects.all(),
         fk_field='id',
@@ -141,9 +141,9 @@ class TransactionCreationForm(forms.ModelForm):
     invoice_reference_id = SearchableModelField(
         queryset=Invoice.objects.all(),
         label = 'Invoice Reference',
-        search_url = '/invoice/invoices/search/',
-        all_url = '/invoice/invoices/all/',
-        repr_format = r'{formatted}',
+        search_url = '/invoice/invoices/formatted_search/',
+        all_url = '/invoice/invoices/formatted_all/',
+        repr_format = r'{fields.formatted}',
         model=Invoice,
         choices=Invoice.objects.all(),
         fk_field='id',
@@ -155,9 +155,9 @@ class TransactionCreationForm(forms.ModelForm):
     transaction_from = SearchableModelField(
         queryset=Company.objects.all(),
         label = 'Transaction from',
-        search_url = '/invoice/companies/search/',
-        all_url = '/invoice/companies/all/',
-        repr_format = r'{formatted}',
+        search_url = '/invoice/companies/formatted_search/',
+        all_url = '/invoice/companies/formatted_all/',
+        repr_format = r'{fields.formatted}',
         model=Company,
         choices=Company.objects.all(),
         fk_field='id',
@@ -178,6 +178,34 @@ class TransactionCreationForm(forms.ModelForm):
             )
 
 class TransactionChangeForm(forms.ModelForm):
+    invoice_reference_id = SearchableModelField(
+        queryset=Invoice.objects.all(),
+        label = 'Invoice Reference',
+        search_url = '/invoice/invoices/formatted_search/',
+        all_url = '/invoice/invoices/formatted_all/',
+        repr_format = r'{fields.formatted}',
+        model=Invoice,
+        choices=Invoice.objects.all(),
+        fk_field='id',
+        empty_label=None,
+        disabled=True,
+        required=False,
+        render_options=False
+        )
+    transaction_from = SearchableModelField(
+        queryset=Company.objects.all(),
+        label = 'Transaction from',
+        search_url = '/invoice/companies/formatted_search/',
+        all_url = '/invoice/companies/formatted_all/',
+        repr_format = r'{fields.formatted}',
+        model=Company,
+        choices=Company.objects.all(),
+        fk_field='id',
+        empty_label=None,
+        disabled=True,
+        required=False,
+        render_options=False
+        )
     class Meta:
         model = Transaction
         fields = (

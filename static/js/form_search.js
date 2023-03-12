@@ -92,14 +92,14 @@ async function show_option(record, repr_format, options_container, option_elemen
   option.value = record.pk
   option.setAttribute('data-value', record.pk)
   
-  if (record.model=="invoice.company" && repr_format=="{formatted}") {
-    let response = await fetch_url({url:`/invoice/companies/${record.pk}/formatted/`, req_method:'GET'})
-    record = await response.json()
-  }
-  if (record.model=="invoice.invoice" && repr_format=="{formatted}"){
-    let response = await fetch_url({url:`/invoice/invoices/${record.pk}/formatted/`, req_method:'GET'})
-    record = await response.json()
-  }
+  // if (record.model=="invoice.company" && repr_format=="{formatted}") {
+  //   let response = await fetch_url({url:`/invoice/companies/${record.pk}/formatted/`, req_method:'GET'})
+  //   record = await response.json()
+  // }
+  // if (record.model=="invoice.invoice" && repr_format=="{formatted}"){
+  //   let response = await fetch_url({url:`/invoice/invoices/${record.pk}/formatted/`, req_method:'GET'})
+  //   record = await response.json()
+  // }
 
   option.textContent = repr_format.format(record) // `👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} ☎{fields.business_phone_number}`
   // add class

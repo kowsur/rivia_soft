@@ -154,18 +154,18 @@ class InvoiceViewSet(
         instance = self.get_object()
         return HttpResponse(json.dumps({'formatted': f"#{instance.id} To: {instance.invoice_to}"}), content_type='application/json')
     
-    @decorators.action(detail=False, methods=['get'])
-    def search(self, request, *args, **kwargs):
+    def search_queryset_with_request_params(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         query = request.query_params.get('q', None)
         if query is not None:
-            query = query.strip()
-            if query.isnumeric():
-                Query = Q(id=query)
-            else:
-                Query = Q(invoice_to__selfassesment__client_name__icontains=query) |\
-                        Q(invoice_to__limited__client_name__icontains=query)
+            Query = Q(invoice_to__selfassesment__client_name__icontains=query) |\
+                    Q(invoice_to__limited__client_name__icontains=query)
             queryset = queryset.filter(Query)
+        return queryset
+
+    @decorators.action(detail=False, methods=['get'])
+    def search(self, request, *args, **kwargs):
+        queryset = self.search_queryset_with_request_params(request, *args, **kwargs)
         serializer = serialize(queryset=queryset, format='json')
         return HttpResponse(serializer, content_type='application/json')
     
@@ -174,6 +174,27 @@ class InvoiceViewSet(
         queryset = self.get_queryset()
         serializer = serialize(queryset=queryset, format='json')
         return HttpResponse(serializer, content_type='application/json')
+
+    def json_format_instance(self, instance):
+        return {
+                    'model': self.serializer_class.Meta.model._meta.model_name,
+                    'pk': instance.id,
+                    'fields': {
+                        'formatted': str(instance)
+                    }
+                }
+    def json_queryset(self, queryset):
+        return json.dumps([self.json_format_instance(company) for company in queryset])
+
+    @decorators.action(detail=False, methods=['get'])
+    def formatted_search(self, request, *args, **kwargs):
+        queryset = self.search_queryset_with_request_params(request, *args, **kwargs)
+        return HttpResponse(self.json_queryset(queryset), content_type='application/json')
+    
+    @decorators.action(detail=False, methods=['get'])
+    def formatted_all(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        return HttpResponse(self.json_queryset(queryset), content_type='application/json')
 
 
 
@@ -478,14 +499,39 @@ class CompanyViewSet(
         # serializer = self.get_serializer(instance)
         return HttpResponse(json.dumps({'formatted': str(instance)}), content_type='application/json')
 
-    @decorators.action(detail=False, methods=['get'])
-    def search(self, request, *args, **kwargs):
+    def search_queryset_with_request_params(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         query = request.query_params.get('q', None)
         if query is not None:
             Query = Q(selfassesment__client_name__icontains=query) |\
                     Q(limited__client_name__icontains=query)
             queryset = queryset.filter(Query)
+        return queryset
+
+    def json_format_instance(self, instance):
+        return {
+                    'model': self.serializer_class.Meta.model._meta.model_name,
+                    'pk': instance.id,
+                    'fields': {
+                        'formatted': str(instance)
+                    }
+                }
+    def json_queryset(self, queryset):
+        return json.dumps([self.json_format_instance(company) for company in queryset])
+
+    @decorators.action(detail=False, methods=['get'])
+    def formatted_search(self, request, *args, **kwargs):
+        queryset = self.search_queryset_with_request_params(request, *args, **kwargs)
+        return HttpResponse(self.json_queryset(queryset), content_type='application/json')
+    
+    @decorators.action(detail=False, methods=['get'])
+    def formatted_all(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        return HttpResponse(self.json_queryset(queryset), content_type='application/json')
+    
+    @decorators.action(detail=False, methods=['get'])
+    def search(self, request, *args, **kwargs):
+        queryset = self.search_queryset_with_request_params(request, *args, **kwargs)
         serializer = serialize(queryset=queryset, format='json')
         return HttpResponse(serializer, content_type='application/json')
     
@@ -495,3 +541,4 @@ class CompanyViewSet(
         queryset = queryset.all()
         serializer = serialize(queryset=queryset, format='json')
         return HttpResponse(serializer, content_type='application/json')
+    

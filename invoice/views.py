@@ -117,6 +117,14 @@ class InvoiceViewSet(
             'page_title': 'Update Invoice',
             'form_title': 'Invoice Update Form',
             'form': InvoiceChangeForm(instance=instance, initial={}),
+
+            'data_for_invoice_items': {
+                'create_url': '',
+                'update_url': '',
+                'search_url': '',
+                'all_url': '',
+                'repr_format': '',
+            }
         }
 
         if request.method == 'POST':
@@ -125,7 +133,7 @@ class InvoiceViewSet(
             
             if form.is_valid():
                 invoice = form.save()
-        return render(request, template_name='invoice/update.html', context=context)
+        return render(request, template_name='invoice/invoice_update.html', context=context)
     
     @decorators.action(detail=True, methods=['get', 'post'])
     def delete_form(self, request, *args, **kwargs):

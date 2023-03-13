@@ -27,11 +27,16 @@ select_elements.forEach(element => {
 // Add event lister to query database on text input
 let search_boxes = document.querySelectorAll('div[class="search_field"] > [name="search"]')
 search_boxes.forEach((search_box) => {
+  // break early if data-do-not-attach-form-search-event-listener is set
+  let doNotAttachFormSearchEventListener = search_box.hasAttribute('data-do-not-attach-form-search-event-listener')
+  if (doNotAttachFormSearchEventListener) return false
+
   let search_field = search_box.parentElement
   let options_container = search_field.querySelector('div.select')
   
   // Add event listeners to update selected option
-  for(let option of options_container.children){
+  let option_elements = options_container?.children||[]
+  for(let option of option_elements){
     option.addEventListener('click', option_selected)
   }
 
@@ -63,7 +68,8 @@ search_boxes.forEach((search_box) => {
     }, doneTypingInterval, search_text, search_url, all_url, repr_format, select_element, options_container)
   })
 })
-async function update_options(records, repr_format, select_element, options_container, option_element_tag='span') {
+
+export async function update_options(records, repr_format, select_element, options_container, option_element_tag='span') {
   // clear options
   options_container.innerHTML = ''
   // select previously selected one default
@@ -86,7 +92,7 @@ async function update_options(records, repr_format, select_element, options_cont
   }
 }
 
-async function show_option(record, repr_format, options_container, option_element_tag='span'){
+export async function show_option(record, repr_format, options_container, option_element_tag='span'){
   // create option
   let option = document.createElement(option_element_tag)
   option.value = record.pk
@@ -114,7 +120,7 @@ async function show_option(record, repr_format, options_container, option_elemen
 
 //====================================================================================================================================
 //
-function option_selected(event) {
+export function option_selected(event) {
   // Options container
   let container = event.currentTarget.parentElement
   // Option clicked on

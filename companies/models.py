@@ -12,7 +12,7 @@ from .validators import BANK_ACCOUNT_NUMBER_VALIDATOR, SORT_CODE_VALIDATOR, UTR_
 from .utils import ChainedQuerysetsWithCount
 
 
-CLIENT_RATING_SYMBOL = '⭐'
+CLIENT_RATING_SYMBOL = '🔷'
 
 
 class SelfassesmentType(models.Model):

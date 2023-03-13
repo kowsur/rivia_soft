@@ -8,12 +8,12 @@ let CLIENT_RATING_FIELDS = [
   {
     model: 'companies.selfassesment',
     fields: ['client_rating'],
-    rating_symbol: '⭐'
+    rating_symbol: '🔷'
   },
   {
     model: 'companies.limited',
     fields: ['client_rating'],
-    rating_symbol: '⭐'
+    rating_symbol: '🔷'
   }
 ]
 

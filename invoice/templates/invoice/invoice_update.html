@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load companies_tags %}
+
+{% block title %}
+  {{ page_title }}
+{% endblock title %}
+
+
+{% block content %}
+<div class="max-w-6xl mx-auto mt-5">
+  {% if not hide_navbar %}
+  <div class="text-right">
+  <a href="{{ view_url }}">View</a>
+  </div>
+  {% endif %}
+
+  <!-- messages -->
+  {% if messages %}
+  {% for message in messages %}
+  <h1 class='message {{ message.tags }}'>
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+    {{ message }}
+  </h1>
+  {% endfor %}
+  {% endif %}
+    
+
+{% comment %}  {% endcomment %}
+  <form action="" method="post">
+    <h2 class="header update-header">Items in invoice</h2>
+
+    <!-- data -->
+    {% autoescape off %}
+    <pre name="items_in_invocie" type="application/json" style="display: none;">
+      {{ data_for_invoice_items|convert_to_JSON }}
+    </pre>
+    {% endautoescape %}
+    
+    <div class="w-full mt-3.5">
+
+
+      <!-- input label -->
+      <label for="items_in_invoice">Invoice Item</label>
+      <!-- input field -->
+      <div style="position: relative;" class="search_field">
+        <input type="text" class="search" name="search" autocomplete="off" value="" placeholder="Please select an option" data-do-not-attach-form-search-event-listener>
+
+        <div class="select" name="assigned_to" id="items_in_invoice">
+          <span data-value="1" class="option">📨ab@cd.com 👥a</span>
+          <span data-value="2" class="option">📨ef@gh.com 👥e</span>
+        </div>
+
+        <!-- actual input -->
+        <select class="hidden" name="assigned_to" id="items_in_invoice">
+          <option value="1" data-value="1">📨ab@cd.com 👥a</option>
+        </select>
+      </div>
+    </div>
+  </form>
+
+</div>
+
+  <!-- form -->
+  <form action="{{ update_url }}" method="POST" class="my-10">
+    {% csrf_token %}
+    <h1 class="header update-header">{{ form_title }}</h1>
+    <!-- form -->
+
+    <ol style="margin-top: 10px; margin-bottom: 10px; list-style: inside;">
+      {% for error in form.errors|get_attr:'__all__' %}
+        <li style="color: red; display: list-item;">{{ error }}</li>
+      {% endfor %}
+    </ol>
+
+    {% if form|get_attr:'Meta.fieldsets' %}
+      {% comment %} fieldsets exists so organize them {% endcomment %}
+      {% for fieldset in form.Meta.fieldsets %}
+        <fieldset class="fieldset">
+          <h1 class="fieldset title">{{ fieldset.title }}</h1>
+
+          {% for field_name in fieldset.fields %}
+            {% with field=form|get_field:field_name  %}
+            <div class="flex flex-col align-middle items-start w-full">
+              <!-- input container -->
+              <div class="w-full mt-3.5">
+                <!-- input label -->
+                <label for="{{ 'id_'|addstr:field.name }}">{{ field.label }}
+                  {% if field.field.required %}
+                  <!-- required indicator -->
+                  {% include "companies/required_indicator.html" %}
+                  {% endif %}
+                </label>
+                <!-- input field -->
+                {{ field }}
+                <div class="text-red-500">
+                    {{ field.errors }}
+                </div>
+              </div>
+            </div>
+            {% endwith %}
+          {% endfor %}
+        </fieldset>
+      {% endfor %}
+    {% else %}
+      {% comment %} fieldsets doesn't exist so show all the fields {% endcomment %}
+      
+      {% for field in form %}
+      <div class="flex flex-col align-middle items-start w-full">
+        <!-- input container -->
+        <div class="w-full mt-3.5">
+          <!-- input label -->
+          <label for="{{ 'id_'|addstr:field.name }}">{{ field.label }}
+            {% if field.field.required %}
+            <!-- required indicator -->
+            {% include "companies/required_indicator.html" %}
+            {% endif %}
+          </label>
+          <!-- input field -->
+          {{ field }}
+          <div class="text-red-500">
+              {{ field.errors }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% endif %}
+    <button type="submit" class="update">Update</button>
+
+  </form>
+
+
+
+{% endblock content %}

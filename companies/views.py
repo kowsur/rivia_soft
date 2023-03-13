@@ -147,7 +147,7 @@ def home_selfassesment(request):
   current_tax_year = SelfassesmentAccountSubmissionTaxYear.get_max_year()
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_rating', 'client_file_number', 'client_name', 'is_active', 'start_date', 'HMRC_agent', 'incomplete_tasks', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', "created_by", "date_of_registration"]
+  include_fields = ['client_rating', 'client_name', 'client_file_number', 'is_active', 'start_date', 'HMRC_agent', 'incomplete_tasks', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', "created_by", "date_of_registration"]
   keep_include_fields = True
   show_others = False
   model_fields = get_field_names_from_model(Selfassesment)
@@ -1486,7 +1486,7 @@ def get_limited_where_Client_IS_INACTIVE():
 def home_limited(request):
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_rating', 'client_file_number', 'client_name', 'is_active', 'HMRC_agent', 'is_payroll', 'payment_method', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', "created_by", "date_of_registration"]
+  include_fields = ['client_rating', 'client_name', 'client_file_number', 'is_active', 'HMRC_agent', 'is_payroll', 'payment_method', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', "created_by", "date_of_registration"]
   keep_include_fields = True
   show_others = False
   model_fields = get_field_names_from_model(Limited)
@@ -2035,7 +2035,7 @@ def home_limited_submission_deadline_tracker(request):
       'updated_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'submitted_by': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
       'submitted_by_hmrc': { 'details_url_without_argument': user_details_url_without_argument, 'repr-format': HTML_Generator.CustomUser_repr_format },
-      'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': r"🏢{client_name}", 'href-url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url,},
+      'client_id': { 'details_url_without_argument': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_details_url, 'repr-format': HTML_Generator.Limited_client_id_repr_format, 'href-url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_update_url,},
       'reg_num': { 'details_url_without_argument': '/companies/LTD/details/', 'repr-format': r'{company_reg_number}', 'data-field': 'fields.client_id'},
       'file_#': { 'details_url_without_argument': '/companies/LTD/details/', 'repr-format': r'{client_file_number}', 'data-field': 'fields.client_id'},
       }

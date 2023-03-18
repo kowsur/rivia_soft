@@ -390,7 +390,6 @@ class ItemsInInvoiceViewSet(
     def add_invoice_item_to_invoice(self, request, *args, **kwargs):
         invoice_id = request.GET.get('invoice_id', None)
         invoice_item_id = request.GET.get('invoice_item_id', None)
-        print(invoice_id, invoice_item_id)
         if invoice_id is not None and invoice_item_id is not None:
             try:
                 invoice = Invoice.objects.get(id=invoice_id)

@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from rest_framework.routers import DefaultRouter
 from .views import InvoiceViewSet, InvoiceItemViewSet, ItemsInInvoiceViewSet, TransactionViewSet, CompanyViewSet
 
+
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
 router.register(r'companies', CompanyViewSet, basename="companies")
@@ -17,3 +18,4 @@ urlpatterns = router.urls
 urlpatterns += [
     re_path(r'.*', lambda request: redirect('invoices-home')),
 ]
+

@@ -1,0 +1,38 @@
+.invoice-items-in-invoice{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+    gap: 1rem;
+}
+.invoice-item {
+    display: grid;
+    grid-template-columns: max-content auto repeat(4, min-content);
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.service-name{
+    margin: auto 0;
+    font-size: 1.15rem;
+    font-weight: 500;
+}
+.cell{
+    display: inline-flex;
+    flex-direction: column;
+    width: min-content;
+}
+.cell input{
+    width: 10rem;
+}
+.cell button.delete{
+    display: inline;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+@media (prefers-color-scheme: light) {
+    hr {
+        border-color: rgba(17, 24, 39, var(--tw-text-opacity));
+    }
+}

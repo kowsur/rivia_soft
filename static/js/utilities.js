@@ -3,6 +3,12 @@ export function makeSafeHTML(string){
   return string.replace(/&/g, "&amp;").replace(/>/g, "&gt;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 }
 
+// Convert text to html node
+export function textToHTML(html) {
+  const template = document.createElement("template");
+  template.innerHTML = html;
+  return template.content;
+}
 
 //=======================================================================================================
 // URL has query params

@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 {% load companies_tags %}
+{% load static %}
 
 {% block title %}
   {{ page_title }}
-{% endblock title %}
-
-
+  {% endblock title %}
+  
+  
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/invoice_update.css' %}">
+
 <div class="max-w-6xl mx-auto mt-5">
   {% if not hide_navbar %}
   <div class="text-right">
@@ -26,46 +29,63 @@
     
 
 {% comment %}  {% endcomment %}
-  <form action="" method="post">
+  <div>
     <h2 class="header update-header">Items in invoice</h2>
 
     <!-- data -->
     {% autoescape off %}
-    <pre name="items_in_invocie" type="application/json" style="display: none;">
+    <pre name="items_in_invoice_data" type="application/json" style="display: none;">
       {{ data_for_invoice_items|convert_to_JSON }}
     </pre>
     {% endautoescape %}
     
     <div class="w-full mt-3.5">
 
-
       <!-- input label -->
-      <label for="items_in_invoice">Invoice Item</label>
+      <label for="invoice-items-search">Invoice Items Search</label>
       <!-- input field -->
       <div style="position: relative;" class="search_field">
-        <input type="text" class="search" name="search" autocomplete="off" value="" placeholder="Please select an option" data-do-not-attach-form-search-event-listener>
+        <input type="text" class="search" name="search" data-invoice-items-search autocomplete="off" value="" placeholder="Please select an option to add to invoice items" data-do-not-attach-form-search-event-listener>
 
-        <div class="select" name="assigned_to" id="items_in_invoice">
-          <span data-value="1" class="option">📨ab@cd.com 👥a</span>
-          <span data-value="2" class="option">📨ef@gh.com 👥e</span>
+        <div class="select" name="assigned_to" id="invoice-items-search">
         </div>
-
-        <!-- actual input -->
-        <select class="hidden" name="assigned_to" id="items_in_invoice">
-          <option value="1" data-value="1">📨ab@cd.com 👥a</option>
-        </select>
       </div>
     </div>
-  </form>
+    <div class="invoice-items-in-invoice">
+      {% comment %}       
+        <!-- Invoice Item in Invoice -->
+        <div class="invoice-item">
+          <h2 class="service-name">${invoice_item.name}</h2>
 
-</div>
+          <div class="cell">
+            <label for="${id}_quantity">Quantity</label>
+            <input id="${id}_quantity" type="number" step="1" value="${quantity}">
+          </div>
+          <div class="cell">
+            <label for="${id}_rate">Rate</label>
+            <input id="${id}_rate" type="number" value="${rate}">
+          </div>
+          <div class="cell">
+            <label for="${id}_vat">VAT(%)</label>
+            <input id="${id}_vat" type="number" value="${vat_percent}">
+          </div>
+          <div class="cell">
+            <button id="${id}_delete" class="delete">Remove</button>
+          </div>
 
+        </div>  
+      {% endcomment %}
+    </div>
+  </div>
+
+  <script src="{% static 'js/invoice_items.js' %}" async defer type='module'></script>
+  
   <!-- form -->
   <form action="{{ update_url }}" method="POST" class="my-10">
     {% csrf_token %}
     <h1 class="header update-header">{{ form_title }}</h1>
     <!-- form -->
-
+    
     <ol style="margin-top: 10px; margin-bottom: 10px; list-style: inside;">
       {% for error in form.errors|get_attr:'__all__' %}
         <li style="color: red; display: list-item;">{{ error }}</li>
@@ -73,7 +93,7 @@
     </ol>
 
     {% if form|get_attr:'Meta.fieldsets' %}
-      {% comment %} fieldsets exists so organize them {% endcomment %}
+    {% comment %} fieldsets exists so organize them {% endcomment %}
       {% for fieldset in form.Meta.fieldsets %}
         <fieldset class="fieldset">
           <h1 class="fieldset title">{{ fieldset.title }}</h1>
@@ -98,10 +118,10 @@
               </div>
             </div>
             {% endwith %}
-          {% endfor %}
+            {% endfor %}
         </fieldset>
       {% endfor %}
-    {% else %}
+      {% else %}
       {% comment %} fieldsets doesn't exist so show all the fields {% endcomment %}
       
       {% for field in form %}
@@ -128,6 +148,7 @@
 
   </form>
 
+</div>
 
 
 {% endblock content %}

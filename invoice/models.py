@@ -56,6 +56,7 @@ class Invoice(models.Model):
 
     amount = models.FloatField(default=0)
     discount = models.FloatField(default=0)
+    is_paid = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"#{self.id} To: {self.invoice_to}"
@@ -82,6 +83,11 @@ class InvoiceItem(models.Model):
 
 
 class ItemsInInvoice(models.Model):
+    class Meta:
+        constraints = [
+                models.UniqueConstraint(fields=['invoice_id', 'invoice_item_id'], name='unique_invoice_item')
+            ]
+        ordering = ['invoice_id', 'invoice_item_id']
     invoice_id = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     invoice_item_id = models.ForeignKey(InvoiceItem, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)

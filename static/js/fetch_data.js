@@ -80,7 +80,7 @@ export async function fetch_url({url, req_method, data_object={}, headers={'Cont
     const response = await fetch( url, {
         method: req_method,
         headers: headers,
-        body: data_object,
+        body: typeof(data_object)=='string' ? data_object : JSON.stringify(data_object),
         ...others
       })
     catchErrorAndLog(hideLoadingIndicator)

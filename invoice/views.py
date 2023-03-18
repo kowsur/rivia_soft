@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.core.serializers import serialize
 from django.http.response import HttpResponse
 from django.db.models import Q
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import viewsets, permissions, renderers, mixins, decorators, response
 from .models import Invoice, InvoiceItem, ItemsInInvoice, Transaction, Company
 from .forms import InvoiceCreationForm, InvoiceChangeForm, InvoiceDeleteForm,\
@@ -17,6 +18,15 @@ from companies.url_variables import *
 # html generator
 from companies.html_generator import get_field_names_from_model, generate_template_tag_for_model, generate_data_container_table
 from companies.repr_formats import HTML_Generator, Forms as FK_Formats
+
+
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication 
+
+class CsrfExemptSessionAuthentication(SessionAuthentication):
+
+    def enforce_csrf(self, request):
+        return  # To not perform the csrf check previously happening
+
 
 application_name = APPLICATION_NAME
 # these path names will be passed to templates to use in the navbar links
@@ -41,6 +51,7 @@ class InvoiceViewSet(
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
 
     @decorators.action(detail=False, methods=['get'])
     def home(self, request, *args, **kwargs):
@@ -106,6 +117,7 @@ class InvoiceViewSet(
                 return redirect(reverse('invoices-update-form', args=(invoice.id,)))
         return render(request, template_name='invoice/create.html', context=context)
     
+    
     @decorators.action(detail=True, methods=['get', 'post'])
     def update_form(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -119,11 +131,36 @@ class InvoiceViewSet(
             'form': InvoiceChangeForm(instance=instance, initial={}),
 
             'data_for_invoice_items': {
-                'create_url': '',
-                'update_url': '',
-                'search_url': '',
-                'all_url': '',
-                'repr_format': '',
+                'invoice_item': {
+                    'repr_format': r'{fields.name} Rate: {fields.rate} VAT: {fields.vat_percent}%',
+                    'search': {
+                        'url': '/invoice/invoice_items/search/',
+                        'request_method': 'GET',
+                    },
+                    'all': {
+                        'url': '/invoice/invoice_items/all/',
+                        'request_method': 'GET',
+                    },
+                },
+                'invoice_id': instance.id,
+                'items_in_invoice': {
+                    'create': {
+                        'url': r'/invoice/items_in_invoice/add_invoice_item_to_invoice/?invoice_id={invoice_id}&invoice_item_id={invoice_item_id}',
+                        'request_method': 'GET',
+                    },
+                    'update': {
+                        'url': r'/invoice/items_in_invoice/{pk}/',
+                        'request_method': 'PUT',
+                    },
+                    'delete': {
+                        'url': r'/invoice/items_in_invoice/{pk}/',
+                        'request_method': 'DELETE',
+                    },
+                    'all': {
+                        'url': r'/invoice/items_in_invoice/search/?invoice_id={invoice_id}',
+                        'request_method': 'GET',
+                    }
+                },
             }
         }
 
@@ -347,6 +384,56 @@ class ItemsInInvoiceViewSet(
     queryset = ItemsInInvoice.objects.all()
     serializer_class = ItemsInInvoiceSerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [CsrfExemptSessionAuthentication, BasicAuthentication]
+
+    @decorators.action(detail=False, methods=['get'])
+    def add_invoice_item_to_invoice(self, request, *args, **kwargs):
+        invoice_id = request.GET.get('invoice_id', None)
+        invoice_item_id = request.GET.get('invoice_item_id', None)
+        print(invoice_id, invoice_item_id)
+        if invoice_id is not None and invoice_item_id is not None:
+            try:
+                invoice = Invoice.objects.get(id=invoice_id)
+                invoice_item = InvoiceItem.objects.get(id=invoice_item_id)
+            except:
+                return HttpResponse(json.dumps({'detail': "Record with provided invoice_id or invoice_item_id not found"}), status=400, content_type='application/json')
+            
+            try:
+                added_item_in_invoice = ItemsInInvoice(invoice_id=invoice, invoice_item_id=invoice_item)
+                added_item_in_invoice.rate = invoice_item.rate
+                added_item_in_invoice.vat_percent = invoice_item.vat_percent
+                added_item_in_invoice.save()
+            except:
+                added_item_in_invoice = ItemsInInvoice.objects.get(invoice_id=invoice, invoice_item_id=invoice_item)
+
+            response = {
+                "model": "invoice.itemsininvoice",
+                "pk": added_item_in_invoice.id,
+                "fields": {
+                    "invoice_id": invoice.id,
+                    "invoice_item_id": invoice_item.id,
+                    "quantity": added_item_in_invoice.quantity,
+                    "rate": added_item_in_invoice.rate,
+                    "vat_percent": added_item_in_invoice.vat_percent,
+                }
+            }
+            return HttpResponse(json.dumps(response), content_type='application/json')
+        return HttpResponse(json.dumps({'detail': "invoice_id and invoice_item_id required"}), status=400, content_type='application/json')
+
+    @decorators.action(detail=False, methods=['get'])
+    def search(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        
+        invoice_id = request.query_params.get('invoice_id', '')
+        invoice_id = invoice_id.strip()
+        if invoice_id.isnumeric():
+            invoice_id = int(invoice_id)
+            queryset = queryset.filter(invoice_id=invoice_id)
+        else:
+            return HttpResponse(status=400)
+        
+        serializer = serialize(queryset=queryset, format='json')
+        return HttpResponse(serializer, content_type='application/json')
 
 
 class TransactionViewSet(
@@ -477,6 +564,7 @@ class TransactionViewSet(
         queryset = self.get_queryset()
         serializer = serialize(queryset=queryset, format='json')
         return HttpResponse(serializer, content_type='application/json')
+    
 
 class CompanyViewSet(
         mixins.CreateModelMixin,

@@ -59,6 +59,7 @@ class InvoiceCreationForm(forms.ModelForm):
 
             "amount",
             "discount",
+            "is_paid"
             )
 
 class InvoiceChangeForm(forms.ModelForm):
@@ -99,6 +100,7 @@ class InvoiceChangeForm(forms.ModelForm):
 
             "amount",
             "discount",
+            "is_paid"
             )
 
 class InvoiceDeleteForm(forms.ModelForm):

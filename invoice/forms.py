@@ -57,7 +57,7 @@ class InvoiceCreationForm(forms.ModelForm):
             "service_date",
             "due_date",
 
-            "amount",
+            # "amount",
             "discount",
             "is_paid"
             )
@@ -98,7 +98,7 @@ class InvoiceChangeForm(forms.ModelForm):
             "service_date",
             "due_date",
 
-            "amount",
+            # "amount",
             "discount",
             "is_paid"
             )

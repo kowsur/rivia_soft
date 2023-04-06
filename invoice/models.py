@@ -96,6 +96,21 @@ class ItemsInInvoice(models.Model):
     
     def __str__(self) -> str:
         return f"Id: {self.invoice_id}, Item Id: {self.invoice_item_id}"
+    
+    @property
+    def amount(self):
+        return self.rate * self.quantity
+    
+    @property
+    def vat(self):
+        if self.vat_percent is None:
+            return 0
+        return self.amount * self.vat_percent / 100
+    
+    @property
+    def total(self):
+        return self.amount + self.vat
+    
 
 
 class Transaction(models.Model):

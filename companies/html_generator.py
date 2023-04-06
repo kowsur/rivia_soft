@@ -59,7 +59,8 @@ def generate_template_tag_for_model(
       'invoice_from': { 'details_url_without_argument': '/invoice/companies/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/', 'href-url': r'/invoice/companies/{fields.invoice_from}/redirect_to_original/' },
       'invoice_to': { 'details_url_without_argument': '/invoice/companies/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/', 'href-url': r'/invoice/companies/{fields.invoice_to}/redirect_to_original/' },
       'invoice_reference_id': { 'details_url_without_argument': '/invoice/invoices/', 'repr-format': r"{formatted}", 'data-url-ending': '/formatted/', 'href-url': r'/invoice/invoices/{fields.invoice_reference_id}/update_form/' },
-      'transaction_from': { 'details_url_without_argument': '/invoice/companies/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/', 'href-url': r'/invoice/companies/{fields.transaction_from}/redirect_to_original/' }
+      'transaction_from': { 'details_url_without_argument': '/invoice/companies/', 'repr-format': r'{formatted}', 'data-url-ending': '/formatted/', 'href-url': r'/invoice/companies/{fields.transaction_from}/redirect_to_original/' },
+      'all_transactions': { 'details_url_without_argument': '/invoice/companies/', 'data-field': 'fields.transaction_from', 'repr-format': r'All transaction from company', 'data-url-ending': '/formatted/', 'href-url': r'/invoice/transactions/{fields.transaction_from}/view_all_transactions_of_company/' }
     },
   ):
   inner_template_tr = """

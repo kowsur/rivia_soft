@@ -19,6 +19,7 @@ from companies.url_variables import *
 from companies.html_generator import get_field_names_from_model, generate_template_tag_for_model, generate_data_container_table
 from companies.repr_formats import HTML_Generator, Forms as FK_Formats
 
+from .helper_functions import get_amount_for_invoice
 
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication 
 
@@ -169,7 +170,13 @@ class InvoiceViewSet(
             context['form'] = form
             
             if form.is_valid():
-                invoice = form.save()
+                invoice = form.save(commit=False)
+                invoice.amount = get_amount_for_invoice(invoice)
+                invoice.save()
+
+                form = InvoiceChangeForm(instance=invoice)
+                context['form'] = form
+
         return render(request, template_name='invoice/invoice_update.html', context=context)
     
     @decorators.action(detail=True, methods=['get', 'post'])
@@ -452,11 +459,11 @@ class TransactionViewSet(
     def home(self, request, *args, **kwargs):
         pk_field = 'id'
         exclude_fields = []
-        include_fields = []
+        include_fields = ['all_transactions']
         keep_include_fields = True
         show_others = True
         model_fields = get_field_names_from_model(Transaction)
-        # model_fields.append('incomplete_tasks')
+        model_fields.append('all_transactions')
         # model_fields = get_field_names_from_model(Invoice)
         context = {
             **URLS,
@@ -465,7 +472,7 @@ class TransactionViewSet(
 
             'caption': 'View Transaction',
             'page_title': 'View Transaction',
-            'template_tag': generate_template_tag_for_model(Transaction, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
+            'template_tag': generate_template_tag_for_model(Transaction, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others,),
             'data_container': generate_data_container_table(Transaction, pk_field=pk_field, show_id=False, exclude_fields=exclude_fields, include_fields=include_fields, keep_include_fields=keep_include_fields, show_others=show_others),
 
             "counts": True,
@@ -480,6 +487,11 @@ class TransactionViewSet(
             'model_fields': model_fields
             },
         }
+        return render(request, 'invoice/home.html', context)
+    
+    @decorators.action(detail=True, methods=['get'])
+    def view_all_transactions_of_company(self, request, *args, **kwargs):
+        context = {}
         return render(request, 'invoice/home.html', context)
 
     @decorators.action(detail=False, methods=['get', 'post'])

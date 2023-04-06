@@ -41,3 +41,4 @@ def get_total_for_items_in_invoice(items_in_invoice):
 def get_amount_for_invoice(invoice):
     items_in_invoice = ItemsInInvoice.objects.filter(invoice_id=invoice)
     return get_total_for_items_in_invoice(items_in_invoice) - invoice.discount
+

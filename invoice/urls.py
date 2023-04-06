@@ -16,6 +16,6 @@ router.register(r'transactions', TransactionViewSet, basename="transactions")
 urlpatterns = router.urls
 
 urlpatterns += [
-    re_path(r'.*', lambda request: redirect('invoices-home')),
+    # re_path(r'.*', lambda request: redirect('invoices-home')),
 ]
 

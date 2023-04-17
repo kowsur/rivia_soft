@@ -296,6 +296,7 @@ class SelfassesmentAccountSubmission(models.Model):
         ("CASH", "CASH"),
         ("DIRECT DEBIT","DIRECT DEBIT"),
         ("BANK TRANSFER","BANK TRANSFER"),
+        ("CARD","CARD"),
     )
     payment_method = models.CharField("Payment Method", blank=True, null=True, max_length=55, choices=payment_method_choices, default=None)
     paid_amount = models.BigIntegerField(verbose_name='Amount Paid', blank=True, null=True)

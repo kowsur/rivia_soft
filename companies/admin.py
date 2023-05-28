@@ -1,8 +1,10 @@
 from django.contrib import admin
+from .models import OnboardingTask
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfemploymentIncomeAndExpensesDataCollection, SelfassesmentTracker, SelfassesmentType, SelfassesmentAccountSubmissionTaxYear
-from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
+from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker, LimitedOnboardingTasks
 
 
+admin.site.register(OnboardingTask)
 admin.site.register(SelfassesmentType)
 admin.site.register(SelfemploymentIncomeAndExpensesDataCollection)
 

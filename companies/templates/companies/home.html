@@ -181,6 +181,22 @@
           <span id="task-count">{{ limited_COMPANY_AUTH_CODE_NOT_SET }}</span>
           <span class="task-tooltip">Authentication Code not set.</span>
         </span>
+        <span class="task task-done" data-tasks='limited_where_onboarding_tasks_status_Done'>
+          <span id="task-count">{{ limited_where_onboarding_tasks_status_Done }}</span>
+          <span class="task-tooltip">Companies has onboarding tasks status Done</span>
+        </span>
+        <span class="task task-issue" data-tasks='limited_where_onboarding_tasks_status_InProgress'>
+          <span id="task-count">{{ limited_where_onboarding_tasks_status_InProgress }}</span>
+          <span class="task-tooltip">Companies has onboarding tasks status In Progress</span>
+        </span>
+        <span class="task task-upcoming" data-tasks='limited_where_onboarding_tasks_status_NeedToDo'>
+          <span id="task-count">{{ limited_where_onboarding_tasks_status_NeedToDo }}</span>
+          <span class="task-tooltip">Companies has onboarding tasks status Need To Do</span>
+        </span>
+        <span class="task task-own" data-tasks='limited_where_onboarding_tasks_status_NotApplicable'>
+          <span id="task-count">{{ limited_where_onboarding_tasks_status_NotApplicable }}</span>
+          <span class="task-tooltip">Companies has onboarding tasks status Not Applicable</span>
+        </span>
       </div>
     {% elif limited_submission_counts %}
       <div class="task-container">

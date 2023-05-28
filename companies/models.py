@@ -300,7 +300,7 @@ class SelfassesmentAccountSubmission(models.Model):
     )
     payment_method = models.CharField("Payment Method", blank=True, null=True, max_length=55, choices=payment_method_choices, default=None)
     paid_amount = models.BigIntegerField(verbose_name='Amount Paid', blank=True, null=True)
-    unique_public_view_key = models.UUIDField(default=uuid.uuid4, editable=False)
+    unique_public_view_key = models.UUIDField('Unique Public View Key', default=uuid.uuid4, editable=False)
 
     last_updated_by = models.ForeignKey(
         to='users.CustomUser',
@@ -983,6 +983,94 @@ class SelfemploymentIncomeAndExpensesDataCollection(models.Model):
 
     def __str__(self):
         return f"{self.tax_year} - {self.selfassesment}"
+
+
+class OnboardingTask(models.Model):
+    class Meta:
+        verbose_name = 'Onboarding Task'
+        verbose_name_plural = 'Onboarding Tasks'
+        ordering = ['-created_at']
+    
+    name = models.CharField(default='', max_length=255, blank=False, null=False)
+    description = models.TextField(default='', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True)
+
+    def __str__(self) -> str:
+        return f"{self.name}"
+
+
+class LimitedOnboardingTasks(models.Model):
+    class Meta:
+        verbose_name = 'Limited Onboarding Task'
+        verbose_name_plural = 'Limited Onboarding Tasks'
+        ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields = ('client_id', 'task_id',),
+                name = "unique_client_id__task_id__limited_onboarding_tasks",
+                )
+        ]
+        indexes = [
+            models.Index(fields=['task_status']),
+        ]
+
+    client_id = models.ForeignKey(
+        to='companies.Limited',
+        on_delete=models.CASCADE,
+        verbose_name='Client ID',
+        to_field='client_id',
+        related_name='limited_onboarding_tasks_client_id',
+        blank=False,
+        null=True)
+    task_id = models.ForeignKey(
+        to='companies.OnboardingTask',
+        on_delete=models.CASCADE,
+        verbose_name='Task ID',
+        to_field='id',
+        related_name='limited_onboarding_tasks_task_id',
+        blank=False,
+        null=True)
+
+    task_status_choices = (
+        ("NeedToDo", "Need to do",),
+        ("InProgress", "In Progress",),
+        ("Done", "Done",),
+        ("NotApplicable", "Not Applicable",),
+    )
+    task_status = models.CharField(
+        verbose_name='Task Status',
+        max_length=255,
+        choices=task_status_choices,
+        default="Need to do",
+        blank=False,
+        null=True)
+    note = models.TextField(verbose_name='Note', default='', blank=True, null=True)
+    
+    created_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Created By',
+        related_name='limited_onboarding_tasks_created_by',
+        to_field='user_id',
+        blank=False,
+        null=True)
+
+    updated_by = models.ForeignKey(
+        to='users.CustomUser',
+        on_delete=models.RESTRICT,
+        verbose_name='Last Updated By',
+        related_name='limited_onboarding_tasks_updated_by',
+        to_field='user_id',
+        blank=False,
+        null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, blank=True)
+
+
+    def __str__(self) -> str:
+        return f"{self.client_id} - {self.task_id}"
 
 
 from django.db.models.signals import post_save, pre_save

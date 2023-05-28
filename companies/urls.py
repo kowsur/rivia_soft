@@ -31,6 +31,9 @@ from .views import home_limited, create_limited, update_limited, \
     delete_limited, search_limited, all_limited, get_details_limited, \
     export_limited
 
+# limited onboarding tasks
+from .views import update_limited_onboarding_tasks, search_limited_onboarding_tasks
+
 # limited tracker
 from .views import home_limited_tracker, create_limited_tracker, update_limited_tracker, \
     delete_limited_tracker, search_limited_tracker, all_limited_tracker, export_limited_tracker
@@ -259,7 +262,20 @@ urlpatterns = [
         name = URL_NAMES.Limited_export_name
     ),
 
+    # =============================================================================================================
+    # Limited Onboarding Tasks
+    path(
+        route = 'limited_onboarding_tasks/<int:client_id>/',
+        view = update_limited_onboarding_tasks,
+        name = 'limited_onboarding_tasks',
+    ),
+    path(
+        route = 'search_limited_onboarding_tasks/',
+        view = search_limited_onboarding_tasks,
+        name = 'search_limited_onboarding_tasks',
+    ),
 
+    # =============================================================================================================
     # Limited Submission Deadline Tracker
     path(route = URL_PATHS.Limited_Submission_Deadline_Tracker_home_url,
         view = home_limited_submission_deadline_tracker,

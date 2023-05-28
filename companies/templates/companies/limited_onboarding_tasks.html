@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+{% load companies_tags %}
+
+{% block title %}
+  {{ page_title }}
+{% endblock title %}
+
+
+
+{% block content %}
+<div class="max-w-6xl mx-auto mt-5">
+  {% if not hide_navbar %}
+  <div class="text-right">
+  <a href="{% url view_url %}">View</a>
+  </div>
+  {% endif %}
+
+  <!-- messages -->
+  {% if messages %}
+  {% for message in messages %}
+  <h1 class='message {{ message.tags }}'>
+    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+    {{ message }}
+  </h1>
+  {% endfor %}
+  {% endif %}
+    
+
+  <style>
+    .onboarding-task-group {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: 1fr 1.5fr;
+        margin-bottom: 1rem;
+        align-items: baseline;
+    }
+    .onboarding-task-group .form-fields {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+    .onboarding-task-group .form-group {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: no-wrap;
+        flex-grow: 1;
+    }
+    .onboarding-task-group .form-group:first-child {
+        flex-grow: 0;
+    }
+    .onboarding-task-group .form-group textarea {
+        display: inline-block;
+        height: 2.5rem;
+    }
+    .onboarding-task-group .name {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+    }
+    .onboarding-task-group .name hr {
+        min-width: 0.5rem;
+    }
+  </style>
+
+  <!-- form -->
+    <p class="header update-header" style='margin-bottom: 1rem'>{{ form_title }}</p>
+    <!-- form -->
+    {% for onboarding_task in limited_onboarding_tasks %}
+    <form action="{% url update_url id %}" method='POST'  class="onboarding-task-group" data-task-id="{{ onboarding_task.task_id.id }}">
+        <h2 class='name'>
+            <span>{{ onboarding_task.task_id.name }}</span>
+            <hr>
+        </h2>
+
+        <div class='form-fields'>
+            <span class="form-group">
+                <label for="task_status_{{ onboarding_task.id }}">Status</label>
+                <select name="task_status_{{ onboarding_task.id }}" id="task_status_{{ onboarding_task.id }}" data-field-name="task_status">
+                    {% for choice in task_status_choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == onboarding_task.task_status %}selected{% endif %}>{{ choice.1 }}</option>
+                    {% endfor %}
+                </select>
+            </span>
+            <span class="form-group">
+                <label for="task_note_{{ onboarding_task.id }}">Note</label>
+                <textarea name="task_note_{{ onboarding_task.id }}" id="task_note_{{ onboarding_task.id }}" style="display: inline;" data-field-name="note">{{ onboarding_task.note }}</textarea>
+            </span>
+        </div>
+    </form>
+    {% endfor %}
+    <button type="submit" class="update">Update</button>
+</div>
+
+<script type='module' defer src='{% static "js/limited_onboarding_tasks.js" %}'></script>
+
+{% endblock content %}

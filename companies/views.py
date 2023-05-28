@@ -5,6 +5,7 @@ import json
 from django.http.response import Http404, HttpResponse
 from django.core.serializers import serialize
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -22,6 +23,7 @@ from .forms import Add_All_Selfassesment_to_SelfassesmentAccountSubmission_Form
 from .forms import SelfassesmentTrackerCreationForm, SelfassesmentTrackerChangeForm, SelfassesmentTrackerDeleteForm
 
 from .forms import LimitedCreationForm, LimitedChangeForm, LimitedDeleteForm
+from .forms import LimitedOnboardingForm
 from .forms import LimitedTrackerCreationForm, LimitedTrackerChangeForm, LimitedTrackerDeleteForm
 from .forms import MergedTrackerCreateionForm
 from .forms import LimitedSubmissionDeadlineTrackerCreationForm, LimitedSubmissionDeadlineTrackerChangeForm, LimitedSubmissionDeadlineTrackerDeleteForm
@@ -30,9 +32,10 @@ from .forms import LimitedConfirmationStatementTrackerCreationForm, LimitedConfi
 
 #models
 from django.db.models import Subquery
-from .models import  Selfassesment, SelfassesmentTracker, SelfassesmentAccountSubmission, SelfassesmentAccountSubmissionTaxYear, SelfemploymentIncomeAndExpensesDataCollection
+from .models import Selfassesment, SelfassesmentTracker, SelfassesmentAccountSubmission, SelfassesmentAccountSubmissionTaxYear, SelfemploymentIncomeAndExpensesDataCollection
 from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
 from .models import AutoCreatedSelfassesmentTracker
+from .models import OnboardingTask, LimitedOnboardingTasks
 
 # Serializers
 from rest_framework.renderers import JSONRenderer
@@ -1482,15 +1485,52 @@ def get_limited_where_Client_IS_ACTIVE():
 def get_limited_where_Client_IS_INACTIVE():
   return Limited.objects.filter(is_active=False)
 
+def get_limited_where_onboarding_tasks_status_Done():
+  return Limited.objects.filter(client_id__in=LimitedOnboardingTasks.objects.filter(task_status='Done').values('client_id'))
+def get_limited_where_onboarding_tasks_status_InProgress():
+  return Limited.objects.filter(client_id__in=LimitedOnboardingTasks.objects.filter(task_status='InProgress').values('client_id'))
+def get_limited_where_onboarding_tasks_status_NeedToDo():
+  return Limited.objects.filter(client_id__in=LimitedOnboardingTasks.objects.filter(task_status='NeedToDo').values('client_id'))
+def get_limited_where_onboarding_tasks_status_NotApplicable():
+  return Limited.objects.filter(client_id__in=LimitedOnboardingTasks.objects.filter(task_status='NotApplicable').values('client_id'))
+
+
 @login_required
 def home_limited(request):
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_rating', 'client_name', 'client_file_number', 'is_active', 'HMRC_agent', 'is_payroll', 'payment_method', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', "created_by", "date_of_registration"]
+  include_fields = [
+    'client_rating',
+    'client_name',
+    'client_file_number',
+    # 'all_onboarding_tasks',
+    'onboarding_tasks__status__Done',
+    'onboarding_tasks__status__In_Progress',
+    'onboarding_tasks__status__Need_to_do',
+    'onboarding_tasks__status__Not_Applicable',
+    'is_active',
+    'HMRC_agent',
+    'is_payroll',
+    'payment_method',
+    'company_reg_number',
+    'company_auth_code',
+    'remarks',
+    'director_phone_number',
+    'director_email',
+    'UTR',
+    'NINO',
+    "created_by",
+    "date_of_registration"
+  ]
   keep_include_fields = True
   show_others = False
   model_fields = get_field_names_from_model(Limited)
   model_fields.append('incomplete_tasks')
+  # model_fields.append('all_onboarding_tasks')
+  model_fields.append('onboarding_tasks__status__Done')
+  model_fields.append('onboarding_tasks__status__In_Progress')
+  model_fields.append('onboarding_tasks__status__Need_to_do')
+  model_fields.append('onboarding_tasks__status__Not_Applicable')
   context = {
     **URLS,
     'caption': 'View Limited',
@@ -1509,6 +1549,11 @@ def home_limited(request):
     "limited_AGENT_NOT_ACTIVE": get_limited_where_AGENT_NOT_ACTIVE().count(),
     "limited_Client_IS_ACTIVE": get_limited_where_Client_IS_ACTIVE().count(),
     "limited_Client_IS_INACTIVE": get_limited_where_Client_IS_INACTIVE().count(),
+    "limited_Client_IS_INACTIVE": get_limited_where_Client_IS_INACTIVE().count(),
+    "limited_where_onboarding_tasks_status_Done": get_limited_where_onboarding_tasks_status_Done().count(),
+    "limited_where_onboarding_tasks_status_InProgress": get_limited_where_onboarding_tasks_status_InProgress().count(),
+    "limited_where_onboarding_tasks_status_NeedToDo": get_limited_where_onboarding_tasks_status_NeedToDo().count(),
+    "limited_where_onboarding_tasks_status_NotApplicable": get_limited_where_onboarding_tasks_status_NotApplicable().count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Limited_viewall_url,
@@ -1539,34 +1584,38 @@ def create_limited(request):
     form = LimitedCreationForm(request.POST)
     context['form'] = form
     if form.is_valid():
-      assesment = form.save()
-      assesment.set_defaults()
-      assesment.created_by = request.user
-      assesment.save()
-      messages.success(request, f"New Limited has been created {assesment}!")
+      limited = form.save()
+      limited.set_defaults()
+      limited.created_by = request.user
+      limited.save()
+      messages.success(request, f"New Limited has been created {limited}!")
 
       # Create record in Limited Submission Deadline Tracker
       submission = LimitedSubmissionDeadlineTracker()
-      submission.client_id = assesment
+      submission.client_id = limited
       submission.updated_by = request.user
       submission.save()
       messages.success(request, f'New Limited Submission has been created {submission}!')
 
       # Create record in Limited Confirmation Statement Tracker
       statement = LimitedConfirmationStatementTracker()
-      statement.client_id = assesment
+      statement.client_id = limited
       statement.set_defaults(request)
       messages.success(request, f'New Limited Confirmation Statement has been created {submission}!')
 
       # Create record in Limited VAT Tracker
-      if assesment.vat:
+      if limited.vat:
         for i in range(3):
           vat = LimitedVATTracker()
-          vat.client_id = assesment
+          vat.client_id = limited
           vat.updated_by = request.user
           vat.save()
           messages.success(request, f'New Limited VAT Tracker has been created {vat}')
-      context['form'] = LimitedCreationForm(initial={'client_file_number': Limited.get_next_file_number()})
+
+      return redirect('companies:limited_onboarding_tasks', client_id=limited.client_id)
+
+      # Previous behaviour after adding new company
+      # context['form'] = LimitedCreationForm(initial={'client_file_number': Limited.get_next_file_number()})
   return render(request, template_name='companies/create.html', context=context)
 
 @login_required
@@ -1631,7 +1680,7 @@ def update_limited(request, client_id:int):
 def delete_limited(request, client_id:int):
   context = {
     **URLS,
-    'page_title': 'Delte Limited',
+    'page_title': 'Delete Limited',
     'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name,
     'id': client_id,
     'delete_url':  URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_delete_name,
@@ -1668,6 +1717,10 @@ def search_limited(request, limit: int=-1):
         "limited_AGENT_NOT_ACTIVE": get_limited_where_AGENT_NOT_ACTIVE(),
         "limited_Client_IS_ACTIVE": get_limited_where_Client_IS_ACTIVE(),
         "limited_Client_IS_INACTIVE": get_limited_where_Client_IS_INACTIVE(),
+        "limited_where_onboarding_tasks_status_Done": get_limited_where_onboarding_tasks_status_Done(),
+        "limited_where_onboarding_tasks_status_InProgress": get_limited_where_onboarding_tasks_status_InProgress(),
+        "limited_where_onboarding_tasks_status_NeedToDo": get_limited_where_onboarding_tasks_status_NeedToDo(),
+        "limited_where_onboarding_tasks_status_NotApplicable": get_limited_where_onboarding_tasks_status_NotApplicable(),
       }
       records = tasks.get(request.GET.get('tasks'), [])
       data = serialize(queryset=records, format='json')
@@ -1713,6 +1766,111 @@ def export_limited(request):
     )
   return response
 
+
+
+# =============================================================================================================
+# =============================================================================================================
+# LimitedOnboardingTasks
+@csrf_exempt
+def update_limited_onboarding_tasks(request, client_id:int):
+  try:
+    limited = Limited.objects.get(client_id=client_id)
+  except Limited.DoesNotExist:
+    messages.error(request, f'Limited record with id {client_id}, you are looking for does not exist!')
+    return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name)
+  
+  if request.method=='GET':  
+    onboarding_tasks = OnboardingTask.objects.all()
+    context = {
+      **URLS,
+      'page_title': 'Limited Onboarding Tasks',
+      'view_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_home_name,
+      'id': client_id,
+      'update_url':  'companies:limited_onboarding_tasks',
+      'form_title': f"{limited.client_name} onboarding tasks",
+      
+      'form': LimitedOnboardingForm(),
+      'limited': limited,
+      'task_status_choices': LimitedOnboardingTasks.task_status_choices,
+    }
+    
+    limited_onboarding_tasks = []
+    for task in onboarding_tasks:
+      try:
+        limited_onboarding_tasks.append(LimitedOnboardingTasks.objects.get(client_id=limited, task_id=task))
+      except LimitedOnboardingTasks.DoesNotExist:
+        task = LimitedOnboardingTasks(client_id=limited, task_id=task)
+        task.save()
+        limited_onboarding_tasks.append(task)
+
+    context['limited_onboarding_tasks'] = limited_onboarding_tasks
+    return render(request, template_name='companies/limited_onboarding_tasks.html', context=context)
+  
+  elif request.method=='POST':
+    post_data = json.loads(request.body)
+    task_id = post_data.get('task_id', None)
+    status = post_data.get('task_status', None)
+    note = post_data.get('note', None)
+    
+    try:
+      task = OnboardingTask.objects.get(id=task_id)
+    except OnboardingTask.DoesNotExist:
+      return HttpResponse(f"Task for {task_id} not found!", status=400)
+    
+    try:
+      onboarding_task_for_limited = LimitedOnboardingTasks.objects.get(client_id=client_id, task_id=task_id)
+      print(f'retrived {onboarding_task_for_limited}')
+    except LimitedOnboardingTasks.DoesNotExist:
+      onboarding_task_for_limited = LimitedOnboardingTasks()
+    
+    onboarding_task_for_limited.client_id = limited
+    onboarding_task_for_limited.task_id = task
+    
+    if status!=None:
+      onboarding_task_for_limited.task_status = status
+
+    if note!=None:
+      onboarding_task_for_limited.note = note
+    
+    onboarding_task_for_limited.save()
+    return HttpResponse("Success", status=200)
+  
+  return HttpResponse("Client error", status=400)
+
+@login_required
+def search_limited_onboarding_tasks(request, limit: int=-1):
+  if request.method=='GET' and request.headers.get('Content-Type')=='application/json':
+    # get search text from url query parameter
+    client_id = request.GET.get('client_id', None)
+    task_lookup = request.GET.get('tasks', None)
+    count_only = request.GET.get('count_only', None)
+
+    # if tasks query paramter exists then return tasks
+    if task_lookup:
+      records = LimitedOnboardingTasks.objects.all()
+      if client_id:
+        records = records.filter(client_id=client_id)
+      tasks = {
+        'all_tasks': records,
+        'status__Done': records.filter(task_status='Done'),
+        'status__InProgress': records.filter(task_status='InProgress'),
+        'status__NeedToDo': records.filter(task_status='NeedToDo'),
+        'status__NotApplicable': records.filter(task_status='NotApplicable'),
+      }
+
+      if task_lookup=='__all__' and count_only!=None:
+        for key in tasks:
+          tasks[key] = tasks[key].count()
+        return HttpResponse(json.dumps(tasks), content_type='application/json')
+
+      records = tasks.get(task_lookup, [])
+      if count_only != None:
+        return HttpResponse(json.dumps({'count': records.count()}), content_type='application/json')
+      data = serialize(queryset=records, format='json')
+      return HttpResponse(data, content_type='application/json')
+    
+    return HttpResponse(data, content_type='application/json')
+  raise Http404
 
 
 # =============================================================================================================

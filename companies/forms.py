@@ -9,7 +9,7 @@ from .fields import SearchableModelField, Select, Fieldset
 from .url_variables import Full_URL_PATHS_WITHOUT_ARGUMENTS
 
 from .models import Selfassesment, SelfassesmentAccountSubmission, SelfassesmentTracker, SelfassesmentAccountSubmissionTaxYear, SelfemploymentIncomeAndExpensesDataCollection
-from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker
+from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, LimitedVATTracker, LimitedConfirmationStatementTracker, LimitedOnboardingTasks
 
 # from .queries import db_all_Limited, db_all_LimitedConfirmationStatementTracker, db_all_LimitedSubmissionDeadlineTracker, \
 #     db_all_LimitedTracker, db_all_LimitedVATTracker
@@ -1011,6 +1011,19 @@ class LimitedDeleteForm(forms.ModelForm):
     class Meta:
         model = Limited
         fields = ()
+
+
+# Limited Onboarding Tasks
+class LimitedOnboardingForm(forms.ModelForm):
+    class Meta:
+        model = LimitedOnboardingTasks
+        fields = (
+            'client_id',
+            'task_id',
+            'task_status',
+            'note'
+        )
+
 
 # Limited Tracker
 class LimitedTrackerCreationForm(forms.ModelForm):

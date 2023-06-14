@@ -1,7 +1,13 @@
 from django.shortcuts import redirect, resolve_url
 from django.urls import reverse
 from pprint import pprint
+import re
+from companies.url_variables import Full_URL_PATHS_WITHOUT_ARGUMENTS
 
+
+public_urls = [
+    re.compile(r'^/companies/SA/data_collection/(auth|create)_for_client/.*'),
+]
 
 class SimpleMiddleware:
     def __init__(self, get_response):
@@ -16,8 +22,19 @@ class SimpleMiddleware:
         if not next_url:
             next_url = request.POST.get('next')
 
-        if not request.user.is_authenticated and request.path != self.login_url:
+        # This is for the data collection page which is public
+        is_public_url = False
+        for url in public_urls:
+            if url.match(request.path):
+                is_public_url = True
+                break
+        
+        if is_public_url:
+            pass
+        elif not request.user.is_authenticated and request.path != self.login_url:
             return redirect(f"{self.login_url}?next={next_url or request.path}")
+        
+        # render the page if the user is authenticated or the page is public
         response = self.get_response(request)
 
         # Code to be executed for each request/response after

@@ -407,7 +407,7 @@
                         <span>{{ tax_calc.adv_tax|floatformat:'2g' }}</span>
                     </div>
                     <div class="d-f items-center justify-between">
-                        <h2 class="d-ib fs-inherit">TOTAL DUE TAX ON 31 JANUARY {{tax_year_next}} TAX YEAR</h2>
+                        <h2 class="d-ib fs-inherit">TOTAL DUE TAX ON 31 JANUARY {{tax_year_next|add:'1'|floatformat}} TAX YEAR</h2>
                         <span>{{ tax_calc.net_total_tax|floatformat:'2g' }}</span>
                     </div>
                 </div>

@@ -235,7 +235,7 @@
                                 <td colspan='1'></td>
                                 <td colspan='2'>{{ taxable_income.taxable_income_source.name }}</td>
                                 <td colspan='1'></td>
-                                <td colspan='1' text-right>{{ taxable_income.amount|floatformat:'2g' }}</td>
+                                <td colspan='1' text-right>{{ taxable_income.amount|natural_round }}</td>
                             </tr>
                         {% endfor %}
                         <tr>
@@ -381,7 +381,7 @@
                         <tr class="text-right">
                             <td colspan="1"></td>
                             <td colspan="2">Total deduction</td>
-                            <td colspan="1">{{tax_calc.total_paid_tax|floatformat:'2g'}}</td>
+                            <td colspan="1">{{tax_calc.total_paid_tax|natural_round}}</td>
                         </tr>
                     </tbody>
                     <tfoot>
@@ -404,11 +404,11 @@
 
                     <div class="d-f items-center justify-between">
                         <h2 class="d-ib fs-inherit">DUE ADVANCE TAX FOR {{tax_year_prev|add:'1'|floatformat}}/{{tax_year_next|add:'1'|floatformat}} TAX YEAR</h2>
-                        <span>{{ tax_calc.adv_tax|floatformat:'2g' }}</span>
+                        <span>{{ tax_calc.adv_tax|natural_round }}</span>
                     </div>
                     <div class="d-f items-center justify-between">
                         <h2 class="d-ib fs-inherit">TOTAL DUE TAX ON 31 JANUARY {{tax_year_next|add:'1'|floatformat}} TAX YEAR</h2>
-                        <span>{{ tax_calc.net_total_tax|floatformat:'2g' }}</span>
+                        <span>{{ tax_calc.net_total_tax|natural_round }}</span>
                     </div>
                 </div>
                 {% endif %}

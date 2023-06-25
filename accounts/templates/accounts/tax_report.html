@@ -86,7 +86,7 @@
             <h1 class="to-upper text-center fs-11">Profit and loss for the year ended 5 April {{tax_year_next}}</h1>
             
             <br>
-            <h2 class="fs-11 font-normal d-f justify-between">Selfemployment Income (Including Tips) <span>£{{selfemployment_total_income|floatformat:"2g"}}</span></h2>
+            <h2 class="fs-11 font-normal d-f justify-between">Selfemployment Income (Including Tips) <span>£{{selfemployment_total_income|natural_round}}</span></h2>
             <br>
 
             <section >
@@ -104,10 +104,10 @@
                         {% for expense in selfemployment_expenses %}
                             <tr>
                                 <td>{{expense.expense_source.name}}</td>
-                                <td class="text-right">{{expense.amount|floatformat:"2g"}}</td>
+                                <td class="text-right">{{expense.amount|natural_round}}</td>
                                 {% with expense.amount|as_percentage_of:expense.personal_usage_percentage as personal_usage %}
-                                    <td class="text-right">{{personal_usage|floatformat:"2g"}}</td>
-                                    <td class="text-right">{{expense.amount|subtract:personal_usage|floatformat:"2g"}}</td>
+                                    <td class="text-right">{{personal_usage|natural_round}}</td>
+                                    <td class="text-right">{{expense.amount|subtract:personal_usage|natural_round}}</td>
                                 {% endwith %}
                             </tr>
                         {% endfor %}
@@ -115,7 +115,7 @@
                     <tfoot>
                         <tr>
                             <th class="text-right font-bolder" colspan="3">Total Allowable Expenses</th>
-                            <th class="text-right font-bolder">{{selfemployment_total_expense|floatformat:"2g"}}</th>
+                            <th class="text-right font-bolder">{{selfemployment_total_expense|natural_round}}</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -134,37 +134,37 @@
                             <tr>
                                 <td colspan="1"></td>
                                 <td colspan="3">Pool Written Down Value b/fwd</td>
-                                <td class="text-right" colspan="1">{{car_value.amount|floatformat:"2g"}}</td>
+                                <td class="text-right" colspan="1">{{car_value.amount|natural_round}}</td>
                                 <td colspan="2"></td>
                             </tr>
                             <tr>
                                 <td colspan="1"></td>
                                 <td colspan="3">Additions</td>
-                                <td class="text-right" colspan="1">{{car_value.addition|floatformat:"2g"}}</td>
+                                <td class="text-right" colspan="1">{{car_value.addition|natural_round}}</td>
                                 <td colspan="2"></td>
                             </tr>
                             <tr>
                                 <td colspan="1"></td>
                                 <td colspan="3">Disposals</td>
-                                <td class="text-right" colspan="1">{{car_value.disposal|floatformat:"2g"}}</td>
+                                <td class="text-right" colspan="1">{{car_value.disposal|natural_round}}</td>
                                 <td colspan="2"></td>
                             </tr>
                             <tr>
                                 <td colspan="2"></td>
                                 <td class="bt-1" colspan="2">Total</td>
-                                <td class="text-right bt-1" colspan="1">{{car_value.total|floatformat:"2g"}}</td>
+                                <td class="text-right bt-1" colspan="1">{{car_value.total|natural_round}}</td>
                                 <td colspan="2"></td>
                             </tr>
                             <tr>
                                 <td colspan="2"></td>
                                 <td colspan="2">WDA @{{car_value.written_down_allowance_percentage}}%</td>
-                                <td class="text-right" colspan="1">{{car_value.written_down_allowance|floatformat:"2g"}}</td>
+                                <td class="text-right" colspan="1">{{car_value.written_down_allowance|natural_round}}</td>
                                 <td colspan="2"></td>
                             </tr>
                             <tr>
                                 <td colspan="2"></td>
                                 <td colspan="2">WDV c/fwd</td>
-                                <td class="text-right bt-1" colspan="1">{{car_value.written_down_value|floatformat:"2g"}}</td>
+                                <td class="text-right bt-1" colspan="1">{{car_value.written_down_value|natural_round}}</td>
                                 <td colspan="2"></td>
                             </tr>
                             
@@ -176,27 +176,27 @@
                             <tr>
                                 <td colspan="1"></td>
                                 <td colspan="5">Capital Allowance available</td>
-                                <td class="text-right" colspan="1">{{car_value.written_down_allowance|floatformat:"2g"}}</td>
+                                <td class="text-right" colspan="1">{{car_value.written_down_allowance|natural_round}}</td>
                             </tr>
                             <tr>
                                 <td colspan="1"></td>
                                 <td colspan="5">(Less):Personal Usages - {{car_value.personal_usage_percentage}}%</td>
-                                <td class="text-right" colspan="1">{{car_value.personal_usage|floatformat:"2g"}}</td>
+                                <td class="text-right" colspan="1">{{car_value.personal_usage|natural_round}}</td>
                             </tr>
                             <tr>
                                 <td colspan="2"></td>
                                 <td class="font-bolder bt-1" colspan="4">Capital Allowable Deduction</td>
-                                <td class="font-bolder bt-1 text-right"colspan="1">{{car_value.capital_allowance_deduction|floatformat:"2g"}}</td>
+                                <td class="font-bolder bt-1 text-right"colspan="1">{{car_value.capital_allowance_deduction|natural_round}}</td>
                             </tr>                    
                         </tbody>
                     </table>
                 {% endif %}
-                <h2 class="fs-11 font-bold d-f justify-between">Total Expenses <span>£{{selfemployment_total_expense_with_car_value|floatformat:"2g"}}</span></h2>
+                <h2 class="fs-11 font-bold d-f justify-between">Total Expenses <span>£{{selfemployment_total_expense_with_car_value|natural_round}}</span></h2>
                 {% if loss_brought_forward_from_previous_year > 0 %}
-                <h2 class="fs-11 font-bold d-f justify-between">Profit for the year <span>£{{profit_for_the_year|floatformat:"2g"}}</span></h2>
-                    <h2 class="fs-11 font-bold d-f justify-between">Loss B/f for {{tax_year_prev_prev}}-{{tax_year_prev}} <span>£-{{loss_brought_forward_from_previous_year|floatformat:"2g"}}</span></h2>
+                <h2 class="fs-11 font-bold d-f justify-between">Profit for the year <span>£{{profit_for_the_year|natural_round}}</span></h2>
+                    <h2 class="fs-11 font-bold d-f justify-between">Loss B/f for {{tax_year_prev_prev}}-{{tax_year_prev}} <span>£-{{loss_brought_forward_from_previous_year|natural_round}}</span></h2>
                 {% endif %}
-                <h2 class="fs-11 font-bold d-f justify-between doubble-underline">Net {% if selfemployment_is_loss %}Loss{% else %}Profit{% endif %} for the year <span>£{{selfemployment_net_profit|floatformat:"2g"}}</span></h2>
+                <h2 class="fs-11 font-bold d-f justify-between doubble-underline">Net {% if selfemployment_is_loss %}Loss{% else %}Profit{% endif %} for the year <span>£{{selfemployment_net_profit|natural_round}}</span></h2>
             </section>
         </section>
     </article>
@@ -242,13 +242,13 @@
                             <td colspan='1'></td>
                             <td colspan='2'>Selfemployment net {% if selfemployment_is_loss %}loss{% else %}profit{% endif %}</td>
                             <td colspan='1'></td>
-                            <td colspan='1' text-right>{{selfemployment_net_profit|floatformat:"2g"}}</td>
+                            <td colspan='1' text-right>{{selfemployment_net_profit|natural_round}}</td>
                         </tr>
                         <tr>
                             <td colspan='2'></td>
                             <td colspan='1'>Total income</td>
                             <td colspan='1'></td>
-                            <td  class="bt-1 pt-1 pl-2" colspan='1' text-right>{{tax_calc.income.total_income|floatformat:"2g"}}</td>
+                            <td  class="bt-1 pt-1 pl-2" colspan='1' text-right>{{tax_calc.income.total_income|natural_round}}</td>
                         </tr>
                         
                         <tr>
@@ -260,7 +260,7 @@
                             <td colspan='1'></td>
                             <td colspan='2'>Personal Allowance</td>
                             <td colspan='1'></td>
-                            <td colspan='1' text-right>{{tax_calc.income.reduced_personal_allowance|floatformat:"2g"}}</td>
+                            <td colspan='1' text-right>{{tax_calc.income.reduced_personal_allowance|natural_round}}</td>
                         </tr>
                         
                         <tr>
@@ -272,7 +272,7 @@
                     <tfoot>
                         <tr class="font-bolder underline">
                             <td colspan="4">Taxable Income for {{tax_year_prev}}/{{tax_year_next}}</td>
-                            <td colspan="1" text-right>{{tax_calc.income.taxable_income|floatformat:"2g"}}</td>
+                            <td colspan="1" text-right>{{tax_calc.income.taxable_income|natural_round}}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -297,17 +297,17 @@
                         {% for tax in tax_calc.uk_tax.details %}
                             <tr>
                                 <td colspan="2"></td>
-                                <td colspan="1" class='text-right'>{{tax.applied_on|floatformat:"2g"}}</td>
+                                <td colspan="1" class='text-right'>{{tax.applied_on|natural_round}}</td>
                                 <td colspan="1" class="text-right pr-5">at</td>
-                                <td colspan="1">{{tax.rate|floatformat:"2g"}}%</td>
-                                <td colspan="1" class='text-right'>{{tax.amount|floatformat:"2g"}}</td>
+                                <td colspan="1">{{tax.rate|natural_round}}%</td>
+                                <td colspan="1" class='text-right'>{{tax.amount|natural_round}}</td>
                                 <td colspan="1"></td>
                             </tr>
                         {% endfor %}
                         <tr class="font-bolder">
                             <td colspan="3"></td>
                             <td colspan="3" text-right>Tax Liability</td>
-                            <td colspan="1" class="pl-5 text-right">{{tax_calc.uk_tax.total|floatformat:"2g"}}</td>
+                            <td colspan="1" class="pl-5 text-right">{{tax_calc.uk_tax.total|natural_round}}</td>
                         </tr>
 
                         <tr>
@@ -322,17 +322,17 @@
                         {% for tax in tax_calc.class_4.details %}
                             <tr>
                                 <td colspan="2"></td>
-                                <td colspan="1" class='text-right'>{{tax.applied_on|floatformat:"2g"}}</td>
+                                <td colspan="1" class='text-right'>{{tax.applied_on|natural_round}}</td>
                                 <td colspan="1" class="text-right pr-5">at</td>
-                                <td colspan="1">{{tax.rate|floatformat:"2g"}}%</td>
-                                <td colspan="1" class='text-right'>{{tax.amount|floatformat:"2g"}}</td>
+                                <td colspan="1">{{tax.rate|natural_round}}%</td>
+                                <td colspan="1" class='text-right'>{{tax.amount|natural_round}}</td>
                                 <td colspan="1"></td>
                             </tr>
                         {% endfor %}
                         <tr class="font-bolder">
                             <td colspan="3"></td>
                             <td colspan="3" text-right>Plus Class 4 NIC</td>
-                            <td colspan="1" class="pl-5 text-right">{{tax_calc.class_4.total|floatformat:"2g"}}</td>
+                            <td colspan="1" class="pl-5 text-right">{{tax_calc.class_4.total|natural_round}}</td>
                         </tr>
 
                         <tr>
@@ -345,8 +345,8 @@
                         </tr>
                         <tr>
                             <td colspan="2"></td>
-                            <td colspan="4">Plus Class 2 NIC <span class="color-red">(Earning Above £{{tax_calc.class_2.earning_limit|floatformat:"2g"}})</span></td>
-                            <td colspan="1" class="text-right font-bolder">{{tax_calc.class_2.total|floatformat:"2g"}}</td>
+                            <td colspan="4">Plus Class 2 NIC <span class="color-red">(Earning Above £{{tax_calc.class_2.earning_limit|natural_round}})</span></td>
+                            <td colspan="1" class="text-right font-bolder">{{tax_calc.class_2.total|natural_round}}</td>
                         </tr>
                     </tbody>
                     <tfoot>
@@ -356,7 +356,7 @@
                         </tr>
                         <tr class="font-bolder">
                             <td colspan="6">Income Tax &amp; NIC</td>
-                            <td colspan="1" class="pl-5 text-right">{{tax_calc.total_tax|floatformat:"2g"}}</td>
+                            <td colspan="1" class="pl-5 text-right">{{tax_calc.total_tax|natural_round}}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -374,7 +374,7 @@
                             <tr>
                                 <td colspan="1"></td>
                                 <td colspan="1">{{taxable_income.taxable_income_source.name}}</td>
-                                <td colspan="1" class="text-right">{{taxable_income.paid_income_tax_amount|floatformat:"2g"}}</td>
+                                <td colspan="1" class="text-right">{{taxable_income.paid_income_tax_amount|natural_round}}</td>
                                 <td colspan="1"></td>
                             </tr>
                         {% endfor %}
@@ -391,7 +391,7 @@
                         </tr>
                         <tr class="font-bolder doubble-underline">
                             <td colspan="3">TAX AND CLASS 2 &amp; 4 NIC DUE</td>
-                            <td colspan="1" class="text-right">{{tax_calc.total_tax_due|floatformat:"2g"}}</td>
+                            <td colspan="1" class="text-right">{{tax_calc.total_tax_due|natural_round}}</td>
                         </tr>
                     </tfoot>
                 </table>

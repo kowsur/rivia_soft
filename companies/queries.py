@@ -226,6 +226,7 @@ def db_search_Limited(search_text: str, limit=-1):
             Q(HMRC_referance__icontains                = search_text) |\
             Q(UTR__icontains                           = search_text) |\
             Q(NINO__icontains                          = search_text) |\
+            Q(vat__icontains                           = search_text) |\
             Q(gateway_id__icontains                    = search_text) |\
             Q(gateway_password__icontains              = search_text) |\
             Q(bank_name__icontains                     = search_text) |\

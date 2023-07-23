@@ -1519,6 +1519,7 @@ def home_limited(request):
     'director_email',
     'UTR',
     'NINO',
+    "vat",
     "created_by",
     "date_of_registration"
   ]

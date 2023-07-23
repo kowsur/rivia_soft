@@ -1753,7 +1753,7 @@ def export_limited(request):
     content_type='text/csv',
     headers={'Content-Disposition': f'attachment; filename="limited_{timezone.localtime()}.csv"'},
   )
-  include_fields = ['is_active', 'is_payroll', 'payment_method', 'client_file_number', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent']
+  include_fields = ['is_active', 'is_payroll', 'payment_method', 'client_file_number', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'director_phone_number', 'director_email', 'UTR', 'NINO', 'HMRC_agent', 'vat']
   exclude_fields = ['client_id',]
   keep_include_fields = True
   show_others = False

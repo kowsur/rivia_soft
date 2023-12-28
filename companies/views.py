@@ -140,7 +140,9 @@ def get_selfassesment_where_Client_IS_ACTIVE():
 def get_selfassesment_where_Client_IS_INACTIVE():
   return Selfassesment.objects.filter(is_active=False)
 
-def get_selfassesment_which_are_not_added_in_selfassesment_account_submission(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year()):
+def get_selfassesment_which_are_not_added_in_selfassesment_account_submission(tax_year=None):
+  if tax_year==None:
+    tax_year = SelfassesmentAccountSubmissionTaxYear.get_max_year()
   selfassesment_account_submission_created_for_selfassesments = SelfassesmentAccountSubmission.objects.filter(tax_year=tax_year)
   return Selfassesment.objects.exclude(pk__in=Subquery(selfassesment_account_submission_created_for_selfassesments.values('client_id')))
 
@@ -862,7 +864,9 @@ def get_selfassesment_account_submissions_where_status_ASSIGNED_TO_ME(user):
 def get_selfassesment_account_submissions_where_status_NOT_ASSIGNED():
   return SelfassesmentAccountSubmission.objects.filter(assigned_to=None)
 
-def get_selfassesment_account_submissions_where_data_collected(tax_year=SelfassesmentAccountSubmissionTaxYear.get_max_year()):
+def get_selfassesment_account_submissions_where_data_collected(tax_year=None):
+  if tax_year == None:
+    tax_year = SelfassesmentAccountSubmissionTaxYear.get_max_year()
   collected_data_for_clients_for_current_year = SelfemploymentIncomeAndExpensesDataCollection.objects.filter(tax_year=tax_year)
   return SelfassesmentAccountSubmission.objects.filter(tax_year=tax_year, client_id__in=Subquery(collected_data_for_clients_for_current_year.values('selfassesment__pk')))
 

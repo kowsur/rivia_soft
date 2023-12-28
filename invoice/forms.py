@@ -10,6 +10,7 @@ from companies.fields import SearchableModelField, Select, Fieldset
 
 from .models import Invoice, Transaction, InvoiceItem, Company
 
+# dummy import
 # Uncomment the following line before database migrations
 # from .dummy_class import *
 

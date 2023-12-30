@@ -30,6 +30,7 @@ def export_to_csv(
       # 'fk_field_name_in_model': ['referenced_model_field_names']
     },
     write_header_row=True,
+    records=None
     ):
   model_fields = get_field_names_from_model(django_model)
   writer = csv.writer(write_to)
@@ -79,7 +80,8 @@ def export_to_csv(
     writer.writerow(header)
   del(header)
 
-  records = django_model.objects.all()
+  if records is None:
+    records = django_model.objects.all()
   for record in records:
     row = []
     for column in columns:

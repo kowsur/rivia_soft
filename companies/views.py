@@ -792,6 +792,17 @@ def all_selfassesment_data_collection(request, limit:int=-1):
   message="Sorry! You are not authorized to export this.",
   redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_home_name)
 def export_selfassesment_data_collection(request):
+  tax_year_id = request.GET.get('tax_year', None)
+  if tax_year_id:
+    try:
+      tax_year_id = int(tax_year_id)
+    except ValueError:
+      tax_year_id = None
+  django_model = SelfemploymentIncomeAndExpensesDataCollection
+  data_to_export = django_model.objects.all()
+  if tax_year_id:
+    data_to_export = data_to_export.filter(tax_year=tax_year_id)
+
   response = HttpResponse(
     content_type='text/csv',
     headers={'Content-Disposition': f'attachment; filename="selfassesment_{timezone.localtime()}.csv"'},
@@ -805,13 +816,14 @@ def export_selfassesment_data_collection(request):
   keep_include_fields = True
   show_others = True
   export_to_csv(
-    django_model = SelfemploymentIncomeAndExpensesDataCollection,
+    django_model = django_model,
     write_to = response,
     include_fields = include_fields,
     exclude_fields = exclude_fields,
     keep_include_fields = keep_include_fields,
     show_others = show_others,
-    fk_fields=fk_fields
+    fk_fields=fk_fields,
+    records=data_to_export
     )
   return response
 
@@ -1158,6 +1170,17 @@ SELFASSESMENT_FK_FIELDS_TO_EXPORT.remove('client_name')
   message="Sorry! You are not authorized to export this.",
   redirect_to=URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Account_Submission_home_name)
 def export_selfassesment_account_submission(request):
+  tax_year_id = request.GET.get('tax_year', None)
+  if tax_year_id:
+    try:
+      tax_year_id = int(tax_year_id)
+    except ValueError:
+      tax_year_id = None
+  django_model = SelfassesmentAccountSubmission
+  data_to_export = django_model.objects.all()
+  if tax_year_id:
+    data_to_export = data_to_export.filter(tax_year=tax_year_id)
+  
   response = HttpResponse(
     content_type='text/csv',
     headers={'Content-Disposition': f'attachment; filename="selfassesment_account_submimssion_{timezone.localtime()}.csv"'},
@@ -1176,13 +1199,14 @@ def export_selfassesment_account_submission(request):
   keep_include_fields = True
   show_others = True
   export_to_csv(
-    django_model = SelfassesmentAccountSubmission,
+    django_model = django_model,
     write_to = response,
     include_fields = include_fields,
     exclude_fields = exclude_fields,
     keep_include_fields = keep_include_fields,
     show_others = show_others,
-    fk_fields = fk_fields
+    fk_fields = fk_fields,
+    records=data_to_export
     )
   return response
 

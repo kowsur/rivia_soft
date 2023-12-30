@@ -78,3 +78,24 @@ if (tasks){
 //   let reloadBtn = document.querySelector(".action.action-reload")
 //   reloadBtn.click()
 // }
+
+
+// ================================================================================================
+// Handle export for pages which has tax year input beside search bar
+let exportBtn = document.querySelector(".action-export")
+let exportAnchor = exportBtn.querySelector("a")
+if (tax_year_select_input!=null){
+  exportBtn.addEventListener('click', async (event) => {
+    if (exportAnchor.hasAttribute('do-not-prevent-default')) {
+      exportAnchor.removeAttribute('do-not-prevent-default')
+      return
+    }
+    event.preventDefault()
+    let tax_year = tax_year_select_input.value
+    let url = new URL(exportAnchor.href)
+    url.searchParams.set('tax_year', tax_year)
+    exportAnchor.href = url.href
+    exportAnchor.setAttribute('do-not-prevent-default', '')
+    exportAnchor.click()
+  })
+}

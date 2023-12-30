@@ -1,5 +1,6 @@
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
+from datetime import date
 
 import json
 from django.http.response import Http404, HttpResponse
@@ -2170,7 +2171,7 @@ def get_limited_submissions_where_company_house_deadline_missed_of_inactive_clie
   return LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(HMRC_deadline__lt = timezone.now(), is_submitted=False, client_id__is_active=False)
 
 def get_limited_submissions_where_HMRC_deadline_missed():
-  return LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(our_deadline__lt = timezone.now(), is_submitted=False)
+  return LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(our_deadline__lt = timezone.now(), is_submitted_hmrc=False)
 
 def get_limited_submission_where_period_end(limit=-1):
   records = LimitedSubmissionDeadlineTracker.ordered_manager.ordered_filter(period__lt = timezone.now(), is_submitted=False)
@@ -2326,7 +2327,12 @@ def update_limited_submission_deadline_tracker(request, submission_id:int):
         assesment.submitted_by_hmrc = None
         assesment.save()
 
-      does_newer_record_already_exist = LimitedSubmissionDeadlineTracker.objects.filter(client_id=record.client_id, period_start_date__gt=record.period_start_date).exists()
+      # Create new record for next year
+      d = assesment.period_start_date
+      if d == None:
+        d = date.today()
+      # Check if record already exists for next year
+      does_newer_record_already_exist = LimitedSubmissionDeadlineTracker.objects.filter(client_id=assesment.client_id, period_start_date__gt=d).exists()
       if (assesment.is_submitted and assesment.is_submitted_hmrc) and not does_newer_record_already_exist:
         new_assesment = LimitedSubmissionDeadlineTracker()
         new_assesment.client_id = assesment.client_id
@@ -2334,7 +2340,7 @@ def update_limited_submission_deadline_tracker(request, submission_id:int):
         new_assesment.HMRC_deadline = assesment.HMRC_deadline + relativedelta(years=1) # Compnay House deadline
         new_assesment.our_deadline = assesment.our_deadline + relativedelta(years=1) # HMRC Deadline
         new_assesment.period_start_date = assesment.period + relativedelta(days=1) # Period Start
-        new_assesment.period = assesment.period + relativedelta(years=1) # Period End
+        new_assesment.period = assesment.period + relativedelta(years=1, days=1) # Period End
         new_assesment.save()
         messages.success(request, f'New Limited Submission Deadline Tracker has been created {new_assesment}')
         return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)
@@ -2562,6 +2568,8 @@ def update_limited_vat_tracker(request, vat_id:int):
         vat = LimitedVATTracker()
         vat.client_id = assesment.client_id
         vat.updated_by = request.user
+        vat.period_start = assesment.period_end + relativedelta(days=1)
+        vat.period_end = assesment.period_end + relativedelta(assesment.period_end + relativedelta(days=1), assesment.period_start)
         vat.save()
         messages.success(request, f'New Limited VAT Tracker has been created {vat}')
 

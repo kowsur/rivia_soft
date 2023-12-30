@@ -2326,7 +2326,8 @@ def update_limited_submission_deadline_tracker(request, submission_id:int):
         assesment.submitted_by_hmrc = None
         assesment.save()
 
-      if assesment.is_submitted and assesment.is_submitted_hmrc:
+      does_newer_record_already_exist = LimitedSubmissionDeadlineTracker.objects.filter(client_id=record.client_id, period_start_date__gt=record.period_start_date).exists()
+      if (assesment.is_submitted and assesment.is_submitted_hmrc) and not does_newer_record_already_exist:
         new_assesment = LimitedSubmissionDeadlineTracker()
         new_assesment.client_id = assesment.client_id
         new_assesment.updated_by = request.user

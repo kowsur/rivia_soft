@@ -35,6 +35,7 @@ with open(CONFIG_FILE_PATH, 'r') as CONFIG_FILE:
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = CONFIG['DEBUG']
+WANT_TO_MIGRATE = False
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Database

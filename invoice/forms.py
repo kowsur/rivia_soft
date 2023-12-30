@@ -10,9 +10,12 @@ from companies.fields import SearchableModelField, Select, Fieldset
 
 from .models import Invoice, Transaction, InvoiceItem, Company
 
+from django.conf import settings
+
 # dummy import
 # Uncomment the following line before database migrations
-# from .dummy_class import *
+if settings.WANT_TO_MIGRATE:
+    from .dummy_class import *
 
 
 def get_date_today(date_format = '%Y-%m-%d'):

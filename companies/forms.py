@@ -18,9 +18,12 @@ from .models import Limited, LimitedTracker, LimitedSubmissionDeadlineTracker, L
 
 from .repr_formats import Forms
 
+from django.conf import settings
+
 # dummy import
 # uncomment next line before migrating
-# from .dummy_class import *
+if settings.WANT_TO_MIGRATE:
+    from .dummy_class import *
 
 
 from users.models import CustomUser

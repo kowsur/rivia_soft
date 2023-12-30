@@ -5,10 +5,13 @@ from typing import *
 from dataclasses import dataclass, field
 from collections import namedtuple
 from django.db.models.query import QuerySet
+from django.conf import settings
+
 
 # dummy import
 # uncomment next line before migrating
-# from .dummy_class import *
+if settings.WANT_TO_MIGRATE:
+    from .dummy_class import *
 
 @dataclass
 class Fieldset:

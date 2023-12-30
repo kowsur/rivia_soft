@@ -90,7 +90,7 @@ dayjs.extend(window.dayjs_plugin_customParseFormat)
 // datetime format
 const time_zone = Intl.DateTimeFormat().resolvedOptions().timeZone // get user timezone
 const time_format = "HH:mm"
-const date_format = "YYYY-MM-DD"
+const date_format = "DD-MM-YYYY"
 const datetime_format = `${date_format} ${time_format}`
 
 const search_date_format = "YYYY-MM-DD"

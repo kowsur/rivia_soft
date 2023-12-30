@@ -2587,8 +2587,14 @@ def update_limited_vat_tracker(request, vat_id:int):
       assesment.set_defaults(request)
       assesment.save()
       
+      # Create new record for next year
+      d = assesment.period_start
+      if d == None:
+        d = date.today()
+      # Check if record already exists for next year
+      does_newer_record_already_exist = LimitedVATTracker.objects.filter(client_id=assesment.client_id, period_start__gt=d).exists()
       # Create Limited VAT Tracker
-      if assesment.is_submitted:
+      if assesment.is_submitted and not does_newer_record_already_exist:
         vat = LimitedVATTracker()
         vat.client_id = assesment.client_id
         vat.updated_by = request.user

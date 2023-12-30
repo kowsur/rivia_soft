@@ -152,7 +152,7 @@ def home_selfassesment(request):
   current_tax_year = SelfassesmentAccountSubmissionTaxYear.get_max_year()
   pk_field = 'client_id'
   exclude_fields = []
-  include_fields = ['client_rating', 'client_name', 'client_file_number', 'is_active', 'start_date', 'HMRC_agent', 'incomplete_tasks', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', "created_by", "date_of_registration"]
+  include_fields = ['client_rating', 'client_name', 'client_file_number', 'is_active', 'start_date', 'HMRC_agent', 'incomplete_tasks', 'personal_phone_number', 'personal_email', 'UTR', 'NINO', "created_by", "date_of_registration", 'driving_license_expiry_date', 'passport_expiry_date', ]
   keep_include_fields = True
   show_others = False
   model_fields = get_field_names_from_model(Selfassesment)

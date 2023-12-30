@@ -49,6 +49,14 @@ class SelfassesmentCreationForm(forms.ModelForm):
         required=False,
         widget=forms.DateInput(attrs={'type': 'date',})
     )
+    driving_license_expiry_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date',})
+    )
+    passport_expiry_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date',})
+    )
 
     class Meta:
         model = Selfassesment
@@ -72,6 +80,8 @@ class SelfassesmentCreationForm(forms.ModelForm):
             'personal_email',
             'personal_address',
             'personal_post_code',
+            'driving_license_expiry_date',
+            'passport_expiry_date',
 
             'AOR_number',
             'business_phone_number',
@@ -98,7 +108,7 @@ class SelfassesmentCreationForm(forms.ModelForm):
                 ),
             Fieldset(
                 title = 'Personal Info',
-                fields = ('date_of_birth', 'personal_phone_number', 'personal_email', 'personal_address', 'personal_post_code', )
+                fields = ('date_of_birth', 'personal_phone_number', 'personal_email', 'personal_address', 'personal_post_code', 'driving_license_expiry_date', 'passport_expiry_date', )
                 ),
             Fieldset(
                 title = 'HMRC Details',
@@ -129,6 +139,14 @@ class SelfassesmentChangeForm(forms.ModelForm):
         required=False,
         widget=forms.DateInput(attrs={'type': 'date',})
     )
+    driving_license_expiry_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date',})
+    )
+    passport_expiry_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date',})
+    )
     
     class Meta:
         model = Selfassesment
@@ -152,6 +170,8 @@ class SelfassesmentChangeForm(forms.ModelForm):
             'personal_email',
             'personal_address',
             'personal_post_code',
+            'driving_license_expiry_date',
+            'passport_expiry_date',
 
             'AOR_number',
             'business_phone_number',
@@ -178,7 +198,7 @@ class SelfassesmentChangeForm(forms.ModelForm):
                 ),
             Fieldset(
                 title = 'Personal Info',
-                fields = ('date_of_birth', 'personal_phone_number', 'personal_email', 'personal_address', 'personal_post_code', )
+                fields = ('date_of_birth', 'personal_phone_number', 'personal_email', 'personal_address', 'personal_post_code', 'driving_license_expiry_date', 'passport_expiry_date',)
                 ),
             Fieldset(
                 title = 'HMRC Details',

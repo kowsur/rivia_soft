@@ -102,6 +102,10 @@ class Selfassesment(models.Model):
     personal_post_code =models.CharField(verbose_name='Personal Postal Code', max_length=10, blank=True, null=True)
     gateway_id = models.CharField(verbose_name='Personal Gateway ID', max_length=255, blank=True, null=True, unique=True)
     gateway_password = models.CharField(verbose_name='Gateway Password', max_length=255, blank=True, null=True)
+    # driving_license_number = models.CharField(verbose_name='Driving License Number', max_length=255, blank=True, null=True, unique=True)
+    driving_license_expiry_date = models.DateField(verbose_name='Driving License Expiry Date', blank=True, null=True)
+    # passport_number = models.CharField(verbose_name='Passport Number', max_length=255, blank=True, null=True, unique=True)
+    passport_expiry_date = models.DateField(verbose_name='Passport Expiry Date', blank=True, null=True)
     
     # Business Info
     AOR_number = models.CharField(verbose_name='Account Office Reference number', max_length=511, blank=True, null=True, db_index=True)

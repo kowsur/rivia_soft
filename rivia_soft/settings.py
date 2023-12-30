@@ -14,9 +14,13 @@ from pathlib import Path
 from companies.url_variables import URL_NAMES_PREFIXED_WITH_APP_NAME
 from socket import gethostname, gethostbyname
 from json import loads
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+if os.name == 'nt':
+    os.add_dll_directory(r"C:\msys64\mingw64\bin")
 
 # config file for production
 CONFIG_FILE_NAME = 'config.json'
@@ -151,9 +155,9 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
-# STATICFILES_DIRS = [
-#     BASE_DIR / 'staticfiles'
-# ]
+STATICFILES_DIRS = [
+    # BASE_DIR / 'staticfiles'
+]
 
 # Custom User Model
 AUTH_USER_MODEL = 'users.CustomUser'

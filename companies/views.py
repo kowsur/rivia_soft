@@ -147,6 +147,16 @@ def get_selfassesment_which_are_not_added_in_selfassesment_account_submission(ta
   selfassesment_account_submission_created_for_selfassesments = SelfassesmentAccountSubmission.objects.filter(tax_year=tax_year)
   return Selfassesment.objects.exclude(pk__in=Subquery(selfassesment_account_submission_created_for_selfassesments.values('client_id')))
 
+def get_selfassesment_where_driving_license_expiry_date_is_less_than_3_months():
+  return Selfassesment.objects.filter(driving_license_expiry_date__gte=timezone.now()).filter(driving_license_expiry_date__lte=timezone.now()+relativedelta(months=3))
+def get_selfassesment_where_passport_expiry_date_is_less_than_3_months():
+  return Selfassesment.objects.filter(passport_expiry_date__gte=timezone.now()).filter(passport_expiry_date__lte=timezone.now()+relativedelta(months=3))
+
+def get_selfassesment_where_driving_license_expired():
+  return Selfassesment.objects.filter(driving_license_expiry_date__lte=timezone.now())
+def get_selfassesment_where_passport_expired():
+  return Selfassesment.objects.filter(passport_expiry_date__lte=timezone.now())
+
 
 @login_required
 def home_selfassesment(request):
@@ -176,6 +186,10 @@ def home_selfassesment(request):
     "selfassesment_Client_IS_ACTIVE": get_selfassesment_where_Client_IS_ACTIVE().count(),
     "selfassesment_Client_IS_INACTIVE": get_selfassesment_where_Client_IS_INACTIVE().count(),
     "selfassesment_not_added_in_selfassesment_account_submission": get_selfassesment_which_are_not_added_in_selfassesment_account_submission(tax_year=current_tax_year).count(),
+    "selfassesment_where_driving_license_expiry_date_is_less_than_3_months": get_selfassesment_where_driving_license_expiry_date_is_less_than_3_months().count(),
+    "selfassesment_where_passport_expiry_date_is_less_than_3_months": get_selfassesment_where_passport_expiry_date_is_less_than_3_months().count(),
+    "selfassesment_where_driving_license_expired": get_selfassesment_where_driving_license_expired().count(),
+    "selfassesment_where_passport_expired": get_selfassesment_where_passport_expired().count(),
 
     'frontend_data':{
       'all_url': Full_URL_PATHS_WITHOUT_ARGUMENTS.Selfassesment_viewall_url,
@@ -400,6 +414,10 @@ def search_selfassesment(request, limit: int=-1):
         "selfassesment_Client_IS_ACTIVE": get_selfassesment_where_Client_IS_ACTIVE(),
         "selfassesment_Client_IS_INACTIVE": get_selfassesment_where_Client_IS_INACTIVE(),
         "selfassesment_not_added_in_selfassesment_account_submission": get_selfassesment_which_are_not_added_in_selfassesment_account_submission(tax_year=current_tax_year),
+        "selfassesment_where_driving_license_expiry_date_is_less_than_3_months": get_selfassesment_where_driving_license_expiry_date_is_less_than_3_months(),
+        "selfassesment_where_passport_expiry_date_is_less_than_3_months": get_selfassesment_where_passport_expiry_date_is_less_than_3_months(),
+        "selfassesment_where_driving_license_expired": get_selfassesment_where_driving_license_expired(),
+        "selfassesment_where_passport_expired": get_selfassesment_where_passport_expired(),
       }
       records = tasks.get(request.GET.get('tasks'), [])
       data = serialize(queryset=records, format='json')

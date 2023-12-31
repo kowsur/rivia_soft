@@ -87,6 +87,21 @@
           <span id="task-count">{{ selfassesment_not_added_in_selfassesment_account_submission }}</span>
           <span class="task-tooltip">Selfssesments not added in Selfassesment Account Submission for current tax year</span>
         </span>
+        <span class="task task-issue" data-tasks='selfassesment_where_driving_license_expiry_date_is_less_than_3_months'>
+          <span id="task-count">{{ selfassesment_where_driving_license_expiry_date_is_less_than_3_months }}</span>
+          <span class="task-tooltip">Driving license will expire in less than 3 months</span>
+        </span>
+        <span class="task task-issue" data-tasks='selfassesment_where_passport_expiry_date_is_less_than_3_months'>
+          <span id="task-count">{{ selfassesment_where_passport_expiry_date_is_less_than_3_months }}</span>
+          <span class="task-tooltip">Passport will expire in less than 3 months</span>
+        </span>
+        <span class="task task-previous" data-tasks='selfassesment_where_driving_license_expired'>
+          <span id="task-count">{{ selfassesment_where_driving_license_expired }}</span>
+          <span class="task-tooltip">Driving license has expired</span>
+        </span>
+        <span class="task task-previous" data-tasks='selfassesment_where_passport_expired'>
+          <span id="task-count">{{ selfassesment_where_passport_expired }}</span>
+          <span class="task-tooltip">Passport has expired</span>
       </div>
     {% elif selfassesment_account_submission_counts %}
       <div class="task-container">

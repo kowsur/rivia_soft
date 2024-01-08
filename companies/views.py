@@ -2382,7 +2382,7 @@ def update_limited_submission_deadline_tracker(request, submission_id:int):
         new_assesment.HMRC_deadline = assesment.HMRC_deadline + relativedelta(years=1) # Compnay House deadline
         new_assesment.our_deadline = assesment.our_deadline + relativedelta(years=1) # HMRC Deadline
         new_assesment.period_start_date = assesment.period + relativedelta(days=1) # Period Start
-        new_assesment.period = assesment.period + relativedelta(years=1, days=1) # Period End
+        new_assesment.period = assesment.period + relativedelta(years=1) # Period End
         new_assesment.save()
         messages.success(request, f'New Limited Submission Deadline Tracker has been created {new_assesment}')
         return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Limited_Submission_Deadline_Tracker_home_name)

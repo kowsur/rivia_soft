@@ -143,7 +143,7 @@ export async function fetch_url({
 			!cache_url_match_rules.some((rule) => rule.test(url))
 		) {
 			let response = await fetch(request); // none of the rules matched, do not cache
-			catchErrorAndLog(hideLoadingIndicator);
+			// catchErrorAndLog(hideLoadingIndicator);
 			return response;
 		}
 
@@ -151,13 +151,13 @@ export async function fetch_url({
 		if (!API_CACHE) await evict_cache();
 		let response = await API_CACHE.match(request);
 		if (response) {
-			catchErrorAndLog(hideLoadingIndicator);
+			// catchErrorAndLog(hideLoadingIndicator);
 			return response;
 		}
 		// not found in cache so fetch from server
 		response = await fetch(request);
 		API_CACHE.put(request, response.clone());
-		catchErrorAndLog(hideLoadingIndicator);
+		// catchErrorAndLog(hideLoadingIndicator);
 		return response;
 	} else {
 		// send other requests
@@ -170,7 +170,7 @@ export async function fetch_url({
 					: JSON.stringify(data_object),
 			...others,
 		});
-		catchErrorAndLog(hideLoadingIndicator);
+		// catchErrorAndLog(hideLoadingIndicator);
 		return response;
 	}
 }

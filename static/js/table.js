@@ -10,6 +10,7 @@ const ObserverCallback = (entries, observer) => {
 
 const OBSERVER = new IntersectionObserver(ObserverCallback, {
 	root: null, // Root element, null means the browser viewport
+  rootMargin: "200px 0px 200px 0px", // Margin around the root
 	threshold: 0, // Trigger the callback when 100% of the target is visible
 });
 

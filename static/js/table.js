@@ -1,8 +1,6 @@
 import DATA from './parse_data.js'
 import { fetch_url } from './fetch_data.js';
 import { makeSafeHTML, URL_HasQueryParams, dateFormat } from './utilities.js';
-//Cache foriegn key fields
-const CACHE = {}
 
 let CLIENT_RATING_FIELDS = [
   {
@@ -154,20 +152,10 @@ export async function populate_with_foreign_data(td, field, field_data, data){
     url: data_url,
     req_method: 'GET'
   }
-  if (!CACHE[data_url]){
-    CACHE[data_url] = "FETCHING"
-    let resp = await fetch_url(kwargs).then(response => response.json())
-    CACHE[data_url] = resp
-  }
-  if (CACHE[data_url]==="FETCHING"){
-    setTimeout(()=>{
-      populate_with_foreign_data(td, field, field_data, data)
-    }, 450)
-    return 
-  }
+  let resp = await fetch_url(kwargs).then(response => response.json())
   
-  let string = repr_format.formatMultiplication(CACHE[data_url])
-  string = string.format(CACHE[data_url])
+  let string = repr_format.formatMultiplication(resp)
+  string = string.format(resp)
   
   td.textContent = string
   td.removeAttribute('data-url')

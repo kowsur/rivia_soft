@@ -61,14 +61,14 @@ export async function db_search_records_client_id(
 
 function cache_duration_calc({
 	hours = 0,
-	minutes = 20,
+	minutes = 0,
 	seconds = 0,
 	milliseconds = 0,
 }) {
 	return (hours * 60 * 60 + minutes * 60 + seconds) * 1000 + milliseconds;
 }
 let API_CACHE = null;
-let cache_duration_obj = { hours: 1, minutes: 30 };
+let cache_duration_obj = { hours: 3 };
 const max_cache_duration = cache_duration_calc(cache_duration_obj);
 
 async function evict_cache() {

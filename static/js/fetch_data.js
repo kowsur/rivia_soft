@@ -72,15 +72,15 @@ let cache_duration_obj = { hours: 3 };
 const max_cache_duration = cache_duration_calc(cache_duration_obj);
 
 async function evict_cache() {
+	if (API_CACHE !== null) return;
+
 	let keys = await caches.keys();
-
 	let new_key = new Date().getTime();
-
 	let keys_to_number = keys.map((key) => Number(key)).sort((a, b) => a - b);
+
 	let is_latest_key_valid =
 		new Date().getTime() - keys_to_number[keys_to_number.length - 1] <
 		max_cache_duration;
-
 	if (is_latest_key_valid) {
 		// Reuse valid cache
 		new_key = keys_to_number.pop();

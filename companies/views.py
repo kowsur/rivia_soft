@@ -1550,6 +1550,7 @@ def home_limited(request):
     'client_rating',
     'client_name',
     'client_file_number',
+    'direct_debit_amount',
     # 'all_onboarding_tasks',
     'onboarding_tasks__status__Done',
     'onboarding_tasks__status__In_Progress',

@@ -161,7 +161,9 @@ export async function fetch_url({
 			return response;
 		}
 		// not found in cache so fetch from server
+		FETCHING_URLS.add(url);
 		response = await fetch(request);
+		FETCHING_URLS.delete(url);
 		API_CACHE.put(request, response.clone());
 		// catchErrorAndLog(hideLoadingIndicator);
 		return response;

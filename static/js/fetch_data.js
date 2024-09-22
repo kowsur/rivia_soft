@@ -112,6 +112,7 @@ await evict_cache();
 const CACHE_URL_MATCH_RULES = [RegExp("/details|/all|id=")];
 const NO_CACHE_URL_MATCH_RULES = [RegExp("/search")];
 const FETCHING_URLS = {};
+globalThis.FETCHING_URLS = FETCHING_URLS;
 const THROTTLE_DURATION_SAME_URL = cache_duration_calc({ seconds: 1 });
 
 export async function fetch_url({

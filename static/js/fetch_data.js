@@ -137,19 +137,17 @@ export async function fetch_url({
 			...others,
 		});
 
+		if (!cache_url_match_rules.some((rule) => rule.test(url)))
+			return await fetch(request); // none of the rules matched, do not cache
+		
 		// check if request is in cache
-		if (
-			API_CACHE !== null &&
-			cache_url_match_rules.some((rule) => rule.test(url))
-		) {
-			let response = await API_CACHE.match(request);
-			if (response) {
-				catchErrorAndLog(hideLoadingIndicator);
-				return response;
-			}
+		let response = await API_CACHE.match(request);
+		if (response) {
+			catchErrorAndLog(hideLoadingIndicator);
+			return response;
 		}
-
-		let response = await fetch(request);
+		// not found in cache so fetch from server
+		response = await fetch(request);
 		API_CACHE.put(request, response.clone());
 		catchErrorAndLog(hideLoadingIndicator);
 		return response;

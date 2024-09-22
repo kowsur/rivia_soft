@@ -109,9 +109,10 @@ await evict_cache();
 //   evict_cache();
 // }, max_cache_duration);
 
-const cache_url_match_rules = [RegExp("\/details|\/all|id=")];
-const no_cache_url_match_rules = [RegExp("/search")];
-const FETCHING_URLS = new Map()
+const CACHE_URL_MATCH_RULES = [RegExp("/details|/all|id=")];
+const NO_CACHE_URL_MATCH_RULES = [RegExp("/search")];
+const FETCHING_URLS = {};
+const THROTTLE_DURATION_SAME_URL = cache_duration_calc({ seconds: 1 });
 
 export async function fetch_url({
 	url,
@@ -141,31 +142,31 @@ export async function fetch_url({
 		});
 
 		if (
-			no_cache_url_match_rules.some((rule) => rule.test(url)) ||
-			!cache_url_match_rules.some((rule) => rule.test(url))
+			NO_CACHE_URL_MATCH_RULES.some((rule) => rule.test(url)) ||
+			!CACHE_URL_MATCH_RULES.some((rule) => rule.test(url))
 		) {
 			// none of the rules matched, do not cache
-			let response = await fetch(request); 
+			let response = await fetch(request);
 			// catchErrorAndLog(hideLoadingIndicator);
 			return response;
 		}
 
 		// check if request is in cache
 		if (!API_CACHE) await evict_cache();
-		while (FETCHING_URLS.has(url)) {
-			console.log("Waiting for fetch to complete...");
-			await sleep(9000);
-		}
+		while (FETCHING_URLS[url] === true) await sleep(THROTTLE_DURATION_SAME_URL);
+		if (FETCHING_URLS[url] === undefined) FETCHING_URLS[url] = true;
+		console.log(FETCHING_URLS);
+
 		let response = await API_CACHE.match(request);
 		if (response) {
 			// catchErrorAndLog(hideLoadingIndicator);
+			FETCHING_URLS[url] += 1;
 			return response;
 		}
 		// not found in cache so fetch from server
-		FETCHING_URLS.set(url);
 		response = await fetch(request);
-		FETCHING_URLS.delete(url);
 		API_CACHE.put(request, response.clone());
+		FETCHING_URLS[url] = 1;
 		// catchErrorAndLog(hideLoadingIndicator);
 		return response;
 	} else {
@@ -185,7 +186,7 @@ export async function fetch_url({
 }
 
 async function sleep(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
+	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // =============================================================================================================================

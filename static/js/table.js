@@ -4,14 +4,14 @@ import { makeSafeHTML, URL_HasQueryParams, dateFormat } from "./utilities.js";
 
 const ObserverCallback = (entries, observer) => {
 	entries.forEach((entry) => {
-		if (entry.isIntersecting) entry.target.onVisible();
+    if (entry.isIntersecting) entry.target.onVisible();
 	});
 };
 
 const OBSERVER = new IntersectionObserver(ObserverCallback, {
 	root: null, // Root element, null means the browser viewport
   rootMargin: "200px 0px 200px 0px", // Margin around the root
-	threshold: 0, // Trigger the callback when 100% of the target is visible
+	threshold: 0.005, // Trigger the callback when 100% of the target is visible
 });
 
 let CLIENT_RATING_FIELDS = [
@@ -114,7 +114,8 @@ export async function get_tr_for_table(
 			//this is a foreign key field. fetch the data and format it
 			// populate_with_foreign_data(td, field, field_data, data);
 			td.onVisible = () => {
-				OBSERVER.unobserve(td);
+        OBSERVER.unobserve(td);
+        td.onVisible = null;
 				populate_with_foreign_data(td, field, field_data, data);
 			};
 			OBSERVER.observe(td);

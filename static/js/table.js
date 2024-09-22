@@ -114,8 +114,8 @@ export async function get_tr_for_table(
 			//this is a foreign key field. fetch the data and format it
 			// populate_with_foreign_data(td, field, field_data, data);
 			td.onVisible = () => {
-				populate_with_foreign_data(td, field, field_data, data);
 				OBSERVER.unobserve(td);
+				populate_with_foreign_data(td, field, field_data, data);
 			};
 			OBSERVER.observe(td);
 			continue;

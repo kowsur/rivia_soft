@@ -109,7 +109,8 @@ await evict_cache();
 //   evict_cache();
 // }, max_cache_duration);
 
-const cache_url_match_rules = [RegExp("details|all|client_id=")];
+const cache_url_match_rules = [RegExp("\/details|\/all|id=")];
+const no_cache_url_match_rules = [RegExp("/search")];
 export async function fetch_url({
 	url,
 	req_method,
@@ -137,12 +138,15 @@ export async function fetch_url({
 			...others,
 		});
 
-		if (!cache_url_match_rules.some((rule) => rule.test(url))){
+		if (
+			no_cache_url_match_rules.some((rule) => rule.test(url)) ||
+			!cache_url_match_rules.some((rule) => rule.test(url))
+		) {
 			let response = await fetch(request); // none of the rules matched, do not cache
 			catchErrorAndLog(hideLoadingIndicator);
 			return response;
 		}
-		
+
 		// check if request is in cache
 		if (!API_CACHE) await evict_cache();
 		let response = await API_CACHE.match(request);

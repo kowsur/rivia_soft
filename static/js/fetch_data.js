@@ -111,6 +111,8 @@ await evict_cache();
 
 const cache_url_match_rules = [RegExp("\/details|\/all|id=")];
 const no_cache_url_match_rules = [RegExp("/search")];
+const FETCHING_URLS = new Set()
+
 export async function fetch_url({
 	url,
 	req_method,
@@ -118,7 +120,7 @@ export async function fetch_url({
 	headers = { "Content-Type": "application/json" },
 	others = {},
 }) {
-	catchErrorAndLog(showLoadingIndicator);
+	// catchErrorAndLog(showLoadingIndicator);
 	req_method = req_method.toUpperCase();
 	if (deepCompare(others, {})) {
 		others = {
@@ -142,13 +144,17 @@ export async function fetch_url({
 			no_cache_url_match_rules.some((rule) => rule.test(url)) ||
 			!cache_url_match_rules.some((rule) => rule.test(url))
 		) {
-			let response = await fetch(request); // none of the rules matched, do not cache
+			// none of the rules matched, do not cache
+			let response = await fetch(request); 
 			// catchErrorAndLog(hideLoadingIndicator);
 			return response;
 		}
 
 		// check if request is in cache
 		if (!API_CACHE) await evict_cache();
+		while (FETCHING_URLS.has(url)) {
+			await sleep(1200);
+		}
 		let response = await API_CACHE.match(request);
 		if (response) {
 			// catchErrorAndLog(hideLoadingIndicator);
@@ -173,6 +179,10 @@ export async function fetch_url({
 		// catchErrorAndLog(hideLoadingIndicator);
 		return response;
 	}
+}
+
+async function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // =============================================================================================================================

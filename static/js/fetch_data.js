@@ -111,7 +111,7 @@ await evict_cache();
 
 const cache_url_match_rules = [RegExp("\/details|\/all|id=")];
 const no_cache_url_match_rules = [RegExp("/search")];
-const FETCHING_URLS = new Set()
+const FETCHING_URLS = new Map()
 
 export async function fetch_url({
 	url,
@@ -161,7 +161,7 @@ export async function fetch_url({
 			return response;
 		}
 		// not found in cache so fetch from server
-		FETCHING_URLS.add(url);
+		FETCHING_URLS.set(url);
 		response = await fetch(request);
 		FETCHING_URLS.delete(url);
 		API_CACHE.put(request, response.clone());

@@ -121,7 +121,7 @@ export async function fetch_url({
 	headers = { "Content-Type": "application/json" },
 	others = {},
 }) {
-	// catchErrorAndLog(showLoadingIndicator);
+	catchErrorAndLog(showLoadingIndicator);
 	req_method = req_method.toUpperCase();
 	if (deepCompare(others, {})) {
 		others = {
@@ -147,7 +147,7 @@ export async function fetch_url({
 		) {
 			// none of the rules matched, do not cache
 			let response = await fetch(request);
-			// catchErrorAndLog(hideLoadingIndicator);
+			catchErrorAndLog(hideLoadingIndicator);
 			return response;
 		}
 
@@ -155,19 +155,18 @@ export async function fetch_url({
 		if (!API_CACHE) await evict_cache();
 		while (FETCHING_URLS[url] === true) await sleep(THROTTLE_DURATION_SAME_URL);
 		if (FETCHING_URLS[url] === undefined) FETCHING_URLS[url] = true;
-		console.log(FETCHING_URLS);
 
 		let response = await API_CACHE.match(request);
 		if (response) {
-			// catchErrorAndLog(hideLoadingIndicator);
 			FETCHING_URLS[url] += 1;
+			catchErrorAndLog(hideLoadingIndicator);
 			return response;
 		}
 		// not found in cache so fetch from server
 		response = await fetch(request);
+		catchErrorAndLog(hideLoadingIndicator);
 		API_CACHE.put(request, response.clone());
 		FETCHING_URLS[url] = 1;
-		// catchErrorAndLog(hideLoadingIndicator);
 		return response;
 	} else {
 		// send other requests
@@ -180,7 +179,7 @@ export async function fetch_url({
 					: JSON.stringify(data_object),
 			...others,
 		});
-		// catchErrorAndLog(hideLoadingIndicator);
+		catchErrorAndLog(hideLoadingIndicator);
 		return response;
 	}
 }

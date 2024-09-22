@@ -68,7 +68,7 @@ function cache_duration_calc({
 	return (hours * 60 * 60 + minutes * 60 + seconds) * 1000 + milliseconds;
 }
 let API_CACHE = null;
-let cache_duration_obj = { minutes: 30 }
+let cache_duration_obj = { hours: 1, minutes: 30 };
 const max_cache_duration = cache_duration_calc(cache_duration_obj);
 
 async function evict_cache() {
@@ -92,9 +92,12 @@ async function evict_cache() {
 	}
 
 	caches.open(new_key.toString()).then((cache) => {
-    console.log("Cache duration:", cache_duration_obj);
+		console.log("Cache duration:", cache_duration_obj);
 		console.log("Cache created:", new Date(new_key).toISOString());
-		console.log("Eviction time:", new Date(new_key+max_cache_duration).toISOString());
+		console.log(
+			"Eviction time:",
+			new Date(new_key + max_cache_duration).toISOString()
+		);
 		API_CACHE = cache;
 		globalThis.API_CACHE = cache;
 	});
@@ -106,7 +109,7 @@ await evict_cache();
 //   evict_cache();
 // }, max_cache_duration);
 
-const cache_url_match_rules = [RegExp("details"), RegExp("client_id=")];
+const cache_url_match_rules = [RegExp("details|all|client_id=")];
 export async function fetch_url({
 	url,
 	req_method,

@@ -153,6 +153,7 @@ export async function fetch_url({
 		// check if request is in cache
 		if (!API_CACHE) await evict_cache();
 		while (FETCHING_URLS.has(url)) {
+			console.log("Waiting for fetch to complete...");
 			await sleep(9000);
 		}
 		let response = await API_CACHE.match(request);

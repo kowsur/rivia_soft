@@ -893,11 +893,11 @@ class LimitedCreationForm(forms.ModelForm):
             'remarks',
 
             'client_file_number',
-            'direct_debit_amount',
             'client_name',
             'company_reg_number',
             'company_auth_code',
             'payment_method',
+            'direct_debit_amount',
 
             'date_of_birth',
             'PAYE_number',
@@ -930,7 +930,7 @@ class LimitedCreationForm(forms.ModelForm):
         fieldsets = (
             Fieldset(
                 title = 'Client Info',
-                fields = ('client_rating', 'client_file_number', 'direct_debit_amount', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', 'is_payroll', 'payment_method', )
+                fields = ('client_rating', 'client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', 'is_payroll', 'payment_method', 'direct_debit_amount', )
                 ),
             Fieldset(
                 title = 'Director Info',
@@ -974,11 +974,11 @@ class LimitedChangeForm(forms.ModelForm):
             'remarks',
 
             'client_file_number',
-            'direct_debit_amount',
             'client_name',
             'company_reg_number',
             'company_auth_code',
             'payment_method',
+            'direct_debit_amount',
 
             'date_of_birth',
             'PAYE_number',
@@ -1011,7 +1011,7 @@ class LimitedChangeForm(forms.ModelForm):
         fieldsets = (
             Fieldset(
                 title = 'Client Info',
-                fields = ('client_rating', 'client_file_number', 'direct_debit_amount', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', 'is_payroll', 'payment_method', )
+                fields = ('client_rating', 'client_file_number', 'date_of_registration', 'client_name', 'company_reg_number', 'company_auth_code', 'remarks', 'is_active', 'is_payroll', 'payment_method', 'direct_debit_amount', )
                 ),
             Fieldset(
                 title = 'Director Info',

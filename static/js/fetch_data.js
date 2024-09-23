@@ -185,7 +185,7 @@ export async function fetch_url({
 	}
 }
 
-async function sleep(ms) {
+function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 

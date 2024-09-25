@@ -1048,7 +1048,7 @@ class LimitedOnboardingTasks(models.Model):
         verbose_name='Task Status',
         max_length=255,
         choices=task_status_choices,
-        default="Need to do",
+        default="NotApplicable",
         blank=False,
         null=True)
     note = models.TextField(verbose_name='Note', default='', blank=True, null=True)

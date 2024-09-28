@@ -146,8 +146,8 @@ USE_TZ = True
 
 # Expire user session when browser closes
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-# Set session cookie max age to 5 hours
-SESSION_COOKIE_AGE = 60*60*5
+# Set session cookie max age to 10 hours
+SESSION_COOKIE_AGE = 10 * 60 * 60
 
 # Allow iframe to load from same origin
 X_FRAME_OPTIONS = "SAMEORIGIN"

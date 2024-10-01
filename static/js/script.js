@@ -16,7 +16,7 @@ setTimeout(function(){
 
 // ================================================================================================
 // Handle reload
-document.querySelector('.action-reload').addEventListener('click', async (event) => {
+document.querySelector('.action-reload')?.addEventListener('click', async (event) => {
   if (location.pathname!=="/companies/MTrc/home/") loadAllRecords()
 })
 
@@ -83,7 +83,7 @@ if (tasks){
 // ================================================================================================
 // Handle export for pages which has tax year input beside search bar
 let exportBtn = document.querySelector(".action-export")
-let exportAnchor = exportBtn.querySelector("a")
+let exportAnchor = exportBtn?.querySelector("a")
 if (tax_year_select_input!=null){
   exportBtn.addEventListener('click', async (event) => {
     if (exportAnchor.hasAttribute('do-not-prevent-default')) {
@@ -94,8 +94,11 @@ if (tax_year_select_input!=null){
     let tax_year = tax_year_select_input.value
     let url = new URL(exportAnchor.href)
     url.searchParams.set('tax_year', tax_year)
-    exportAnchor.href = url.href
-    exportAnchor.setAttribute('do-not-prevent-default', '')
-    exportAnchor.click()
+
+    if (exportAnchor){
+      exportAnchor.href = url.href
+      exportAnchor.setAttribute('do-not-prevent-default', '')
+      exportAnchor.click()
+    }
   })
 }

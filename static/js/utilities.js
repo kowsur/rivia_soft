@@ -323,7 +323,6 @@ String.prototype.format = function(data) {
   let re = /\{("|')(?<string>.*?)\1\*(?<multiplicator>(?:\d+?|{(?<format_string>[^{}]+)}))\}/gm;
   let rv = str.replaceAll(re, function(...args) {
     let capturedGroups = args[args.length-1]
-    
     let multiplicator = capturedGroups.multiplicator
     if ('format_string' in capturedGroups) multiplicator = multiplicator.format(data)
     return capturedGroups.string.repeat(multiplicator);

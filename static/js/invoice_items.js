@@ -67,8 +67,12 @@ async function show_option(record, repr_format, options_container, option_elemen
   let option = document.createElement(option_element_tag)
   option.value = record.pk
   option.setAttribute('data-value', record.pk)
+  
+  let string = repr_format.formatMultiplication(record)
+  string = string.format(record)
 
-  option.textContent = repr_format.format(record) // `👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} ☎{fields.business_phone_number}`
+  option.textContent = string // `👥{fields.client_name} 📁{fields.client_file_number} 📞{fields.personal_phone_number} ☎{fields.business_phone_number}`
+
   // add class
   option.classList.add('option')
   

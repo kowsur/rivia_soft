@@ -40,7 +40,7 @@
     <script>
       {% comment %} Open decendent links of table in new tab {% endcomment %}
       const tbody = document.querySelector('tbody')
-      tbody.addEventListener('click', e=>{
+      tbody?.addEventListener('click', e=>{
         let element = e.target
         if(element.tagName=='A' && element.matches('td[id="client_id"]>a')){
           e.preventDefault()

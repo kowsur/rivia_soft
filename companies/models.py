@@ -1,6 +1,7 @@
 import uuid
 from datetime import timedelta, date
 from itertools import chain
+from dateutil.relativedelta import relativedelta
 
 from django.db import models
 from django.utils import timezone
@@ -827,8 +828,8 @@ class LimitedSubmissionDeadlineTracker(models.Model):
         if not type(self.HMRC_deadline) == type(date(2021, 6, 28)):
             raise ValueError("HMRC_deadline should be an instance of datetime.date")
         
-        # set self.our_deadline 30 days before the self.HMRC_deadline
-        self.our_deadline = self.HMRC_deadline + timedelta(45)
+        # set self.our_deadline 45 days before the self.HMRC_deadline
+        self.our_deadline = self.HMRC_deadline + relativedelta(months=1, days=15)
         self.save()
 
 # Limited VAT Tracker
@@ -873,8 +874,8 @@ class LimitedVATTracker(models.Model):
         self.last_updated_on = timezone.now()
         
         if self.period_end:
-            # set self.our_deadline 30 days before the self.HMRC_deadline
-            self.HMRC_deadline = self.period_end + timedelta(30)
+            # set self.our_deadline 1 month before the self.HMRC_deadline
+            self.HMRC_deadline = self.period_end + relativedelta(months=1)
         self.save()
 
 

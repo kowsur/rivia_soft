@@ -231,7 +231,7 @@ def create_selfassesment(request):
         # Create Tracker
         tracker = SelfassesmentTracker()
         tracker.client_id = assesment
-        tracker.deadline = timezone.now()+timedelta(2)
+        tracker.deadline = timezone.now() + relativedelta(days=2)
         tracker.has_issue = True
         tracker.new_customer = True
         tracker.job_description = job_description + '    - Apply/ask for UTR\n'
@@ -249,7 +249,7 @@ def create_selfassesment(request):
         # Create Tracker
         tracker = SelfassesmentTracker()
         tracker.client_id = assesment
-        tracker.deadline = timezone.now()+timedelta(2)
+        tracker.deadline = timezone.now() + relativedelta(days=2)
         tracker.has_issue = True
         tracker.new_customer = True
         tracker.job_description = job_description + '    - Ask for NINO\n'
@@ -267,7 +267,7 @@ def create_selfassesment(request):
         # Create Tracker
         tracker = SelfassesmentTracker()
         tracker.client_id = assesment
-        tracker.deadline = timezone.now()+timedelta(2)
+        tracker.deadline = timezone.now() + relativedelta(days=2)
         tracker.has_issue = True
         tracker.new_customer = True
         tracker.job_description = job_description + '    - Apply for agent\n'
@@ -2506,8 +2506,9 @@ def get_limited_vats_where_deadline_missed():
 
 def get_limited_vats_where_period_difference_more_than_3months():
   return LimitedVATTracker.objects.annotate(
-  diff=ExpressionWrapper(F('period_end') - F('period_start') , 
+  diff=ExpressionWrapper(F('period_end') - F('period_start'), 
   output_field=DurationField())).filter(diff__gte=timedelta(90), is_submitted=False)
+
 
 @login_required
 def home_limited_vat_tracker(request):
@@ -2619,6 +2620,7 @@ def update_limited_vat_tracker(request, vat_id:int):
         vat.updated_by = request.user
         vat.period_start = assesment.period_end + relativedelta(days=1)
         vat.period_end = assesment.period_end + relativedelta(assesment.period_end + relativedelta(days=1), assesment.period_start)
+        vat.HMRC_deadline = vat.period_end + relativedelta(months=1)
         vat.save()
         messages.success(request, f'New Limited VAT Tracker has been created {vat}')
 

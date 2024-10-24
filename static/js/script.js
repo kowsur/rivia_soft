@@ -17,6 +17,7 @@ setTimeout(function(){
 // ================================================================================================
 // Handle reload
 if (!["/companies/MTrc/home/", "/"].includes(location.pathname)){
+  // don't add reload handler for view tracker, merged tracker will handle that
   document.querySelector('.action-reload')?.addEventListener('click', async (event) => {
     loadAllRecords()
   })

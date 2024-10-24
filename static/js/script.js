@@ -16,9 +16,12 @@ setTimeout(function(){
 
 // ================================================================================================
 // Handle reload
-document.querySelector('.action-reload')?.addEventListener('click', async (event) => {
-  if (location.pathname!=="/companies/MTrc/home/") loadAllRecords()
-})
+if (!["/companies/MTrc/home/", "/"].includes(location.pathname)){
+  document.querySelector('.action-reload')?.addEventListener('click', async (event) => {
+    loadAllRecords()
+  })
+}
+
 
 // Search functionality
 //setup before functions

@@ -3,8 +3,8 @@ import { db_all_records, db_search_records, db_search_records_client_id } from '
 import DATA from './parse_data.js'
 //table cell compare attribute name = "data-cmp"
 
-// clear messsage after 10 seconds
-let delete_message_after = 10000 //milisecond
+// clear message after 10 seconds
+let delete_message_after = 10000 //millisecond
 setTimeout(function(){
   let messages = document.querySelectorAll('.message')
   if (messages){

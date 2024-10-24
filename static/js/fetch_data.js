@@ -109,11 +109,11 @@ await evict_cache();
 //   evict_cache();
 // }, max_cache_duration);
 
-const CACHE_URL_MATCH_RULES = [RegExp("/details|/all|id=")];
+const CACHE_URL_MATCH_RULES = [RegExp("/details|id=")];
 const NO_CACHE_URL_MATCH_RULES = [RegExp("/search")];
 const FETCHING_URLS = {};
 globalThis.FETCHING_URLS = FETCHING_URLS;
-const THROTTLE_DURATION_SAME_URL = cache_duration_calc({ seconds: 1 });
+const THROTTLE_DURATION_SAME_URL = cache_duration_calc({ milliseconds: 750 });
 
 export async function fetch_url({
 	url,

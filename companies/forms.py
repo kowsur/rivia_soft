@@ -1287,7 +1287,7 @@ class LimitedSubmissionDeadlineTrackerCreationForm(forms.ModelForm):
 
             # "payment_status",
             # "payment_method",
-            # "paid_amount",
+            # "charged_amount",
 
             # "updated_by",
             # "last_updated_on",
@@ -1364,7 +1364,7 @@ class LimitedSubmissionDeadlineTrackerChangeForm(forms.ModelForm):
 
             "payment_status",
             "payment_method",
-            "paid_amount",
+            "charged_amount",
 
             # "updated_by",
             # "last_updated_on",

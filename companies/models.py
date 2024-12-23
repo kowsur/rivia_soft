@@ -795,6 +795,7 @@ class LimitedSubmissionDeadlineTracker(models.Model):
     remarks = models.TextField(verbose_name='Remarks', blank=True, null=True)
     payment_status_choices = (
         ("NOT PAID", "NOT PAID"),
+        ("INVOICE SENT", "INVOICE SENT"),
         ("PARTIALLY PAID", "PARTIALLY PAID"),
         ("PAID", "PAID"),
     )
@@ -802,11 +803,12 @@ class LimitedSubmissionDeadlineTracker(models.Model):
     payment_method_choices = (
         (None, "--------------"),
         ("CASH", "CASH"),
+        ("CARD","CARD"),
         ("DIRECT DEBIT","DIRECT DEBIT"),
         ("BANK TRANSFER","BANK TRANSFER"),
     )
     payment_method = models.CharField("Payment Method", blank=True, null=True, max_length=55, choices=payment_method_choices, default=None)
-    paid_amount = models.BigIntegerField(verbose_name='Amount', blank=True, null=True)
+    charged_amount = models.BigIntegerField(verbose_name='Charged Amount', blank=True, null=True)
     updated_by = models.ForeignKey(
         to='users.CustomUser',
         on_delete=models.RESTRICT,

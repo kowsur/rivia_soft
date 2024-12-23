@@ -20,6 +20,7 @@ from .serializers import CustomUserSerializer
 
 from companies.url_variables import APPLICATION_NAME, URL_NAMES, URL_PATHS, Full_URL_PATHS_WITHOUT_ARGUMENTS, URL_NAMES_PREFIXED_WITH_APP_NAME
 from companies.url_variables import *
+from inspect import getmembers
 
 
 application_name = APPLICATION_NAME
@@ -58,6 +59,12 @@ def signup_user(request):
 
 def login_user(request):
     context = {'form': CustomUserLoginForm()}
+    if hasattr(request, 'user') and request.user.is_authenticated:
+        if hasattr(request.GET, "next"):
+            return redirect(request.GET.get('next'))
+        else:
+            return redirect(URL_NAMES_PREFIXED_WITH_APP_NAME.Merged_Tracker_home_name)
+        
     if request.method=='POST':
         form = CustomUserLoginForm(request.POST)
         context['form'] = form

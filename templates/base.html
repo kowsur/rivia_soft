@@ -11,9 +11,13 @@
     
     <link rel="stylesheet" href='{% static "css/style.css" %}' />
     <link rel="stylesheet" href='{% static "css/custom_scrollbar.css" %}' />
+
+    <script src="{% static 'js/auto_logout.js' %}"></script>
+    
     {% block head %} {% endblock head %}
     <script src="https://unpkg.com/dayjs@1.8.21/dayjs.min.js"></script>
     <script src="https://unpkg.com/dayjs@1.8.21/plugin/customParseFormat.js"></script>
+
   </head>
   
   <body class="font-normal text-gray-700 dark:text-gray-400 bg-gray-200 dark:bg-gray-900 min-w-full min-h-screen">

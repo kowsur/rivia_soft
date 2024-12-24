@@ -2369,6 +2369,10 @@ def update_limited_submission_deadline_tracker(request, submission_id:int):
       else:
         assesment.submitted_by_hmrc = None
         assesment.save()
+      
+      if assesment.charged_amount!=None and assesment.received_amount!=None:
+        assesment.balance_amount = assesment.received_amount - assesment.charged_amount
+        assesment.save()
 
       # Create new record for next year
       d = assesment.period_start_date

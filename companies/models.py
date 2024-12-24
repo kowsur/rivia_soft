@@ -808,7 +808,9 @@ class LimitedSubmissionDeadlineTracker(models.Model):
         ("BANK TRANSFER","BANK TRANSFER"),
     )
     payment_method = models.CharField("Payment Method", blank=True, null=True, max_length=55, choices=payment_method_choices, default=None)
-    charged_amount = models.BigIntegerField(verbose_name='Charged Amount', blank=True, null=True)
+    charged_amount = models.BigIntegerField(verbose_name='Charged Amount', blank=True, null=True, default=0)
+    received_amount = models.BigIntegerField(verbose_name='Received Amount', blank=True, null=True, default=0)
+    balance_amount = models.BigIntegerField(verbose_name="Balance", blank=True, null=True, default=0)
     updated_by = models.ForeignKey(
         to='users.CustomUser',
         on_delete=models.RESTRICT,

@@ -1288,6 +1288,8 @@ class LimitedSubmissionDeadlineTrackerCreationForm(forms.ModelForm):
             # "payment_status",
             # "payment_method",
             # "charged_amount",
+            # "received_amount",
+            # "balance_amount",
 
             # "updated_by",
             # "last_updated_on",
@@ -1365,6 +1367,8 @@ class LimitedSubmissionDeadlineTrackerChangeForm(forms.ModelForm):
             "payment_status",
             "payment_method",
             "charged_amount",
+            "received_amount",
+            # "balance_amount",
 
             # "updated_by",
             # "last_updated_on",
@@ -1457,7 +1461,7 @@ class LimitedVATTrackerCreationForm(forms.ModelForm):
             raise ValidationError('Is Submitted is True therefore Submission Date is required.')
         return submission_date
 
-# Limited Submission Deadline Tracker
+# Limited VAT Tracker
 class LimitedVATTrackerChangeForm(forms.ModelForm):
     client_id = SearchableModelField(
         queryset=Limited.objects.all(),

@@ -629,7 +629,7 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         choices=Selfassesment.objects.all().only('client_id', 'client_name'),
         fk_field='client_id',
         empty_label=None,
-        disabled=False
+        disabled=True
         )
     submitted_by = SearchableModelField(
         queryset=CustomUser.objects.all(),
@@ -640,8 +640,8 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         choices=CustomUser.objects.all().only('user_id', 'first_name'),
         fk_field='user_id',
         empty_label=None,
-        disabled=False,
-        required = False
+        disabled=True,
+        required=False
         )
     prepared_by = SearchableModelField(
         queryset=CustomUser.objects.all(),
@@ -699,6 +699,12 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         if status=="BOOK APPOINTMENT" and not appointment_date:
             raise ValidationError("Status is BOOK APPOINTMENT. Therefore, Appointment Date is required.")
         return appointment_date
+    
+    read_only_fields = ["client_id", "submitted_by"]
+    def save(self, commit=True):
+        for ro_field in self.read_only_fields:
+            self.cleaned_data.pop(ro_field, None)
+        return super().save(commit=commit)
 
 
 

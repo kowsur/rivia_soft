@@ -7,6 +7,7 @@ update_suffix = 'update'
 delete_suffix = 'delete'
 search_suffix = 'search'
 details_suffix = 'details'
+metadata_suffix = 'metadata'
 export_suffix = 'export'
 viewall_suffix = 'all'
 auth_suffix = 'auth'
@@ -128,6 +129,7 @@ class URL_PATHS(Dict_Duck_type):
   Limited_Submission_Deadline_Tracker_search_url = f'{Limited_Submission_Deadline_Tracker_path}/{search_suffix}/' # fetch only
   Limited_Submission_Deadline_Tracker_viewall_url = f'{Limited_Submission_Deadline_Tracker_path}/{viewall_suffix}/' # fetch only
   Limited_Submission_Deadline_Tracker_export_url = f'{Limited_Submission_Deadline_Tracker_path}/{export_suffix}/'
+  Limited_Submission_Deadline_Tracker_metadata_url = f'{Limited_Submission_Deadline_Tracker_path}/{metadata_suffix}/'
   
   # Limited VAT Tracker
   Limited_VAT_Tracker_home_url = f'{Limited_VAT_Tracker_path}/{home_suffix}/'
@@ -228,6 +230,7 @@ class URL_NAMES(Dict_Duck_type):
   Limited_Submission_Deadline_Tracker_search_name = f'{Limited_Submission_Deadline_Tracker_name}_{search_suffix}' # fetch only
   Limited_Submission_Deadline_Tracker_viewall_name = f'{Limited_Submission_Deadline_Tracker_name}_{viewall_suffix}' # fetch only
   Limited_Submission_Deadline_Tracker_export_name = f'{Limited_Submission_Deadline_Tracker_name}_{export_suffix}'
+  Limited_Submission_Deadline_Tracker_metadata_name = f'{Limited_Submission_Deadline_Tracker_name}_{metadata_suffix}'
   
   # Limited VAT Tracker
   Limited_VAT_Tracker_home_name = f'{Limited_VAT_Tracker_name}_{home_suffix}'
@@ -329,6 +332,7 @@ class Full_URL_PATHS_WITHOUT_ARGUMENTS(Dict_Duck_type):
   Limited_Submission_Deadline_Tracker_search_url = f'/{APPLICATION_NAME}/{Limited_Submission_Deadline_Tracker_path}/{search_suffix}/' # fetch only
   Limited_Submission_Deadline_Tracker_viewall_url = f'/{APPLICATION_NAME}/{Limited_Submission_Deadline_Tracker_path}/{viewall_suffix}/' # fetch only
   Limited_Submission_Deadline_Tracker_export_url = f'/{APPLICATION_NAME}/{Limited_Submission_Deadline_Tracker_path}/{export_suffix}/'
+  Limited_Submission_Deadline_Tracker_metadata_url = f'/{APPLICATION_NAME}/{Limited_Submission_Deadline_Tracker_path}_{metadata_suffix}'
 
   # Limited VAT Tracker
   Limited_VAT_Tracker_home_url = f'/{APPLICATION_NAME}/{Limited_VAT_Tracker_path}/{home_suffix}/'
@@ -430,6 +434,7 @@ class URL_NAMES_PREFIXED_WITH_APP_NAME(Dict_Duck_type):
   Limited_Submission_Deadline_Tracker_search_name = f'{APPLICATION_NAME}:{Limited_Submission_Deadline_Tracker_name}_{search_suffix}' # fetch only
   Limited_Submission_Deadline_Tracker_viewall_name = f'{APPLICATION_NAME}:{Limited_Submission_Deadline_Tracker_name}_{viewall_suffix}' # fetch only
   Limited_Submission_Deadline_Tracker_export_name = f'{APPLICATION_NAME}:{Limited_Submission_Deadline_Tracker_name}_{export_suffix}'
+  Limited_Submission_Deadline_Tracker_metadata_name = f'{APPLICATION_NAME}:{Limited_Submission_Deadline_Tracker_name}_{metadata_suffix}'
 
   # Limited VAT Tracker
   Limited_VAT_Tracker_home_name = f'{APPLICATION_NAME}:{Limited_VAT_Tracker_name}_{home_suffix}'

@@ -85,9 +85,6 @@ URLS = {
 }
 user_details_url_without_argument = '/u/details/'
 
-from pprint import pp, pprint
-
-
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import QuerySet
 
@@ -527,8 +524,8 @@ def home_selfassesment_data_collection(request):
   model_fields = get_field_names_from_model(SelfemploymentIncomeAndExpensesDataCollection)
   context = {
     **URLS,
-    'caption': 'View Selfassesment Data Collection',
     'page_title': 'View Selfassesment Data Collection',
+    'caption': '<a href="/companies/SA/data_collection/auth_for_client/">View Selfassesment Data Collection</a>',
     
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_create_name,
     'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_export_name,

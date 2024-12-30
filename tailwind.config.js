@@ -1,32 +1,21 @@
 module.exports = {
-  mode: 'jit',
-  future: {
-    removeDeprecatedGapUtilities: true,
-    purgeLayersByDefault: false,
-  },
-  purge: {
-    enabled: true,
-    mode: 'all',
-    preserveHtmlElements: false,
-    // it's important to keep the "*.html" or "*.js" files that uses tailwind classes in a sub folder so that postcss can properly purge the classes 
-    content: [
-      // Important: keep the files that uses tailwind classes in a sub-folder and add them here
-      './templates/**/*.html',
-      './**/templates/**/*.html',
-      './**/static/js/**/*.js'
-    ]
-  },
-  darkMode: 'media', // or 'media' or 'class'
+  darkMode: 'media', // or 'media' or 'selector'
   theme: {
     extend: {
       screen: {
       }
     },
   },
-  variants: {
-    extend: {},
-  },
+  content: [
+    // Important: keep the files that uses tailwind classes in a sub-folder and add them here
+    './templates/**/*.html',
+    './**/templates/**/*.html',
+    './**/static/js/**/*.js'
+  ],
   plugins: [
-    require('@tailwindcss/custom-forms'),
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/aspect-ratio'),
+    require('@tailwindcss/container-queries'),
   ],
 }

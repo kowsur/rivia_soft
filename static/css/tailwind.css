@@ -237,7 +237,7 @@
 		@apply mx-auto max-w-max;
 	}
 	.data-wrapper {
-		@apply relative mt-8 overflow-auto sm:mt-10 md:mt-12;
+		@apply relative mt-8 overflow-auto sm:mt-10 md:mt-12 border-2 border-gray-300 dark:border-gray-600;
 		max-height: 92dvh;
 	}
 	.data-container {
@@ -245,7 +245,7 @@
 	}
 
 	.stick-top {
-		@apply sticky top-0 py-3 text-gray-900 bg-gray-400 dark:text-gray-300 dark:bg-gray-600;
+		@apply sticky top-0 py-3 text-gray-900 bg-gray-300 dark:text-gray-300 dark:bg-gray-600;
 		-webkit-box-shadow: 0px 1px 0px 0px #ffff;
 		box-shadow: 0px 1px 0px 0px #ffff;
 	}
@@ -272,10 +272,10 @@
 	}
 
 	.data-row {
-		@apply h-full bg-gray-300 dark:bg-gray-800;
+		@apply h-full bg-gray-200 dark:bg-gray-800;
 	}
 	.data-row:hover {
-		@apply bg-[#b1b7c0] text-gray-900 dark:bg-gray-700 dark:text-white;
+		@apply bg-gray-50 text-gray-900 dark:bg-gray-700 dark:text-white;
 	}
 	table a:hover {
 		text-decoration: underline;

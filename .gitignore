@@ -4,6 +4,8 @@
 
 **/migrations/**
 
+collected_staticfiles/
+
 *env*/
 todo.txt
 db.sqlite3*

@@ -19,6 +19,8 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Weasyprint relies on some linux libraries which is required
+# those can be satisfied with mingw installation
 if os.name == 'nt':
     os.add_dll_directory(r"C:\msys64\mingw64\bin")
 
@@ -63,7 +65,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    # 'django.contrib.staticfiles',
+    'django.contrib.staticfiles',
     'rest_framework',
 
     # Project apps
@@ -154,11 +156,16 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
+
+# URL to use when referring to static files located in STATIC_ROOT
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static'
+# Absolute path to the directory where collectstatic will collect static files for deployment.
+STATIC_ROOT = BASE_DIR / 'collected_staticfiles'
+# Additional locations the staticfiles app will traverse if the FileSystemFinder finder is enabled
 STATICFILES_DIRS = [
-    # BASE_DIR / 'staticfiles'
+    BASE_DIR / 'static',
 ]
+
 
 # Custom User Model
 AUTH_USER_MODEL = 'users.CustomUser'

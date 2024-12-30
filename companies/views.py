@@ -68,6 +68,9 @@ from .serializers import CustomUserSerializer, SelfassesmentAccountSubmissionTax
 from .decorators import allowed_for_staff, allowed_for_superuser
 
 
+from .utils import model_field_to_form_meta
+
+
 from .url_variables import APPLICATION_NAME, URL_NAMES, URL_PATHS, Full_URL_PATHS_WITHOUT_ARGUMENTS, URL_NAMES_PREFIXED_WITH_APP_NAME
 from .url_variables import *
 
@@ -2495,6 +2498,14 @@ def export_limited_submission_deadline_tracker(request):
     )
   return response
 
+@login_required
+def info_limited_submission_deadline_tracker(request):
+  fields_metadata = []
+  for field in LimitedSubmissionDeadlineTracker._meta.fields:
+    field_meta = model_field_to_form_meta(field)
+    if field_meta:
+      fields_metadata.append(field_meta)
+  return HttpResponse(json.dumps(fields_metadata))
 
 # =============================================================================================================
 # =============================================================================================================

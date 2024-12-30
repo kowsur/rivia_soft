@@ -45,7 +45,7 @@ from .views import home_merged_tracker, create_merged_tracker, export_merged_tra
 from .views import home_limited_submission_deadline_tracker, create_limited_submission_deadline_tracker, \
     update_limited_submission_deadline_tracker, delete_limited_submission_deadline_tracker,               \
     search_limited_submission_deadline_tracker, all_limited_submission_deadline_tracker,                  \
-    export_limited_submission_deadline_tracker
+    export_limited_submission_deadline_tracker, info_limited_submission_deadline_tracker
 
 # limited vat tracker
 from .views import home_limited_vat_tracker, create_limited_vat_tracker, update_limited_vat_tracker, \
@@ -304,6 +304,10 @@ urlpatterns = [
     path(route = URL_PATHS.Limited_Submission_Deadline_Tracker_export_url,
         view = export_limited_submission_deadline_tracker,
         name = URL_NAMES.Limited_Submission_Deadline_Tracker_export_name
+    ),
+    path(route = URL_PATHS.Limited_Submission_Deadline_Tracker_metadata_url,
+        view = info_limited_submission_deadline_tracker,
+        name = URL_NAMES.Limited_Submission_Deadline_Tracker_metadata_name
     ),
 
 

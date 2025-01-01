@@ -16,10 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
-from django.http import FileResponse
-from companies.views import home_merged_tracker
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
+
+from companies.views import home_merged_tracker
+
 
 urlpatterns = [
     path('', home_merged_tracker),
@@ -29,9 +29,11 @@ urlpatterns = [
     path('invoice/', include('invoice.urls'), name='invoice'),
     path('only-admins-can-access-this/', admin.site.urls, name='admin'),
 ]
+
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     # urlpatterns += staticfiles_urlpatterns()
+
 
 # Custom error handler page
 handler400 = 'error_handler.views.handle_400_error'

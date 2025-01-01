@@ -38,7 +38,7 @@ with open(CONFIG_FILE_PATH, 'r') as CONFIG_FILE:
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 ###############################################################################
-# SECURITY WARNING: don't run with debug turned on in production!
+# ?: (security.W018) You should not have DEBUG set to True in deployment.
 DEBUG = CONFIG['DEBUG']
 WANT_TO_MIGRATE = False
 ###############################################################################
@@ -195,3 +195,21 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ]
 }
+
+
+if not DEBUG:
+    # python manage.py check --deploy
+    # ?: (security.W004) You have not set a value for the SECURE_HSTS_SECONDS setting. If your entire site is served only over SSL, you may want to consider setting a value and enabling HTTP Strict Transport Security. Be sure to read the documentation first; enabling HSTS carelessly can cause serious, irreversible problems.
+    # SECURE_HSTS_SECONDS = 10 # 1800
+
+    # ?: (security.W008) Your SECURE_SSL_REDIRECT setting is not set to True. Unless your site should be available over both SSL and non-SSL connections, you may want to either set this setting True or configure a load balancer or reverse-proxy server to redirect all connections to HTTPS.       
+    SECURE_SSL_REDIRECT = True
+
+    # ?: (security.W012) SESSION_COOKIE_SECURE is not set to True. Using a secure-only session cookie makes it more difficult for network traffic sniffers to hijack user sessions.
+    SESSION_COOKIE_SECURE = True
+
+    # ?: (security.W016) You have 'django.middleware.csrf.CsrfViewMiddleware' in your MIDDLEWARE, but you have not set CSRF_COOKIE_SECURE to True. Using a secure-only CSRF cookie makes it more difficult for network traffic sniffers to steal the CSRF token.
+    CSRF_COOKIE_SECURE = True
+
+    # ?: (security.W019) You have 'django.middleware.clickjacking.XFrameOptionsMiddleware' in your MIDDLEWARE, but X_FRAME_OPTIONS is not set to 'DENY'. Unless there is a good reason for your site to serve other parts of itself in a frame, you should change it to 'DENY'.
+    X_FRAME_OPTIONS = "SAMEORIGIN"

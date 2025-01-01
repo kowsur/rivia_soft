@@ -4,6 +4,7 @@
 
 **/migrations/**
 
+**production/
 collected_staticfiles/
 
 *env*/

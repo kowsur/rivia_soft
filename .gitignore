@@ -1,23 +1,17 @@
-.vscode/
-
-**/data/
-
-**/migrations/**
+# Custom rules
 
 **production/
-collected_staticfiles/
+# **/migrations/**
 
+collected_staticfiles/
+staticfiles/
+
+*.sqlite3
 *env*/
 todo.txt
-db.sqlite3*
 
-#Server Setup
-config.json
-ENVIRONMENT.py
-server-setup.sh
+.vscode/
 
-### Custom ###
-staticfiles/
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/django,node,python,vscode,windows,git

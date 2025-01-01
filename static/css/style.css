@@ -925,8 +925,8 @@ video {
     width: 1.5rem;
   }
 
-  .w-\[85dvw\]{
-    width: 85dvw;
+  .w-\[80dvw\]{
+    width: 80dvw;
   }
 
   .w-full{
@@ -936,10 +936,6 @@ video {
   .w-max{
     width: -moz-max-content;
     width: max-content;
-  }
-
-  .w-\[80dvw\]{
-    width: 80dvw;
   }
 
   .min-w-full{

@@ -10,11 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 from companies.url_variables import URL_NAMES_PREFIXED_WITH_APP_NAME
-from socket import gethostname, gethostbyname
 from json import loads
-import os
+from .network_address import get_hostname, get_all_ipv4_addresses
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -50,7 +50,8 @@ WANT_TO_MIGRATE = False
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 if DEBUG:
     SECRET_KEY = 'wh*lo-yh6geec40s91k0wb!enwn5ov6)3^k53c1hq)pq6png4@'
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1', gethostname(), gethostbyname(gethostname())]
+    ALLOWED_HOSTS = ["localhost", get_hostname()]
+    ALLOWED_HOSTS += get_all_ipv4_addresses()
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

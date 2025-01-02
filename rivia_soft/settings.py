@@ -50,7 +50,7 @@ WANT_TO_MIGRATE = False
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 if DEBUG:
     SECRET_KEY = 'wh*lo-yh6geec40s91k0wb!enwn5ov6)3^k53c1hq)pq6png4@'
-    ALLOWED_HOSTS = ["localhost", get_hostname()]
+    ALLOWED_HOSTS = ["riviagw.com", "*.riviagw.com", "localhost", get_hostname()]
     ALLOWED_HOSTS += get_all_ipv4_addresses()
     DATABASES = {
         'default': {
@@ -200,16 +200,22 @@ REST_FRAMEWORK = {
 if not DEBUG:
     # python manage.py check --deploy
     # ?: (security.W004) You have not set a value for the SECURE_HSTS_SECONDS setting. If your entire site is served only over SSL, you may want to consider setting a value and enabling HTTP Strict Transport Security. Be sure to read the documentation first; enabling HSTS carelessly can cause serious, irreversible problems.
-    # SECURE_HSTS_SECONDS = 10 # 1800 # nginx will handle this
+    SECURE_HSTS_SECONDS = 1800 # 1800 # nginx will handle this
+    
+    # ?: (security.W005) You have not set the SECURE_HSTS_INCLUDE_SUBDOMAINS setting to True. Without this, your site is potentially vulnerable to attack via an insecure connection to a subdomain. Only set this to True if you are certain that all subdomains of your domain should be served exclusively via SSL.
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
     # ?: (security.W008) Your SECURE_SSL_REDIRECT setting is not set to True. Unless your site should be available over both SSL and non-SSL connections, you may want to either set this setting True or configure a load balancer or reverse-proxy server to redirect all connections to HTTPS.       
-    # SECURE_SSL_REDIRECT = True # behind nginx so no need for this
+    SECURE_SSL_REDIRECT = True # behind nginx so no need for this
 
     # ?: (security.W012) SESSION_COOKIE_SECURE is not set to True. Using a secure-only session cookie makes it more difficult for network traffic sniffers to hijack user sessions.
     SESSION_COOKIE_SECURE = True
 
     # ?: (security.W016) You have 'django.middleware.csrf.CsrfViewMiddleware' in your MIDDLEWARE, but you have not set CSRF_COOKIE_SECURE to True. Using a secure-only CSRF cookie makes it more difficult for network traffic sniffers to steal the CSRF token.
     CSRF_COOKIE_SECURE = True
+
+    # ?: (security.W021) You have not set the SECURE_HSTS_PRELOAD setting to True. Without this, your site cannot be submitted to the browser preload list.
+    SECURE_HSTS_PRELOAD = True
 
     # ?: (security.W019) You have 'django.middleware.clickjacking.XFrameOptionsMiddleware' in your MIDDLEWARE, but X_FRAME_OPTIONS is not set to 'DENY'. Unless there is a good reason for your site to serve other parts of itself in a frame, you should change it to 'DENY'.
     X_FRAME_OPTIONS = "SAMEORIGIN"

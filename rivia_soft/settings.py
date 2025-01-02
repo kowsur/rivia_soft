@@ -218,4 +218,4 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
 
     # ?: (security.W019) You have 'django.middleware.clickjacking.XFrameOptionsMiddleware' in your MIDDLEWARE, but X_FRAME_OPTIONS is not set to 'DENY'. Unless there is a good reason for your site to serve other parts of itself in a frame, you should change it to 'DENY'.
-    X_FRAME_OPTIONS = "SAMEORIGIN"
+    X_FRAME_OPTIONS = "SAMEORIGIN" # this is necessary to embed the pdf reports

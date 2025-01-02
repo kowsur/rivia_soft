@@ -669,6 +669,12 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
     appointment_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
     # request_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
 
+    read_only_fields = ["client_id", "submitted_by"]
+    def save(self, commit=True):
+        for ro_field in self.read_only_fields:
+            self.cleaned_data.pop(ro_field, None)
+        return super().save(commit=commit)
+    
     class Meta:
         model = SelfassesmentAccountSubmission
         fields = (
@@ -699,13 +705,6 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         if status=="BOOK APPOINTMENT" and not appointment_date:
             raise ValidationError("Status is BOOK APPOINTMENT. Therefore, Appointment Date is required.")
         return appointment_date
-    
-    read_only_fields = ["client_id", "submitted_by"]
-    def save(self, commit=True):
-        for ro_field in self.read_only_fields:
-            self.cleaned_data.pop(ro_field, None)
-        return super().save(commit=commit)
-
 
 
 class SelfassesmentAccountSubmissionDeleteForm(forms.ModelForm):
@@ -830,7 +829,7 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
         model = CustomUser,
         choices = CustomUser.objects.all().only('user_id', 'first_name'),
         fk_field = 'user_id',
-        disabled = False,
+        disabled = True,
         required = False,
         empty_label = None # remove default option '------' from select menu
         )
@@ -846,6 +845,12 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
     #     required = False,
     #     empty_label = None # remove default option '------' from select menu
     #     )
+
+    read_only_fields = ["client_id"]
+    def save(self, commit=True):
+        for ro_field in self.read_only_fields:
+            self.cleaned_data.pop(ro_field, None)
+        return super().save(commit=commit)
     
     class Meta:
         model = SelfassesmentTracker
@@ -860,13 +865,14 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
             'has_issue',
             # 'complete_date',
             'is_completed',)
-    
+
     def clean_remarks(self):
         remarks = self.cleaned_data.get('remarks').strip()
         issue = self.data.get('has_issue')
         if issue and not remarks:
             raise ValidationError("Tracker has issue therefore remarks is required")
         return remarks
+    
 
 class SelfassesmentTrackerDeleteForm(forms.ModelForm):
     agree = forms.BooleanField(label='I want to proceed.', required=True)
@@ -1152,6 +1158,12 @@ class LimitedTrackerChangeForm(forms.ModelForm):
     #     empty_label = None # remove default option '------' from select menu
     #     )
     
+    read_only_fields = ["client_id"]
+    def save(self, commit=True):
+        for ro_field in self.read_only_fields:
+            self.cleaned_data.pop(ro_field, None)
+        return super().save(commit=commit)
+    
     class Meta:
         model = LimitedTracker
         fields = (
@@ -1338,7 +1350,7 @@ class LimitedSubmissionDeadlineTrackerChangeForm(forms.ModelForm):
         choices=Limited.objects.all().only('client_id', 'client_name'),
         fk_field='client_id',
         empty_label=None,
-        disabled=False
+        disabled=True
         )
     period_start_date = forms.DateField(label="Period Start", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
     period = forms.DateField(label="Period End", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
@@ -1347,6 +1359,12 @@ class LimitedSubmissionDeadlineTrackerChangeForm(forms.ModelForm):
     HMRC_deadline = forms.DateField(label="CompanyHouse Deadline", widget=forms.DateInput(attrs={'type': 'date'}))
     submission_date = forms.DateField(label="Submission Date(CH)", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
     submission_date_hmrc = forms.DateField(label="Submission Date(HM)", widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    
+    read_only_fields = ["client_id"]
+    def save(self, commit=True):
+        for ro_field in self.read_only_fields:
+            self.cleaned_data.pop(ro_field, None)
+        return super().save(commit=commit)
     
     class Meta:
         model = LimitedSubmissionDeadlineTracker
@@ -1479,13 +1497,19 @@ class LimitedVATTrackerChangeForm(forms.ModelForm):
         choices=Limited.objects.all().only('client_id', 'client_name'),
         fk_field='client_id',
         empty_label=None,
-        disabled=False
+        disabled=True
         )
     period_start = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     period_end = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     # HMRC_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     submission_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
     
+    read_only_fields = ["client_id"]
+    def save(self, commit=True):
+        for ro_field in self.read_only_fields:
+            self.cleaned_data.pop(ro_field, None)
+        return super().save(commit=commit)
+
     class Meta:
         model = LimitedVATTracker
         fields = (
@@ -1513,6 +1537,7 @@ class LimitedVATTrackerChangeForm(forms.ModelForm):
         if is_submitted == True and not type(submission_date)==type(date(2021, 6, 28)):
             raise ValidationError('Is Submitted is True therefore Submission Date is required.')
         return submission_date
+
 
 class LimitedVATTrackerDeleteForm(forms.ModelForm):
     agree = forms.BooleanField(label='I want to proceed.', required=True)
@@ -1571,11 +1596,17 @@ class LimitedConfirmationStatementTrackerChangeForm(forms.ModelForm):
         choices=Limited.objects.all().only('client_id', 'client_name'),
         fk_field='client_id',
         empty_label=None,
-        disabled=False
+        disabled=True
         )
     company_house_deadline = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     submission_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
     
+    read_only_fields = ["client_id"]
+    def save(self, commit=True):
+        for ro_field in self.read_only_fields:
+            self.cleaned_data.pop(ro_field, None)
+        return super().save(commit=commit)
+
     class Meta:
         model = LimitedConfirmationStatementTracker
         fields = (
@@ -1597,6 +1628,7 @@ class LimitedConfirmationStatementTrackerChangeForm(forms.ModelForm):
         if is_submitted == True and not type(submission_date)==type(date(2021, 6, 28)):
             raise ValidationError('Is Submitted is True therefore Submission Date is required.')
         return submission_date
+
 
 class LimitedConfirmationStatementTrackerDeleteForm(forms.ModelForm):
     agree = forms.BooleanField(label='I want to proceed.', required=True)

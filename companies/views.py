@@ -13,6 +13,8 @@ from django.contrib import messages
 from django.urls.exceptions import NoReverseMatch
 from django.db.models import DurationField, F, ExpressionWrapper, Q
 from django.db.utils import IntegrityError
+from django.utils.safestring import mark_safe
+
 
 #forms
 from .forms import SelfassesmentCreationForm, SelfassesmentChangeForm, SelfassesmentDeleteForm
@@ -528,7 +530,7 @@ def home_selfassesment_data_collection(request):
   context = {
     **URLS,
     'page_title': 'View Selfassesment Data Collection',
-    'caption': '<a href="/companies/SA/data_collection/auth_for_client/">View Selfassesment Data Collection</a>',
+    'caption': mark_safe('View <a href="/companies/SA/data_collection/auth_for_client/">Selfassesment Data Collection</a>'),
     
     'create_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_create_name,
     'export_url': URL_NAMES_PREFIXED_WITH_APP_NAME.Selfassesment_Data_Collection_export_name,

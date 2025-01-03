@@ -23,7 +23,7 @@
 {% endif %}
 
 {% if caption %}
-<h1 class="mt-5 text-2xl text-center">{{ caption|safe }}</h1>
+<h1 class="mt-5 text-2xl text-center">{{ caption }}</h1>
 {% if add_all_url %}
   <!-- add all selfassesments -->
   {% if request.user.is_superuser %}

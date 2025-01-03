@@ -18,7 +18,7 @@ class UserLoginHistory(models.Model):
     logged_out_at = models.DateTimeField(default=None, null=True)
 
     def __str__(self) -> str:
-        return f"{self.user} \n logged in {self.logged_in_at.isoformat()} \n last seen {self.last_seen_at.isoformat()} \n logged out {self.logged_out_at.isoformat()}"
+        return f"{self.user} \n logged in {self.logged_in_at} \n last seen {self.last_seen_at} \n logged out {self.logged_out_at}"
 
 
 class ActiveUser(models.Model):
@@ -31,7 +31,7 @@ class ActiveUser(models.Model):
     last_seen_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return f"{self.user} last seen {self.last_seen_at.isoformat()}"
+        return f"{self.user} last seen {self.last_seen_at}"
 
 
 class FailedLoginAttempts(models.Model):

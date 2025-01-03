@@ -9,42 +9,44 @@ def UserLastSeenLoggerMiddleware(get_response):
         if not isinstance(request.user, get_user_model()):
             return response
         
+        session = Session.objects.get(pk=request.session.session_key)
         user = request.user
-        if ActiveUser.objects.filter(user=user).exists():
-            active_user_log = ActiveUser.objects.get(user=user)
+
+        if ActiveUser.objects.filter(session=session, user=user).exists():
+            active_user_log = ActiveUser.objects.get(session=session, user=user)
             active_user_log.save()
             user_login_history = active_user_log.user_login_history
             user_login_history.save()
             return response
         
-        active_devices = ActiveUser.objects.filter(user=user)
-        if len(active_devices)>0:
-            for active_device in active_devices:
-                # updateing login_history
-                login_history = active_device.user_login_history
-                login_history.logged_out_at = now()
-                login_history.save()
+        # active_devices = ActiveUser.objects.filter(user=user)
+        # if len(active_devices)>0:
+        #     for active_device in active_devices:
+        #         # updateing login_history
+        #         login_history = active_device.user_login_history
+        #         login_history.logged_out_at = now()
+        #         login_history.save()
 
-                session = active_device.session
-                session.delete()
+        #         session = active_device.session
+        #         session.delete()
                 
-                active_device.delete()
+        #         active_device.delete()
 
-        session = Session.objects.get(pk=request.session.session_key)
         
         logged_in_user_history = UserLoginHistory(
             user=user,
-            ip_address=request.META.get("HTTP_X_FORWARDED_FOR"),
-            device_user_agent=request.META.get("HTTP_USER_AGENT"))
+            ip_address=request.META.get("HTTP_X_FORWARDED_FOR", 'HTTP_X_FORWARDED_FOR header value is None'),
+            device_user_agent=request.META.get("HTTP_USER_AGENT", 'HTTP_USER_AGENT header value is None'))
         logged_in_user_history.save()
         
         active_user = ActiveUser(
             user_login_history=logged_in_user_history,
             user=user,
-            session=session)
+            session=session
+        )
         active_user.save()
 
-        active_user_log = ActiveUser.objects.get(user=user)
+        active_user_log = ActiveUser.objects.get(session=session, user=user)
         active_user_log.save()
         user_login_history = active_user_log.user_login_history
         user_login_history.save()

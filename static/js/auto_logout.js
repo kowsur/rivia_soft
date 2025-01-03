@@ -21,7 +21,7 @@ auto_logout_bc.addEventListener("message", (event) => {
             };
 			break;
 		case "do__redirect_to_login":
-			if (!location.href.includes("login")) {
+			if (!location.href.includes("/u/login")) {
                 redirect_to_login()
             };
 			break;

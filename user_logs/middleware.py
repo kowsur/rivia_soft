@@ -19,20 +19,7 @@ def UserLastSeenLoggerMiddleware(get_response):
             user_login_history.save()
             return response
         
-        # active_devices = ActiveUser.objects.filter(user=user)
-        # if len(active_devices)>0:
-        #     for active_device in active_devices:
-        #         # updateing login_history
-        #         login_history = active_device.user_login_history
-        #         login_history.logged_out_at = now()
-        #         login_history.save()
-
-        #         session = active_device.session
-        #         session.delete()
-                
-        #         active_device.delete()
-
-        
+        # Log is not present for the user so create those
         logged_in_user_history = UserLoginHistory(
             user=user,
             ip_address=request.META.get("HTTP_X_FORWARDED_FOR", 'HTTP_X_FORWARDED_FOR header value is None'),
@@ -45,11 +32,7 @@ def UserLastSeenLoggerMiddleware(get_response):
             session=session
         )
         active_user.save()
-
-        active_user_log = ActiveUser.objects.get(session=session, user=user)
-        active_user_log.save()
-        user_login_history = active_user_log.user_login_history
-        user_login_history.save()
+        
         return response
     return middleware
 

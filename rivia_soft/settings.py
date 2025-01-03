@@ -78,7 +78,7 @@ INSTALLED_APPS = [
     # Project apps
     'error_handler',
     'users',
-    # "user_logs",
+    'user_logs',
     'companies',
     'accounts',
     'invoice',
@@ -90,7 +90,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    # 'user_logs.middleware.UserLastSeenLoggerMiddleware',
+    'user_logs.middleware.UserLastSeenLoggerMiddleware',
     'invoice.middleware.SimpleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

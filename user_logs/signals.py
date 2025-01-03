@@ -22,15 +22,21 @@ def log_user_login(sender, request, user, **kwargs):
             active_device.delete()
 
     session = Session.objects.get(pk=request.session.session_key)
-    logged_in_user_history = UserLoginHistory(user=user, ip_address=request.META.get("REMOTE_ADDR"), device_user_agent=request.META.get("HTTP_USER_AGENT"))
+    logged_in_user_history = UserLoginHistory(
+        user=user,
+        ip_address=request.META.get("HTTP_X_FORWARDED_FOR"),
+        device_user_agent=request.META.get("HTTP_USER_AGENT"))
     logged_in_user_history.save()
-    active_user = ActiveUser(user_login_history=logged_in_user_history, user=user, session=session)
+    active_user = ActiveUser(
+        user_login_history=logged_in_user_history,
+        user=user,
+        session=session)
     active_user.save()
 
 
 @receiver(user_login_failed)
 def log_user_login_failed(sender, credentials, request, **kwargs):
-    failed_attempt = FailedLoginAttempts(ip_address=request.META.get("REMOTE_ADDR"), device_user_agent=request.META.get("HTTP_USER_AGENT"), credentials=json.dumps(credentials, indent=4))
+    failed_attempt = FailedLoginAttempts(ip_address=request.META.get("HTTP_X_FORWARDED_FOR"), device_user_agent=request.META.get("HTTP_USER_AGENT"), credentials=json.dumps(credentials, indent=4))
     failed_attempt.save()
 
 

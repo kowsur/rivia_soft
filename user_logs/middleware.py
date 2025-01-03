@@ -9,12 +9,20 @@ def UserLastSeenLoggerMiddleware(get_response):
         if not isinstance(request.user, get_user_model()):
             return response
         
-        session = Session.objects.get(pk=request.session.session_key)
+        try:
+            session = Session.objects.get(pk=request.session.session_key)
+        except Exception:
+            return response
         user = request.user
 
         if ActiveUser.objects.filter(session=session, user=user).exists():
-            active_user_log = ActiveUser.objects.get(session=session, user=user)
-            active_user_log.save()
+            try:
+                # session can be none if browser sends multiple requests
+                # and one of them is logout
+                active_user_log = ActiveUser.objects.get(session=session, user=user)
+                active_user_log.save()
+            except Exception:
+                return response
             user_login_history = active_user_log.user_login_history
             user_login_history.save()
             return response
@@ -31,7 +39,12 @@ def UserLastSeenLoggerMiddleware(get_response):
             user=user,
             session=session
         )
-        active_user.save()
+        try:
+            # session can be none if browser sends multiple requests
+            # and one of them is logout
+            active_user.save()
+        except Exception:
+            pass
         
         return response
     return middleware

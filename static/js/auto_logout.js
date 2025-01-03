@@ -10,16 +10,48 @@ const auto_logout_bc = new BroadcastChannel("auto_logout_channel");
 let auto_logout_interval = null;
 
 
+let isNavigating = false;
+
+// Detect link clicks
+document.addEventListener('click', function (event) {
+    const target = event.target.closest("A");
+    if (target?.tagName === 'A') {
+        isNavigating = true;
+    }
+});
+addEventListener('popstate', ()=>isNavigating = true);
+// Detect form submissions
+document.addEventListener('submit', ()=>isNavigating = true);
+// Detect back/forward navigation
+navigation.addEventListener('submit', ()=>isNavigating = true);
+
+
+// Detect JavaScript-triggered navigation
+window.addEventListener('beforeunload', function (event) {
+    if (!isNavigating) {
+        // User is closing the tab/browser
+        // navigator.sendBeacon('/log-user-leave', JSON.stringify({ status: 'tab closed' }));
+        fetch("/u/logout/")
+    }
+});
+
+
 // Listen to broadcast messages
 auto_logout_bc.addEventListener("message", (event) => {
 	let msg = event.data;
 	switch (msg.type) {
         // actions to be performed by all tabs
 		case "do__reload":
-			if (location.href.includes("login")) location.reload();
+			if (location.href.includes("login")) {
+                isNavigating = true
+                location.reload()
+            };
 			break;
 		case "do__redirect_to_login":
-			if (!location.href.includes("login")) redirect_to_login();
+			if (!location.href.includes("login")) {
+                isNavigating = true
+                redirect_to_login()
+            };
 			break;
 
         // queries from other tabs
@@ -131,3 +163,4 @@ function debounce(func, delay) {
         }
     };
 }
+

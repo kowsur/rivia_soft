@@ -49,18 +49,3 @@ def UserLastSeenLoggerMiddleware(get_response):
         return response
     return middleware
 
-
-
-from django.utils.timezone import now
-
-class UpdateLastSeenMiddleware:
-    """
-    Middleware to update the last_seen field for authenticated users.
-    """
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        if request.user.is_authenticated:
-            request.user.update_last_seen()
-        return self.get_response(request)

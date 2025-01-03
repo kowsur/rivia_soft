@@ -50,7 +50,7 @@ WANT_TO_MIGRATE = False
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 if DEBUG:
     SECRET_KEY = 'wh*lo-yh6geec40s91k0wb!enwn5ov6)3^k53c1hq)pq6png4@'
-    ALLOWED_HOSTS = ["riviagw.com", "*.riviagw.com", "localhost", get_hostname()]
+    ALLOWED_HOSTS = ["riviagw.com", "*.riviagw.com", "localhost", "127.0.0.1", get_hostname()]
     ALLOWED_HOSTS += get_all_ipv4_addresses()
     DATABASES = {
         'default': {

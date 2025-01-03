@@ -16,12 +16,12 @@ auto_logout_bc.addEventListener("message", (event) => {
 	switch (msg.type) {
         // actions to be performed by all tabs
 		case "do__reload":
-			if (location.href.includes("login")) {
+			if (location.href.includes(LOGIN_URL)) {
                 location.reload()
             };
 			break;
 		case "do__redirect_to_login":
-			if (!location.href.includes("/u/login")) {
+			if (!location.href.includes(LOGIN_URL)) {
                 redirect_to_login()
             };
 			break;
@@ -47,7 +47,7 @@ auto_logout_bc.postMessage({ type: "query__tab_creation_time?" });
 
 // Wait for the reply from other tabs
 setTimeout(() => {
-	if (!location.href.includes("login")) {
+    if (!location.href.includes(LOGIN_URL)) {
         addActivityListeners();
 		auto_logout_bc.postMessage({ type: "do__reload" }); // reload tabs that were logged out
     
@@ -56,7 +56,12 @@ setTimeout(() => {
             ACTIVITY_CHECK_INTERVAL
         );
 	}
+    
+    // if (location.href.includes(LOGIN_URL)){
+    //     reload()
+    // }
 }, ACTIVITY_CHECK_INTERVAL);
+
 
 
 //================================================================================================
@@ -94,6 +99,7 @@ function checkActivity() {
         if (time_diff > AUTO_LOGOUT_AFTER && (other_tabs_creation_time.length==0 || am_i_oldest)) {
             logout();
         }
+        other_tabs_creation_time.length = 0; // clear array
     }, ACTIVITY_CHECK_INTERVAL);
 }
 
@@ -103,7 +109,7 @@ const ACTIVITY_EVENTS = [
 	"mousemove",
 	"keypress",
 	"touchstart",
-	"visibilitychange",
+	// "visibilitychange",
 ];
 function removeActivityListeners() {
 	ACTIVITY_EVENTS.forEach((event) => {

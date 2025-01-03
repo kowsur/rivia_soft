@@ -13,21 +13,19 @@ def log_user_login_failed(sender, credentials, request: HttpRequest, **kwargs):
         ip_address=request.META.get("HTTP_X_FORWARDED_FOR", 'HTTP_X_FORWARDED_FOR header value is None'),
         device_user_agent=request.META.get("HTTP_USER_AGENT", 'HTTP_USER_AGENT header value is None'),
         credentials=json.dumps(request.POST.dict(), indent=4))
-
     failed_attempt.save()
 
 
 @receiver(user_logged_out)
-def log_user_logout(sender, request, user, **kwargs):
-    for active_user in ActiveUser.objects.filter(user=user):
-        # removing session
-        session = active_user.session
-        session.delete()
+def log_user_logout(sender, request: HttpRequest, user, **kwargs):    
+    session = Session.objects.get(pk=request.session.session_key)
+    active_user = ActiveUser.objects.get(user=user, session=session)
+    login_history = active_user.user_login_history
 
-        # updateing login_history
-        login_history = active_user.user_login_history
-        login_history.logged_out_at = now()
-        login_history.save()
-        
-        # removing from active user
-        active_user.delete()
+    # update log out time
+    login_history.logged_out_at = now()
+    login_history.save()
+    
+    # clean up
+    session.delete()
+    active_user.delete()

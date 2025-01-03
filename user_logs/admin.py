@@ -10,7 +10,7 @@ from .models import ActiveUser, FailedLoginAttempts, UserLoginHistory
 class UserLoginHistoryAdmin(admin.ModelAdmin):
     model = UserLoginHistory
     list_display = ("user", "ip_address", "device_user_agent", "logged_in_at", "last_seen_at", "logged_out_at", )
-    list_filter = ("user", "ip_address", "logged_in_at", "last_seen_at", "logged_out_at", )
+    list_filter = ("logged_in_at", "last_seen_at", "logged_out_at", "user", "ip_address", )
     search_fields = ("user__email", "ip_address", "device_user_agent", )
     ordering = ("-logged_in_at", "-last_seen_at")
     
@@ -18,7 +18,7 @@ class UserLoginHistoryAdmin(admin.ModelAdmin):
 class ActiveUserAdmin(admin.ModelAdmin):
     model = ActiveUser
     list_display = ("user", "session", "last_seen_at", "user_login_history", )
-    list_filter = ("user", "last_seen_at", )
+    list_filter = ("last_seen_at", "user", )
     search_fields = ("user", "session", )
     ordering = ("-last_seen_at", )
     

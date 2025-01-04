@@ -34,14 +34,7 @@ class OverrideAdminDatetimeFormats:
         self.add_formatted_datetime_fields()
 
 
-class UserLoginHistoryAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
-    model = UserLoginHistory
-    list_display = ("user", "ip_address", "device_user_agent", "_short_dt__logged_in_at", "_short_dt__logged_out_at", )
-    list_filter = ("logged_in_at", "last_seen_at", "logged_out_at", "user", "ip_address", )
-    search_fields = ("user__email", "ip_address", "device_user_agent", )
-    ordering = ("-logged_in_at", "-last_seen_at")
 
-    
 
 class ActiveUserAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
     model = ActiveUser
@@ -51,6 +44,12 @@ class ActiveUserAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
     ordering = ("-last_seen_at", )
     
 
+class UserLoginHistoryAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
+    model = UserLoginHistory
+    list_display = ("user", "ip_address", "device_user_agent", "_short_dt__logged_in_at",  "_short_dt__last_seen_at", "_short_dt__logged_out_at", )
+    list_filter = ("logged_in_at", "last_seen_at", "logged_out_at", "user", "ip_address", )
+    search_fields = ("user__email", "ip_address", "device_user_agent", )
+    ordering = ("-logged_in_at", "-last_seen_at")
 
 
 class FailedLoginAttemptsAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
@@ -63,9 +62,9 @@ class FailedLoginAttemptsAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
 
 
 # Register your models here.
-admin.site.register(FailedLoginAttempts, FailedLoginAttemptsAdmin)
-admin.site.register(UserLoginHistory, UserLoginHistoryAdmin)
 admin.site.register(ActiveUser, ActiveUserAdmin)
+admin.site.register(UserLoginHistory, UserLoginHistoryAdmin)
+admin.site.register(FailedLoginAttempts, FailedLoginAttemptsAdmin)
 
 
 # Custom list filter to filter by user in the session

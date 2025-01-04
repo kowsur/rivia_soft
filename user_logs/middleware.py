@@ -21,10 +21,11 @@ def UserLastSeenLoggerMiddleware(get_response):
                 # and one of them is logout
                 active_user_log = ActiveUser.objects.get(session=session, user=user)
                 active_user_log.save()
+                
+                user_login_history = active_user_log.user_login_history
+                user_login_history.save()
             except Exception:
                 return response
-            user_login_history = active_user_log.user_login_history
-            user_login_history.save()
             return response
         
         # Log is not present for the user so create those

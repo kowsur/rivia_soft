@@ -49,7 +49,7 @@ class UserLoginHistoryAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
     list_display = ("user", "_short_dt__logged_in_at",  "_short_dt__last_seen_at", "_short_dt__logged_out_at", "ip_address", "device_user_agent", )
     list_filter = ("logged_in_at", "last_seen_at", "logged_out_at", "user", "ip_address", )
     search_fields = ("user__email", "ip_address", "device_user_agent", )
-    ordering = ("-logged_in_at", "-last_seen_at")
+    ordering = ("-last_seen_at", "-logged_in_at",)
 
 
 class FailedLoginAttemptsAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
@@ -103,4 +103,3 @@ class SessionAdmin(admin.ModelAdmin):
             return None
 
 admin.site.register(Session, SessionAdmin)
-    

@@ -640,7 +640,7 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
         choices=CustomUser.objects.all().only('user_id', 'first_name'),
         fk_field='user_id',
         empty_label=None,
-        disabled=True,
+        disabled=False,
         required=False
         )
     prepared_by = SearchableModelField(
@@ -669,7 +669,7 @@ class SelfassesmentAccountSubmissionChangeForm(forms.ModelForm):
     appointment_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
     # request_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), required=False)
 
-    read_only_fields = ["client_id", "submitted_by"]
+    read_only_fields = ["client_id", ]
     def save(self, commit=True):
         for ro_field in self.read_only_fields:
             self.cleaned_data.pop(ro_field, None)

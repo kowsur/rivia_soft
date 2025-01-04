@@ -829,7 +829,7 @@ class SelfassesmentTrackerChangeForm(forms.ModelForm):
         model = CustomUser,
         choices = CustomUser.objects.all().only('user_id', 'first_name'),
         fk_field = 'user_id',
-        disabled = True,
+        disabled = False,
         required = False,
         empty_label = None # remove default option '------' from select menu
         )

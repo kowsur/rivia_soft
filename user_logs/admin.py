@@ -23,7 +23,7 @@ class OverrideAdminDatetimeFormats:
         fields = [field.name for field in self.model._meta.fields if field.name.endswith("at")]
         for field in fields:
             # Add dynamic method to admin
-            method_name = f"_formatted__{field}"
+            method_name = f"_short_dt__{field}"
             setattr(self, method_name, lambda obj, field=field: self.format_datetime(obj, field))
                 # Configure display name and sorting
             getattr(self, method_name).short_description = field.replace("_", " ").capitalize()
@@ -36,7 +36,7 @@ class OverrideAdminDatetimeFormats:
 
 class UserLoginHistoryAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
     model = UserLoginHistory
-    list_display = ("user", "ip_address", "device_user_agent", "_formatted__logged_in_at", "_formatted__logged_out_at", )
+    list_display = ("user", "ip_address", "device_user_agent", "_short_dt__logged_in_at", "_short_dt__logged_out_at", )
     list_filter = ("logged_in_at", "last_seen_at", "logged_out_at", "user", "ip_address", )
     search_fields = ("user__email", "ip_address", "device_user_agent", )
     ordering = ("-logged_in_at", "-last_seen_at")
@@ -45,7 +45,7 @@ class UserLoginHistoryAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
 
 class ActiveUserAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
     model = ActiveUser
-    list_display = ("user", "session", "last_seen_at", "user_login_history", )
+    list_display = ("user", "session", "_short_dt__last_seen_at", "user_login_history", )
     list_filter = ("last_seen_at", "user", )
     search_fields = ("user", "session", )
     ordering = ("-last_seen_at", )
@@ -55,7 +55,7 @@ class ActiveUserAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
 
 class FailedLoginAttemptsAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
     model = FailedLoginAttempts
-    list_display = ("tried_to_log_in_at", "ip_address", "credentials", "device_user_agent", )
+    list_display = ("_short_dt__tried_to_log_in_at", "ip_address", "credentials", "device_user_agent", )
     list_filter = ("tried_to_log_in_at", "ip_address",)
     search_fields = ("ip_address", "credentials", "device_user_agent", )
     ordering = ("-tried_to_log_in_at", )

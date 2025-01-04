@@ -74,12 +74,13 @@
     <article id="profit-and-loss" page-break-before page-break-after>
         <section>
             <aside data-client-details class="fs-12">
-                <strong class="to-upper">{{client_name}}</strong>
-                <address class="text-center to-upper">
-                    <pre class="pre-to-normal mw-45ch">{{client_address}}</pre>
+                <strong class="to-upper" data-client-name>{{client_name}}</strong>
+                <address class="text-center to-upper" data-address-section>
+                    {% if client_address %}
+                        <pre class="pre-to-normal mw-45ch" data-client-address>{{client_address}}</pre>
+                    {% endif %}
                     {% if client_post_code %}
-                        <br/>
-                        <span>{{client_post_code}}</span>
+                        <span data-client-post-code>{{client_post_code}}</span>
                     {% endif %}
                 </address>
             </aside>

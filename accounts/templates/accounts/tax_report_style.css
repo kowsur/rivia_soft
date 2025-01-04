@@ -315,17 +315,28 @@ p{
 }
 
 /* client-details container styles */
-[data-client-details] * {
-    display: inline-block;
-}
-[data-client-details] {
+[data-client-details]{
     margin-top: 5pt;
     margin-bottom: 5pt;
-    
+}
+[data-client-details], [data-address-section] {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
+[data-client-name]{
+    display: block;
+    text-align: center;
+}
+
+/* debug */
+/* [data-client-details]{
+    background-color: red;
+}
+[data-client-details] *{
+    outline: 2px solid black;
+} */
+
 
 #agreement {}
 

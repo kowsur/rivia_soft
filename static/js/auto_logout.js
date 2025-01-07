@@ -1,5 +1,5 @@
 const ACTIVITY_CHECK_INTERVAL = 1000; // Check activity every 1 second
-const AUTO_LOGOUT_AFTER = (20 * 60 * 1000) - (2 * ACTIVITY_CHECK_INTERVAL); // 20 minutes in milliseconds
+const AUTO_LOGOUT_AFTER = (2 * 60 * 60 * 1000) - (2 * ACTIVITY_CHECK_INTERVAL); // 2 hours in milliseconds
 const LOGOUT_URL = "/u/logout/"; // URL to logout endpoint
 const LOGIN_URL = "/u/login/"; // URL to redirect after logout
 const LAST_ACTIVITY_KEY = "auto_logout_last_activity"; // Key to store last activity timestamp

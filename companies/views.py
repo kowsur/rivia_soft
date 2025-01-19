@@ -1870,7 +1870,6 @@ def update_limited_onboarding_tasks(request, client_id:int):
     
     try:
       onboarding_task_for_limited = LimitedOnboardingTasks.objects.get(client_id=client_id, task_id=task_id)
-      print(f'retrived {onboarding_task_for_limited}')
     except LimitedOnboardingTasks.DoesNotExist:
       onboarding_task_for_limited = LimitedOnboardingTasks()
     

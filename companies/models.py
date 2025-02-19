@@ -575,7 +575,7 @@ class Limited(models.Model):
         max_length=9,
         blank=True,
         null=True,
-        unique=True,
+        unique=False,
         validators=[NINO_VALIDATOR])
     HMRC_agent = models.BooleanField(verbose_name="HMRC agent active status", default=False, blank=False, null=False)
     

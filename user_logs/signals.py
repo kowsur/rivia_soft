@@ -9,10 +9,12 @@ from django.http import HttpRequest
 
 @receiver(user_login_failed)
 def log_user_login_failed(sender, credentials, request: HttpRequest, **kwargs):
+    login_data = request.POST.dict()
+    login_data.pop("csrfmiddlewaretoken")
     failed_attempt = FailedLoginAttempts(
         ip_address=request.META.get("HTTP_X_FORWARDED_FOR", 'HTTP_X_FORWARDED_FOR header value is None'),
         device_user_agent=request.META.get("HTTP_USER_AGENT", 'HTTP_USER_AGENT header value is None'),
-        credentials=json.dumps(request.POST.dict(), indent=4))
+        credentials=json.dumps(login_data, indent=4))
     failed_attempt.save()
 
 

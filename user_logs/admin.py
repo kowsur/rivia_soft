@@ -54,9 +54,9 @@ class UserLoginHistoryAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
 
 class FailedLoginAttemptsAdmin(OverrideAdminDatetimeFormats, admin.ModelAdmin):
     model = FailedLoginAttempts
-    list_display = ("_short_dt__tried_to_log_in_at", "ip_address", "credentials", "device_user_agent", )
+    list_display = ("_short_dt__tried_to_log_in_at", "ip_address", "credentials", "device_user_agent", "extra_info",)
     list_filter = ("tried_to_log_in_at", "ip_address",)
-    search_fields = ("ip_address", "credentials", "device_user_agent", )
+    search_fields = ("ip_address", "credentials", "extra_info", "device_user_agent", )
     ordering = ("-tried_to_log_in_at", )
 
 

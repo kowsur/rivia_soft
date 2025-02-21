@@ -1,9 +1,10 @@
+import json
+from pprint import pp
 from django.utils.timezone import now
 from django.dispatch import receiver
 from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 from django.contrib.sessions.models import Session
 from .models import ActiveUser, UserLoginHistory, FailedLoginAttempts
-import json
 from django.http import HttpRequest
 
 
@@ -11,10 +12,13 @@ from django.http import HttpRequest
 def log_user_login_failed(sender, credentials, request: HttpRequest, **kwargs):
     login_data = request.POST.dict()
     login_data.pop("csrfmiddlewaretoken")
+
     failed_attempt = FailedLoginAttempts(
-        ip_address=request.META.get("HTTP_X_FORWARDED_FOR", 'HTTP_X_FORWARDED_FOR header value is None'),
-        device_user_agent=request.META.get("HTTP_USER_AGENT", 'HTTP_USER_AGENT header value is None'),
-        credentials=json.dumps(login_data, indent=4))
+        credentials = json.dumps(login_data),
+        extra_info = json.dumps({k:v for k,v in request.headers.items()}),
+        ip_address = request.headers.get("X_FORWARDED_FOR", '0.0.0.0'), #  0.0.0.0 indicates the reverse proxy didn't forward the IP Addr
+        device_user_agent = request.headers.get("USER_AGENT", 'USER_AGENT = None'),
+    )
     failed_attempt.save()
 
 

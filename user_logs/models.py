@@ -43,9 +43,10 @@ class FailedLoginAttempts(models.Model):
         verbose_name = _("Failed User Login History")
         verbose_name_plural = _("Failed User Login Histories")
     
-    ip_address = models.GenericIPAddressField(verbose_name="Public ip address of device")
-    credentials = models.TextField()
-    device_user_agent = models.TextField(verbose_name="User Agent")
+    ip_address = models.GenericIPAddressField(verbose_name="Public IP")
+    credentials = models.TextField("Login Credentials", default="")
+    extra_info = models.TextField("Extra Info", default="")
+    device_user_agent = models.TextField(verbose_name="User Agent", default="")
     tried_to_log_in_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:

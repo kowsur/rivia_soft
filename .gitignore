@@ -10,6 +10,7 @@ staticfiles/
 *.sqlite3
 *env*/
 todo.txt
+*.sql
 
 .vscode/
 
